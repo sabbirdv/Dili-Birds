@@ -3,7 +3,7 @@ import { HudController } from './hud.js';
 import { LEVELS } from '../levels/levelData.js';
 
 /**
- * High-level UI orchestrator connecting the Top Bar, Initial Menu, Level Select,
+ * High-level UI orchestrator connecting the Single Top Nav Bar, Initial Menu, Level Select,
  * Profile Setup Screen, and In-Game HUD.
  */
 export class UIManager {
@@ -17,7 +17,9 @@ export class UIManager {
     onNextLevel,
     onReturnToMenu,
     onBrandChanged,
-    onToggleCameraView
+    onToggleCameraView,
+    onPauseGame,
+    onResumeGame
   }) {
     this.storage = storage;
     this.audio = audio;
@@ -26,18 +28,18 @@ export class UIManager {
     this.onSelectLevel = onSelectLevel;
     this.onReturnToMenu = onReturnToMenu;
     this.onBrandChanged = onBrandChanged;
+    this.onPauseGame = onPauseGame;
+    this.onResumeGame = onResumeGame;
 
-    // Top bar elements
+    // Single unified top bar elements
     this.displayUsernameEl = document.getElementById('display-username');
     this.topAvatarImgEl = document.getElementById('top-avatar-img');
     this.displayLevelEl = document.getElementById('display-player-level');
     this.displayCoinsEl = document.getElementById('display-coins');
     this.heroBrandTagEl = document.getElementById('hero-brand-tag');
-    this.audioIconEl = document.getElementById('audio-icon');
-    this.backMenuBtn = document.getElementById('btn-back-menu');
     this.menuScreenEl = document.getElementById('menu-screen');
 
-    // Summary bar elements
+    // Summary bar elements on Roadmap screen
     this.summaryUsernameEl = document.getElementById('summary-username');
     this.summaryAvatarImgEl = document.getElementById('summary-avatar-img');
     this.summaryLevelEl = document.getElementById('summary-level');
@@ -49,7 +51,6 @@ export class UIManager {
       ({ username, brandName }) => {
         this.refreshHeaderAndMenu();
         this.onBrandChanged?.(brandName);
-        this.hud?.spawnFloatingToast(`Welcome, Commander ${username}!`);
         // Launch active unlocked stage immediately on "Save Profile & Launch"
         const activeLevel =
           LEVELS.find((l) => l.id === this.storage.getUnlockedLevel()) || LEVELS[0];
@@ -66,7 +67,9 @@ export class UIManager {
       onRetryLevel,
       onNextLevel,
       onReturnToMenu: () => this.showMainMenu(),
-      onOpenProfile: () => this.profileModal.open('username')
+      onOpenProfile: () => this.profileModal.open('username'),
+      onPauseGame: () => this.onPauseGame?.(),
+      onResumeGame: () => this.onResumeGame?.()
     });
 
     this.bindTopBarEvents();
@@ -75,11 +78,11 @@ export class UIManager {
 
   bindTopBarEvents() {
     const badgeBtn = document.getElementById('player-badge-btn');
-    badgeBtn?.addEventListener('click', () => this.profileModal.open('username'));
+    badgeBtn?.addEventListener('click', () => this.hud.openGameMenu());
     badgeBtn?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        this.profileModal.open('username');
+        this.hud.openGameMenu();
       }
     });
 
@@ -90,21 +93,6 @@ export class UIManager {
         e.preventDefault();
         this.profileModal.open('username');
       }
-    });
-
-    document.getElementById('btn-brand-theme')?.addEventListener('click', () => {
-      this.profileModal.open('username');
-    });
-
-    document.getElementById('btn-audio-toggle')?.addEventListener('click', () => {
-      const enabled = this.storage.toggleSound();
-      if (this.audioIconEl) {
-        this.audioIconEl.textContent = enabled ? '🔊' : '🔇';
-      }
-    });
-
-    this.backMenuBtn?.addEventListener('click', () => {
-      this.showMainMenu();
     });
   }
 
@@ -125,9 +113,6 @@ export class UIManager {
     if (this.displayLevelEl) this.displayLevelEl.textContent = `LVL ${unlockedLevel}`;
     if (this.displayCoinsEl) this.displayCoinsEl.textContent = coins.toLocaleString();
     if (this.heroBrandTagEl) this.heroBrandTagEl.textContent = `${brandName} • 3D WORLD`;
-    if (this.audioIconEl) {
-      this.audioIconEl.textContent = this.storage.isSoundEnabled() ? '🔊' : '🔇';
-    }
 
     if (this.summaryUsernameEl) this.summaryUsernameEl.textContent = username;
     if (this.summaryAvatarImgEl) this.summaryAvatarImgEl.src = avatarUrl;
@@ -144,7 +129,6 @@ export class UIManager {
   showMainMenu() {
     this.hud.closeResultModal();
     this.hud.hide();
-    this.backMenuBtn?.classList.add('hidden');
     this.menuScreenEl?.classList.remove('hidden');
     this.refreshHeaderAndMenu();
     this.onReturnToMenu?.();
@@ -152,7 +136,6 @@ export class UIManager {
 
   showGameView(levelConfig) {
     this.menuScreenEl?.classList.add('hidden');
-    this.backMenuBtn?.classList.remove('hidden');
     this.hud.updateLevelHeader(levelConfig);
     this.hud.show();
   }

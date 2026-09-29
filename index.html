@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Dili-Birds 3D — Slingshot Physics Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,50 +18,64 @@
 
   <!-- UI Overlay Layer -->
   <div id="ui-layer">
-    <!-- Persistent Top Bar (Player Profile, Level, Accumulated Coins, Audio) -->
-    <header id="top-bar" class="glass-panel">
-      <div class="player-badge" id="player-badge-btn" role="button" tabindex="0" title="Click to open User Profile Setup">
-        <div class="avatar-circle" id="player-avatar">
-          <img id="top-avatar-img" src="" alt="Player Avatar" />
-        </div>
-        <div class="player-info">
-          <span class="player-label">COMMANDER PROFILE</span>
+    <!-- Single Unified Clean Top Navigation Bar -->
+    <header id="top-bar" class="top-nav glass-panel" aria-label="Game Navigation Bar">
+      <!-- Left: Profile Pic & Name + Current Level Badge -->
+      <div class="nav-left-group">
+        <div class="player-badge" id="player-badge-btn" role="button" tabindex="0" title="Commander Profile">
+          <div class="avatar-circle" id="player-avatar">
+            <img id="top-avatar-img" src="" alt="Player Avatar" />
+          </div>
           <span class="player-name" id="display-username">Commander</span>
         </div>
-        <span class="edit-pill">Edit Profile ✎</span>
-      </div>
 
-      <div class="stats-group">
-        <div class="stat-pill level-pill" title="Highest Unlocked Level">
+        <div class="stat-pill level-pill" id="nav-level-pill" title="Current Level / Stage">
           <span class="stat-icon">⭐</span>
-          <div class="stat-text">
-            <span class="stat-label">PLAYER LEVEL</span>
-            <span class="stat-value" id="display-player-level">LVL 1</span>
-          </div>
-        </div>
-
-        <div class="stat-pill coin-pill" title="Accumulated Coins">
-          <span class="stat-icon">🪙</span>
-          <div class="stat-text">
-            <span class="stat-label">COINS</span>
-            <span class="stat-value" id="display-coins">100</span>
-          </div>
+          <span class="stat-value" id="display-player-level">LVL 1</span>
         </div>
       </div>
 
-      <div class="top-actions">
-        <button id="btn-brand-theme" class="icon-btn" type="button" title="Open Commander Profile Setup">
-          <span>👤</span>
-          <span class="btn-text">Profile</span>
+      <!-- Center: In-Game Active Mission HUD Cluster (Targets, Birds, Score - Only visible when playing level) -->
+      <div id="gameplay-hud-cluster" class="gameplay-hud-cluster hidden">
+        <div class="hud-metric" title="Targets Remaining">
+          <span class="metric-label">TARGETS</span>
+          <span class="metric-val" id="hud-targets-left">0</span>
+        </div>
+        <div class="hud-metric" title="Birds in Slingshot Queue">
+          <span class="metric-label">BIRDS</span>
+          <div class="bird-queue" id="hud-bird-queue"></div>
+        </div>
+        <div class="hud-metric" title="Mission Score">
+          <span class="metric-label">SCORE</span>
+          <span class="metric-val" id="hud-score">0</span>
+        </div>
+      </div>
+
+      <!-- Right: Treasury Coins, In-Game Retry, and Game Pause / Menu Button -->
+      <div class="nav-right-group">
+        <div class="stat-pill coin-pill" title="Treasury Coins">
+          <span class="stat-icon">🪙</span>
+          <span class="stat-value" id="display-coins">100</span>
+        </div>
+
+        <button id="btn-restart-level" class="nav-btn retry-btn hidden" type="button" title="Restart Level (↻)" aria-label="Restart Level">
+          <span class="btn-icon">↻</span>
+          <span class="btn-text">Retry</span>
         </button>
-        <button id="btn-audio-toggle" class="icon-btn" type="button" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
-          <span id="audio-icon">🔊</span>
-        </button>
-        <button id="btn-back-menu" class="action-btn secondary-btn hidden" type="button">
-          <span>🗺️ Roadmap</span>
+
+        <button id="btn-pause-menu" class="nav-btn pause-menu-btn" type="button" title="Pause Game / Open Menu" aria-label="Pause Game / Open Menu">
+          <span class="btn-icon">⏸️</span>
+          <span class="btn-text">Menu</span>
         </button>
       </div>
     </header>
+
+    <!-- Slingshot Aim Telemetry (Only while actively aiming slingshot) -->
+    <div id="aim-telemetry" class="aim-telemetry hidden">
+      <span id="telemetry-power">Power: 0%</span>
+      <span class="telemetry-sep">•</span>
+      <span id="telemetry-angle">Angle: 0°</span>
+    </div>
 
     <!-- Initial UI: 3D Square-Shaped Roadmap Level Selection Screen -->
     <main id="menu-screen" class="screen-overlay">
@@ -123,55 +140,6 @@
         </section>
       </div>
     </main>
-
-    <!-- In-Game Unified HUD (Single Clean Bar across top while playing) -->
-    <header id="game-hud" class="hud-layer hidden" aria-label="In-Game HUD">
-      <div class="hud-top-bar glass-panel">
-        <div class="hud-left-group">
-          <button id="btn-hud-roadmap" class="hud-icon-btn" type="button" title="Return to Campaign Roadmap" aria-label="Return to Campaign Roadmap">
-            <span class="btn-icon">🗺️</span>
-            <span class="btn-label">Roadmap</span>
-          </button>
-          <div class="hud-stage-info">
-            <span class="hud-stage-badge" id="hud-level-number">STAGE 1</span>
-            <h2 class="hud-stage-name" id="hud-level-title">Training Outpost</h2>
-          </div>
-        </div>
-
-        <div class="hud-metrics">
-          <div class="hud-metric" title="Targets Remaining">
-            <span class="metric-label">TARGETS</span>
-            <span class="metric-val" id="hud-targets-left">2</span>
-          </div>
-          <div class="hud-metric" title="Birds Ready in Slingshot Queue">
-            <span class="metric-label">BIRDS</span>
-            <div class="bird-queue" id="hud-bird-queue"></div>
-          </div>
-          <div class="hud-metric" title="Mission Score">
-            <span class="metric-label">SCORE</span>
-            <span class="metric-val" id="hud-score">0</span>
-          </div>
-        </div>
-
-        <div class="hud-controls">
-          <button id="btn-restart-level" class="hud-btn hud-retry-btn" type="button" title="Restart Level (↻)">
-            <span class="hud-btn-icon">↻</span>
-            <span class="hud-btn-text">Retry</span>
-          </button>
-          <button id="btn-hud-menu" class="hud-btn hud-menu-btn" type="button" title="Open Game Menu" aria-label="Open Game Menu">
-            <span class="hud-btn-icon">☰</span>
-            <span class="hud-btn-text">Menu</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Slingshot Aim Telemetry (Clean, subtle, only during active drag) -->
-      <div id="aim-telemetry" class="aim-telemetry hidden">
-        <span id="telemetry-power">Power: 0%</span>
-        <span class="telemetry-sep">•</span>
-        <span id="telemetry-angle">Angle: 0°</span>
-      </div>
-    </header>
   </div>
 
   <!-- Structured In-Game Menu Modal (Clean, organized pause & profile settings) -->
@@ -228,6 +196,14 @@
 
       <!-- Menu Action List -->
       <section class="menu-action-list">
+        <button type="button" id="btn-menu-fullscreen" class="menu-list-btn">
+          <div class="list-left">
+            <span class="list-icon" id="menu-fullscreen-icon">⛶</span>
+            <span class="list-text">Fullscreen Mode</span>
+          </div>
+          <span class="list-badge" id="menu-fullscreen-status">TOGGLE</span>
+        </button>
+
         <button type="button" id="btn-menu-audio-toggle" class="menu-list-btn">
           <div class="list-left">
             <span class="list-icon" id="menu-audio-icon">🔊</span>
@@ -418,9 +394,6 @@
       </p>
       <button type="button" id="btn-force-landscape" class="action-btn primary-btn orientation-btn">
         <span>🔄 Rotate to Landscape</span>
-      </button>
-      <button type="button" id="btn-dismiss-landscape" class="action-btn secondary-btn orientation-dismiss-btn">
-        <span>Continue in Portrait</span>
       </button>
     </div>
   </div>

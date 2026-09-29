@@ -41,6 +41,7 @@ export class GameScene {
     this.levelCoinsEarned = 0;
     this.isPlayingLevel = false;
     this.levelResolved = false;
+    this.isPaused = false;
 
     this.clock = new THREE.Clock();
 
@@ -872,8 +873,27 @@ export class GameScene {
     this.updateDynamicCamera(aspect);
   }
 
+  pause() {
+    this.isPaused = true;
+    if (this.slingshot) {
+      this.slingshot.canInteract = false;
+    }
+  }
+
+  resume() {
+    this.isPaused = false;
+    if (this.slingshot && !this.levelResolved && this.birdsQueue.length > 0 && !this.activeBird) {
+      this.slingshot.canInteract = true;
+    }
+  }
+
   animate() {
     requestAnimationFrame(() => this.animate());
+
+    if (this.isPaused) {
+      this.renderer.render(this.scene, this.camera);
+      return;
+    }
 
     const deltaTime = Math.min(this.clock.getDelta(), 0.05);
 

@@ -4,6 +4,7 @@ import { LevelSelect } from './levels/levelSelect.js';
 import { LEVELS } from './levels/levelData.js';
 import { UIManager } from './ui/uiManager.js';
 import { GameScene } from './scene/gameScene.js';
+import { requestFullscreen } from './ui/fullscreenHelper.js';
 
 class DiliBirdsApp {
   constructor() {
@@ -51,6 +52,12 @@ class DiliBirdsApp {
       },
       onToggleCameraView: () => {
         this.gameScene?.toggleCameraView();
+      },
+      onPauseGame: () => {
+        this.gameScene?.pause();
+      },
+      onResumeGame: () => {
+        this.gameScene?.resume();
       }
     });
 
@@ -113,6 +120,10 @@ class DiliBirdsApp {
     if (!levelConfig) return;
     this.currentLevelConfig = levelConfig;
     tryLockLandscape();
+    // Auto-request fullscreen on touch devices to ensure full-screen mobile gameplay
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+      requestFullscreen().catch(() => {});
+    }
     this.ui.showGameView(levelConfig);
     this.gameScene?.loadLevel(levelConfig, false);
   }
@@ -138,24 +149,19 @@ export async function tryLockLandscape() {
   }
 }
 
+/**
+ * Strict landscape orientation enforcement for mobile devices.
+ * In portrait mode, gameplay is strictly blocked until the device is turned sideways.
+ */
 function initLandscapeGuard() {
   const guard = document.getElementById('orientation-guard');
   const btnForce = document.getElementById('btn-force-landscape');
-  const btnDismiss = document.getElementById('btn-dismiss-landscape');
-  let userDismissed = false;
 
   const isTouchDevice = () => {
     return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   };
 
   const checkOrientation = () => {
-    if (userDismissed) {
-      guard?.classList.remove('active-portrait');
-      guard?.classList.add('dismissed');
-      document.body.classList.add('orientation-dismissed');
-      return;
-    }
-
     const isPortrait =
       isTouchDevice() &&
       window.innerHeight > window.innerWidth &&
@@ -170,21 +176,8 @@ function initLandscapeGuard() {
     }
   };
 
-  btnDismiss?.addEventListener('click', () => {
-    userDismissed = true;
-    checkOrientation();
-  });
-
   btnForce?.addEventListener('click', async () => {
-    try {
-      if (!document.fullscreenElement) {
-        if (document.documentElement.requestFullscreen) {
-          await document.documentElement.requestFullscreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          await document.documentElement.webkitRequestFullscreen();
-        }
-      }
-    } catch (e) {}
+    await requestFullscreen();
     await tryLockLandscape();
     checkOrientation();
   });

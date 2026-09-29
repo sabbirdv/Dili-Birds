@@ -1,5 +1,7 @@
+import { isFullscreen, toggleFullscreen } from './fullscreenHelper.js';
+
 /**
- * Manages the In-Game Unified HUD, aim telemetry, structured game menu dialog,
+ * Manages the In-Game Unified HUD, aim telemetry, structured game menu dialog (Pause),
  * and the end-of-level Victory / Defeat modal.
  */
 export class HudController {
@@ -9,7 +11,9 @@ export class HudController {
     onRetryLevel,
     onNextLevel,
     onReturnToMenu,
-    onOpenProfile
+    onOpenProfile,
+    onPauseGame,
+    onResumeGame
   }) {
     this.storage = storage;
     this.totalLevelsCount = totalLevelsCount;
@@ -17,11 +21,14 @@ export class HudController {
     this.onNextLevel = onNextLevel;
     this.onReturnToMenu = onReturnToMenu;
     this.onOpenProfile = onOpenProfile;
+    this.onPauseGame = onPauseGame;
+    this.onResumeGame = onResumeGame;
 
-    // HUD DOM elements
-    this.hudLayer = document.getElementById('game-hud');
-    this.levelNumberEl = document.getElementById('hud-level-number');
-    this.levelTitleEl = document.getElementById('hud-level-title');
+    // HUD DOM elements on the single unified Top Bar
+    this.gameplayHudCluster = document.getElementById('gameplay-hud-cluster');
+    this.restartLevelBtn = document.getElementById('btn-restart-level');
+    this.pauseMenuBtn = document.getElementById('btn-pause-menu');
+    this.displayLevelNumber = document.getElementById('display-player-level');
     this.targetsLeftEl = document.getElementById('hud-targets-left');
     this.birdQueueEl = document.getElementById('hud-bird-queue');
     this.scoreEl = document.getElementById('hud-score');
@@ -38,6 +45,8 @@ export class HudController {
     this.menuStars = document.getElementById('menu-stars');
     this.menuAudioIcon = document.getElementById('menu-audio-icon');
     this.menuAudioStatus = document.getElementById('menu-audio-status');
+    this.menuFullscreenIcon = document.getElementById('menu-fullscreen-icon');
+    this.menuFullscreenStatus = document.getElementById('menu-fullscreen-status');
 
     // Result Dialog elements
     this.resultDialog = document.getElementById('result-dialog');
@@ -56,19 +65,13 @@ export class HudController {
 
   initListeners() {
     // HUD Header Buttons
-    document.getElementById('btn-restart-level')?.addEventListener('click', () => {
+    this.restartLevelBtn?.addEventListener('click', () => {
       this.closeGameMenu();
       this.closeResultModal();
       this.onRetryLevel?.();
     });
 
-    document.getElementById('btn-hud-roadmap')?.addEventListener('click', () => {
-      this.closeGameMenu();
-      this.closeResultModal();
-      this.onReturnToMenu?.();
-    });
-
-    document.getElementById('btn-hud-menu')?.addEventListener('click', () => {
+    this.pauseMenuBtn?.addEventListener('click', () => {
       this.openGameMenu();
     });
 
@@ -96,12 +99,15 @@ export class HudController {
       this.onReturnToMenu?.();
     });
 
+    document.getElementById('btn-menu-fullscreen')?.addEventListener('click', async () => {
+      await toggleFullscreen();
+      this.updateFullscreenUI();
+    });
+
     document.getElementById('btn-menu-audio-toggle')?.addEventListener('click', () => {
       if (this.storage) {
         const enabled = this.storage.toggleSound();
         this.updateAudioUI(enabled);
-        const topAudioIcon = document.getElementById('audio-icon');
-        if (topAudioIcon) topAudioIcon.textContent = enabled ? '🔊' : '🔇';
       }
     });
 
@@ -120,10 +126,16 @@ export class HudController {
       this.closeResultModal();
       this.onNextLevel?.();
     });
+
+    // Listen for Escape key to close pause menu
+    this.gameMenuDialog?.addEventListener('cancel', () => {
+      this.onResumeGame?.();
+    });
   }
 
   openGameMenu() {
     if (!this.gameMenuDialog) return;
+    this.onPauseGame?.();
     if (this.storage) {
       if (this.menuAvatarImg) this.menuAvatarImg.src = this.storage.getAvatarUrl();
       if (this.menuUsername) this.menuUsername.textContent = this.storage.getUsername();
@@ -135,6 +147,7 @@ export class HudController {
         this.menuStars.textContent = `${stars} / ${maxStars}`;
       }
       this.updateAudioUI(this.storage.isSoundEnabled());
+      this.updateFullscreenUI();
     }
 
     if (!this.gameMenuDialog.open) {
@@ -146,6 +159,7 @@ export class HudController {
     if (this.gameMenuDialog?.open) {
       this.gameMenuDialog.close();
     }
+    this.onResumeGame?.();
   }
 
   updateAudioUI(enabled) {
@@ -153,19 +167,28 @@ export class HudController {
     if (this.menuAudioStatus) this.menuAudioStatus.textContent = enabled ? 'ON' : 'OFF';
   }
 
+  updateFullscreenUI() {
+    const full = isFullscreen();
+    if (this.menuFullscreenIcon) this.menuFullscreenIcon.textContent = full ? '⛶' : '⛶';
+    if (this.menuFullscreenStatus) this.menuFullscreenStatus.textContent = full ? 'FULLSCREEN' : 'WINDOWED';
+  }
+
   show() {
-    this.hudLayer?.classList.remove('hidden');
+    this.gameplayHudCluster?.classList.remove('hidden');
+    this.restartLevelBtn?.classList.remove('hidden');
   }
 
   hide() {
-    this.hudLayer?.classList.add('hidden');
+    this.gameplayHudCluster?.classList.add('hidden');
+    this.restartLevelBtn?.classList.add('hidden');
     this.closeGameMenu();
     this.hideAimTelemetry();
   }
 
   updateLevelHeader(levelConfig) {
-    if (this.levelNumberEl) this.levelNumberEl.textContent = `STAGE ${levelConfig.id}`;
-    if (this.levelTitleEl) this.levelTitleEl.textContent = levelConfig.name;
+    if (this.displayLevelNumber) {
+      this.displayLevelNumber.textContent = `STAGE ${levelConfig.id}`;
+    }
   }
 
   updateStats({ targetsLeft, birdsQueue, score }) {

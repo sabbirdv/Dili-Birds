@@ -1269,6 +1269,92 @@ html, body {
   border-radius: 14px;
 }
 
+.main-menu-list-btn {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(129, 140, 248, 0.08));
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.main-menu-list-btn:hover {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(129, 140, 248, 0.16));
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+.menu-settings-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.menu-sub-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.menu-sub-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.menu-sub-btn .sub-icon {
+  font-size: 1rem;
+}
+
+.menu-sub-btn .sub-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Universal Coin Asset Icon */
+.coin-icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  flex-shrink: 0;
+}
+
+.stat-capsule .coin-icon-img {
+  width: 19px;
+  height: 19px;
+}
+
+#summary-coins .coin-icon-img {
+  width: 22px;
+  height: 22px;
+  margin-right: 4px;
+}
+
+.menu-stat-pill .coin-icon-img {
+  width: 24px;
+  height: 24px;
+}
+
+#result-coins .coin-icon-img {
+  width: 24px;
+  height: 24px;
+  margin-left: 6px;
+}
+
 /* Native <dialog> Modals */
 .game-dialog {
   margin: auto;

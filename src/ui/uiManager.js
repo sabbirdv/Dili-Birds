@@ -1,6 +1,7 @@
 import { ProfileModal } from './profileModal.js';
 import { HudController } from './hud.js';
 import { LEVELS } from '../levels/levelData.js';
+import coinLogoUrl from '../assets/coin-with-logo.png';
 
 /**
  * High-level UI orchestrator connecting the Single Top Nav Bar, Initial Menu, Level Select,
@@ -44,6 +45,7 @@ export class UIManager {
     this.summaryAvatarImgEl = document.getElementById('summary-avatar-img');
     this.summaryLevelEl = document.getElementById('summary-level');
     this.summaryCoinsEl = document.getElementById('summary-coins');
+    this.summaryCoinsTextEl = document.getElementById('summary-coins-text');
     this.summaryStarsEl = document.getElementById('summary-stars');
 
     this.profileModal = new ProfileModal(
@@ -117,7 +119,11 @@ export class UIManager {
     if (this.summaryUsernameEl) this.summaryUsernameEl.textContent = username;
     if (this.summaryAvatarImgEl) this.summaryAvatarImgEl.src = avatarUrl;
     if (this.summaryLevelEl) this.summaryLevelEl.textContent = `${unlockedLevel} / ${this.totalLevelsCount}`;
-    if (this.summaryCoinsEl) this.summaryCoinsEl.textContent = `${coins.toLocaleString()} Coins`;
+    if (this.summaryCoinsTextEl) {
+      this.summaryCoinsTextEl.textContent = `${coins.toLocaleString()} Coins`;
+    } else if (this.summaryCoinsEl) {
+      this.summaryCoinsEl.innerHTML = `<img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" /> <span id="summary-coins-text">${coins.toLocaleString()} Coins</span>`;
+    }
     if (this.summaryStarsEl) this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
   }
 

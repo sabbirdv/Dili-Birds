@@ -54,7 +54,7 @@
       <!-- Right: Treasury Coins, In-Game Retry, and Game Pause / Menu Button -->
       <div class="nav-right-group">
         <div class="stat-pill coin-pill" title="Treasury Coins">
-          <span class="stat-icon">🪙</span>
+          <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
           <span class="stat-value" id="display-coins">100</span>
         </div>
 
@@ -63,9 +63,9 @@
           <span class="btn-text">Retry</span>
         </button>
 
-        <button id="btn-pause-menu" class="nav-btn pause-menu-btn" type="button" title="Pause Game / Open Menu" aria-label="Pause Game / Open Menu">
+        <button id="btn-pause-menu" class="nav-btn pause-btn" type="button" title="Pause Game (⏸️)" aria-label="Pause Game">
           <span class="btn-icon">⏸️</span>
-          <span class="btn-text">Menu</span>
+          <span class="btn-text">Pause</span>
         </button>
       </div>
     </header>
@@ -104,7 +104,10 @@
             <div class="summary-divider"></div>
             <div class="summary-item">
               <span class="summary-title">Treasury</span>
-              <strong class="summary-val coin-accent" id="summary-coins">100 Coins</strong>
+              <strong class="summary-val coin-accent" id="summary-coins">
+                <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
+                <span id="summary-coins-text">100 Coins</span>
+              </strong>
             </div>
             <div class="summary-divider"></div>
             <div class="summary-item">
@@ -142,15 +145,15 @@
     </main>
   </div>
 
-  <!-- Structured In-Game Menu Modal (Clean, organized pause & profile settings) -->
+  <!-- Structured In-Game Pause Dialog -->
   <dialog id="game-menu-dialog" class="game-dialog in-game-menu-dialog" closedby="any" aria-labelledby="game-menu-title">
     <div class="game-menu-shell glass-card">
       <div class="game-menu-header">
         <div class="menu-title-group">
-          <span class="menu-kicker">MISSION PAUSED</span>
-          <h2 id="game-menu-title">Game Menu</h2>
+          <span class="menu-kicker">MISSION STATUS</span>
+          <h2 id="game-menu-title">⏸️ Game Paused</h2>
         </div>
-        <button type="button" id="btn-close-game-menu" class="dialog-close-btn" aria-label="Close Game Menu" title="Close (Esc)">
+        <button type="button" id="btn-close-game-menu" class="dialog-close-btn" aria-label="Resume Game" title="Resume Game (Esc)">
           ✕
         </button>
       </div>
@@ -164,7 +167,7 @@
           <span class="menu-profile-label">COMMANDER</span>
           <strong class="menu-profile-name" id="menu-username">Commander</strong>
         </div>
-        <button type="button" id="btn-menu-edit-profile" class="action-btn secondary-btn menu-edit-btn">
+        <button type="button" id="btn-menu-edit-profile" class="action-btn secondary-btn menu-edit-btn" title="Customize Username and Avatar">
           <span>✎ Edit Profile</span>
         </button>
       </section>
@@ -179,7 +182,7 @@
           </div>
         </div>
         <div class="menu-stat-pill">
-          <span class="m-icon">🪙</span>
+          <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
           <div class="m-content">
             <span class="m-label">TREASURY</span>
             <strong class="m-val" id="menu-coins">100</strong>
@@ -194,22 +197,11 @@
         </div>
       </section>
 
-      <!-- Menu Action List -->
+      <!-- Primary Action Buttons (Resume, Restart, Main Menu) -->
       <section class="menu-action-list">
-        <button type="button" id="btn-menu-fullscreen" class="menu-list-btn">
-          <div class="list-left">
-            <span class="list-icon" id="menu-fullscreen-icon">⛶</span>
-            <span class="list-text">Fullscreen Mode</span>
-          </div>
-          <span class="list-badge" id="menu-fullscreen-status">TOGGLE</span>
-        </button>
-
-        <button type="button" id="btn-menu-audio-toggle" class="menu-list-btn">
-          <div class="list-left">
-            <span class="list-icon" id="menu-audio-icon">🔊</span>
-            <span class="list-text">Sound Effects</span>
-          </div>
-          <span class="list-badge" id="menu-audio-status">ON</span>
+        <button type="button" id="btn-menu-resume" class="action-btn primary-btn resume-cta-btn">
+          <span class="btn-icon">▶</span>
+          <span class="btn-text">Resume Game</span>
         </button>
 
         <button type="button" id="btn-menu-retry" class="menu-list-btn">
@@ -220,20 +212,28 @@
           <span class="list-arrow">➔</span>
         </button>
 
-        <button type="button" id="btn-menu-roadmap" class="menu-list-btn">
+        <button type="button" id="btn-menu-main-menu" class="menu-list-btn main-menu-list-btn" title="Return to Main Menu / Level Select Roadmap">
           <div class="list-left">
-            <span class="list-icon">🗺️</span>
-            <span class="list-text">Campaign Roadmap</span>
+            <span class="list-icon">🏠</span>
+            <span class="list-text">Main Menu (New Game / Level Select)</span>
           </div>
           <span class="list-arrow">➔</span>
         </button>
-      </section>
 
-      <div class="menu-footer-actions">
-        <button type="button" id="btn-menu-resume" class="action-btn primary-btn resume-cta-btn">
-          <span>▶ Resume Mission</span>
-        </button>
-      </div>
+        <div class="menu-settings-split">
+          <button type="button" id="btn-menu-audio-toggle" class="menu-sub-btn">
+            <span class="sub-icon" id="menu-audio-icon">🔊</span>
+            <span class="sub-text">Sound</span>
+            <span class="sub-badge" id="menu-audio-status">ON</span>
+          </button>
+
+          <button type="button" id="btn-menu-fullscreen" class="menu-sub-btn">
+            <span class="sub-icon" id="menu-fullscreen-icon">⛶</span>
+            <span class="sub-text">Fullscreen</span>
+            <span class="sub-badge" id="menu-fullscreen-status">TOGGLE</span>
+          </button>
+        </div>
+      </section>
     </div>
   </dialog>
 
@@ -360,7 +360,7 @@
         </div>
         <div class="result-stat-box coin-box">
           <span class="r-label">COINS EARNED</span>
-          <strong class="r-value" id="result-coins">+0 🪙</strong>
+          <strong class="r-value" id="result-coins"><span id="result-coins-val">+0</span> <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" /></strong>
         </div>
       </div>
 

@@ -322,6 +322,7 @@ export class GameScene {
 
     this.currentLevel = levelConfig;
     this.isPlayingLevel = !isMenuPreview;
+    this.isPaused = false;
     this.hasBirdLaunched = false;
     this.world.allowSleep = true;
     this.levelResolved = false;

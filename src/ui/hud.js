@@ -1,4 +1,5 @@
 import { isFullscreen, toggleFullscreen } from './fullscreenHelper.js';
+import coinLogoUrl from '../assets/coin-with-logo.png';
 
 /**
  * Manages the In-Game Unified HUD, aim telemetry, structured game menu dialog (Pause),
@@ -56,6 +57,7 @@ export class HudController {
     this.resultMessage = document.getElementById('result-message');
     this.resultScore = document.getElementById('result-score');
     this.resultCoins = document.getElementById('result-coins');
+    this.resultCoinsVal = document.getElementById('result-coins-val');
     this.btnResultMenu = document.getElementById('btn-result-menu');
     this.btnResultRetry = document.getElementById('btn-result-retry');
     this.btnResultNext = document.getElementById('btn-result-next');
@@ -92,6 +94,11 @@ export class HudController {
     document.getElementById('btn-menu-retry')?.addEventListener('click', () => {
       this.closeGameMenu();
       this.onRetryLevel?.();
+    });
+
+    document.getElementById('btn-menu-main-menu')?.addEventListener('click', () => {
+      this.closeGameMenu();
+      this.onReturnToMenu?.();
     });
 
     document.getElementById('btn-menu-roadmap')?.addEventListener('click', () => {
@@ -240,7 +247,11 @@ export class HudController {
       : 'Some targets survived the bombardment. Adjust your trajectory and try again!';
 
     this.resultScore.textContent = score.toLocaleString();
-    this.resultCoins.textContent = `+${coinsEarned} 🪙`;
+    if (this.resultCoinsVal) {
+      this.resultCoinsVal.textContent = `+${coinsEarned}`;
+    } else if (this.resultCoins) {
+      this.resultCoins.innerHTML = `<span id="result-coins-val">+${coinsEarned}</span> <img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" />`;
+    }
 
     const starSpans = this.resultStars.querySelectorAll('.star');
     starSpans.forEach((starEl, i) => {

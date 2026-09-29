@@ -81,9 +81,10 @@ export const LEVELS = [
       { type: 'glass', pos: [9.2, 3.0, 0], size: [0.4, 1.8, 1.0] },
       { type: 'wood', pos: [8.5, 4.05, 0], size: [2.2, 0.3, 1.2] },
 
-      // Left Spire - Roof Crystal
-      { type: 'glass', pos: [8.5, 5.0, 0], size: [0.4, 1.6, 1.0] },
-      { type: 'wood', pos: [8.5, 5.95, 0], size: [1.6, 0.3, 1.0] },
+      // Left Spire - Roof Crystal (dual balanced columns)
+      { type: 'glass', pos: [7.9, 5.0, 0], size: [0.35, 1.6, 1.0] },
+      { type: 'glass', pos: [9.1, 5.0, 0], size: [0.35, 1.6, 1.0] },
+      { type: 'wood', pos: [8.5, 5.95, 0], size: [1.8, 0.3, 1.0] },
       { type: 'coin', pos: [8.5, 6.5, 0], size: [0.75, 0.75, 0.75] },
 
       // Right Spire - Ground & 1st Floor (y = 0 to 2.1)
@@ -96,24 +97,27 @@ export const LEVELS = [
       { type: 'glass', pos: [15.2, 3.0, 0], size: [0.4, 1.8, 1.0] },
       { type: 'wood', pos: [14.5, 4.05, 0], size: [2.2, 0.3, 1.2] },
 
-      // Right Spire - Roof Bastion
-      { type: 'stone', pos: [14.5, 5.0, 0], size: [0.5, 1.6, 1.0] },
-      { type: 'wood', pos: [14.5, 5.95, 0], size: [1.6, 0.3, 1.0] },
+      // Right Spire - Roof Bastion (dual balanced columns)
+      { type: 'stone', pos: [13.9, 5.0, 0], size: [0.4, 1.6, 1.0] },
+      { type: 'stone', pos: [15.1, 5.0, 0], size: [0.4, 1.6, 1.0] },
+      { type: 'wood', pos: [14.5, 5.95, 0], size: [1.8, 0.3, 1.0] },
       { type: 'coin', pos: [14.5, 6.5, 0], size: [0.75, 0.75, 0.75] },
 
-      // Central Suspension Bridge connecting spires at y = 4.05
+      // Central Support Pillar and Suspension Bridge connecting spires at y = 4.05
+      { type: 'wood', pos: [11.5, 1.95, 0], size: [0.55, 3.9, 1.0] },
       { type: 'wood', pos: [11.5, 4.05, 0], size: [3.8, 0.3, 1.0] },
-      { type: 'tnt', pos: [10.5, 4.6, 0], size: [0.8, 0.8, 0.8] },
+      { type: 'tnt', pos: [11.5, 4.6, 0], size: [0.8, 0.8, 0.8] },
 
       // Ground TNT between spires
-      { type: 'tnt', pos: [11.5, 0.4, 0], size: [0.8, 0.8, 0.8] }
+      { type: 'tnt', pos: [10.2, 0.4, 0], size: [0.8, 0.8, 0.8] },
+      { type: 'tnt', pos: [12.8, 0.4, 0], size: [0.8, 0.8, 0.8] }
     ],
     targets: [
       { pos: [8.5, 0.55, 0], radius: 0.55, isBoss: false },
       { pos: [14.5, 0.55, 0], radius: 0.55, isBoss: false },
       { pos: [8.5, 2.65, 0], radius: 0.55, isBoss: false },
       { pos: [14.5, 2.65, 0], radius: 0.55, isBoss: false },
-      { pos: [12.5, 4.75, 0], radius: 0.55, isBoss: false }
+      { pos: [11.5, 5.35, 0], radius: 0.55, isBoss: false }
     ]
   },
   {
@@ -140,12 +144,11 @@ export const LEVELS = [
       { type: 'stone', pos: [14.4, 1.8, 0], size: [0.5, 1.8, 1.2] },
       { type: 'stone', pos: [16.8, 1.8, 0], size: [0.5, 1.8, 1.2] },
 
-      // 1st Floor Beams (y = 2.7 to 3.0)
-      { type: 'stone', pos: [8.4, 2.85, 0], size: [2.8, 0.3, 1.2] },
-      { type: 'stone', pos: [13.2, 2.85, 0], size: [2.8, 0.3, 1.2] },
-      { type: 'stone', pos: [15.6, 2.85, 0], size: [2.8, 0.3, 1.2] },
+      // 1st Floor Continuous Beams (y = 2.7 to 3.0, zero gaps across all pillars)
+      { type: 'stone', pos: [9.6, 2.85, 0], size: [5.2, 0.3, 1.2] },
+      { type: 'stone', pos: [14.4, 2.85, 0], size: [5.2, 0.3, 1.2] },
 
-      // 2nd Floor Fortifications (y = 3.0 to 4.8)
+      // 2nd Floor Fortifications (y = 3.0 to 4.8, perfectly seated on beams)
       { type: 'wood', pos: [8.4, 3.9, 0], size: [0.45, 1.8, 1.2] },
       { type: 'wood', pos: [10.8, 3.9, 0], size: [0.45, 1.8, 1.2] },
       { type: 'stone', pos: [13.2, 3.9, 0], size: [0.45, 1.8, 1.2] },

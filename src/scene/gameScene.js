@@ -324,6 +324,7 @@ export class GameScene {
     this.isPlayingLevel = !isMenuPreview;
     this.isPaused = false;
     this.hasBirdLaunched = false;
+    this.structureAwakened = false;
     this.world.allowSleep = true;
     this.levelResolved = false;
     this.score = 0;
@@ -389,22 +390,22 @@ export class GameScene {
 
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
     const massMap = {
-      glass: 1.8,
-      wood: 3.8,
-      coin: 2.6,
-      tnt: 2.4,
-      stone: 6.8
+      glass: 1.6,
+      wood: 3.2,
+      coin: 2.2,
+      tnt: 2.0,
+      stone: 5.6
     };
     const hpMap = {
-      glass: 28,
-      coin: 35,
-      tnt: 20,
-      wood: 68,
-      stone: 135
+      glass: 20,
+      coin: 26,
+      tnt: 16,
+      wood: 50,
+      stone: 95
     };
 
     const body = new CANNON.Body({
-      mass: massMap[type] || 3.8,
+      mass: massMap[type] || 3.2,
       shape: new CANNON.Box(halfExtents),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
@@ -420,7 +421,7 @@ export class GameScene {
     body.sleepTimeLimit = 0.8;
     body.sleep();
 
-    const maxHp = hpMap[type] || 68;
+    const maxHp = hpMap[type] || 50;
     const blockObj = {
       type,
       size,
@@ -439,16 +440,23 @@ export class GameScene {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       const now = performance.now();
 
-      // Debounce micro-contacts within 110ms (prevents multi-step iteration over-damage)
-      if (now - blockObj.lastHitTime < 110) {
+      // Debounce micro-contacts within 100ms (prevents multi-step iteration over-damage)
+      if (now - blockObj.lastHitTime < 100) {
         return;
       }
 
       // Direct impact from player bird
       if (isBirdHit) {
-        // Light graze or glancing collision (< 2.6 normal impact) deals zero damage
-        if (normalImpact < 2.6) {
-          this.audio?.playImpact(0.18);
+        // Awaken full structure physics when bird actually strikes the tower
+        if (!this.structureAwakened) {
+          this.structureAwakened = true;
+          this.world.allowSleep = false;
+          this.wakeAllStructures();
+        }
+
+        // Light graze or glancing collision (< 1.8 normal impact) deals zero damage
+        if (normalImpact < 1.8) {
+          this.audio?.playImpact(0.15);
           return;
         }
 
@@ -457,14 +465,14 @@ export class GameScene {
         const birdType = this.activeBird?.type || 'red';
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.2 : 0.95;
+          birdMultiplier = blockObj.type === 'glass' ? 2.4 : 1.0;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.4 : 2.0;
+          birdMultiplier = blockObj.type === 'stone' ? 2.3 : 1.8;
         }
 
         // Damage derived from normal impact collision force
-        const effectiveImpact = normalImpact - 1.8;
-        const dmg = effectiveImpact * 2.1 * birdMultiplier;
+        const effectiveImpact = normalImpact - 1.2;
+        const dmg = effectiveImpact * 2.8 * birdMultiplier;
 
         if (dmg > 1.0) {
           this.audio?.playImpact(Math.min(1.0, dmg * 0.06));
@@ -472,7 +480,7 @@ export class GameScene {
 
           // Visual crack & stress feedback (darken slightly as it takes heavy structural damage)
           if (blockObj.mesh?.material && !blockObj.isDamagedTinted) {
-            if (blockObj.hp < blockObj.maxHp * 0.55) {
+            if (blockObj.hp < blockObj.maxHp * 0.6) {
               blockObj.isDamagedTinted = true;
               if (blockObj.mesh.material.color) {
                 blockObj.mesh.material.color.multiplyScalar(0.78);
@@ -484,11 +492,11 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 9.0) {
-        // Only high-velocity violent falls or heavy direct crushes damage blocks (prevents normal leaning from collapsing towers)
+      } else if (normalImpact >= 7.8) {
+        // Only high-velocity falls or heavy direct crushes damage blocks (prevents normal leaning from collapsing towers)
         blockObj.lastHitTime = now;
         this.audio?.playImpact(Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 7.5) * 1.8;
+        const debrisDmg = (normalImpact - 6.2) * 2.0;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
@@ -626,10 +634,6 @@ export class GameScene {
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
-
-    // Ensure full dynamic simulation is running and all bodies respond to active gravity
-    this.world.allowSleep = false;
-    this.wakeAllStructures();
 
     this.world.addBody(body);
     this.activeBird.body = body;

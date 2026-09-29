@@ -316,6 +316,26 @@
     </div>
   </dialog>
 
+  <!-- Prioritized Landscape Orientation Guard Overlay for Mobile Devices -->
+  <div id="orientation-guard" class="orientation-guard" aria-live="assertive" role="alert">
+    <div class="orientation-guard-card glass-panel">
+      <div class="rotate-phone-anim">
+        <div class="phone-device">
+          <div class="phone-screen"></div>
+          <div class="phone-notch"></div>
+        </div>
+        <div class="rotate-arrow" aria-hidden="true">↻</div>
+      </div>
+      <h2 class="orientation-title">Landscape Mode Required</h2>
+      <p class="orientation-msg">
+        Please rotate your device to landscape mode to play <strong>Dili-Birds</strong>.
+      </p>
+      <button type="button" id="btn-force-landscape" class="action-btn primary-btn orientation-btn">
+        <span>🔄 Rotate to Landscape</span>
+      </button>
+    </div>
+  </div>
+
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

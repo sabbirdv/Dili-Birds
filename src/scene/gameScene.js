@@ -62,6 +62,19 @@ export class GameScene {
     });
 
     window.addEventListener('resize', () => this.onResize());
+    window.addEventListener('orientationchange', () => {
+      setTimeout(() => this.onResize(), 150);
+      setTimeout(() => this.onResize(), 350);
+    });
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', () => {
+        setTimeout(() => this.onResize(), 150);
+      });
+    }
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => this.onResize());
+    }
+
     this.animate();
   }
 
@@ -117,13 +130,24 @@ export class GameScene {
   }
 
   /**
-   * Computes a fixed, completely stationary camera position that frames both the slingshot
-   * on the left (x = -15.5) and the fortress on the right (x = +18.0) without distortion.
+   * Computes a dynamic, perfectly framed stationary camera position that guarantees
+   * both the slingshot & waiting birds on the left (x = -16.5) and the entire fortress on the right (x = +18.5)
+   * plus the ground and upper battlements remain completely visible without distortion across any
+   * aspect ratio (e.g. mobile landscape 19.5:9, 16:9, tablet 4:3, or desktop).
    */
   updateStationaryCameraPosition(aspect) {
-    const baseZ = 42.5;
-    const adjustedZ = aspect < 1.65 ? baseZ * (1.65 / Math.max(0.85, aspect)) : baseZ;
-    this.stationaryCameraPos = new THREE.Vector3(1.0, 4.8, adjustedZ);
+    const safeAspect = Math.max(0.65, aspect || 1.77);
+    this.camera.fov = 28;
+    const halfAngleTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
+    // Generous framing: 42.5 world units width, 16.0 world units height
+    const targetWidth = 42.5;
+    const targetHeight = 16.0;
+
+    const zForWidth = targetWidth / (2 * halfAngleTan * safeAspect);
+    const zForHeight = targetHeight / (2 * halfAngleTan);
+    const computedZ = Math.max(38.0, Math.max(zForWidth, zForHeight));
+
+    this.stationaryCameraPos = new THREE.Vector3(1.0, 4.8, computedZ);
     this.camera.position.copy(this.stationaryCameraPos);
     this.camera.lookAt(this.stationaryLookAt);
   }
@@ -742,11 +766,12 @@ export class GameScene {
   onResize() {
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
-    const aspect = width / height;
+    const aspect = width / Math.max(1, height);
     this.camera.aspect = aspect;
     this.updateStationaryCameraPosition(aspect);
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   }
 
   animate() {

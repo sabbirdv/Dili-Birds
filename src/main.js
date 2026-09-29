@@ -112,11 +112,84 @@ class DiliBirdsApp {
   startLevel(levelConfig) {
     if (!levelConfig) return;
     this.currentLevelConfig = levelConfig;
+    tryLockLandscape();
     this.ui.showGameView(levelConfig);
     this.gameScene?.loadLevel(levelConfig, false);
   }
 }
 
+/**
+ * Automatically locks the mobile device in landscape mode using the Screen Orientation API
+ * with graceful fallback for unsupported browsers (e.g. iOS Safari).
+ */
+export async function tryLockLandscape() {
+  try {
+    if (screen.orientation && typeof screen.orientation.lock === 'function') {
+      await screen.orientation.lock('landscape');
+    } else if (screen.lockOrientation) {
+      screen.lockOrientation('landscape');
+    } else if (screen.mozLockOrientation) {
+      screen.mozLockOrientation('landscape');
+    } else if (screen.msLockOrientation) {
+      screen.msLockOrientation('landscape');
+    }
+  } catch (err) {
+    // Orientation lock might require fullscreen or is unsupported on iOS Safari
+  }
+}
+
+function initLandscapeGuard() {
+  const guard = document.getElementById('orientation-guard');
+  const btnForce = document.getElementById('btn-force-landscape');
+
+  const checkOrientation = () => {
+    const isPortrait = window.innerHeight > window.innerWidth && window.innerWidth <= 1024;
+    if (guard) {
+      if (isPortrait) {
+        guard.classList.add('active-portrait');
+      } else {
+        guard.classList.remove('active-portrait');
+      }
+    }
+  };
+
+  btnForce?.addEventListener('click', async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          await document.documentElement.webkitRequestFullscreen();
+        }
+      }
+    } catch (e) {}
+    await tryLockLandscape();
+    checkOrientation();
+  });
+
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', () => {
+    setTimeout(checkOrientation, 150);
+  });
+  if (screen.orientation) {
+    screen.orientation.addEventListener('change', () => {
+      setTimeout(checkOrientation, 150);
+    });
+  }
+
+  checkOrientation();
+
+  // Attempt orientation lock on first touch or click
+  const onFirstInteraction = () => {
+    tryLockLandscape();
+    window.removeEventListener('pointerdown', onFirstInteraction);
+    window.removeEventListener('touchstart', onFirstInteraction);
+  };
+  window.addEventListener('pointerdown', onFirstInteraction, { passive: true });
+  window.addEventListener('touchstart', onFirstInteraction, { passive: true });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  initLandscapeGuard();
   new DiliBirdsApp();
 });

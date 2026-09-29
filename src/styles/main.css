@@ -30,23 +30,35 @@ html, body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   font-family: var(--font-sans);
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
 }
 
-/* 3D Canvas Container - touch-action: none is critical for mobile slingshot drag */
+/* 3D Canvas Container - strictly disable all default mobile browser gestures */
 #canvas-container {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   z-index: 1;
-  touch-action: none;
+  touch-action: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  overscroll-behavior: none !important;
 }
 
 #canvas-container canvas {
   display: block;
   width: 100%;
   height: 100%;
-  touch-action: none;
+  touch-action: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
   cursor: grab;
 }
 
@@ -1664,78 +1676,350 @@ html, body {
   display: none !important;
 }
 
-/* Responsive adjustments for mobile & tablet screens */
-@media (max-width: 780px) {
+/* ==========================================================================
+   PRIORITIZED LANDSCAPE ORIENTATION ENFORCEMENT OVERLAY
+   ========================================================================== */
+.orientation-guard {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.99));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+  pointer-events: auto;
+}
+
+.orientation-guard-card {
+  max-width: 420px;
+  width: 90%;
+  padding: 32px 24px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  animation: pulseGuardCard 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseGuardCard {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.rotate-phone-anim {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.phone-device {
+  width: 36px;
+  height: 62px;
+  border: 3px solid var(--text-main);
+  border-radius: 8px;
+  position: relative;
+  animation: rotateDeviceAnim 2.4s ease-in-out infinite;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.phone-device .phone-screen {
+  position: absolute;
+  inset: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.phone-device .phone-notch {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 2px;
+  background: var(--text-main);
+  border-radius: 2px;
+}
+
+.rotate-arrow {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  font-size: 1.8rem;
+  color: var(--accent-gold);
+  animation: spinArrow 2.4s linear infinite;
+}
+
+@keyframes rotateDeviceAnim {
+  0% { transform: rotate(0deg); }
+  35%, 65% { transform: rotate(90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes spinArrow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.orientation-title {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.orientation-msg {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.orientation-btn {
+  margin-top: 8px;
+  padding: 12px 24px;
+  font-size: 1.0rem;
+  border-radius: 14px;
+}
+
+/* Prioritized CSS Detection: Display whenever portrait mode is detected on mobile/tablet */
+@media screen and (orientation: portrait) and (max-width: 1024px) {
+  .orientation-guard {
+    display: flex !important;
+  }
+  #canvas-container,
   #ui-layer {
-    padding: 8px 10px;
+    filter: blur(12px);
+    pointer-events: none !important;
+  }
+}
+
+/* Programmatic fallback class for browsers with CSS orientation delay */
+.orientation-guard.active-portrait {
+  display: flex !important;
+}
+
+/* ==========================================================================
+   CROSS-DEVICE RESPONSIVE LAYOUT & MOBILE LANDSCAPE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Universal Safe-Area Inset Handling for modern mobile notches and home bars */
+#ui-layer {
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+
+/* Compact Mobile Landscape Mode (Phones & Small Tablets in Landscape: height <= 540px) */
+@media screen and (max-height: 540px) {
+  #ui-layer {
+    padding-top: max(4px, env(safe-area-inset-top));
+    padding-bottom: max(4px, env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
   }
 
   #top-bar {
-    padding: 8px 12px;
+    padding: 4px 10px;
     gap: 8px;
-    flex-wrap: wrap;
+    border-radius: 12px;
   }
 
-  .btn-text,
-  .edit-pill {
+  .player-badge {
+    padding: 3px 8px;
+    gap: 6px;
+  }
+
+  .avatar-circle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .player-label {
+    font-size: 0.58rem;
+  }
+
+  .player-name {
+    font-size: 0.85rem;
+  }
+
+  .edit-pill,
+  .btn-text {
     display: none;
   }
 
+  .stat-pill {
+    padding: 3px 8px;
+    gap: 5px;
+  }
+
+  .stat-icon {
+    font-size: 0.85rem;
+  }
+
+  .stat-label {
+    font-size: 0.52rem;
+  }
+
+  .stat-value {
+    font-size: 0.85rem;
+  }
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+  }
+
+  /* Roadmap screen in landscape */
   .roadmap-screen-card {
-    padding: 14px 12px;
+    max-height: 94vh;
+    overflow-y: auto;
+    padding: 10px 14px;
+  }
+
+  .roadmap-top-bar {
+    margin-bottom: 8px;
+  }
+
+  .game-title {
+    font-size: 1.35rem;
+  }
+
+  .progress-summary {
+    padding: 4px 10px;
+    gap: 10px;
+  }
+
+  .summary-title {
+    font-size: 0.55rem;
+  }
+
+  .summary-val {
+    font-size: 0.82rem;
   }
 
   .roadmap-square-board {
-    aspect-ratio: auto;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: auto;
-    transform: none !important;
+    gap: 8px;
+    padding: 8px;
   }
 
-  .roadmap-svg-track,
-  .roadmap-dir-Step {
-    display: none;
+  .roadmap-square-node {
+    padding: 6px;
   }
 
-  .roadmap-square-node,
-  .roadmap-center-showcase {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    min-height: 115px;
+  .node-level-num {
+    font-size: 1.3rem;
   }
 
-  .roadmap-center-showcase {
-    grid-column: 1 / -1 !important;
-    order: -1;
+  .node-stars {
+    font-size: 0.75rem;
   }
 
+  .node-coin-reward {
+    font-size: 0.68rem;
+  }
+
+  .center-logo-badge {
+    width: 38px;
+    height: 38px;
+  }
+
+  .center-brand-name {
+    font-size: 1.05rem;
+  }
+
+  /* In-game HUD in mobile landscape */
+  .hud-top-bar {
+    padding: 4px 10px;
+    border-radius: 12px;
+  }
+
+  .hud-level-badge {
+    padding: 2px 8px;
+    font-size: 0.82rem;
+  }
+
+  .hud-stat-pill {
+    padding: 3px 8px;
+    font-size: 0.82rem;
+  }
+
+  .hud-bottom-bar {
+    margin-bottom: 2px;
+  }
+
+  .hud-bottom-hint {
+    font-size: 0.72rem;
+    padding: 4px 12px;
+  }
+
+  .aim-telemetry {
+    padding: 4px 10px;
+    font-size: 0.75rem;
+  }
+
+  /* Modals in mobile landscape */
   .profile-setup-shell {
-    padding: 20px 16px;
-    max-height: 90vh;
+    padding: 14px 18px;
+    max-height: 94vh;
     overflow-y: auto;
   }
 
   .profile-setup-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
   }
 
   .avatar-presets-grid {
     grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
   }
 
-  .hud-top-bar {
-    padding: 8px 12px;
-    gap: 10px;
+  .result-content {
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 16px 20px;
   }
 
-  .hud-metrics {
-    gap: 12px;
+  .result-stars {
+    font-size: 2.2rem;
+    margin: 2px 0;
   }
 
-  .hud-bottom-hint {
-    font-size: 0.74rem;
-    padding: 6px 12px;
-    text-align: center;
+  .result-stats-grid {
+    gap: 8px;
+    margin: 4px 0;
+  }
+}
+
+/* Tablet & Mobile Breakpoints for Responsive Touch Targets (min 44px) */
+@media (pointer: coarse) {
+  button,
+  .player-badge,
+  .action-btn,
+  .icon-btn,
+  .roadmap-square-node {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .roadmap-square-node:hover {
+    transform: none; /* Disable hover tilt on touch devices */
+  }
+
+  .roadmap-square-node:active {
+    transform: scale(0.97); /* Punchy active tap feedback */
   }
 }

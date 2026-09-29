@@ -43,6 +43,7 @@ export class SlingshotController {
     this.isDragging = false;
     this.canInteract = false;
     this.birdInFlight = false;
+    this.activeTouchId = null;
     this.currentPullPos = this.anchor.clone();
     this.lastStretchSoundTime = 0;
 
@@ -185,32 +186,24 @@ export class SlingshotController {
   }
 
   /**
-   * Unified Mouse & Mobile Touch event bindings for drag-and-release controls.
+   * Unified Mouse & Mobile Touch event bindings with explicit touch tracking,
+   * safe multi-touch rejection, and complete suppression of native browser gestures
+   * (swipe-to-scroll, pinch-zoom, text selection, and callout menus).
    */
   bindInputEvents() {
-    const extractClientCoords = (e) => {
-      if (e.touches && e.touches.length > 0) {
-        return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
-      }
-      if (e.changedTouches && e.changedTouches.length > 0) {
-        return { clientX: e.changedTouches[0].clientX, clientY: e.changedTouches[0].clientY };
-      }
-      return { clientX: e.clientX, clientY: e.clientY };
-    };
+    // Explicitly disable browser default gestures and context menus on the 3D canvas
+    this.domElement.style.touchAction = 'none';
+    this.domElement.style.userSelect = 'none';
+    this.domElement.style.webkitUserSelect = 'none';
+    this.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+    this.domElement.addEventListener('selectstart', (e) => e.preventDefault());
 
-    const handleStart = (e) => {
-      if (e.target !== this.domElement) return;
+    // Prevent Safari pinch-to-zoom gestures
+    window.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
+    window.addEventListener('gesturechange', (e) => e.preventDefault(), { passive: false });
+    window.addEventListener('gestureend', (e) => e.preventDefault(), { passive: false });
 
-      const { clientX, clientY } = extractClientCoords(e);
-
-      // If a bird is already in mid-flight, tapping/clicking triggers its special boost ability
-      if (this.birdInFlight) {
-        this.onFlightTap?.();
-        return;
-      }
-
-      if (!this.canInteract || !this.currentBirdMesh) return;
-
+    const isHitOnSlingshotOrBird = (clientX, clientY) => {
       const rect = this.domElement.getBoundingClientRect();
       const projected = this.anchor.clone().project(this.camera);
       const anchorScreenX = ((projected.x + 1) * 0.5) * rect.width + rect.left;
@@ -221,36 +214,112 @@ export class SlingshotController {
       this.updateRaycaster(clientX, clientY, rect);
       const rayDistToBird = this.raycaster.ray.distanceToPoint(this.currentBirdMesh.position);
 
-      if (pixelDist < 150 || rayDistToBird < 3.0) {
-        if (e.cancelable) e.preventDefault();
+      // Generous touch target area (160px or 3.2 world units) for mobile fingertips
+      return pixelDist < 160 || rayDistToBird < 3.2;
+    };
+
+    // ── MOBILE TOUCH HANDLING ──
+    const handleTouchStart = (e) => {
+      if (e.target !== this.domElement) return;
+      if (e.cancelable) e.preventDefault();
+
+      // Mid-flight tap activates character boost ability
+      if (this.birdInFlight) {
+        this.onFlightTap?.();
+        return;
+      }
+
+      if (!this.canInteract || !this.currentBirdMesh) return;
+
+      // Only lock on the primary touch finger
+      const touch = e.changedTouches[0];
+      if (isHitOnSlingshotOrBird(touch.clientX, touch.clientY)) {
+        this.activeTouchId = touch.identifier;
         this.isDragging = true;
-        this.updatePullFromInput(clientX, clientY, rect);
+        const rect = this.domElement.getBoundingClientRect();
+        this.updatePullFromInput(touch.clientX, touch.clientY, rect);
       }
     };
 
-    const handleMove = (e) => {
-      if (!this.isDragging || !this.currentBirdMesh) return;
+    const handleTouchMove = (e) => {
+      if (!this.isDragging || this.activeTouchId === null || !this.currentBirdMesh) return;
       if (e.cancelable) e.preventDefault();
-      const { clientX, clientY } = extractClientCoords(e);
-      const rect = this.domElement.getBoundingClientRect();
-      this.updatePullFromInput(clientX, clientY, rect);
+
+      // Find the specific finger that started the slingshot drag
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === this.activeTouchId) {
+          const rect = this.domElement.getBoundingClientRect();
+          this.updatePullFromInput(e.touches[i].clientX, e.touches[i].clientY, rect);
+          break;
+        }
+      }
     };
 
-    const handleEnd = (e) => {
+    const handleTouchEnd = (e) => {
+      if (!this.isDragging || this.activeTouchId === null) return;
+
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === this.activeTouchId) {
+          if (e.cancelable) e.preventDefault();
+          this.isDragging = false;
+          this.activeTouchId = null;
+          this.releaseSlingshot();
+          break;
+        }
+      }
+    };
+
+    const handleTouchCancel = (e) => {
       if (!this.isDragging) return;
+      if (e.cancelable) e.preventDefault();
+      this.isDragging = false;
+      this.activeTouchId = null;
+      this.releaseSlingshot();
+    };
+
+    this.domElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    window.addEventListener('touchcancel', handleTouchCancel, { passive: false });
+
+    // ── DESKTOP MOUSE HANDLING ──
+    const handleMouseDown = (e) => {
+      if (e.target !== this.domElement || e.button !== 0) return;
+      // If a mobile touch is active, ignore synthetic mouse events
+      if (this.activeTouchId !== null) return;
+
+      if (this.birdInFlight) {
+        this.onFlightTap?.();
+        return;
+      }
+
+      if (!this.canInteract || !this.currentBirdMesh) return;
+
+      if (isHitOnSlingshotOrBird(e.clientX, e.clientY)) {
+        if (e.cancelable) e.preventDefault();
+        this.isDragging = true;
+        const rect = this.domElement.getBoundingClientRect();
+        this.updatePullFromInput(e.clientX, e.clientY, rect);
+      }
+    };
+
+    const handleMouseMove = (e) => {
+      if (!this.isDragging || this.activeTouchId !== null || !this.currentBirdMesh) return;
+      if (e.cancelable) e.preventDefault();
+      const rect = this.domElement.getBoundingClientRect();
+      this.updatePullFromInput(e.clientX, e.clientY, rect);
+    };
+
+    const handleMouseUp = (e) => {
+      if (!this.isDragging || this.activeTouchId !== null) return;
       if (e.cancelable) e.preventDefault();
       this.isDragging = false;
       this.releaseSlingshot();
     };
 
-    this.domElement.addEventListener('pointerdown', handleStart);
-    window.addEventListener('pointermove', handleMove, { passive: false });
-    window.addEventListener('pointerup', handleEnd);
-    window.addEventListener('pointercancel', handleEnd);
-
-    this.domElement.addEventListener('touchstart', handleStart, { passive: false });
-    window.addEventListener('touchmove', handleMove, { passive: false });
-    window.addEventListener('touchend', handleEnd);
+    this.domElement.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
   }
 
   updateRaycaster(clientX, clientY, rect) {

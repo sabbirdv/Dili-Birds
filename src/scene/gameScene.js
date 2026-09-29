@@ -44,6 +44,7 @@ export class GameScene {
     this.isPaused = false;
 
     this.clock = new THREE.Clock();
+    this.cameraShakeTrauma = 0;
 
     this.initThree();
     this.initPhysics();
@@ -375,8 +376,15 @@ export class GameScene {
     });
     this.targets = [];
 
-    this.particles.forEach((p) => this.scene.remove(p.mesh));
+    this.particles.forEach((p) => {
+      if (p.mesh) this.scene.remove(p.mesh);
+      if (p.light) {
+        this.scene.remove(p.light);
+        p.light.dispose?.();
+      }
+    });
     this.particles = [];
+    this.cameraShakeTrauma = 0;
 
     this.onHideAbilityPrompt?.();
   }
@@ -716,30 +724,141 @@ export class GameScene {
       this.levelCoinsEarned += bonusCoins;
       this.storage.addCoins(bonusCoins);
       this.onToast?.(`+${bonusCoins} Coins! 🪙 Treasure Crate Smashed`);
-      this.spawnBurstParticles(pos, 0xfbbf24, 22);
+      this.spawnBlockShatter(blockObj, pos);
     } else if (blockObj.type === 'tnt') {
       this.detonateTNT(pos);
     } else {
       this.score += 120;
-      const colorMap = { wood: 0xc27838, stone: 0x64748b, glass: 0x7dd3fc };
-      this.spawnBurstParticles(pos, colorMap[blockObj.type] || 0xc27838, 12);
+      this.spawnBlockShatter(blockObj, pos);
     }
 
     this.emitHudStats();
+  }
+
+  /**
+   * Spawns physical 3D debris fragments and stylized smoke/dust puffs when a block breaks,
+   * replacing instant vanishing with a satisfying tactile shattering effect.
+   */
+  spawnBlockShatter(blockObj, origin) {
+    const size = blockObj.size || [1.0, 1.0, 1.0];
+    const type = blockObj.type || 'wood';
+
+    // 1. Physical tumbling 3D debris chunks
+    const paletteMap = {
+      wood: [0xc27838, 0x8f4f1a, 0xd97706],
+      stone: [0x64748b, 0x475569, 0x94a3b8],
+      glass: [0x7dd3fc, 0x38bdf8, 0xe0f2fe],
+      coin: [0xfbbf24, 0xf59e0b, 0x38bdf8]
+    };
+    const colors = paletteMap[type] || [0xc27838, 0x8f4f1a];
+    const chunkCount = type === 'stone' ? 8 : type === 'glass' ? 10 : 7;
+
+    for (let i = 0; i < chunkCount; i++) {
+      const color = colors[i % colors.length];
+      const chunkW = Math.max(0.12, (size[0] / 3) * (0.6 + Math.random() * 0.7));
+      const chunkH = Math.max(0.12, (size[1] / 3) * (0.6 + Math.random() * 0.7));
+      const chunkD = Math.max(0.12, (size[2] / 2) * (0.6 + Math.random() * 0.7));
+
+      const geo = new THREE.BoxGeometry(chunkW, chunkH, chunkD);
+      const isGlass = type === 'glass';
+      const mat = isGlass
+        ? new THREE.MeshPhysicalMaterial({
+            color,
+            transparent: true,
+            opacity: 0.85,
+            roughness: 0.1,
+            metalness: 0.1,
+            transmission: 0.3
+          })
+        : new THREE.MeshStandardMaterial({
+            color,
+            roughness: type === 'stone' ? 0.8 : 0.55,
+            metalness: type === 'coin' ? 0.4 : 0.05
+          });
+
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.castShadow = true;
+      const offsetX = (Math.random() - 0.5) * (size[0] * 0.6);
+      const offsetY = (Math.random() - 0.5) * (size[1] * 0.6);
+      mesh.position.set(origin.x + offsetX, origin.y + offsetY, (Math.random() - 0.5) * 0.3);
+      this.scene.add(mesh);
+
+      const vel = new THREE.Vector3(
+        (Math.random() - 0.5) * 8.5 + (offsetX * 4),
+        Math.random() * 6.5 + 2.0,
+        (Math.random() - 0.5) * 2.5
+      );
+      const rotVel = new THREE.Vector3(
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 16
+      );
+
+      this.particles.push({
+        type: 'debris',
+        mesh,
+        vel,
+        rotVel,
+        baseScale: 1.0,
+        life: 1.0,
+        decay: 1.2
+      });
+    }
+
+    // 2. Soft stylized dust / smoke puff
+    const dustCount = 4;
+    const dustColor = type === 'stone' ? 0x94a3b8 : type === 'glass' ? 0xe0f2fe : 0xd1a06d;
+    for (let i = 0; i < dustCount; i++) {
+      const dustGeo = new THREE.SphereGeometry(0.28, 8, 8);
+      const dustMat = new THREE.MeshBasicMaterial({
+        color: dustColor,
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false
+      });
+      const mesh = new THREE.Mesh(dustGeo, dustMat);
+      mesh.position.set(
+        origin.x + (Math.random() - 0.5) * (size[0] * 0.5),
+        origin.y + (Math.random() - 0.5) * (size[1] * 0.5),
+        0.1
+      );
+      this.scene.add(mesh);
+
+      const vel = new THREE.Vector3(
+        (Math.random() - 0.5) * 2.5,
+        Math.random() * 2.5 + 0.8,
+        0
+      );
+
+      this.particles.push({
+        type: 'smoke',
+        mesh,
+        vel,
+        baseScale: 1.0,
+        baseOpacity: 0.55,
+        life: 1.0,
+        decay: 1.8
+      });
+    }
   }
 
   detonateTNT(origin) {
     this.audio?.playExplosion();
     this.score += 400;
     this.onToast?.('💥 BOOM! TNT Detonated!');
-    this.spawnBurstParticles(origin, 0xef4444, 32);
-    this.spawnBurstParticles(origin, 0xfbbf24, 18);
+
+    // Punchy screen shake trauma
+    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.72);
+
+    // Modern multi-layer explosion VFX
+    this.createModernExplosion(origin);
 
     // Awaken entire fortress
     this.wakeAllStructures();
 
-    const blastRadius = 7.2;
-    const blastForce = 44.0;
+    // Calibrated, balanced blast radius & force (not a map-wide violent nuke)
+    const blastRadius = 4.8;
+    const blastForce = 22.0;
 
     // Push and damage nearby blocks
     [...this.blocks].forEach((b) => {
@@ -750,8 +869,8 @@ export class GameScene {
         b.body.wakeUp();
         const dir = bPos.clone().sub(origin).normalize();
         const strength = (1 - dist / blastRadius) * blastForce;
-        b.body.applyImpulse(new CANNON.Vec3(dir.x * strength, (dir.y + 0.45) * strength, 0));
-        b.hp -= (1 - dist / blastRadius) * 140;
+        b.body.applyImpulse(new CANNON.Vec3(dir.x * strength, (dir.y + 0.35) * strength, 0));
+        b.hp -= (1 - dist / blastRadius) * 85;
         if (b.hp <= 0) {
           this.destroyBlock(b);
         }
@@ -765,11 +884,145 @@ export class GameScene {
       const dist = origin.distanceTo(tPos);
       if (dist < blastRadius) {
         t.body.wakeUp();
-        t.hp -= (1 - dist / blastRadius) * 50;
+        t.hp -= (1 - dist / blastRadius) * 35;
         if (t.hp <= 0) {
           this.defeatTarget(t);
         }
       }
+    });
+  }
+
+  /**
+   * Modern stylized 3D explosion with expanding shockwave, fireball core,
+   * rising volumetric smoke plumes, glowing sparks, and light flash.
+   */
+  createModernExplosion(origin) {
+    // 1. Expanding Shockwave Ring (Torus on XY plane)
+    const ringGeo = new THREE.TorusGeometry(0.5, 0.12, 10, 36);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0xfde047,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false
+    });
+    const shockwaveMesh = new THREE.Mesh(ringGeo, ringMat);
+    shockwaveMesh.position.set(origin.x, origin.y, 0.05);
+    this.scene.add(shockwaveMesh);
+    this.particles.push({
+      type: 'shockwave',
+      mesh: shockwaveMesh,
+      baseScale: 0.3,
+      maxExpansion: 6.8,
+      baseOpacity: 0.95,
+      life: 1.0,
+      decay: 2.8
+    });
+
+    // 2. Blazing Fireball Plasma Core
+    const fireGeo = new THREE.SphereGeometry(0.9, 16, 16);
+    const fireMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 1.0,
+      depthWrite: false
+    });
+    const fireMesh = new THREE.Mesh(fireGeo, fireMat);
+    fireMesh.position.set(origin.x, origin.y, 0.1);
+    this.scene.add(fireMesh);
+    this.particles.push({
+      type: 'fireball',
+      mesh: fireMesh,
+      baseScale: 0.5,
+      baseOpacity: 1.0,
+      life: 1.0,
+      decay: 3.2
+    });
+
+    // 3. Volumetric Billowing Smoke Plumes
+    const smokeColors = [0x1e293b, 0x334155, 0x475569, 0x0f172a];
+    const smokeCount = 12;
+    for (let i = 0; i < smokeCount; i++) {
+      const color = smokeColors[i % smokeColors.length];
+      const radius = 0.4 + Math.random() * 0.35;
+      const smokeGeo = new THREE.SphereGeometry(radius, 10, 10);
+      const smokeMat = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.9,
+        transparent: true,
+        opacity: 0.8,
+        depthWrite: false
+      });
+      const mesh = new THREE.Mesh(smokeGeo, smokeMat);
+      mesh.position.set(
+        origin.x + (Math.random() - 0.5) * 0.6,
+        origin.y + (Math.random() - 0.5) * 0.6,
+        (Math.random() - 0.5) * 0.4
+      );
+      this.scene.add(mesh);
+
+      const angle = (i / smokeCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const speed = 2.5 + Math.random() * 3.5;
+      const vel = new THREE.Vector3(
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed * 0.8 + 2.0,
+        (Math.random() - 0.5) * 1.5
+      );
+
+      this.particles.push({
+        type: 'smoke',
+        mesh,
+        vel,
+        baseScale: 1.0,
+        baseOpacity: 0.8,
+        life: 1.0,
+        decay: 1.3
+      });
+    }
+
+    // 4. Incandescent High-Speed Sparks & Shrapnel Embers
+    const sparkCount = 26;
+    const sparkGeo = new THREE.BoxGeometry(0.14, 0.14, 0.14);
+    const sparkMat1 = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+    const sparkMat2 = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+    for (let i = 0; i < sparkCount; i++) {
+      const mesh = new THREE.Mesh(sparkGeo, i % 2 === 0 ? sparkMat1 : sparkMat2);
+      mesh.position.copy(origin);
+      this.scene.add(mesh);
+
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 7.0 + Math.random() * 11.0;
+      const vel = new THREE.Vector3(
+        Math.cos(angle) * speed,
+        Math.sin(angle) * speed * 0.9 + 3.0,
+        (Math.random() - 0.5) * 3.0
+      );
+      const rotVel = new THREE.Vector3(
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20,
+        (Math.random() - 0.5) * 20
+      );
+
+      this.particles.push({
+        type: 'debris',
+        mesh,
+        vel,
+        rotVel,
+        baseScale: 1.0,
+        life: 1.0,
+        decay: 1.6
+      });
+    }
+
+    // 5. Dynamic Flash Light
+    const flashLight = new THREE.PointLight(0xff8800, 6.0, 16);
+    flashLight.position.set(origin.x, origin.y, 1.5);
+    this.scene.add(flashLight);
+    this.particles.push({
+      type: 'light',
+      light: flashLight,
+      baseIntensity: 6.0,
+      life: 1.0,
+      decay: 5.0
     });
   }
 
@@ -793,12 +1046,12 @@ export class GameScene {
     this.storage.addCoins(coinBounty);
 
     this.onToast?.(`🎯 Target Eliminated! +${pts} pts (+${coinBounty} 🪙)`);
-    this.spawnBurstParticles(pos, 0x38bdf8, 24);
+    this.spawnBurstParticles(pos, 0x38bdf8, 22);
     this.emitHudStats();
   }
 
-  spawnBurstParticles(origin, colorHex, count = 18) {
-    const geo = new THREE.BoxGeometry(0.24, 0.24, 0.24);
+  spawnBurstParticles(origin, colorHex, count = 16) {
+    const geo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
     const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.45 });
 
     for (let i = 0; i < count; i++) {
@@ -812,7 +1065,15 @@ export class GameScene {
         (Math.random() - 0.5) * 4
       );
       this.scene.add(mesh);
-      this.particles.push({ mesh, vel, life: 1.0 });
+      this.particles.push({
+        type: 'debris',
+        mesh,
+        vel,
+        rotVel: new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, 0),
+        baseScale: 1.0,
+        life: 1.0,
+        decay: 1.5
+      });
     }
   }
 
@@ -984,7 +1245,7 @@ export class GameScene {
     });
 
     // Active structural gravity guarantee: prevent any airborne block or target from freezing asleep
-    if (this.isPlayingLevel && !this.levelResolved) {
+    if (this.isPlayingLevel && !this.levelResolved && this.structureAwakened) {
       for (let i = 0; i < this.blocks.length; i++) {
         const b = this.blocks[i];
         if (b.body && b.body.sleepState === CANNON.Body.SLEEPING) {
@@ -1003,19 +1264,82 @@ export class GameScene {
       }
     }
 
-    // Update explosion / debris particles
+    // Update explosion / debris / smoke / shockwave / light particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
-      p.life -= deltaTime * 1.5;
+      const decay = p.decay || 1.5;
+      p.life -= deltaTime * decay;
+
       if (p.life <= 0) {
-        this.scene.remove(p.mesh);
+        if (p.mesh) {
+          this.scene.remove(p.mesh);
+          p.mesh.geometry?.dispose?.();
+        }
+        if (p.light) {
+          this.scene.remove(p.light);
+          p.light.dispose?.();
+        }
         this.particles.splice(i, 1);
-      } else {
-        p.vel.y -= 18 * deltaTime;
+        continue;
+      }
+
+      if (p.type === 'light') {
+        if (p.light) {
+          p.light.intensity = (p.baseIntensity || 6.0) * Math.max(0, p.life);
+        }
+      } else if (p.type === 'shockwave') {
+        const progress = 1.0 - Math.max(0, p.life);
+        const currentScale = (p.baseScale || 0.3) + progress * (p.maxExpansion || 6.8);
+        p.mesh.scale.set(currentScale, currentScale, 1.0);
+        if (p.mesh.material) {
+          p.mesh.material.opacity = (p.baseOpacity || 0.95) * (p.life * p.life);
+        }
+      } else if (p.type === 'fireball') {
+        const progress = 1.0 - Math.max(0, p.life);
+        const scale = (p.baseScale || 0.5) + progress * 2.8;
+        p.mesh.scale.setScalar(scale);
+        if (p.mesh.material) {
+          p.mesh.material.opacity = (p.baseOpacity || 1.0) * (p.life * p.life);
+          if (p.life > 0.6) {
+            p.mesh.material.color.setHex(0xfef08a);
+          } else if (p.life > 0.3) {
+            p.mesh.material.color.setHex(0xf97316);
+          } else {
+            p.mesh.material.color.setHex(0xdc2626);
+          }
+        }
+      } else if (p.type === 'smoke') {
+        p.vel.x *= Math.max(0, 1.0 - deltaTime * 1.6);
+        p.vel.y += deltaTime * 0.9; // buoyancy rise
         p.mesh.position.addScaledVector(p.vel, deltaTime);
-        p.mesh.rotation.x += 4 * deltaTime;
-        p.mesh.rotation.y += 5 * deltaTime;
-        p.mesh.scale.setScalar(p.life);
+        const progress = 1.0 - Math.max(0, p.life);
+        const currentScale = (p.baseScale || 1.0) * (1.0 + progress * 1.9);
+        p.mesh.scale.setScalar(currentScale);
+        if (p.mesh.material) {
+          p.mesh.material.opacity = (p.baseOpacity || 0.6) * Math.max(0, p.life);
+        }
+      } else {
+        // 'debris' or standard burst particle
+        p.vel.y -= 19.0 * deltaTime; // gravity
+        p.mesh.position.addScaledVector(p.vel, deltaTime);
+
+        // Ground bounce on z=0 floor plane
+        if (p.mesh.position.y <= 0.12) {
+          p.mesh.position.y = 0.12;
+          p.vel.y = Math.abs(p.vel.y) * 0.38;
+          p.vel.x *= 0.68;
+        }
+
+        if (p.rotVel) {
+          p.mesh.rotation.x += p.rotVel.x * deltaTime;
+          p.mesh.rotation.y += p.rotVel.y * deltaTime;
+          p.mesh.rotation.z += (p.rotVel.z || 0) * deltaTime;
+        } else {
+          p.mesh.rotation.x += 4 * deltaTime;
+          p.mesh.rotation.y += 5 * deltaTime;
+        }
+
+        p.mesh.scale.setScalar(Math.max(0.01, p.life * (p.baseScale || 1.0)));
       }
     }
 
@@ -1025,6 +1349,27 @@ export class GameScene {
     // Animate anime environment (drifting clouds, falling cherry blossom petals)
     const elapsedTime = this.clock.elapsedTime;
     this.branding?.update(elapsedTime, deltaTime);
+
+    // Dynamic Camera Shake (Screen Trauma)
+    if (this.cameraShakeTrauma > 0.001) {
+      const traumaSq = this.cameraShakeTrauma * this.cameraShakeTrauma;
+      const offsetX = (Math.random() - 0.5) * 0.72 * traumaSq;
+      const offsetY = (Math.random() - 0.5) * 0.72 * traumaSq;
+      this.camera.position.set(
+        this.stationaryCameraPos.x + offsetX,
+        this.stationaryCameraPos.y + offsetY,
+        this.stationaryCameraPos.z
+      );
+      this.camera.lookAt(
+        this.stationaryLookAt.x + offsetX * 0.4,
+        this.stationaryLookAt.y + offsetY * 0.4,
+        this.stationaryLookAt.z
+      );
+      this.cameraShakeTrauma = Math.max(0, this.cameraShakeTrauma - deltaTime * 3.2);
+    } else {
+      this.camera.position.copy(this.stationaryCameraPos);
+      this.camera.lookAt(this.stationaryLookAt);
+    }
 
     // Render stationary camera frame
     this.renderer.render(this.scene, this.camera);

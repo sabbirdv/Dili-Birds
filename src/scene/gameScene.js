@@ -389,27 +389,27 @@ export class GameScene {
 
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
     const massMap = {
-      glass: 1.2,
-      wood: 2.2,
-      coin: 1.8,
-      tnt: 2.0,
-      stone: 4.5
+      glass: 2.4,
+      wood: 5.2,
+      coin: 3.6,
+      tnt: 3.4,
+      stone: 9.5
     };
     const hpMap = {
-      glass: 9,
-      coin: 10,
-      tnt: 8,
-      wood: 20,
-      stone: 38
+      glass: 42,
+      coin: 55,
+      tnt: 28,
+      wood: 110,
+      stone: 220
     };
 
     const body = new CANNON.Body({
-      mass: massMap[type] || 2.2,
+      mass: massMap[type] || 4.5,
       shape: new CANNON.Box(halfExtents),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
-      linearDamping: 0.04,
-      angularDamping: 0.08,
+      linearDamping: 0.05,
+      angularDamping: 0.1,
       // Constrain block physics strictly to the 2D XY plane
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
@@ -420,36 +420,76 @@ export class GameScene {
     body.sleepTimeLimit = 0.8;
     body.sleep();
 
+    const maxHp = hpMap[type] || 100;
     const blockObj = {
       type,
       size,
       mesh,
       body,
-      hp: hpMap[type] || 20,
-      destroyed: false
+      maxHp,
+      hp: maxHp,
+      destroyed: false,
+      lastHitTime: 0
     };
 
     body.addEventListener('collide', (event) => {
       if (!this.isPlayingLevel || blockObj.destroyed || !this.hasBirdLaunched) return;
 
       const isBirdHit = event.body === this.activeBird?.body;
-      const impact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      const now = performance.now();
 
-      // Direct impact from player bird deals heavy damage
+      // Debounce micro-contacts within 130ms (prevents physics solver over-damage)
+      if (now - blockObj.lastHitTime < 130) {
+        return;
+      }
+
+      // Direct impact from player bird
       if (isBirdHit) {
-        const birdVel = this.activeBird?.body ? this.activeBird.body.velocity.length() : impact;
-        const dmg = Math.max(impact, birdVel) * 2.8;
-        if (dmg > 2.0) {
-          this.audio?.playImpact(dmg * 0.15);
+        // Light graze or glancing collision (< 3.8 normal impact) deals ZERO damage, just a physics deflection
+        if (normalImpact < 3.8) {
+          this.audio?.playImpact(0.2);
+          return;
+        }
+
+        blockObj.lastHitTime = now;
+
+        const birdType = this.activeBird?.type || 'red';
+        let birdMultiplier = 1.0;
+        if (birdType === 'speed') {
+          birdMultiplier = blockObj.type === 'glass' ? 2.5 : 0.95;
+        } else if (birdType === 'heavy') {
+          birdMultiplier = blockObj.type === 'stone' ? 2.6 : 2.0;
+        }
+
+        // Damage strictly derived from the normal impact collision force
+        const effectiveImpact = normalImpact - 3.0;
+        const dmg = effectiveImpact * 2.2 * birdMultiplier;
+
+        if (dmg > 1.0) {
+          this.audio?.playImpact(Math.min(1.0, dmg * 0.05));
           blockObj.hp -= dmg;
+
+          // Visual crack & stress feedback (darken slightly as it takes heavy structural damage)
+          if (blockObj.mesh?.material && !blockObj.isDamagedTinted) {
+            if (blockObj.hp < blockObj.maxHp * 0.55) {
+              blockObj.isDamagedTinted = true;
+              if (blockObj.mesh.material.color) {
+                blockObj.mesh.material.color.multiplyScalar(0.76);
+              }
+            }
+          }
+
           if (blockObj.hp <= 0) {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (impact >= 6.5) {
-        // High-energy falling debris or collapsing structure impact (never static resting load)
-        this.audio?.playImpact(impact * 0.1);
-        blockObj.hp -= (impact - 4.5) * 1.5;
+      } else if (normalImpact >= 11.5) {
+        // High-velocity collapsing structure or falling debris crash
+        blockObj.lastHitTime = now;
+        this.audio?.playImpact(Math.min(1.0, normalImpact * 0.06));
+        const debrisDmg = (normalImpact - 10.0) * 2.2;
+        blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
         }
@@ -470,7 +510,7 @@ export class GameScene {
     this.scene.add(mesh);
 
     const body = new CANNON.Body({
-      mass: isBoss ? 2.6 : 1.6,
+      mass: isBoss ? 3.0 : 1.8,
       shape: new CANNON.Sphere(radius),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
@@ -489,28 +529,36 @@ export class GameScene {
       body,
       radius,
       isBoss,
-      hp: isBoss ? 15 : 8.5,
-      destroyed: false
+      hp: isBoss ? 28 : 16,
+      destroyed: false,
+      lastHitTime: 0
     };
 
     body.addEventListener('collide', (event) => {
       if (!this.isPlayingLevel || targetObj.destroyed || !this.hasBirdLaunched) return;
 
       const isBirdHit = event.body === this.activeBird?.body;
-      const impact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      const now = performance.now();
+
+      if (now - targetObj.lastHitTime < 130) {
+        return;
+      }
 
       if (isBirdHit) {
-        const birdVel = this.activeBird?.body ? this.activeBird.body.velocity.length() : impact;
-        const dmg = Math.max(impact, birdVel) * 3.2;
-        if (dmg > 2.0) {
+        if (normalImpact < 2.5) return;
+        targetObj.lastHitTime = now;
+        const dmg = (normalImpact - 1.5) * 2.8;
+        if (dmg > 1.0) {
           targetObj.hp -= dmg;
           if (targetObj.hp <= 0) {
             this.defeatTarget(targetObj);
           }
         }
-      } else if (impact >= 5.5) {
+      } else if (normalImpact >= 5.0) {
         // Crushed by heavy falling debris
-        targetObj.hp -= (impact - 3.5) * 2.5;
+        targetObj.lastHitTime = now;
+        targetObj.hp -= (normalImpact - 3.5) * 3.0;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
         }
@@ -686,8 +734,8 @@ export class GameScene {
     // Awaken entire fortress
     this.wakeAllStructures();
 
-    const blastRadius = 6.8;
-    const blastForce = 36.0;
+    const blastRadius = 7.2;
+    const blastForce = 44.0;
 
     // Push and damage nearby blocks
     [...this.blocks].forEach((b) => {
@@ -699,7 +747,7 @@ export class GameScene {
         const dir = bPos.clone().sub(origin).normalize();
         const strength = (1 - dist / blastRadius) * blastForce;
         b.body.applyImpulse(new CANNON.Vec3(dir.x * strength, (dir.y + 0.45) * strength, 0));
-        b.hp -= (1 - dist / blastRadius) * 34;
+        b.hp -= (1 - dist / blastRadius) * 140;
         if (b.hp <= 0) {
           this.destroyBlock(b);
         }
@@ -713,7 +761,7 @@ export class GameScene {
       const dist = origin.distanceTo(tPos);
       if (dist < blastRadius) {
         t.body.wakeUp();
-        t.hp -= (1 - dist / blastRadius) * 30;
+        t.hp -= (1 - dist / blastRadius) * 50;
         if (t.hp <= 0) {
           this.defeatTarget(t);
         }
@@ -741,20 +789,22 @@ export class GameScene {
     this.storage.addCoins(coinBounty);
 
     this.onToast?.(`🎯 Target Eliminated! +${pts} pts (+${coinBounty} 🪙)`);
-    this.spawnBurstParticles(pos, 0x38bdf8, 22);
+    this.spawnBurstParticles(pos, 0x38bdf8, 24);
     this.emitHudStats();
   }
 
-  spawnBurstParticles(origin, colorHex, count = 14) {
-    const geo = new THREE.BoxGeometry(0.22, 0.22, 0.22);
-    const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.4 });
+  spawnBurstParticles(origin, colorHex, count = 18) {
+    const geo = new THREE.BoxGeometry(0.24, 0.24, 0.24);
+    const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.45 });
 
     for (let i = 0; i < count; i++) {
       const mesh = new THREE.Mesh(geo, mat);
+      const scale = 0.5 + Math.random() * 0.9;
+      mesh.scale.set(scale, scale, scale);
       mesh.position.copy(origin);
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 10,
-        Math.random() * 7 + 2,
+        (Math.random() - 0.5) * 11,
+        Math.random() * 8 + 2,
         (Math.random() - 0.5) * 4
       );
       this.scene.add(mesh);

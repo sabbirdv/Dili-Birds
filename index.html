@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dili-Birds 3D — Slingshot Physics Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <!-- 3D WebGL Canvas Container -->
+  <div id="canvas-container" aria-label="3D Game World"></div>
+
+  <!-- UI Overlay Layer -->
+  <div id="ui-layer">
+    <!-- Persistent Top Bar (Player Profile, Level, Accumulated Coins, Audio) -->
+    <header id="top-bar" class="glass-panel">
+      <div class="player-badge" id="player-badge-btn" role="button" tabindex="0" title="Click to open User Profile Setup">
+        <div class="avatar-circle" id="player-avatar">
+          <img id="top-avatar-img" src="" alt="Player Avatar" />
+        </div>
+        <div class="player-info">
+          <span class="player-label">COMMANDER PROFILE</span>
+          <span class="player-name" id="display-username">Commander</span>
+        </div>
+        <span class="edit-pill">Edit Profile ✎</span>
+      </div>
+
+      <div class="stats-group">
+        <div class="stat-pill level-pill" title="Highest Unlocked Level">
+          <span class="stat-icon">⭐</span>
+          <div class="stat-text">
+            <span class="stat-label">PLAYER LEVEL</span>
+            <span class="stat-value" id="display-player-level">LVL 1</span>
+          </div>
+        </div>
+
+        <div class="stat-pill coin-pill" title="Accumulated Coins">
+          <span class="stat-icon">🪙</span>
+          <div class="stat-text">
+            <span class="stat-label">COINS</span>
+            <span class="stat-value" id="display-coins">100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="btn-brand-theme" class="icon-btn" type="button" title="Open Commander Profile Setup">
+          <span>👤</span>
+          <span class="btn-text">Profile</span>
+        </button>
+        <button id="btn-audio-toggle" class="icon-btn" type="button" title="Toggle Sound Effects" aria-label="Toggle Sound Effects">
+          <span id="audio-icon">🔊</span>
+        </button>
+        <button id="btn-back-menu" class="action-btn secondary-btn hidden" type="button">
+          <span>🗺️ Roadmap</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Initial UI: 3D Square-Shaped Roadmap Level Selection Screen -->
+    <main id="menu-screen" class="screen-overlay">
+      <div class="menu-container glass-card roadmap-screen-card">
+        <!-- Top Hero & Commander Progress Row -->
+        <div class="roadmap-top-bar">
+          <div class="hero-compact">
+            <div class="brand-tag" id="hero-brand-tag">Dili-Birds • 3D WORLD</div>
+            <h1 class="game-title">Dili-Birds <span class="accent-3d">ROADMAP</span></h1>
+          </div>
+
+          <!-- Player Progress Summary Bar -->
+          <section class="progress-summary compact-summary" aria-label="Player Progress">
+            <div class="summary-profile-trigger" id="summary-profile-btn" role="button" tabindex="0" title="Customize Username & Profile Picture">
+              <img id="summary-avatar-img" class="summary-avatar" src="" alt="Commander Avatar" />
+              <div class="summary-item align-start">
+                <span class="summary-title">Commander</span>
+                <strong class="summary-val" id="summary-username">Commander</strong>
+              </div>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+              <span class="summary-title">Stage Progress</span>
+              <strong class="summary-val" id="summary-level">1 / 8</strong>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+              <span class="summary-title">Treasury</span>
+              <strong class="summary-val coin-accent" id="summary-coins">100 Coins</strong>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+              <span class="summary-title">Stars</span>
+              <strong class="summary-val star-accent" id="summary-stars">0 / 24 ★</strong>
+            </div>
+          </section>
+        </div>
+
+        <!-- Square-Shaped Roadmap Section -->
+        <section class="level-select-section" aria-labelledby="level-select-heading">
+          <div class="section-header roadmap-controls-bar">
+            <div class="roadmap-heading-group">
+              <h2 id="level-select-heading">Square Campaign Roadmap</h2>
+              <span class="sequential-hint">Follow the clockwise square circuit to unlock all 8 stages</span>
+            </div>
+
+            <div class="roadmap-legend-actions">
+              <div class="roadmap-legend" aria-hidden="true">
+                <span class="legend-item"><i class="dot completed"></i> Cleared</span>
+                <span class="legend-item"><i class="dot frontier"></i> Active Stage</span>
+                <span class="legend-item"><i class="dot locked"></i> Locked</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Square Roadmap Viewport -->
+          <div id="roadmap-viewport" class="roadmap-3d-viewport">
+            <div id="level-grid" class="roadmap-square-board">
+              <!-- Dynamically populated by src/levels/levelSelect.js -->
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- In-Game HUD (Visible while playing a level) -->
+    <section id="game-hud" class="hud-layer hidden" aria-label="In-Game Controls and Status">
+      <div class="hud-top-bar glass-panel">
+        <div class="hud-level-info">
+          <span class="hud-stage-badge" id="hud-level-number">STAGE 1</span>
+          <h2 class="hud-stage-name" id="hud-level-title">Training Outpost</h2>
+        </div>
+
+        <div class="hud-metrics">
+          <div class="hud-metric">
+            <span class="metric-label">TARGETS LEFT</span>
+            <span class="metric-val" id="hud-targets-left">2</span>
+          </div>
+          <div class="hud-metric">
+            <span class="metric-label">BIRDS READY</span>
+            <div class="bird-queue" id="hud-bird-queue"></div>
+          </div>
+          <div class="hud-metric">
+            <span class="metric-label">SCORE</span>
+            <span class="metric-val" id="hud-score">0</span>
+          </div>
+        </div>
+
+        <div class="hud-controls">
+          <button id="btn-restart-level" class="hud-btn" type="button" title="Restart Level">
+            ↻ Retry
+          </button>
+        </div>
+      </div>
+
+      <!-- Slingshot Aim Telemetry & Special Ability Prompt -->
+      <div id="aim-telemetry" class="aim-telemetry hidden">
+        <span id="telemetry-power">Power: 0%</span>
+        <span class="telemetry-sep">•</span>
+        <span id="telemetry-angle">Angle: 0°</span>
+      </div>
+
+      <div id="ability-toast" class="ability-toast hidden">
+        ⚡ Tap or Click anywhere to trigger Bird Boost!
+      </div>
+
+      <!-- Floating Coin / Score Notification Container -->
+      <div id="floating-toasts" class="floating-toasts"></div>
+
+      <!-- Bottom Instructions Banner -->
+      <div class="hud-bottom-hint glass-panel">
+        <span>🎯 <strong>Drag &amp; Release</strong> the Dili-Bird in the slingshot (Mouse or Touch) • Tap in mid-flight to trigger special powers</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Sleek User Profile Setup Screen (<dialog closedby="any"> + fallback) -->
+  <dialog id="profile-dialog" class="game-dialog profile-setup-dialog" closedby="any" aria-labelledby="profile-dialog-title">
+    <form id="profile-form" method="dialog" class="profile-setup-shell" novalidate>
+      <!-- Ambient Decorative Glows -->
+      <div class="profile-ambient-orb orb-orange" aria-hidden="true"></div>
+      <div class="profile-ambient-orb orb-cyan" aria-hidden="true"></div>
+
+      <!-- Close Button (Top Right) -->
+      <button type="button" id="btn-close-profile" class="dialog-close-btn" aria-label="Close Profile Setup" title="Close (Esc)">
+        ✕
+      </button>
+
+      <div class="profile-setup-grid">
+        <!-- LEFT COLUMN: Profile Picture Preview (with Camera upload trigger) & Default Assets Grid -->
+        <aside class="profile-avatar-column" aria-label="Profile Picture Selection and Upload">
+          <div class="avatar-showcase-card">
+            <div class="avatar-orbital-ring" id="avatar-ring-trigger" title="Click camera icon to upload a custom photo">
+              <img id="profile-avatar-preview" src="" alt="Selected Profile Picture Preview" />
+              <input type="file" id="avatar-upload-input" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
+              <button type="button" id="btn-avatar-camera" class="avatar-camera-trigger" title="Upload Custom Profile Photo" aria-label="Upload Custom Profile Photo">
+                📷
+              </button>
+            </div>
+            <div class="live-id-meta">
+              <span class="live-id-callsign" id="preview-callsign">Commander</span>
+              <span class="live-id-rank" id="preview-rank-badge">LVL 1 • 100 COINS</span>
+            </div>
+            <div id="avatar-upload-status" class="upload-status hidden" role="status"></div>
+          </div>
+
+          <!-- Preset Avatars Selector from src/assets -->
+          <div class="presets-section">
+            <span class="sub-label">SELECT DEFAULT AVATAR</span>
+            <div id="avatar-presets-grid" class="avatar-presets-grid" role="radiogroup" aria-label="Default Dili-Birds Avatars">
+              <!-- Populated dynamically from src/assets images by ProfileModal -->
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT COLUMN: Prominent Username Input & Save Actions -->
+        <section class="profile-form-column">
+          <div class="profile-header-block">
+            <div class="dialog-badge">DILI-BIRDS COMMANDER SETUP</div>
+            <h2 id="profile-dialog-title">Create Your Pilot Profile</h2>
+            <p class="dialog-desc">
+              Personalize your commander identity and choose a Dili-Birds avatar or upload your own photo using the camera icon. Your profile, unlocked stages, and treasury are automatically saved in Local Storage.
+            </p>
+          </div>
+
+          <!-- Prominent Username Field -->
+          <div class="form-group prominent-field-group">
+            <div class="label-row">
+              <label for="username-input" class="prominent-label">
+                Commander Username <span class="req-star" aria-hidden="true">*</span>
+              </label>
+              <span id="username-char-count" class="char-counter">0 / 24</span>
+            </div>
+
+            <div class="prominent-input-wrapper">
+              <span class="input-lead-icon" aria-hidden="true">🦅</span>
+              <input
+                type="text"
+                id="username-input"
+                name="username"
+                minlength="2"
+                maxlength="24"
+                placeholder="Enter your callsign (e.g. Maverick)"
+                autocomplete="nickname"
+                required
+                aria-errormessage="username-error"
+              />
+              <button
+                type="button"
+                id="btn-random-username"
+                class="dice-btn"
+                title="Generate Random Bird Callsign"
+                aria-label="Generate Random Callsign"
+              >
+                🎲 Random
+              </button>
+            </div>
+
+            <!-- Accessible Error Message (shown via :user-invalid + fallback) -->
+            <div id="username-error" class="error-msg" role="alert">
+              <span aria-hidden="true">❌</span> Please enter a Commander username (2–24 characters).
+            </div>
+          </div>
+
+          <!-- Action Footer -->
+          <div class="dialog-actions profile-footer-actions">
+            <button type="button" id="btn-reset-progress" class="action-btn danger-outline-btn" title="Reset unlocked levels and coins">
+              Reset Save Data
+            </button>
+            <div class="spacer"></div>
+            <button type="submit" id="btn-save-profile" class="action-btn primary-btn save-profile-cta">
+              <span>Save Profile &amp; Launch</span>
+              <span class="cta-arrow" aria-hidden="true">➔</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Level Result Modal Dialog (Victory / Try Again) -->
+  <dialog id="result-dialog" class="game-dialog" closedby="closerequest" aria-labelledby="result-dialog-title">
+    <div class="dialog-content result-content">
+      <div class="result-badge" id="result-badge">STAGE COMPLETE</div>
+      <h2 id="result-dialog-title">Victory!</h2>
+      <div class="result-stars" id="result-stars" aria-label="Stars Earned">
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+      </div>
+      <p class="result-message" id="result-message">All targets eliminated!</p>
+
+      <div class="result-stats-grid">
+        <div class="result-stat-box">
+          <span class="r-label">STAGE SCORE</span>
+          <strong class="r-value" id="result-score">0</strong>
+        </div>
+        <div class="result-stat-box coin-box">
+          <span class="r-label">COINS EARNED</span>
+          <strong class="r-value" id="result-coins">+0 🪙</strong>
+        </div>
+      </div>
+
+      <div class="dialog-actions result-actions">
+        <button type="button" id="btn-result-menu" class="action-btn secondary-btn">
+          🗺️ Roadmap
+        </button>
+        <button type="button" id="btn-result-retry" class="action-btn secondary-btn">
+          ↻ Replay
+        </button>
+        <button type="button" id="btn-result-next" class="action-btn primary-btn">
+          Next Level ➔
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

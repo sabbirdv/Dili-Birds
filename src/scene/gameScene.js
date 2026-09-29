@@ -389,27 +389,27 @@ export class GameScene {
 
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
     const massMap = {
-      glass: 2.4,
-      wood: 5.2,
-      coin: 3.6,
-      tnt: 3.4,
-      stone: 9.5
+      glass: 1.4,
+      wood: 2.8,
+      coin: 2.0,
+      tnt: 1.8,
+      stone: 4.8
     };
     const hpMap = {
-      glass: 42,
-      coin: 55,
-      tnt: 28,
-      wood: 110,
-      stone: 220
+      glass: 16,
+      coin: 22,
+      tnt: 14,
+      wood: 42,
+      stone: 78
     };
 
     const body = new CANNON.Body({
-      mass: massMap[type] || 4.5,
+      mass: massMap[type] || 2.8,
       shape: new CANNON.Box(halfExtents),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
-      linearDamping: 0.05,
-      angularDamping: 0.1,
+      linearDamping: 0.04,
+      angularDamping: 0.08,
       // Constrain block physics strictly to the 2D XY plane
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
@@ -420,7 +420,7 @@ export class GameScene {
     body.sleepTimeLimit = 0.8;
     body.sleep();
 
-    const maxHp = hpMap[type] || 100;
+    const maxHp = hpMap[type] || 45;
     const blockObj = {
       type,
       size,
@@ -439,16 +439,16 @@ export class GameScene {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       const now = performance.now();
 
-      // Debounce micro-contacts within 130ms (prevents physics solver over-damage)
-      if (now - blockObj.lastHitTime < 130) {
+      // Debounce micro-contacts within 90ms (prevents physics engine multi-collision compounding)
+      if (now - blockObj.lastHitTime < 90) {
         return;
       }
 
       // Direct impact from player bird
       if (isBirdHit) {
-        // Light graze or glancing collision (< 3.8 normal impact) deals ZERO damage, just a physics deflection
-        if (normalImpact < 3.8) {
-          this.audio?.playImpact(0.2);
+        // Light graze or glancing collision (< 2.0 normal impact) deals zero damage
+        if (normalImpact < 2.0) {
+          this.audio?.playImpact(0.15);
           return;
         }
 
@@ -457,25 +457,25 @@ export class GameScene {
         const birdType = this.activeBird?.type || 'red';
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.5 : 0.95;
+          birdMultiplier = blockObj.type === 'glass' ? 2.5 : 1.0;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.6 : 2.0;
+          birdMultiplier = blockObj.type === 'stone' ? 2.4 : 2.0;
         }
 
-        // Damage strictly derived from the normal impact collision force
-        const effectiveImpact = normalImpact - 3.0;
-        const dmg = effectiveImpact * 2.2 * birdMultiplier;
+        // Damage derived from normal impact collision force
+        const effectiveImpact = normalImpact - 1.2;
+        const dmg = effectiveImpact * 2.6 * birdMultiplier;
 
         if (dmg > 1.0) {
-          this.audio?.playImpact(Math.min(1.0, dmg * 0.05));
+          this.audio?.playImpact(Math.min(1.0, dmg * 0.06));
           blockObj.hp -= dmg;
 
           // Visual crack & stress feedback (darken slightly as it takes heavy structural damage)
           if (blockObj.mesh?.material && !blockObj.isDamagedTinted) {
-            if (blockObj.hp < blockObj.maxHp * 0.55) {
+            if (blockObj.hp < blockObj.maxHp * 0.6) {
               blockObj.isDamagedTinted = true;
               if (blockObj.mesh.material.color) {
-                blockObj.mesh.material.color.multiplyScalar(0.76);
+                blockObj.mesh.material.color.multiplyScalar(0.78);
               }
             }
           }
@@ -484,11 +484,11 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 11.5) {
-        // High-velocity collapsing structure or falling debris crash
+      } else if (normalImpact >= 5.5) {
+        // Falling debris or collapsing structure impact (breaks tumbling blocks on ground or heavy crush)
         blockObj.lastHitTime = now;
         this.audio?.playImpact(Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 10.0) * 2.2;
+        const debrisDmg = (normalImpact - 4.2) * 2.2;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
@@ -529,7 +529,7 @@ export class GameScene {
       body,
       radius,
       isBoss,
-      hp: isBoss ? 28 : 16,
+      hp: isBoss ? 20 : 12,
       destroyed: false,
       lastHitTime: 0
     };
@@ -541,24 +541,24 @@ export class GameScene {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       const now = performance.now();
 
-      if (now - targetObj.lastHitTime < 130) {
+      if (now - targetObj.lastHitTime < 90) {
         return;
       }
 
       if (isBirdHit) {
-        if (normalImpact < 2.5) return;
+        if (normalImpact < 1.8) return;
         targetObj.lastHitTime = now;
-        const dmg = (normalImpact - 1.5) * 2.8;
+        const dmg = (normalImpact - 1.0) * 3.0;
         if (dmg > 1.0) {
           targetObj.hp -= dmg;
           if (targetObj.hp <= 0) {
             this.defeatTarget(targetObj);
           }
         }
-      } else if (normalImpact >= 5.0) {
-        // Crushed by heavy falling debris
+      } else if (normalImpact >= 4.0) {
+        // Crushed by heavy falling debris or toppling beams
         targetObj.lastHitTime = now;
-        targetObj.hp -= (normalImpact - 3.5) * 3.0;
+        targetObj.hp -= (normalImpact - 2.8) * 3.2;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
         }

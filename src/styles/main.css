@@ -2024,8 +2024,8 @@ html, body {
   padding-right: max(12px, env(safe-area-inset-right));
 }
 
-/* Compact Mobile Landscape Mode (Phones & Small Tablets in Landscape: height <= 540px) */
-@media screen and (max-height: 540px) {
+/* Compact Mobile Landscape Mode (Phones & Small Tablets in Landscape: height <= 580px or width <= 920px) */
+@media screen and (max-height: 580px), screen and (max-width: 920px) {
   #ui-layer {
     padding-top: max(4px, env(safe-area-inset-top));
     padding-bottom: max(4px, env(safe-area-inset-bottom));
@@ -2106,60 +2106,183 @@ html, body {
 
   /* Roadmap screen in landscape */
   .roadmap-screen-card {
-    max-height: 94vh;
+    max-height: calc(100vh - 42px);
     overflow-y: auto;
-    padding: 10px 14px;
+    padding: 6px 12px;
+    gap: 4px;
+    border-radius: 16px;
   }
 
   .roadmap-top-bar {
-    margin-bottom: 8px;
+    margin-bottom: 2px;
+    gap: 6px;
+  }
+
+  .hero-compact {
+    gap: 1px;
+  }
+
+  .brand-tag {
+    font-size: 0.52rem;
+    padding: 2px 7px;
   }
 
   .game-title {
-    font-size: 1.35rem;
+    font-size: 1.1rem;
   }
 
-  .progress-summary {
-    padding: 4px 10px;
-    gap: 10px;
+  .progress-summary.compact-summary {
+    padding: 3px 8px;
+    gap: 6px;
+    border-radius: 10px;
+  }
+
+  .summary-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  .summary-name {
+    font-size: 0.72rem;
   }
 
   .summary-title {
-    font-size: 0.55rem;
+    font-size: 0.46rem;
   }
 
   .summary-val {
-    font-size: 0.82rem;
+    font-size: 0.7rem;
+  }
+
+  .summary-divider {
+    height: 16px;
+  }
+
+  .roadmap-controls-bar {
+    margin-bottom: 2px;
+    padding-bottom: 2px;
+  }
+
+  .roadmap-heading-group h2 {
+    font-size: 0.78rem;
+  }
+
+  .sequential-hint {
+    display: none;
+  }
+
+  .roadmap-legend {
+    gap: 5px;
+    font-size: 0.6rem;
+  }
+
+  .roadmap-3d-viewport {
+    padding: 0;
   }
 
   .roadmap-square-board {
-    gap: 8px;
-    padding: 8px;
+    width: min(94vw, 390px, calc((100vh - 120px) * 1.25));
+    aspect-ratio: 1.25 / 1;
+    max-height: calc(100vh - 120px);
+    gap: 5px;
+    padding: 5px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   }
 
   .roadmap-square-node {
-    padding: 6px;
+    padding: 2px 3px;
+    border-radius: 10px;
   }
 
-  .node-level-num {
-    font-size: 1.3rem;
+  .node-3d-bevel {
+    display: none;
   }
 
-  .node-stars {
-    font-size: 0.75rem;
+  .node-stars-bar {
+    font-size: 0.65rem;
+    gap: 1px;
   }
 
-  .node-coin-reward {
-    font-size: 0.68rem;
+  .node-big-number {
+    font-size: clamp(1.0rem, 2.6vw, 1.35rem);
   }
 
-  .center-logo-badge {
-    width: 38px;
-    height: 38px;
+  .coin-reward-badge {
+    padding: 1px 4px;
+    font-size: 0.58rem;
+    gap: 2px;
   }
 
-  .center-brand-name {
-    font-size: 1.05rem;
+  .coin-asset-icon {
+    width: 11px;
+    height: 11px;
+  }
+
+  .lock-badge-circle {
+    width: 24px;
+    height: 24px;
+  }
+
+  .lock-svg-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .commander-pin {
+    width: 18px;
+    height: 18px;
+    top: -6px;
+    right: -4px;
+  }
+
+  .roadmap-dir-Step {
+    width: 12px;
+    height: 12px;
+    font-size: 0.48rem;
+  }
+  .dir-right { right: -7px; }
+  .dir-bottom { bottom: -7px; }
+  .dir-left { left: -7px; }
+  .dir-top { top: -7px; }
+  .dir-end { right: -6px; top: -6px; }
+
+  /* Roadmap Center Mascot Showcase in mobile landscape */
+  .roadmap-center-showcase {
+    padding: 3px;
+    border-radius: 10px;
+    gap: 1px;
+  }
+
+  .center-glow-ring {
+    width: 44px;
+    height: 44px;
+  }
+
+  .center-mascot-wrap {
+    width: 28px;
+    height: 28px;
+  }
+
+  .center-brand-caption {
+    gap: 1px;
+  }
+
+  .center-brand-title {
+    font-size: 0.54rem;
+    letter-spacing: 0.06em;
+  }
+
+  .center-trophy-pill {
+    padding: 1px 4px;
+    font-size: 0.52rem;
+    gap: 2px;
+  }
+
+  .roadmap-center-play-cta {
+    padding: 2px 6px;
+    font-size: 0.6rem;
+    border-radius: 5px;
   }
 
   .aim-telemetry {

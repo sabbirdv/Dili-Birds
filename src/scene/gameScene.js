@@ -220,16 +220,16 @@ export class GameScene {
 
   initPhysics() {
     this.world = new CANNON.World();
-    this.world.gravity.set(0, -20.0, 0);
+    this.world.gravity.set(0, -18.0, 0);
     this.world.allowSleep = true;
-    this.world.solver.iterations = 30;
+    this.world.solver.iterations = 35;
 
     this.defaultMaterial = new CANNON.Material('default');
     const contactMat = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, {
-      friction: 0.5,
-      restitution: 0.05,
-      contactEquationStiffness: 1e7,
-      contactEquationRelaxation: 3,
+      friction: 0.85,
+      restitution: 0.01,
+      contactEquationStiffness: 1e8,
+      contactEquationRelaxation: 4,
       frictionEquationStiffness: 1e7
     });
     this.world.defaultContactMaterial = contactMat;
@@ -321,6 +321,8 @@ export class GameScene {
 
     this.currentLevel = levelConfig;
     this.isPlayingLevel = !isMenuPreview;
+    this.hasBirdLaunched = false;
+    this.world.allowSleep = true;
     this.levelResolved = false;
     this.score = 0;
     this.levelCoinsEarned = 0;
@@ -412,8 +414,8 @@ export class GameScene {
     });
 
     // Start settled on initial load; wakes up dynamically during gameplay
-    body.sleepSpeedLimit = 0.05;
-    body.sleepTimeLimit = 1.5;
+    body.sleepSpeedLimit = 0.1;
+    body.sleepTimeLimit = 0.8;
     body.sleep();
 
     const blockObj = {
@@ -426,12 +428,26 @@ export class GameScene {
     };
 
     body.addEventListener('collide', (event) => {
-      if (!this.isPlayingLevel || blockObj.destroyed) return;
-      this.wakeAllStructures();
+      if (!this.isPlayingLevel || blockObj.destroyed || !this.hasBirdLaunched) return;
+
+      const isBirdHit = event.body === this.activeBird?.body;
       const impact = Math.abs(event.contact.getImpactVelocityAlongNormal());
-      if (impact > 1.8) {
-        this.audio?.playImpact(impact * 0.25);
-        blockObj.hp -= impact * 1.85;
+
+      // Direct impact from player bird deals heavy damage
+      if (isBirdHit) {
+        const birdVel = this.activeBird?.body ? this.activeBird.body.velocity.length() : impact;
+        const dmg = Math.max(impact, birdVel) * 2.8;
+        if (dmg > 2.0) {
+          this.audio?.playImpact(dmg * 0.15);
+          blockObj.hp -= dmg;
+          if (blockObj.hp <= 0) {
+            this.destroyBlock(blockObj);
+          }
+        }
+      } else if (impact >= 6.5) {
+        // High-energy falling debris or collapsing structure impact (never static resting load)
+        this.audio?.playImpact(impact * 0.1);
+        blockObj.hp -= (impact - 4.5) * 1.5;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
         }
@@ -462,8 +478,8 @@ export class GameScene {
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
-    body.sleepSpeedLimit = 0.05;
-    body.sleepTimeLimit = 1.5;
+    body.sleepSpeedLimit = 0.1;
+    body.sleepTimeLimit = 0.8;
     body.sleep();
 
     const targetObj = {
@@ -476,11 +492,23 @@ export class GameScene {
     };
 
     body.addEventListener('collide', (event) => {
-      if (!this.isPlayingLevel || targetObj.destroyed) return;
-      this.wakeAllStructures();
+      if (!this.isPlayingLevel || targetObj.destroyed || !this.hasBirdLaunched) return;
+
+      const isBirdHit = event.body === this.activeBird?.body;
       const impact = Math.abs(event.contact.getImpactVelocityAlongNormal());
-      if (impact > 1.5) {
-        targetObj.hp -= impact * 2.4;
+
+      if (isBirdHit) {
+        const birdVel = this.activeBird?.body ? this.activeBird.body.velocity.length() : impact;
+        const dmg = Math.max(impact, birdVel) * 3.2;
+        if (dmg > 2.0) {
+          targetObj.hp -= dmg;
+          if (targetObj.hp <= 0) {
+            this.defeatTarget(targetObj);
+          }
+        }
+      } else if (impact >= 5.5) {
+        // Crushed by heavy falling debris
+        targetObj.hp -= (impact - 3.5) * 2.5;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
         }
@@ -530,6 +558,7 @@ export class GameScene {
 
   handleBirdLaunch(launchPos, velocity) {
     if (!this.activeBird) return;
+    this.hasBirdLaunched = true;
 
     const radius = this.activeBird.mesh.userData.radius || 0.68;
     const mass = this.activeBird.type === 'heavy' ? 5.6 : 2.8;

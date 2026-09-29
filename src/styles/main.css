@@ -602,18 +602,8 @@ html, body {
   justify-content: center;
   align-items: center;
   overflow: visible;
-  transform-style: preserve-3d;
-  translate: 0 0;
-  scale: 1;
-  rotate: 0deg;
-  animation: nodeGentleFloat 4.2s ease-in-out infinite;
-  animation-delay: calc(var(--node-index, 0) * -0.45s);
-  transition: scale 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-@keyframes nodeGentleFloat {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -4px; }
+  animation: none !important;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 /* 3D Extruded Bottom Bevel on Square Nodes */
@@ -642,9 +632,9 @@ html, body {
 }
 
 .roadmap-square-node.unlocked:hover {
-  scale: 1.055;
+  transform: translateY(-2px);
   border-color: var(--accent-primary);
-  box-shadow: 0 16px 32px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 10px 24px rgba(249, 115, 22, 0.35);
   z-index: 6;
 }
 
@@ -844,13 +834,7 @@ html, body {
   height: 110px;
   border-radius: 50%;
   border: 1.5px dashed rgba(56, 189, 248, 0.35);
-  animation: spinSlow 16s linear infinite;
   pointer-events: none;
-}
-
-@keyframes spinSlow {
-  from { rotate: 0deg; }
-  to { rotate: 360deg; }
 }
 
 .center-bg-watermark {
@@ -869,7 +853,6 @@ html, body {
   height: 68px;
   display: grid;
   place-items: center;
-  animation: mascotBob 3s ease-in-out infinite;
 }
 
 .center-mascot-img {
@@ -877,11 +860,6 @@ html, body {
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 6px 14px rgba(56, 189, 248, 0.45));
-}
-
-@keyframes mascotBob {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -5px; }
 }
 
 .center-brand-caption {

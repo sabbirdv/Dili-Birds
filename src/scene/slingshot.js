@@ -30,12 +30,12 @@ export class SlingshotController {
     this.leftForkTip = new THREE.Vector3(-12.5, 3.55, 0.72);
     this.rightForkTip = new THREE.Vector3(-12.5, 3.55, -0.72);
 
-    this.maxPullDistance = 4.2;
+    this.maxPullDistance = 4.0;
     this.minPullDistance = 0.4;
-    this.launchPowerMultiplier = 7.8;
+    this.launchPowerMultiplier = 8.2;
 
     // Physics constants matching cannon-es world in GameScene
-    this.gravityY = -18.0;
+    this.gravityY = -20.0;
     this.birdLinearDamping = 0.01;
 
     // Current state
@@ -127,17 +127,18 @@ export class SlingshotController {
   buildTrajectoryDots() {
     this.trajectoryGroup = new THREE.Group();
     this.trajectoryDots = [];
-    const dotCount = 30;
+    const dotCount = 12; // Natural, compact length — does not stretch across the screen
 
     for (let i = 0; i < dotCount; i++) {
       const t = i / dotCount;
-      const radius = 0.14 * (1 - t * 0.5);
+      const radius = 0.16 * (1 - t * 0.6);
       const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(radius, 12, 12),
+        new THREE.SphereGeometry(radius, 10, 10),
         new THREE.MeshBasicMaterial({
-          color: i % 2 === 0 ? 0xfbbf24 : 0xffffff,
+          color: i % 2 === 0 ? 0xfffbeb : 0xfbbf24,
           transparent: true,
-          opacity: 0.94 - t * 0.65
+          opacity: Math.max(0.18, 0.95 - t * 0.75),
+          depthWrite: false
         })
       );
       dot.visible = false;
@@ -152,8 +153,9 @@ export class SlingshotController {
    * Positions the two 3D elastic rubber bands and leather pouch to wrap behind the bird.
    */
   updateBands(birdPos) {
-    const pouchPos = birdPos.clone().add(new THREE.Vector3(-0.34, 0, 0));
+    const pouchPos = new THREE.Vector3(birdPos.x - 0.34, birdPos.y, 0);
     this.pouchMesh.position.copy(pouchPos);
+    this.pouchMesh.rotation.set(0, 0, 0);
 
     this.leftBand.position.copy(this.leftForkTip);
     this.leftBand.lookAt(pouchPos);
@@ -171,10 +173,10 @@ export class SlingshotController {
    */
   mountBird(birdMesh) {
     this.currentBirdMesh = birdMesh;
-    this.currentPullPos.copy(this.anchor);
-    this.currentBirdMesh.position.copy(this.anchor);
-    // Angle slightly toward the right (+X) while keeping the 3D sculpted front face visible
-    this.currentBirdMesh.rotation.set(0, 0.28, 0);
+    this.currentPullPos.set(this.anchor.x, this.anchor.y, 0);
+    this.currentBirdMesh.position.set(this.anchor.x, this.anchor.y, 0);
+    // Strictly 2D orientation: 0 yaw, 0 pitch, 0 roll
+    this.currentBirdMesh.rotation.set(0, 0, 0);
     this.isDragging = false;
     this.canInteract = true;
     this.birdInFlight = false;
@@ -284,15 +286,15 @@ export class SlingshotController {
         pullVec.z = 0;
       }
 
-      this.currentPullPos.copy(candidatePos);
-      this.currentBirdMesh.position.copy(this.currentPullPos);
+      this.currentPullPos.set(candidatePos.x, candidatePos.y, 0);
+      this.currentBirdMesh.position.set(candidatePos.x, candidatePos.y, 0);
 
-      // Compute exact launch velocity in the XY plane
+      // Compute exact launch velocity in the 2D XY plane
       const launchVel = this.computeLaunchVelocity();
       const angleRad = Math.atan2(launchVel.y, Math.max(0.001, launchVel.x));
 
-      // Tilt the 3D sculpted bird along the launch elevation while keeping its 3D face visible
-      this.currentBirdMesh.rotation.set(0, 0.28, angleRad * 0.55);
+      // Strictly 2D elevation tilt: rotates ONLY along the Z-axis, zero yaw/pitch deflection
+      this.currentBirdMesh.rotation.set(0, 0, angleRad);
 
       this.updateBands(this.currentPullPos);
       this.updateTrajectoryPreview(this.currentPullPos, launchVel);
@@ -319,9 +321,10 @@ export class SlingshotController {
   }
 
   /**
-   * Simulates the exact discrete Euler integration steps used by cannon-es
-   * (dt = 1/60, gravity = -18.0, linearDamping = 0.01) so the trajectory preview dots
-   * match the bird's actual flight path with 100% precision.
+   * Simulates exact discrete Euler integration matching cannon-es:
+   * (dt = 1/60, gravity = -20.0, linearDamping = 0.01).
+   * Generates a natural, compact 2D arc (12 dots, 2 steps/dot = 0.4s of flight)
+   * that clearly guides the shot without stretching across the screen.
    */
   updateTrajectoryPreview(startPos, velocity) {
     const pullDist = this.anchor.distanceTo(startPos);
@@ -338,7 +341,7 @@ export class SlingshotController {
     let vx = velocity.x;
     let vy = velocity.y;
 
-    const stepsPerDot = 3; // Place a dot every 3 physics ticks (0.05s intervals)
+    const stepsPerDot = 2; // Compact, natural spacing (1/30s per dot)
 
     for (let i = 0; i < this.trajectoryDots.length; i++) {
       for (let s = 0; s < stepsPerDot; s++) {
@@ -350,10 +353,11 @@ export class SlingshotController {
       }
 
       const dot = this.trajectoryDots[i];
-      if (simY < 0.15) {
+      if (simY < 0.2) {
         dot.visible = false;
       } else {
-        dot.position.set(simX, simY, 0);
+        // Locked strictly to 2D plane: z is fixed at 0.05, no side-to-side deflection
+        dot.position.set(simX, simY, 0.05);
         dot.visible = true;
       }
     }
@@ -371,18 +375,18 @@ export class SlingshotController {
 
     const pullDist = this.anchor.distanceTo(this.currentPullPos);
     if (pullDist < this.minPullDistance) {
-      this.currentPullPos.copy(this.anchor);
+      this.currentPullPos.set(this.anchor.x, this.anchor.y, 0);
       if (this.currentBirdMesh) {
-        this.currentBirdMesh.position.copy(this.anchor);
-        this.currentBirdMesh.rotation.set(0, 0.28, 0);
+        this.currentBirdMesh.position.set(this.anchor.x, this.anchor.y, 0);
+        this.currentBirdMesh.rotation.set(0, 0, 0);
       }
       this.updateBands(this.anchor);
       return;
     }
 
     const velocity = this.computeLaunchVelocity();
-    const launchPos = this.currentPullPos.clone();
-    launchPos.z = 0;
+    velocity.z = 0;
+    const launchPos = new THREE.Vector3(this.currentPullPos.x, this.currentPullPos.y, 0);
 
     // Snap bands back to rest
     this.updateBands(this.anchor);

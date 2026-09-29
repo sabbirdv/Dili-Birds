@@ -130,14 +130,17 @@ export class GameScene {
 
   initPhysics() {
     this.world = new CANNON.World();
-    this.world.gravity.set(0, -18.0, 0);
+    this.world.gravity.set(0, -20.0, 0);
     this.world.allowSleep = true;
-    this.world.solver.iterations = 18;
+    this.world.solver.iterations = 30;
 
     this.defaultMaterial = new CANNON.Material('default');
     const contactMat = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, {
       friction: 0.5,
-      restitution: 0.15
+      restitution: 0.05,
+      contactEquationStiffness: 1e7,
+      contactEquationRelaxation: 3,
+      frictionEquationStiffness: 1e7
     });
     this.world.defaultContactMaterial = contactMat;
 
@@ -149,6 +152,25 @@ export class GameScene {
     });
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     this.world.addBody(groundBody);
+  }
+
+  /**
+   * Immediately awakens all active blocks and targets in the physics world so that
+   * realistic gravity and collision impulses propagate without freezing in mid-air.
+   */
+  wakeAllStructures() {
+    for (let i = 0; i < this.blocks.length; i++) {
+      const b = this.blocks[i];
+      if (!b.destroyed && b.body) {
+        b.body.wakeUp();
+      }
+    }
+    for (let i = 0; i < this.targets.length; i++) {
+      const t = this.targets[i];
+      if (!t.destroyed && t.body) {
+        t.body.wakeUp();
+      }
+    }
   }
 
   buildEnvironment() {
@@ -268,11 +290,11 @@ export class GameScene {
 
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
     const massMap = {
-      glass: 1.1,
-      wood: 2.0,
-      coin: 1.6,
-      tnt: 1.8,
-      stone: 4.0
+      glass: 1.2,
+      wood: 2.2,
+      coin: 1.8,
+      tnt: 2.0,
+      stone: 4.5
     };
     const hpMap = {
       glass: 9,
@@ -283,20 +305,20 @@ export class GameScene {
     };
 
     const body = new CANNON.Body({
-      mass: massMap[type] || 2.0,
+      mass: massMap[type] || 2.2,
       shape: new CANNON.Box(halfExtents),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
-      linearDamping: 0.06,
-      angularDamping: 0.12,
-      // Constrain block physics strictly to the 2D/3D hybrid XY plane
+      linearDamping: 0.04,
+      angularDamping: 0.08,
+      // Constrain block physics strictly to the 2D XY plane
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
 
-    // Start asleep so the tower stays completely still until hit
-    body.sleepSpeedLimit = 0.22;
-    body.sleepTimeLimit = 0.35;
+    // Start settled on initial load; wakes up dynamically during gameplay
+    body.sleepSpeedLimit = 0.05;
+    body.sleepTimeLimit = 1.5;
     body.sleep();
 
     const blockObj = {
@@ -310,8 +332,9 @@ export class GameScene {
 
     body.addEventListener('collide', (event) => {
       if (!this.isPlayingLevel || blockObj.destroyed) return;
+      this.wakeAllStructures();
       const impact = Math.abs(event.contact.getImpactVelocityAlongNormal());
-      if (impact > 2.2) {
+      if (impact > 1.8) {
         this.audio?.playImpact(impact * 0.25);
         blockObj.hp -= impact * 1.85;
         if (blockObj.hp <= 0) {
@@ -329,23 +352,23 @@ export class GameScene {
     const alignedPos = [pos[0], pos[1], 0];
     const mesh = createTargetMesh(radius, isBoss);
     mesh.position.set(...alignedPos);
-    // Angle slightly toward the slingshot (-0.18 rad) while facing the camera so 3D heart eyes & tufts shine
-    mesh.rotation.set(0, -0.18, 0);
+    // Face directly toward the 2D camera
+    mesh.rotation.set(0, 0, 0);
     this.scene.add(mesh);
 
     const body = new CANNON.Body({
-      mass: isBoss ? 2.4 : 1.5,
+      mass: isBoss ? 2.6 : 1.6,
       shape: new CANNON.Sphere(radius),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
-      linearDamping: 0.12,
-      angularDamping: 0.22,
-      // Constrain target movement strictly to the z = 0 gameplay plane
+      linearDamping: 0.08,
+      angularDamping: 0.15,
+      // Constrain target movement strictly to the 2D plane
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
-    body.sleepSpeedLimit = 0.22;
-    body.sleepTimeLimit = 0.35;
+    body.sleepSpeedLimit = 0.05;
+    body.sleepTimeLimit = 1.5;
     body.sleep();
 
     const targetObj = {
@@ -359,8 +382,9 @@ export class GameScene {
 
     body.addEventListener('collide', (event) => {
       if (!this.isPlayingLevel || targetObj.destroyed) return;
+      this.wakeAllStructures();
       const impact = Math.abs(event.contact.getImpactVelocityAlongNormal());
-      if (impact > 1.6) {
+      if (impact > 1.5) {
         targetObj.hp -= impact * 2.4;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
@@ -398,12 +422,12 @@ export class GameScene {
       this.slingshot.canInteract = false;
     }
 
-    // Render remaining birds lined up behind the slingshot
+    // Render remaining birds lined up behind the slingshot strictly on z = 0
     for (let i = 1; i < this.birdsQueue.length; i++) {
       const wMesh = createBirdMesh(this.birdsQueue[i]);
       const r = wMesh.userData.radius || 0.68;
-      wMesh.position.set(-14.6 - (i - 1) * 1.65, r, 0.35);
-      wMesh.rotation.set(0, 0.25, 0);
+      wMesh.position.set(-14.6 - (i - 1) * 1.65, r, 0.0);
+      wMesh.rotation.set(0, 0, 0);
       this.scene.add(wMesh);
       this.waitingBirdMeshes.push(wMesh);
     }
@@ -429,9 +453,9 @@ export class GameScene {
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
 
-    // Wake up all blocks and targets when a bird launches so collisions respond instantaneously
-    this.blocks.forEach((b) => b.body.wakeUp());
-    this.targets.forEach((t) => t.body.wakeUp());
+    // Ensure full dynamic simulation is running and all bodies respond to active gravity
+    this.world.allowSleep = false;
+    this.wakeAllStructures();
 
     this.world.addBody(body);
     this.activeBird.body = body;
@@ -469,9 +493,43 @@ export class GameScene {
     blockObj.destroyed = true;
 
     const pos = blockObj.mesh.position.clone();
+    const halfWidth = (blockObj.size?.[0] || 1.0) / 2;
+    const halfHeight = (blockObj.size?.[1] || 1.0) / 2;
+
     this.scene.remove(blockObj.mesh);
     this.world.removeBody(blockObj.body);
     this.blocks = this.blocks.filter((b) => b !== blockObj);
+
+    // CRITICAL: Wake up all structures in the physics world so gravity acts immediately
+    this.wakeAllStructures();
+
+    // Specifically for blocks directly above or resting on this block, give them an immediate gravity nudge
+    this.blocks.forEach((b) => {
+      if (!b.destroyed && b.body) {
+        b.body.wakeUp();
+        const bHalfWidth = (b.size?.[0] || 1.0) / 2;
+        const horizOverlap = Math.abs(b.body.position.x - pos.x) < (halfWidth + bHalfWidth + 0.3);
+        const isAbove = b.body.position.y > pos.y - halfHeight;
+        if (isAbove && horizOverlap) {
+          if (b.body.velocity.y > -0.5) {
+            b.body.velocity.y = -1.5;
+          }
+        }
+      }
+    });
+
+    this.targets.forEach((t) => {
+      if (!t.destroyed && t.body) {
+        t.body.wakeUp();
+        const horizOverlap = Math.abs(t.body.position.x - pos.x) < (halfWidth + (t.radius || 0.75) + 0.3);
+        const isAbove = t.body.position.y > pos.y - halfHeight;
+        if (isAbove && horizOverlap) {
+          if (t.body.velocity.y > -0.5) {
+            t.body.velocity.y = -1.5;
+          }
+        }
+      }
+    });
 
     if (blockObj.type === 'coin') {
       this.audio?.playCoin();
@@ -498,6 +556,9 @@ export class GameScene {
     this.onToast?.('💥 BOOM! TNT Detonated!');
     this.spawnBurstParticles(origin, 0xef4444, 32);
     this.spawnBurstParticles(origin, 0xfbbf24, 18);
+
+    // Awaken entire fortress
+    this.wakeAllStructures();
 
     const blastRadius = 6.8;
     const blastForce = 36.0;
@@ -542,6 +603,9 @@ export class GameScene {
     this.scene.remove(targetObj.mesh);
     this.world.removeBody(targetObj.body);
     this.targets = this.targets.filter((t) => t !== targetObj);
+
+    // Awaken structures so anything supported by this target falls naturally
+    this.wakeAllStructures();
 
     this.audio?.playTargetPop();
     const pts = targetObj.isBoss ? 1000 : 500;
@@ -693,23 +757,53 @@ export class GameScene {
     // Step physics world with fixed 60Hz substeps for deterministic trajectory accuracy
     this.world.step(1 / 60, deltaTime, 4);
 
-    // Sync active launched bird mesh with physics body
+    // Sync active launched bird mesh with physics body strictly on z = 0 plane
     if (this.activeBird && this.activeBird.body) {
-      this.activeBird.mesh.position.copy(this.activeBird.body.position);
+      this.activeBird.mesh.position.set(
+        this.activeBird.body.position.x,
+        this.activeBird.body.position.y,
+        0
+      );
+      this.activeBird.body.position.z = 0;
+      this.activeBird.body.velocity.z = 0;
       this.activeBird.mesh.quaternion.copy(this.activeBird.body.quaternion);
     }
 
-    // Sync blocks
+    // Sync blocks strictly on z = 0 plane
     this.blocks.forEach((b) => {
-      b.mesh.position.copy(b.body.position);
+      b.mesh.position.set(b.body.position.x, b.body.position.y, 0);
+      b.body.position.z = 0;
+      b.body.velocity.z = 0;
       b.mesh.quaternion.copy(b.body.quaternion);
     });
 
-    // Sync targets
+    // Sync targets strictly on z = 0 plane
     this.targets.forEach((t) => {
-      t.mesh.position.copy(t.body.position);
+      t.mesh.position.set(t.body.position.x, t.body.position.y, 0);
+      t.body.position.z = 0;
+      t.body.velocity.z = 0;
       t.mesh.quaternion.copy(t.body.quaternion);
     });
+
+    // Active structural gravity guarantee: prevent any airborne block or target from freezing asleep
+    if (this.isPlayingLevel && !this.levelResolved) {
+      for (let i = 0; i < this.blocks.length; i++) {
+        const b = this.blocks[i];
+        if (b.body && b.body.sleepState === CANNON.Body.SLEEPING) {
+          if (b.body.position.y > 0.6) {
+            b.body.wakeUp();
+          }
+        }
+      }
+      for (let i = 0; i < this.targets.length; i++) {
+        const t = this.targets[i];
+        if (t.body && t.body.sleepState === CANNON.Body.SLEEPING) {
+          if (t.body.position.y > 0.8) {
+            t.body.wakeUp();
+          }
+        }
+      }
+    }
 
     // Update explosion / debris particles
     for (let i = this.particles.length - 1; i >= 0; i--) {

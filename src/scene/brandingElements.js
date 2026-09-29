@@ -205,15 +205,15 @@ export class BrandingElements {
     this.paintAnimeCloud(ctx, 1160, 340, 225, 82, 0.72);
     this.paintAnimeCloud(ctx, 1820, 290, 200, 72, 0.75);
 
-    // ── Create textured backdrop plane ──
+    // ── Create textured backdrop plane (expanded for dynamic camera zooming) ──
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
 
     const backdrop = new THREE.Mesh(
-      new THREE.PlaneGeometry(120, 58),
+      new THREE.PlaneGeometry(240, 115),
       new THREE.MeshBasicMaterial({ map: tex, depthWrite: false, fog: false })
     );
-    backdrop.position.set(1, 14, -36);
+    backdrop.position.set(1, 24, -48);
     this.root.add(backdrop);
   }
 
@@ -228,10 +228,12 @@ export class BrandingElements {
     ];
 
     const hills = [
+      { pos: [-38, -6, -25], sx: 20, sy: 9.0, sz: 10, mi: 0 },
       { pos: [-22, -5, -22], sx: 18, sy: 8.5, sz: 9, mi: 1 },
       { pos: [-4, -5.5, -24], sx: 22, sy: 9.5, sz: 10, mi: 0 },
       { pos: [14, -5, -21], sx: 17, sy: 8.0, sz: 8, mi: 1 },
       { pos: [28, -5, -23], sx: 15, sy: 7.5, sz: 9, mi: 0 },
+      { pos: [40, -6, -25], sx: 19, sy: 8.8, sz: 10, mi: 1 },
       { pos: [-14, -3.5, -15], sx: 12, sy: 6.0, sz: 5.5, mi: 2 },
       { pos: [8, -3.8, -16], sx: 13, sy: 6.5, sz: 5.8, mi: 2 },
       { pos: [24, -3.2, -14], sx: 10, sy: 5.8, sz: 5, mi: 0 },
@@ -592,8 +594,8 @@ export class BrandingElements {
       // Gentle vertical bob for breathing life
       c.group.position.y = c.baseY + Math.sin(elapsedTime * 0.45 + c.phase) * 0.18;
 
-      // Wrap around when drifting off-screen
-      if (c.group.position.x > 38) c.group.position.x = -38;
+      // Wrap around when drifting off-screen (expanded bounds for wide-angle camera)
+      if (c.group.position.x > 52) c.group.position.x = -52;
     });
 
     // ── Animate falling cherry blossom petals ──
@@ -613,16 +615,16 @@ export class BrandingElements {
       // Reset petals that fell below the ground
       if (p.mesh.position.y < -1.5) {
         p.mesh.position.set(
-          -24 + Math.random() * 48,
-          16 + Math.random() * 8,
-          -28 + Math.random() * 32
+          -42 + Math.random() * 84,
+          18 + Math.random() * 12,
+          -32 + Math.random() * 40
         );
       }
 
       // Reset petals that drifted too far right
-      if (p.mesh.position.x > 28) {
-        p.mesh.position.x = -24;
-        p.mesh.position.y = 10 + Math.random() * 14;
+      if (p.mesh.position.x > 45) {
+        p.mesh.position.x = -42;
+        p.mesh.position.y = 10 + Math.random() * 16;
       }
     });
   }

@@ -109,13 +109,13 @@ export class GameScene {
     this.scene.add(hemiLight);
 
     const dirLight = new THREE.DirectionalLight(0xfff5e0, 1.55);
-    dirLight.position.set(-8, 24, 22);
+    dirLight.position.set(-8, 32, 28);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
     dirLight.shadow.mapSize.height = 2048;
     dirLight.shadow.camera.near = 2;
-    dirLight.shadow.camera.far = 75;
-    const d = 24;
+    dirLight.shadow.camera.far = 130;
+    const d = 38;
     dirLight.shadow.camera.left = -d;
     dirLight.shadow.camera.right = d;
     dirLight.shadow.camera.top = d;
@@ -130,26 +130,87 @@ export class GameScene {
   }
 
   /**
-   * Computes a dynamic, perfectly framed stationary camera position that guarantees
-   * both the slingshot & waiting birds on the left (x = -16.5) and the entire fortress on the right (x = +18.5)
-   * plus the ground and upper battlements remain completely visible without distortion across any
-   * aspect ratio (e.g. mobile landscape 19.5:9, 16:9, tablet 4:3, or desktop).
+   * Automatically calculates the total bounding box of the current level's structure,
+   * targets, slingshot, and player bird queue.
    */
-  updateStationaryCameraPosition(aspect) {
+  computeLevelBoundingBox(levelConfig) {
+    // Slingshot interactive zone
+    let minX = -18.0; // waiting birds at x = -16.5
+    let maxX = -10.0; // slingshot anchor at x = -12.5
+    let minY = 0.0;   // ground surface
+    let maxY = 5.0;   // slingshot top
+
+    if (levelConfig?.blocks) {
+      levelConfig.blocks.forEach((b) => {
+        const hx = (b.size?.[0] || 1.0) / 2;
+        const hy = (b.size?.[1] || 1.0) / 2;
+        minX = Math.min(minX, b.pos[0] - hx);
+        maxX = Math.max(maxX, b.pos[0] + hx);
+        minY = Math.min(minY, b.pos[1] - hy);
+        maxY = Math.max(maxY, b.pos[1] + hy);
+      });
+    }
+
+    if (levelConfig?.targets) {
+      levelConfig.targets.forEach((t) => {
+        const r = t.radius || 0.75;
+        minX = Math.min(minX, t.pos[0] - r);
+        maxX = Math.max(maxX, t.pos[0] + r);
+        minY = Math.min(minY, t.pos[1] - r);
+        maxY = Math.max(maxY, t.pos[1] + r);
+      });
+    }
+
+    return {
+      minX,
+      maxX,
+      minY: Math.min(0, minY),
+      maxY: Math.max(6.5, maxY)
+    };
+  }
+
+  /**
+   * Dynamic Camera System:
+   * Automatically calculates the total bounding box of the current level's structure.
+   * Adjusts camera distance (moves further back on Z-axis) and FOV so that the entire
+   * structure, slingshot, and ground are always fully visible regardless of size.
+   */
+  updateDynamicCamera(aspect) {
     const safeAspect = Math.max(0.65, aspect || 1.77);
+    const bbox = this.computeLevelBoundingBox(this.currentLevel);
+
+    // Padding around the bounding box (safe room for HUD, trajectory arc, and collapsing debris)
+    const padLeft = 2.8;
+    const padRight = 3.8;
+    const padBottom = 2.0;
+    const padTop = 3.8;
+
+    const totalWidth = (bbox.maxX - bbox.minX) + padLeft + padRight;
+    const totalHeight = (bbox.maxY - bbox.minY) + padBottom + padTop;
+
+    const centerX = (bbox.minX + bbox.maxX) / 2 + (padRight - padLeft) / 2;
+    const centerY = (bbox.minY + bbox.maxY) / 2 + (padTop - padBottom) / 2;
+
+    // Fixed low-distortion FOV (28°) for pure 2D/3D hybrid gameplay
     this.camera.fov = 28;
+    this.camera.aspect = safeAspect;
     const halfAngleTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-    // Generous framing: 42.5 world units width, 16.0 world units height
-    const targetWidth = 42.5;
-    const targetHeight = 16.0;
 
-    const zForWidth = targetWidth / (2 * halfAngleTan * safeAspect);
-    const zForHeight = targetHeight / (2 * halfAngleTan);
-    const computedZ = Math.max(38.0, Math.max(zForWidth, zForHeight));
+    const zForWidth = totalWidth / (2 * halfAngleTan * safeAspect);
+    const zForHeight = totalHeight / (2 * halfAngleTan);
+    const targetZ = Math.max(38.0, Math.max(zForWidth, zForHeight));
 
-    this.stationaryCameraPos = new THREE.Vector3(1.0, 4.8, computedZ);
+    this.stationaryLookAt.set(centerX, Math.max(3.6, centerY), 0.0);
+    this.stationaryCameraPos.set(centerX, Math.max(4.2, centerY + 0.4), targetZ);
+
     this.camera.position.copy(this.stationaryCameraPos);
     this.camera.lookAt(this.stationaryLookAt);
+    this.camera.updateProjectionMatrix();
+  }
+
+  // Alias for backward compatibility
+  updateStationaryCameraPosition(aspect) {
+    this.updateDynamicCamera(aspect);
   }
 
   initPhysics() {
@@ -198,43 +259,43 @@ export class GameScene {
   }
 
   buildEnvironment() {
-    // Main grassy game stage (top surface flush at y = 0)
-    const grassGeo = new THREE.BoxGeometry(52, 1.8, 12);
+    // Main grassy game stage (expanded to 88 units width for grand structures)
+    const grassGeo = new THREE.BoxGeometry(88, 2.0, 16);
     const grassMat = new THREE.MeshStandardMaterial({
       color: 0x22c55e,
       roughness: 0.82
     });
     const grassMesh = new THREE.Mesh(grassGeo, grassMat);
-    grassMesh.position.set(1, -0.9, 0);
+    grassMesh.position.set(1.5, -1.0, 0);
     grassMesh.receiveShadow = true;
     this.scene.add(grassMesh);
 
     // Clean front trim bevel along the grass edge for a crisp 2D/3D hybrid stage look
-    const trimGeo = new THREE.BoxGeometry(52, 0.35, 12.2);
+    const trimGeo = new THREE.BoxGeometry(88.4, 0.35, 16.2);
     const trimMat = new THREE.MeshStandardMaterial({
       color: 0x16a34a,
       roughness: 0.78
     });
     const trimMesh = new THREE.Mesh(trimGeo, trimMat);
-    trimMesh.position.set(1, -0.18, 0);
+    trimMesh.position.set(1.5, -0.18, 0);
     this.scene.add(trimMesh);
 
     // Sub-surface rocky foundation under the stage
-    const cliffGeo = new THREE.BoxGeometry(50, 8.0, 11);
+    const cliffGeo = new THREE.BoxGeometry(84, 10.0, 15);
     const cliffMat = new THREE.MeshStandardMaterial({
       color: 0x334155,
       roughness: 0.9
     });
     const cliffMesh = new THREE.Mesh(cliffGeo, cliffMat);
-    cliffMesh.position.set(1, -5.8, 0);
+    cliffMesh.position.set(1.5, -6.8, 0);
     this.scene.add(cliffMesh);
 
     // Fortress stone foundation pad on the right side
     const padMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(13.5, 0.12, 4.8),
+      new THREE.BoxGeometry(24.0, 0.12, 6.0),
       new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.78 })
     );
-    padMesh.position.set(12.5, 0.04, 0);
+    padMesh.position.set(13.5, 0.04, 0);
     padMesh.receiveShadow = true;
     this.scene.add(padMesh);
   }
@@ -244,7 +305,7 @@ export class GameScene {
   }
 
   toggleCameraView() {
-    // Camera remains stationary during gameplay per design specification
+    // Camera framing dynamically adapts to level structure size
   }
 
   /**
@@ -273,6 +334,11 @@ export class GameScene {
     // 3. Prepare Bird Queue & Active Slingshot Bird
     this.prepareNextBird();
     this.emitHudStats();
+
+    // 4. Dynamically compute the total bounding box and frame the entire structure
+    const width = this.container.clientWidth || window.innerWidth;
+    const height = this.container.clientHeight || window.innerHeight;
+    this.updateDynamicCamera(width / Math.max(1, height));
   }
 
   clearLevelEntities() {
@@ -767,11 +833,9 @@ export class GameScene {
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
     const aspect = width / Math.max(1, height);
-    this.camera.aspect = aspect;
-    this.updateStationaryCameraPosition(aspect);
-    this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.updateDynamicCamera(aspect);
   }
 
   animate() {

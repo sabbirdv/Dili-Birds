@@ -124,56 +124,142 @@
       </div>
     </main>
 
-    <!-- In-Game HUD (Visible while playing a level) -->
-    <section id="game-hud" class="hud-layer hidden" aria-label="In-Game Controls and Status">
+    <!-- In-Game Unified HUD (Single Clean Bar across top while playing) -->
+    <header id="game-hud" class="hud-layer hidden" aria-label="In-Game HUD">
       <div class="hud-top-bar glass-panel">
-        <div class="hud-level-info">
-          <span class="hud-stage-badge" id="hud-level-number">STAGE 1</span>
-          <h2 class="hud-stage-name" id="hud-level-title">Training Outpost</h2>
+        <div class="hud-left-group">
+          <button id="btn-hud-roadmap" class="hud-icon-btn" type="button" title="Return to Campaign Roadmap" aria-label="Return to Campaign Roadmap">
+            <span class="btn-icon">🗺️</span>
+            <span class="btn-label">Roadmap</span>
+          </button>
+          <div class="hud-stage-info">
+            <span class="hud-stage-badge" id="hud-level-number">STAGE 1</span>
+            <h2 class="hud-stage-name" id="hud-level-title">Training Outpost</h2>
+          </div>
         </div>
 
         <div class="hud-metrics">
-          <div class="hud-metric">
-            <span class="metric-label">TARGETS LEFT</span>
+          <div class="hud-metric" title="Targets Remaining">
+            <span class="metric-label">TARGETS</span>
             <span class="metric-val" id="hud-targets-left">2</span>
           </div>
-          <div class="hud-metric">
-            <span class="metric-label">BIRDS READY</span>
+          <div class="hud-metric" title="Birds Ready in Slingshot Queue">
+            <span class="metric-label">BIRDS</span>
             <div class="bird-queue" id="hud-bird-queue"></div>
           </div>
-          <div class="hud-metric">
+          <div class="hud-metric" title="Mission Score">
             <span class="metric-label">SCORE</span>
             <span class="metric-val" id="hud-score">0</span>
           </div>
         </div>
 
         <div class="hud-controls">
-          <button id="btn-restart-level" class="hud-btn" type="button" title="Restart Level">
-            ↻ Retry
+          <button id="btn-restart-level" class="hud-btn hud-retry-btn" type="button" title="Restart Level (↻)">
+            <span class="hud-btn-icon">↻</span>
+            <span class="hud-btn-text">Retry</span>
+          </button>
+          <button id="btn-hud-menu" class="hud-btn hud-menu-btn" type="button" title="Open Game Menu" aria-label="Open Game Menu">
+            <span class="hud-btn-icon">☰</span>
+            <span class="hud-btn-text">Menu</span>
           </button>
         </div>
       </div>
 
-      <!-- Slingshot Aim Telemetry & Special Ability Prompt -->
+      <!-- Slingshot Aim Telemetry (Clean, subtle, only during active drag) -->
       <div id="aim-telemetry" class="aim-telemetry hidden">
         <span id="telemetry-power">Power: 0%</span>
         <span class="telemetry-sep">•</span>
         <span id="telemetry-angle">Angle: 0°</span>
       </div>
-
-      <div id="ability-toast" class="ability-toast hidden">
-        ⚡ Tap or Click anywhere to trigger Bird Boost!
-      </div>
-
-      <!-- Floating Coin / Score Notification Container -->
-      <div id="floating-toasts" class="floating-toasts"></div>
-
-      <!-- Bottom Instructions Banner -->
-      <div class="hud-bottom-hint glass-panel">
-        <span>🎯 <strong>Drag &amp; Release</strong> the Dili-Bird in the slingshot (Mouse or Touch) • Tap in mid-flight to trigger special powers</span>
-      </div>
-    </section>
+    </header>
   </div>
+
+  <!-- Structured In-Game Menu Modal (Clean, organized pause & profile settings) -->
+  <dialog id="game-menu-dialog" class="game-dialog in-game-menu-dialog" closedby="any" aria-labelledby="game-menu-title">
+    <div class="game-menu-shell glass-card">
+      <div class="game-menu-header">
+        <div class="menu-title-group">
+          <span class="menu-kicker">MISSION PAUSED</span>
+          <h2 id="game-menu-title">Game Menu</h2>
+        </div>
+        <button type="button" id="btn-close-game-menu" class="dialog-close-btn" aria-label="Close Game Menu" title="Close (Esc)">
+          ✕
+        </button>
+      </div>
+
+      <!-- Commander Profile Card -->
+      <section class="menu-profile-card">
+        <div class="menu-avatar-wrap">
+          <img id="menu-avatar-img" src="" alt="Commander Avatar" />
+        </div>
+        <div class="menu-profile-info">
+          <span class="menu-profile-label">COMMANDER</span>
+          <strong class="menu-profile-name" id="menu-username">Commander</strong>
+        </div>
+        <button type="button" id="btn-menu-edit-profile" class="action-btn secondary-btn menu-edit-btn">
+          <span>✎ Edit Profile</span>
+        </button>
+      </section>
+
+      <!-- Player Progress Stats Summary -->
+      <section class="menu-stats-row">
+        <div class="menu-stat-pill">
+          <span class="m-icon">⭐</span>
+          <div class="m-content">
+            <span class="m-label">PLAYER LEVEL</span>
+            <strong class="m-val" id="menu-player-level">LVL 1</strong>
+          </div>
+        </div>
+        <div class="menu-stat-pill">
+          <span class="m-icon">🪙</span>
+          <div class="m-content">
+            <span class="m-label">TREASURY</span>
+            <strong class="m-val" id="menu-coins">100</strong>
+          </div>
+        </div>
+        <div class="menu-stat-pill">
+          <span class="m-icon">★</span>
+          <div class="m-content">
+            <span class="m-label">STARS</span>
+            <strong class="m-val" id="menu-stars">0 / 24</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Action List -->
+      <section class="menu-action-list">
+        <button type="button" id="btn-menu-audio-toggle" class="menu-list-btn">
+          <div class="list-left">
+            <span class="list-icon" id="menu-audio-icon">🔊</span>
+            <span class="list-text">Sound Effects</span>
+          </div>
+          <span class="list-badge" id="menu-audio-status">ON</span>
+        </button>
+
+        <button type="button" id="btn-menu-retry" class="menu-list-btn">
+          <div class="list-left">
+            <span class="list-icon">↻</span>
+            <span class="list-text">Restart Level</span>
+          </div>
+          <span class="list-arrow">➔</span>
+        </button>
+
+        <button type="button" id="btn-menu-roadmap" class="menu-list-btn">
+          <div class="list-left">
+            <span class="list-icon">🗺️</span>
+            <span class="list-text">Campaign Roadmap</span>
+          </div>
+          <span class="list-arrow">➔</span>
+        </button>
+      </section>
+
+      <div class="menu-footer-actions">
+        <button type="button" id="btn-menu-resume" class="action-btn primary-btn resume-cta-btn">
+          <span>▶ Resume Mission</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- Sleek User Profile Setup Screen (<dialog closedby="any"> + fallback) -->
   <dialog id="profile-dialog" class="game-dialog profile-setup-dialog" closedby="any" aria-labelledby="profile-dialog-title">

@@ -61,10 +61,12 @@ export class UIManager {
     );
 
     this.hud = new HudController({
+      storage: this.storage,
+      totalLevelsCount: this.totalLevelsCount,
       onRetryLevel,
       onNextLevel,
       onReturnToMenu: () => this.showMainMenu(),
-      onToggleCameraView
+      onOpenProfile: () => this.profileModal.open('username')
     });
 
     this.bindTopBarEvents();

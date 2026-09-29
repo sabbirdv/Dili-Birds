@@ -1,5 +1,6 @@
 import { ProfileModal } from './profileModal.js';
 import { HudController } from './hud.js';
+import { LEVELS } from '../levels/levelData.js';
 
 /**
  * High-level UI orchestrator connecting the Top Bar, Initial Menu, Level Select,
@@ -49,6 +50,10 @@ export class UIManager {
         this.refreshHeaderAndMenu();
         this.onBrandChanged?.(brandName);
         this.hud?.spawnFloatingToast(`Welcome, Commander ${username}!`);
+        // Launch active unlocked stage immediately on "Save Profile & Launch"
+        const activeLevel =
+          LEVELS.find((l) => l.id === this.storage.getUnlockedLevel()) || LEVELS[0];
+        this.onSelectLevel?.(activeLevel);
       },
       () => {
         this.refreshHeaderAndMenu();
@@ -64,13 +69,6 @@ export class UIManager {
 
     this.bindTopBarEvents();
     this.refreshHeaderAndMenu();
-
-    // Automatically present the sleek User Profile Setup Screen if not yet configured
-    if (!this.storage.isProfileConfigured()) {
-      setTimeout(() => {
-        this.profileModal.open('username');
-      }, 220);
-    }
   }
 
   bindTopBarEvents() {

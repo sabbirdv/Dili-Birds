@@ -92,6 +92,7 @@ export class GameScene {
     // while keeping the entire 2D/3D hybrid arena stationary in view.
     this.camera = new THREE.PerspectiveCamera(28, aspect, 1.0, 160);
     this.stationaryLookAt = new THREE.Vector3(1.0, 4.2, 0.0);
+    this.stationaryCameraPos = new THREE.Vector3(1.0, 4.2, 42.0);
     this.updateStationaryCameraPosition(aspect);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -134,13 +135,17 @@ export class GameScene {
    * targets, slingshot, and player bird queue.
    */
   computeLevelBoundingBox(levelConfig) {
-    // Slingshot interactive zone
-    let minX = -18.0; // waiting birds at x = -16.5
-    let maxX = -10.0; // slingshot anchor at x = -12.5
+    // Default bounds encompass whole playable arena: slingshot zone (-18 to -10) + fortress zone (8 to 16.5)
+    let minX = -18.5; // waiting birds at x = -16.5
+    let maxX = 16.5;  // fortress region default
     let minY = 0.0;   // ground surface
-    let maxY = 5.0;   // slingshot top
+    let maxY = 8.0;   // structure height default
 
-    if (levelConfig?.blocks) {
+    if (levelConfig?.blocks && levelConfig.blocks.length > 0) {
+      minX = -18.5;
+      maxX = 12.0;
+      minY = 0.0;
+      maxY = 6.0;
       levelConfig.blocks.forEach((b) => {
         const hx = (b.size?.[0] || 1.0) / 2;
         const hy = (b.size?.[1] || 1.0) / 2;
@@ -151,7 +156,7 @@ export class GameScene {
       });
     }
 
-    if (levelConfig?.targets) {
+    if (levelConfig?.targets && levelConfig.targets.length > 0) {
       levelConfig.targets.forEach((t) => {
         const r = t.radius || 0.75;
         minX = Math.min(minX, t.pos[0] - r);
@@ -163,9 +168,9 @@ export class GameScene {
 
     return {
       minX,
-      maxX,
+      maxX: Math.max(13.0, maxX),
       minY: Math.min(0, minY),
-      maxY: Math.max(6.5, maxY)
+      maxY: Math.max(7.5, maxY)
     };
   }
 

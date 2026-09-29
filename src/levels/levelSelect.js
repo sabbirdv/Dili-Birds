@@ -46,6 +46,14 @@ export class LevelSelect {
     if (!this.gridEl) return;
 
     this.gridEl.addEventListener('click', (e) => {
+      // Direct click on Center Play button
+      if (e.target.closest('#btn-roadmap-center-play, .roadmap-center-play-cta')) {
+        const unlockedLevel = this.storage.getUnlockedLevel();
+        const levelObj = LEVELS.find((l) => l.id === unlockedLevel) || LEVELS[0];
+        this.onSelectLevel?.(levelObj);
+        return;
+      }
+
       const nodeEl = e.target.closest('.roadmap-square-node.unlocked');
       if (!nodeEl) return;
 
@@ -225,6 +233,17 @@ export class LevelSelect {
             <span>${totalStars} / ${maxStars} STARS</span>
           </div>
         </div>
+
+        <button
+          type="button"
+          class="roadmap-center-play-cta"
+          id="btn-roadmap-center-play"
+          title="Play Active Stage ${unlockedLevel}"
+          aria-label="Play Active Stage ${unlockedLevel}"
+        >
+          <span class="play-cta-icon" aria-hidden="true">▶</span>
+          <span class="play-cta-label">PLAY STAGE ${unlockedLevel}</span>
+        </button>
       </section>
     `;
 

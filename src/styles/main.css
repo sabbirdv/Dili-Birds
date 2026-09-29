@@ -915,6 +915,57 @@ html, body {
   letter-spacing: 0.06em;
 }
 
+.roadmap-center-play-cta {
+  position: relative;
+  z-index: 4;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f97316, #ea580c 60%, #c2410c);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(249, 115, 22, 0.55), 0 2px 0 #9a3412, inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  animation: playPulse 2.2s infinite ease-in-out;
+}
+
+.roadmap-center-play-cta:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 24px rgba(249, 115, 22, 0.75), 0 3px 0 #9a3412;
+  filter: brightness(1.08);
+}
+
+.roadmap-center-play-cta:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+}
+
+.play-cta-icon {
+  font-size: 0.95rem;
+  color: var(--accent-gold);
+}
+
+@keyframes playPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 18px rgba(249, 115, 22, 0.55), 0 2px 0 #9a3412;
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 28px rgba(249, 115, 22, 0.8), 0 0 16px rgba(251, 191, 36, 0.6), 0 2px 0 #9a3412;
+  }
+}
+
 /* In-Game HUD */
 .hud-layer {
   flex: 1;
@@ -1792,21 +1843,47 @@ html, body {
   border-radius: 14px;
 }
 
-/* Prioritized CSS Detection: Display whenever portrait mode is detected on mobile/tablet */
-@media screen and (orientation: portrait) and (max-width: 1024px) {
-  .orientation-guard {
+/* Prioritized CSS Detection: Display whenever portrait mode is detected on touch mobile/tablet */
+@media screen and (orientation: portrait) and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+  body:not(.orientation-dismissed) .orientation-guard:not(.dismissed) {
     display: flex !important;
   }
-  #canvas-container,
-  #ui-layer {
+  body:not(.orientation-dismissed) #canvas-container,
+  body:not(.orientation-dismissed) #ui-layer {
     filter: blur(12px);
     pointer-events: none !important;
   }
 }
 
-/* Programmatic fallback class for browsers with CSS orientation delay */
-.orientation-guard.active-portrait {
+/* Programmatic fallback class for mobile browsers with CSS orientation delay */
+.orientation-guard.active-portrait:not(.dismissed) {
   display: flex !important;
+}
+
+.orientation-guard.dismissed,
+body.orientation-dismissed .orientation-guard {
+  display: none !important;
+}
+
+body.orientation-dismissed #canvas-container,
+body.orientation-dismissed #ui-layer {
+  filter: none !important;
+  pointer-events: auto !important;
+}
+
+.orientation-dismiss-btn {
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #cbd5e1 !important;
+  font-size: 0.9rem !important;
+  padding: 10px 20px !important;
+  border-radius: 12px !important;
+}
+
+.orientation-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
 }
 
 /* ==========================================================================

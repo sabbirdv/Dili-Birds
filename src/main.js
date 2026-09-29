@@ -141,9 +141,26 @@ export async function tryLockLandscape() {
 function initLandscapeGuard() {
   const guard = document.getElementById('orientation-guard');
   const btnForce = document.getElementById('btn-force-landscape');
+  const btnDismiss = document.getElementById('btn-dismiss-landscape');
+  let userDismissed = false;
+
+  const isTouchDevice = () => {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  };
 
   const checkOrientation = () => {
-    const isPortrait = window.innerHeight > window.innerWidth && window.innerWidth <= 1024;
+    if (userDismissed) {
+      guard?.classList.remove('active-portrait');
+      guard?.classList.add('dismissed');
+      document.body.classList.add('orientation-dismissed');
+      return;
+    }
+
+    const isPortrait =
+      isTouchDevice() &&
+      window.innerHeight > window.innerWidth &&
+      window.innerWidth <= 1024;
+
     if (guard) {
       if (isPortrait) {
         guard.classList.add('active-portrait');
@@ -152,6 +169,11 @@ function initLandscapeGuard() {
       }
     }
   };
+
+  btnDismiss?.addEventListener('click', () => {
+    userDismissed = true;
+    checkOrientation();
+  });
 
   btnForce?.addEventListener('click', async () => {
     try {
@@ -189,7 +211,13 @@ function initLandscapeGuard() {
   window.addEventListener('touchstart', onFirstInteraction, { passive: true });
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function boot() {
   initLandscapeGuard();
-  new DiliBirdsApp();
-});
+  window.diliBirdsApp = new DiliBirdsApp();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}

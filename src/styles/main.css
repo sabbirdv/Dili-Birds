@@ -758,6 +758,17 @@ html, body {
   font-weight: 700;
 }
 
+.coin-reward-badge.claimed {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #94a3b8;
+  opacity: 0.88;
+}
+
+.coin-reward-badge.claimed .coin-asset-icon {
+  filter: grayscale(0.65) opacity(0.8);
+}
+
 .coin-asset-icon {
   width: 16px;
   height: 16px;
@@ -1320,6 +1331,101 @@ html, body {
   background: rgba(56, 189, 248, 0.15);
   color: var(--accent-cyan);
   border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Audio State & Volume Controls Panel */
+.menu-volume-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 12px 14px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+}
+
+.menu-volume-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.menu-volume-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-main);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.menu-volume-label .v-icon {
+  font-size: 0.95rem;
+}
+
+.menu-volume-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.menu-volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.menu-volume-slider:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.menu-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.55);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  transition: transform 0.1s ease;
+}
+
+.menu-volume-slider::-webkit-slider-thumb:hover,
+.menu-volume-slider::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+}
+
+.menu-volume-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.55);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+}
+
+.menu-volume-val {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 /* Universal Coin Asset Icon */

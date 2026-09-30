@@ -8,6 +8,7 @@ import coinLogoUrl from '../assets/coin-with-logo.png';
 export class HudController {
   constructor({
     storage,
+    audio,
     totalLevelsCount = 8,
     onRetryLevel,
     onNextLevel,
@@ -17,6 +18,7 @@ export class HudController {
     onResumeGame
   }) {
     this.storage = storage;
+    this.audio = audio;
     this.totalLevelsCount = totalLevelsCount;
     this.onRetryLevel = onRetryLevel;
     this.onNextLevel = onNextLevel;
@@ -48,6 +50,12 @@ export class HudController {
     this.menuAudioStatus = document.getElementById('menu-audio-status');
     this.menuFullscreenIcon = document.getElementById('menu-fullscreen-icon');
     this.menuFullscreenStatus = document.getElementById('menu-fullscreen-status');
+
+    // Independent Volume Sliders
+    this.sliderSfxVolume = document.getElementById('slider-sfx-volume');
+    this.valSfxVolume = document.getElementById('val-sfx-volume');
+    this.sliderBgmVolume = document.getElementById('slider-bgm-volume');
+    this.valBgmVolume = document.getElementById('val-bgm-volume');
 
     // Result Dialog elements
     this.resultDialog = document.getElementById('result-dialog');
@@ -112,10 +120,35 @@ export class HudController {
     });
 
     document.getElementById('btn-menu-audio-toggle')?.addEventListener('click', () => {
-      if (this.storage) {
-        const enabled = this.storage.toggleSound();
-        this.updateAudioUI(enabled);
+      let enabled;
+      if (this.audio) {
+        enabled = this.audio.toggleMute();
+      } else if (this.storage) {
+        enabled = this.storage.toggleSound();
       }
+      this.updateAudioUI(enabled);
+    });
+
+    this.sliderSfxVolume?.addEventListener('input', (e) => {
+      const pct = Number(e.target.value) || 0;
+      const vol = pct / 100;
+      if (this.audio) {
+        this.audio.setSFXVolume(vol);
+      } else if (this.storage) {
+        this.storage.setSfxVolume(vol);
+      }
+      if (this.valSfxVolume) this.valSfxVolume.textContent = `${Math.round(pct)}%`;
+    });
+
+    this.sliderBgmVolume?.addEventListener('input', (e) => {
+      const pct = Number(e.target.value) || 0;
+      const vol = pct / 100;
+      if (this.audio) {
+        this.audio.setBGMVolume(vol);
+      } else if (this.storage) {
+        this.storage.setBgmVolume(vol);
+      }
+      if (this.valBgmVolume) this.valBgmVolume.textContent = `${Math.round(pct)}%`;
     });
 
     // Result Modal Buttons
@@ -134,8 +167,11 @@ export class HudController {
       this.onNextLevel?.();
     });
 
-    // Listen for Escape key to close pause menu
+    // Listen for Escape key, backdrop dismiss, or dialog close to resume game
     this.gameMenuDialog?.addEventListener('cancel', () => {
+      this.onResumeGame?.();
+    });
+    this.gameMenuDialog?.addEventListener('close', () => {
       this.onResumeGame?.();
     });
   }
@@ -153,6 +189,13 @@ export class HudController {
         const maxStars = this.totalLevelsCount * 3;
         this.menuStars.textContent = `${stars} / ${maxStars}`;
       }
+      const sfxVal = this.storage.getSfxVolume();
+      const bgmVal = this.storage.getBgmVolume();
+      if (this.sliderSfxVolume) this.sliderSfxVolume.value = Math.round(sfxVal * 100);
+      if (this.valSfxVolume) this.valSfxVolume.textContent = `${Math.round(sfxVal * 100)}%`;
+      if (this.sliderBgmVolume) this.sliderBgmVolume.value = Math.round(bgmVal * 100);
+      if (this.valBgmVolume) this.valBgmVolume.textContent = `${Math.round(bgmVal * 100)}%`;
+
       this.updateAudioUI(this.storage.isSoundEnabled());
       this.updateFullscreenUI();
     }
@@ -193,8 +236,8 @@ export class HudController {
   }
 
   updateLevelHeader(levelConfig) {
-    if (this.displayLevelNumber) {
-      this.displayLevelNumber.textContent = `STAGE ${levelConfig.id}`;
+    if (this.displayLevelNumber && levelConfig) {
+      this.displayLevelNumber.textContent = `LVL ${levelConfig.id}`;
     }
   }
 
@@ -237,20 +280,26 @@ export class HudController {
   hideAbilityPrompt() {}
   spawnFloatingToast() {}
 
-  showResultModal({ won, levelId, hasNextLevel, score, coinsEarned, starsEarned }) {
+  showResultModal({ won, levelId, hasNextLevel, score, coinsEarned, isFirstTimeWin = false, starsEarned }) {
     if (!this.resultDialog) return;
 
     this.resultBadge.textContent = won ? `STAGE ${levelId} CLEARED` : `STAGE ${levelId} FAILED`;
     this.resultTitle.textContent = won ? 'Victory!' : 'Out of Birds!';
-    this.resultMessage.textContent = won
-      ? 'Fortress demolished! Coins added to your treasury and next mission unlocked.'
-      : 'Some targets survived the bombardment. Adjust your trajectory and try again!';
+    if (won) {
+      this.resultMessage.textContent = coinsEarned > 0
+        ? 'Fortress demolished! Coins added to your treasury and next mission unlocked.'
+        : 'Fortress demolished! (Replay: coins already claimed on first clear)';
+    } else {
+      this.resultMessage.textContent =
+        'Some targets survived the bombardment. Adjust your trajectory and try again!';
+    }
 
     this.resultScore.textContent = score.toLocaleString();
+    const coinsDisplay = won && coinsEarned > 0 ? `+${coinsEarned}` : '+0';
     if (this.resultCoinsVal) {
-      this.resultCoinsVal.textContent = `+${coinsEarned}`;
+      this.resultCoinsVal.textContent = coinsDisplay;
     } else if (this.resultCoins) {
-      this.resultCoins.innerHTML = `<span id="result-coins-val">+${coinsEarned}</span> <img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" />`;
+      this.resultCoins.innerHTML = `<span id="result-coins-val">${coinsDisplay}</span> <img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" />`;
     }
 
     const starSpans = this.resultStars.querySelectorAll('.star');

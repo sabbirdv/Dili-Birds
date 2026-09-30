@@ -12,8 +12,11 @@ const DEFAULT_STATE = {
   coins: 100, // Starter coin bonus for new players
   levelStars: {}, // e.g., { 1: 3, 2: 2 }
   levelHighScores: {},
+  claimedCoinLevels: {}, // Tracks level IDs where coins have already been awarded
   brandName: DEFAULT_BRAND_NAME,
-  soundEnabled: true
+  soundEnabled: true,
+  sfxVolume: 0.85,
+  bgmVolume: 0.45
 };
 
 export class StorageManager {
@@ -50,8 +53,12 @@ export class StorageManager {
         brandName: DEFAULT_BRAND_NAME,
         avatarUrl: resolvedAvatarUrl,
         avatarPresetId: resolvedPresetId,
+        soundEnabled: parsed.soundEnabled !== undefined ? Boolean(parsed.soundEnabled) : true,
+        sfxVolume: typeof parsed.sfxVolume === 'number' ? Math.max(0, Math.min(1, parsed.sfxVolume)) : 0.85,
+        bgmVolume: typeof parsed.bgmVolume === 'number' ? Math.max(0, Math.min(1, parsed.bgmVolume)) : 0.45,
         levelStars: { ...(parsed.levelStars || {}) },
-        levelHighScores: { ...(parsed.levelHighScores || {}) }
+        levelHighScores: { ...(parsed.levelHighScores || {}) },
+        claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) }
       };
     } catch (err) {
       console.warn('LocalStorage unavailable or corrupted, using in-memory fallback:', err);
@@ -135,32 +142,76 @@ export class StorageManager {
   }
 
   /**
-   * Records level completion, awards coins, updates star ratings,
+   * Checks whether coins for a given level have already been awarded.
+   * Ensures that repeating/replaying an already completed level gives 0 coins.
+   */
+  hasClaimedCoins(levelId) {
+    const id = Number(levelId);
+    if (this.state.claimedCoinLevels && this.state.claimedCoinLevels[id]) {
+      return true;
+    }
+    // Backward compatibility: If level already has stars recorded, coins were already claimed
+    if (this.state.levelStars && Number(this.state.levelStars[id]) > 0) {
+      if (!this.state.claimedCoinLevels) this.state.claimedCoinLevels = {};
+      this.state.claimedCoinLevels[id] = true;
+      return true;
+    }
+    // Backward compatibility: If level is strictly less than unlockedLevel, it was previously completed
+    if (id < this.getUnlockedLevel()) {
+      if (!this.state.claimedCoinLevels) this.state.claimedCoinLevels = {};
+      this.state.claimedCoinLevels[id] = true;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Records level completion, awards coins (only once per level), updates star ratings,
    * and sequentially unlocks the next level.
    */
   recordLevelWin(levelId, score, starsEarned, coinsEarned, totalLevelsCount) {
-    const prevStars = this.getStarsForLevel(levelId);
+    const id = Number(levelId);
+    const isFirstTimeWin = !this.hasClaimedCoins(id);
+
+    const prevStars = this.getStarsForLevel(id);
     if (starsEarned > prevStars) {
-      this.state.levelStars[levelId] = starsEarned;
+      this.state.levelStars[id] = starsEarned;
     }
 
-    const prevHigh = Number(this.state.levelHighScores[levelId]) || 0;
+    const prevHigh = Number(this.state.levelHighScores[id]) || 0;
     if (score > prevHigh) {
-      this.state.levelHighScores[levelId] = score;
+      this.state.levelHighScores[id] = score;
     }
 
-    this.addCoins(coinsEarned);
+    let actualCoinsAwarded = 0;
+    if (isFirstTimeWin) {
+      if (!this.state.claimedCoinLevels) {
+        this.state.claimedCoinLevels = {};
+      }
+      this.state.claimedCoinLevels[id] = true;
+      actualCoinsAwarded = Math.max(0, Number(coinsEarned) || 0);
+      if (actualCoinsAwarded > 0) {
+        this.addCoins(actualCoinsAwarded);
+      }
+    }
 
     // Sequential level unlocking
-    if (levelId >= this.state.unlockedLevel && levelId < totalLevelsCount) {
-      this.state.unlockedLevel = levelId + 1;
+    if (id >= this.state.unlockedLevel && id < totalLevelsCount) {
+      this.state.unlockedLevel = id + 1;
     }
 
     this.saveState();
+    return { actualCoinsAwarded, isFirstTimeWin };
   }
 
   isSoundEnabled() {
     return Boolean(this.state.soundEnabled);
+  }
+
+  setSoundEnabled(enabled) {
+    this.state.soundEnabled = Boolean(enabled);
+    this.saveState();
+    return this.state.soundEnabled;
   }
 
   toggleSound() {
@@ -169,10 +220,34 @@ export class StorageManager {
     return this.state.soundEnabled;
   }
 
+  getSfxVolume() {
+    return typeof this.state.sfxVolume === 'number' ? this.state.sfxVolume : 0.85;
+  }
+
+  setSfxVolume(val) {
+    this.state.sfxVolume = Math.max(0, Math.min(1, Number(val) || 0));
+    this.saveState();
+    return this.state.sfxVolume;
+  }
+
+  getBgmVolume() {
+    return typeof this.state.bgmVolume === 'number' ? this.state.bgmVolume : 0.45;
+  }
+
+  setBgmVolume(val) {
+    this.state.bgmVolume = Math.max(0, Math.min(1, Number(val) || 0));
+    this.saveState();
+    return this.state.bgmVolume;
+  }
+
   resetProgress() {
     const currentUsername = this.state.username;
     const currentAvatarUrl = this.state.avatarUrl;
     const currentAvatarPresetId = this.state.avatarPresetId;
+    const currentSound = this.state.soundEnabled;
+    const currentSfx = this.getSfxVolume();
+    const currentBgm = this.getBgmVolume();
+
     this.state = {
       ...DEFAULT_STATE,
       username: currentUsername,
@@ -180,8 +255,12 @@ export class StorageManager {
       avatarUrl: currentAvatarUrl,
       avatarPresetId: currentAvatarPresetId,
       profileConfigured: Boolean(currentUsername),
+      soundEnabled: currentSound,
+      sfxVolume: currentSfx,
+      bgmVolume: currentBgm,
       levelStars: {},
-      levelHighScores: {}
+      levelHighScores: {},
+      claimedCoinLevels: {}
     };
     this.saveState();
     return this.state;

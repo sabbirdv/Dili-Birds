@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import dilicomLogoBlueUrl from '../assets/logo-blue.png';
 
 /**
  * High-quality anime-style environment with 3D parallax depth and subtle dynamic elements.
@@ -551,43 +552,85 @@ export class BrandingElements {
     this.monumentSignMesh.position.set(0, 2.8, 0.24);
     this.monumentGroup.add(this.monumentSignMesh);
 
-    // Sculpted Dili-Birds logo emblem (circular wing ring + 45° diamond core)
-    const emblemGroup = new THREE.Group();
-    emblemGroup.position.set(0, 4.95, 0);
-
-    const logoPinkMat = new THREE.MeshStandardMaterial({
-      color: 0xf5a0be,
-      roughness: 0.25,
-      metalness: 0.35
+    // Mounting support stem connecting billboard top to rotating emblem
+    const stemGeo = new THREE.CylinderGeometry(0.1, 0.14, 0.95, 16);
+    const stemMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      metalness: 0.5,
+      roughness: 0.35
     });
-    const logoWhiteMat = new THREE.MeshStandardMaterial({
-      color: 0xfff0f5,
+    const stem = new THREE.Mesh(stemGeo, stemMat);
+    stem.position.set(0, 4.25, 0);
+    this.monumentGroup.add(stem);
+
+    // Official Dilicom rotating brand emblem group
+    this.rotatingLogoGroup = new THREE.Group();
+    this.rotatingLogoGroup.position.set(0, 5.0, 0);
+
+    // Load official Dilicom blue logo texture
+    const textureLoader = new THREE.TextureLoader();
+    const logoTexture = textureLoader.load(dilicomLogoBlueUrl, (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+    });
+
+    // 3D Medallion Disc Base
+    const discGeo = new THREE.CylinderGeometry(0.98, 0.98, 0.15, 48);
+    discGeo.rotateX(Math.PI / 2);
+    const discMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.18,
+      metalness: 0.22
+    });
+    const disc = new THREE.Mesh(discGeo, discMat);
+    this.rotatingLogoGroup.add(disc);
+
+    // Sleek metallic royal blue outer bezel ring
+    const ringGeo = new THREE.TorusGeometry(0.98, 0.07, 16, 48);
+    const ringMat = new THREE.MeshStandardMaterial({
+      color: 0x2563eb,
+      metalness: 0.75,
+      roughness: 0.2
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    this.rotatingLogoGroup.add(ring);
+
+    // Front & Back Logo Face Materials
+    const logoFaceMat = new THREE.MeshStandardMaterial({
+      map: logoTexture,
+      transparent: true,
       roughness: 0.2,
-      metalness: 0.15
+      metalness: 0.1,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
     });
 
-    const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.22, 32), logoPinkMat);
-    disc.rotation.x = Math.PI / 2;
-    emblemGroup.add(disc);
+    // Front face (facing +Z)
+    const frontLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.52, 0.92), logoFaceMat);
+    frontLogo.position.set(0, 0, 0.082);
+    this.rotatingLogoGroup.add(frontLogo);
 
-    const outerRing = new THREE.Mesh(new THREE.TorusGeometry(0.88, 0.1, 16, 36), logoWhiteMat);
-    outerRing.position.z = 0.08;
-    emblemGroup.add(outerRing);
+    // Back face (facing -Z, un-mirrored scale so logo reads properly from both sides)
+    const backLogo = new THREE.Mesh(new THREE.PlaneGeometry(1.52, 0.92), logoFaceMat);
+    backLogo.position.set(0, 0, -0.082);
+    backLogo.rotation.y = Math.PI;
+    backLogo.scale.x = -1;
+    this.rotatingLogoGroup.add(backLogo);
 
-    const diamond = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.26), logoWhiteMat);
-    diamond.rotation.z = Math.PI / 4;
-    diamond.position.z = 0.08;
-    emblemGroup.add(diamond);
-
-    this.monumentGroup.add(emblemGroup);
+    this.monumentGroup.add(this.rotatingLogoGroup);
     this.root.add(this.monumentGroup);
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * UPDATE — Animates clouds and petals each frame
+   * UPDATE — Animates clouds, petals, and rotating logo each frame
    * ═════════════════════════════════════════════════════════════ */
 
   update(elapsedTime, deltaTime) {
+    // ── Rotate official Dilicom logo horizontally slowly ──
+    if (this.rotatingLogoGroup) {
+      this.rotatingLogoGroup.rotation.y += 0.85 * deltaTime;
+    }
+
     // ── Drift clouds ──
     this.clouds.forEach((c) => {
       c.group.position.x += c.speed * deltaTime;

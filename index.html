@@ -51,17 +51,12 @@
         </div>
       </div>
 
-      <!-- Right: Treasury Coins, In-Game Retry, and Game Pause / Menu Button -->
+      <!-- Right: Treasury Coins and Game Pause / Menu Button -->
       <div class="nav-right-group">
         <div class="stat-pill coin-pill" title="Treasury Coins">
           <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
           <span class="stat-value" id="display-coins">100</span>
         </div>
-
-        <button id="btn-restart-level" class="nav-btn retry-btn hidden" type="button" title="Restart Level (↻)" aria-label="Restart Level">
-          <span class="btn-icon">↻</span>
-          <span class="btn-text">Retry</span>
-        </button>
 
         <button id="btn-pause-menu" class="nav-btn pause-btn" type="button" title="Pause Game (⏸️)" aria-label="Pause Game">
           <span class="btn-icon">⏸️</span>
@@ -232,6 +227,30 @@
             <span class="sub-text">Fullscreen</span>
             <span class="sub-badge" id="menu-fullscreen-status">TOGGLE</span>
           </button>
+        </div>
+
+        <!-- Audio State & Independent Volume Controls -->
+        <div class="menu-volume-panel" aria-label="Audio Volume Settings">
+          <div class="menu-volume-row">
+            <div class="menu-volume-label">
+              <span class="v-icon">💥</span>
+              <span>SFX Volume</span>
+            </div>
+            <div class="menu-volume-ctrl">
+              <input type="range" id="slider-sfx-volume" class="menu-volume-slider" min="0" max="100" value="85" aria-label="SFX Sound Effects Volume" />
+              <span class="menu-volume-val" id="val-sfx-volume">85%</span>
+            </div>
+          </div>
+          <div class="menu-volume-row">
+            <div class="menu-volume-label">
+              <span class="v-icon">🎵</span>
+              <span>BGM Music</span>
+            </div>
+            <div class="menu-volume-ctrl">
+              <input type="range" id="slider-bgm-volume" class="menu-volume-slider" min="0" max="100" value="45" aria-label="BGM Background Music Volume" />
+              <span class="menu-volume-val" id="val-bgm-volume">45%</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>

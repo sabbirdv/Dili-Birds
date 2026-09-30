@@ -130,6 +130,23 @@ export class GameScene {
     const fillLight = new THREE.DirectionalLight(0xe0f2fe, 0.55);
     fillLight.position.set(14, 10, 20);
     this.scene.add(fillLight);
+
+    // Dedicated reusable explosion flash light
+    // Pre-added to the scene so Three.js compiles all PBR shaders with point light support on load.
+    // This avoids runtime WebGL shader recompilation, which was the primary cause of screen freezes!
+    this.explosionLight = new THREE.PointLight(0xff9900, 0, 24, 1.2);
+    this.explosionLight.position.set(0, 0, 2);
+    this.scene.add(this.explosionLight);
+    this.explosionLightTimer = 0;
+
+    // Shared zero-allocation particle geometries & materials for buttery smooth 60fps explosions
+    this.sharedUnitBoxGeo = new THREE.BoxGeometry(1, 1, 1);
+    this.sharedUnitSphereGeo = new THREE.SphereGeometry(1, 8, 8);
+    this.sharedShockwaveGeo = new THREE.TorusGeometry(0.5, 0.12, 10, 36);
+    this.sharedFireballGeo = new THREE.SphereGeometry(0.9, 14, 14);
+    this.sharedSparkGeo = new THREE.BoxGeometry(0.14, 0.14, 0.14);
+    this.sharedSparkMat1 = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+    this.sharedSparkMat2 = new THREE.MeshBasicMaterial({ color: 0xf97316 });
   }
 
   /**
@@ -243,6 +260,12 @@ export class GameScene {
       material: this.defaultMaterial
     });
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+    groundBody.addEventListener('collide', (event) => {
+      const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      if (normalImpact > 1.2) {
+        this.audio?.playMaterialImpact('ground', Math.min(1.0, normalImpact * 0.05));
+      }
+    });
     this.world.addBody(groundBody);
   }
 
@@ -330,6 +353,7 @@ export class GameScene {
     this.levelResolved = false;
     this.score = 0;
     this.levelCoinsEarned = 0;
+    this.isLevelAlreadyCompleted = levelConfig ? Boolean(this.storage?.hasClaimedCoins(levelConfig.id)) : false;
     this.birdsQueue = [...levelConfig.birds];
 
     // 1. Spawn Blocks (strictly on z = 0 plane)
@@ -377,13 +401,32 @@ export class GameScene {
     this.targets = [];
 
     this.particles.forEach((p) => {
-      if (p.mesh) this.scene.remove(p.mesh);
-      if (p.light) {
-        this.scene.remove(p.light);
-        p.light.dispose?.();
+      if (p.mesh) {
+        this.scene.remove(p.mesh);
+        if (
+          p.mesh.geometry &&
+          p.mesh.geometry !== this.sharedUnitBoxGeo &&
+          p.mesh.geometry !== this.sharedUnitSphereGeo &&
+          p.mesh.geometry !== this.sharedShockwaveGeo &&
+          p.mesh.geometry !== this.sharedFireballGeo &&
+          p.mesh.geometry !== this.sharedSparkGeo
+        ) {
+          p.mesh.geometry.dispose();
+        }
+        if (
+          p.mesh.material &&
+          p.mesh.material !== this.sharedSparkMat1 &&
+          p.mesh.material !== this.sharedSparkMat2
+        ) {
+          p.mesh.material.dispose?.();
+        }
       }
     });
     this.particles = [];
+    if (this.explosionLight) {
+      this.explosionLight.intensity = 0;
+      this.explosionLightTimer = 0;
+    }
     this.cameraShakeTrauma = 0;
 
     this.onHideAbilityPrompt?.();
@@ -464,7 +507,7 @@ export class GameScene {
 
         // Light graze or glancing collision (< 1.8 normal impact) deals zero damage
         if (normalImpact < 1.8) {
-          this.audio?.playImpact(0.15);
+          this.audio?.playMaterialImpact(blockObj.type, 0.15);
           return;
         }
 
@@ -483,7 +526,7 @@ export class GameScene {
         const dmg = effectiveImpact * 2.8 * birdMultiplier;
 
         if (dmg > 1.0) {
-          this.audio?.playImpact(Math.min(1.0, dmg * 0.06));
+          this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, dmg * 0.06));
           blockObj.hp -= dmg;
 
           // Visual crack & stress feedback (darken slightly as it takes heavy structural damage)
@@ -503,7 +546,7 @@ export class GameScene {
       } else if (normalImpact >= 7.8) {
         // Only high-velocity falls or heavy direct crushes damage blocks (prevents normal leaning from collapsing towers)
         blockObj.lastHitTime = now;
-        this.audio?.playImpact(Math.min(1.0, normalImpact * 0.06));
+        this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
         const debrisDmg = (normalImpact - 6.2) * 2.0;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
@@ -717,18 +760,29 @@ export class GameScene {
       }
     });
 
+    // Track rapid consecutive breaks to scale realistic structural collapse audio
+    const now = performance.now();
+    if (!this.recentBreakWindow || now - this.recentBreakWindow > 250) {
+      this.recentBreakWindow = now;
+      this.recentBreakCount = 1;
+    } else {
+      this.recentBreakCount = (this.recentBreakCount || 1) + 1;
+    }
+    const currentBreakCount = this.recentBreakCount;
+
     if (blockObj.type === 'coin') {
       this.audio?.playCoin();
       this.score += 300;
       const bonusCoins = 35;
-      this.levelCoinsEarned += bonusCoins;
-      this.storage.addCoins(bonusCoins);
-      this.onToast?.(`+${bonusCoins} Coins! 🪙 Treasure Crate Smashed`);
+      if (!this.isLevelAlreadyCompleted) {
+        this.levelCoinsEarned += bonusCoins;
+      }
       this.spawnBlockShatter(blockObj, pos);
     } else if (blockObj.type === 'tnt') {
       this.detonateTNT(pos);
     } else {
       this.score += 120;
+      this.audio?.playBlockBreak(blockObj.type, currentBreakCount);
       this.spawnBlockShatter(blockObj, pos);
     }
 
@@ -743,6 +797,17 @@ export class GameScene {
     const size = blockObj.size || [1.0, 1.0, 1.0];
     const type = blockObj.type || 'wood';
 
+    // Prune oldest particles if pool is full to maintain 60 FPS
+    if (this.particles.length > 70) {
+      const dropCount = Math.min(15, this.particles.length - 55);
+      for (let k = 0; k < dropCount; k++) {
+        const oldP = this.particles.shift();
+        if (oldP?.mesh) {
+          this.scene.remove(oldP.mesh);
+        }
+      }
+    }
+
     // 1. Physical tumbling 3D debris chunks
     const paletteMap = {
       wood: [0xc27838, 0x8f4f1a, 0xd97706],
@@ -751,7 +816,7 @@ export class GameScene {
       coin: [0xfbbf24, 0xf59e0b, 0x38bdf8]
     };
     const colors = paletteMap[type] || [0xc27838, 0x8f4f1a];
-    const chunkCount = type === 'stone' ? 8 : type === 'glass' ? 10 : 7;
+    const chunkCount = type === 'stone' ? 6 : type === 'glass' ? 7 : 5;
 
     for (let i = 0; i < chunkCount; i++) {
       const color = colors[i % colors.length];
@@ -759,7 +824,6 @@ export class GameScene {
       const chunkH = Math.max(0.12, (size[1] / 3) * (0.6 + Math.random() * 0.7));
       const chunkD = Math.max(0.12, (size[2] / 2) * (0.6 + Math.random() * 0.7));
 
-      const geo = new THREE.BoxGeometry(chunkW, chunkH, chunkD);
       const isGlass = type === 'glass';
       const mat = isGlass
         ? new THREE.MeshPhysicalMaterial({
@@ -776,7 +840,9 @@ export class GameScene {
             metalness: type === 'coin' ? 0.4 : 0.05
           });
 
-      const mesh = new THREE.Mesh(geo, mat);
+      // Scale unit box via matrix rather than allocating new geometries every hit
+      const mesh = new THREE.Mesh(this.sharedUnitBoxGeo, mat);
+      mesh.scale.set(chunkW, chunkH, chunkD);
       mesh.castShadow = true;
       const offsetX = (Math.random() - 0.5) * (size[0] * 0.6);
       const offsetY = (Math.random() - 0.5) * (size[1] * 0.6);
@@ -784,9 +850,9 @@ export class GameScene {
       this.scene.add(mesh);
 
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 8.5 + (offsetX * 4),
-        Math.random() * 6.5 + 2.0,
-        (Math.random() - 0.5) * 2.5
+        (Math.random() - 0.5) * 7.5 + (offsetX * 3.5),
+        Math.random() * 5.5 + 2.0,
+        (Math.random() - 0.5) * 2.2
       );
       const rotVel = new THREE.Vector3(
         (Math.random() - 0.5) * 14,
@@ -799,24 +865,25 @@ export class GameScene {
         mesh,
         vel,
         rotVel,
+        baseScaleVec: new THREE.Vector3(chunkW, chunkH, chunkD),
         baseScale: 1.0,
         life: 1.0,
-        decay: 1.2
+        decay: 1.3
       });
     }
 
     // 2. Soft stylized dust / smoke puff
-    const dustCount = 4;
+    const dustCount = 3;
     const dustColor = type === 'stone' ? 0x94a3b8 : type === 'glass' ? 0xe0f2fe : 0xd1a06d;
     for (let i = 0; i < dustCount; i++) {
-      const dustGeo = new THREE.SphereGeometry(0.28, 8, 8);
       const dustMat = new THREE.MeshBasicMaterial({
         color: dustColor,
         transparent: true,
         opacity: 0.55,
         depthWrite: false
       });
-      const mesh = new THREE.Mesh(dustGeo, dustMat);
+      const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, dustMat);
+      mesh.scale.setScalar(0.28);
       mesh.position.set(
         origin.x + (Math.random() - 0.5) * (size[0] * 0.5),
         origin.y + (Math.random() - 0.5) * (size[1] * 0.5),
@@ -825,8 +892,8 @@ export class GameScene {
       this.scene.add(mesh);
 
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 2.5,
-        Math.random() * 2.5 + 0.8,
+        (Math.random() - 0.5) * 2.2,
+        Math.random() * 2.2 + 0.8,
         0
       );
 
@@ -834,10 +901,10 @@ export class GameScene {
         type: 'smoke',
         mesh,
         vel,
-        baseScale: 1.0,
+        baseScale: 0.28,
         baseOpacity: 0.55,
         life: 1.0,
-        decay: 1.8
+        decay: 1.9
       });
     }
   }
@@ -847,8 +914,8 @@ export class GameScene {
     this.score += 400;
     this.onToast?.('💥 BOOM! TNT Detonated!');
 
-    // Punchy screen shake trauma
-    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.72);
+    // Smooth, punchy camera shake trauma
+    this.cameraShakeTrauma = Math.min(0.85, this.cameraShakeTrauma + 0.55);
 
     // Modern multi-layer explosion VFX
     this.createModernExplosion(origin);
@@ -856,77 +923,132 @@ export class GameScene {
     // Awaken entire fortress
     this.wakeAllStructures();
 
-    // Calibrated, balanced blast radius & force (not a map-wide violent nuke)
-    const blastRadius = 4.8;
-    const blastForce = 22.0;
+    // Balanced, punchy blast radius & force
+    const blastRadius = 3.9;
+    const blastForce = 17.5;
 
     // Push and damage nearby blocks
-    [...this.blocks].forEach((b) => {
-      if (b.destroyed) return;
+    const affectedBlocks = [...this.blocks];
+    for (let i = 0; i < affectedBlocks.length; i++) {
+      const b = affectedBlocks[i];
+      if (b.destroyed) continue;
+
       const bPos = b.mesh.position;
       const dist = origin.distanceTo(bPos);
       if (dist < blastRadius) {
         b.body.wakeUp();
-        const dir = bPos.clone().sub(origin).normalize();
-        const strength = (1 - dist / blastRadius) * blastForce;
-        b.body.applyImpulse(new CANNON.Vec3(dir.x * strength, (dir.y + 0.35) * strength, 0));
-        b.hp -= (1 - dist / blastRadius) * 85;
+
+        let dirX = bPos.x - origin.x;
+        let dirY = bPos.y - origin.y;
+        const d = Math.hypot(dirX, dirY);
+        if (d > 0.001) {
+          dirX /= d;
+          dirY /= d;
+        } else {
+          dirX = (Math.random() - 0.5) * 1.5;
+          dirY = 1.0;
+          const len = Math.hypot(dirX, dirY);
+          dirX /= len;
+          dirY /= len;
+        }
+
+        const factor = 1 - dist / blastRadius;
+        const strength = factor * blastForce;
+        b.body.applyImpulse(new CANNON.Vec3(dirX * strength, (dirY + 0.3) * strength, 0));
+        b.hp -= factor * 65;
+
         if (b.hp <= 0) {
-          this.destroyBlock(b);
+          if (b.type === 'tnt') {
+            // Remove from active blocks immediately so it won't be processed again
+            b.destroyed = true;
+            this.scene.remove(b.mesh);
+            this.world.removeBody(b.body);
+            this.blocks = this.blocks.filter((item) => item !== b);
+
+            // Stagger chained TNT detonations by 110ms for a dramatic cascade
+            // and completely prevent frame freeze / synchronous call stack spikes
+            setTimeout(() => {
+              if (this.isPlayingLevel) {
+                this.detonateTNT(bPos);
+              }
+            }, 110);
+          } else {
+            this.destroyBlock(b);
+          }
         }
       }
-    });
+    }
 
     // Push and damage nearby targets
-    [...this.targets].forEach((t) => {
-      if (t.destroyed) return;
+    const affectedTargets = [...this.targets];
+    for (let i = 0; i < affectedTargets.length; i++) {
+      const t = affectedTargets[i];
+      if (t.destroyed) continue;
+
       const tPos = t.mesh.position;
       const dist = origin.distanceTo(tPos);
       if (dist < blastRadius) {
         t.body.wakeUp();
-        t.hp -= (1 - dist / blastRadius) * 35;
+
+        let dirX = tPos.x - origin.x;
+        let dirY = tPos.y - origin.y;
+        const d = Math.hypot(dirX, dirY);
+        if (d > 0.001) {
+          dirX /= d;
+          dirY /= d;
+        } else {
+          dirX = (Math.random() - 0.5);
+          dirY = 1.0;
+          const len = Math.hypot(dirX, dirY);
+          dirX /= len;
+          dirY /= len;
+        }
+
+        const factor = 1 - dist / blastRadius;
+        const targetStrength = factor * blastForce * 0.8;
+        t.body.applyImpulse(new CANNON.Vec3(dirX * targetStrength, (dirY + 0.3) * targetStrength, 0));
+
+        t.hp -= factor * 35;
         if (t.hp <= 0) {
           this.defeatTarget(t);
         }
       }
-    });
+    }
   }
 
   /**
    * Modern stylized 3D explosion with expanding shockwave, fireball core,
-   * rising volumetric smoke plumes, glowing sparks, and light flash.
+   * rising volumetric smoke plumes, glowing sparks, and pre-allocated light flash.
    */
   createModernExplosion(origin) {
     // 1. Expanding Shockwave Ring (Torus on XY plane)
-    const ringGeo = new THREE.TorusGeometry(0.5, 0.12, 10, 36);
-    const ringMat = new THREE.MeshBasicMaterial({
+    const shockwaveMat = new THREE.MeshBasicMaterial({
       color: 0xfde047,
       transparent: true,
       opacity: 0.95,
       depthWrite: false
     });
-    const shockwaveMesh = new THREE.Mesh(ringGeo, ringMat);
+    const shockwaveMesh = new THREE.Mesh(this.sharedShockwaveGeo, shockwaveMat);
     shockwaveMesh.position.set(origin.x, origin.y, 0.05);
     this.scene.add(shockwaveMesh);
     this.particles.push({
       type: 'shockwave',
       mesh: shockwaveMesh,
       baseScale: 0.3,
-      maxExpansion: 6.8,
+      maxExpansion: 6.5,
       baseOpacity: 0.95,
       life: 1.0,
       decay: 2.8
     });
 
     // 2. Blazing Fireball Plasma Core
-    const fireGeo = new THREE.SphereGeometry(0.9, 16, 16);
     const fireMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
       opacity: 1.0,
       depthWrite: false
     });
-    const fireMesh = new THREE.Mesh(fireGeo, fireMat);
+    const fireMesh = new THREE.Mesh(this.sharedFireballGeo, fireMat);
     fireMesh.position.set(origin.x, origin.y, 0.1);
     this.scene.add(fireMesh);
     this.particles.push({
@@ -940,66 +1062,65 @@ export class GameScene {
 
     // 3. Volumetric Billowing Smoke Plumes
     const smokeColors = [0x1e293b, 0x334155, 0x475569, 0x0f172a];
-    const smokeCount = 12;
+    const smokeCount = 10;
     for (let i = 0; i < smokeCount; i++) {
       const color = smokeColors[i % smokeColors.length];
-      const radius = 0.4 + Math.random() * 0.35;
-      const smokeGeo = new THREE.SphereGeometry(radius, 10, 10);
-      const smokeMat = new THREE.MeshStandardMaterial({
+      const radius = 0.38 + Math.random() * 0.3;
+      const smokeMat = new THREE.MeshBasicMaterial({
         color,
-        roughness: 0.9,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.75,
         depthWrite: false
       });
-      const mesh = new THREE.Mesh(smokeGeo, smokeMat);
+      const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, smokeMat);
+      mesh.scale.setScalar(radius);
       mesh.position.set(
-        origin.x + (Math.random() - 0.5) * 0.6,
-        origin.y + (Math.random() - 0.5) * 0.6,
-        (Math.random() - 0.5) * 0.4
+        origin.x + (Math.random() - 0.5) * 0.5,
+        origin.y + (Math.random() - 0.5) * 0.5,
+        (Math.random() - 0.5) * 0.3
       );
       this.scene.add(mesh);
 
       const angle = (i / smokeCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const speed = 2.5 + Math.random() * 3.5;
+      const speed = 2.4 + Math.random() * 3.0;
       const vel = new THREE.Vector3(
         Math.cos(angle) * speed,
-        Math.sin(angle) * speed * 0.8 + 2.0,
-        (Math.random() - 0.5) * 1.5
+        Math.sin(angle) * speed * 0.8 + 1.8,
+        (Math.random() - 0.5) * 1.2
       );
 
       this.particles.push({
         type: 'smoke',
         mesh,
         vel,
-        baseScale: 1.0,
-        baseOpacity: 0.8,
+        baseScale: radius,
+        baseOpacity: 0.75,
         life: 1.0,
-        decay: 1.3
+        decay: 1.4
       });
     }
 
     // 4. Incandescent High-Speed Sparks & Shrapnel Embers
-    const sparkCount = 26;
-    const sparkGeo = new THREE.BoxGeometry(0.14, 0.14, 0.14);
-    const sparkMat1 = new THREE.MeshBasicMaterial({ color: 0xfef08a });
-    const sparkMat2 = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+    const sparkCount = 20;
     for (let i = 0; i < sparkCount; i++) {
-      const mesh = new THREE.Mesh(sparkGeo, i % 2 === 0 ? sparkMat1 : sparkMat2);
+      const mesh = new THREE.Mesh(
+        this.sharedSparkGeo,
+        i % 2 === 0 ? this.sharedSparkMat1 : this.sharedSparkMat2
+      );
       mesh.position.copy(origin);
       this.scene.add(mesh);
 
       const angle = Math.random() * Math.PI * 2;
-      const speed = 7.0 + Math.random() * 11.0;
+      const speed = 6.5 + Math.random() * 9.5;
       const vel = new THREE.Vector3(
         Math.cos(angle) * speed,
-        Math.sin(angle) * speed * 0.9 + 3.0,
-        (Math.random() - 0.5) * 3.0
+        Math.sin(angle) * speed * 0.85 + 2.8,
+        (Math.random() - 0.5) * 2.5
       );
       const rotVel = new THREE.Vector3(
-        (Math.random() - 0.5) * 20,
-        (Math.random() - 0.5) * 20,
-        (Math.random() - 0.5) * 20
+        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 16
       );
 
       this.particles.push({
@@ -1009,21 +1130,17 @@ export class GameScene {
         rotVel,
         baseScale: 1.0,
         life: 1.0,
-        decay: 1.6
+        decay: 1.7,
+        sharedMaterial: true
       });
     }
 
-    // 5. Dynamic Flash Light
-    const flashLight = new THREE.PointLight(0xff8800, 6.0, 16);
-    flashLight.position.set(origin.x, origin.y, 1.5);
-    this.scene.add(flashLight);
-    this.particles.push({
-      type: 'light',
-      light: flashLight,
-      baseIntensity: 6.0,
-      life: 1.0,
-      decay: 5.0
-    });
+    // 5. Dynamic Flash Light using pre-allocated point light (ZERO runtime shader recompilation!)
+    if (this.explosionLight) {
+      this.explosionLight.position.set(origin.x, origin.y, 2.0);
+      this.explosionLight.intensity = 5.5;
+      this.explosionLightTimer = 0.28;
+    }
   }
 
   defeatTarget(targetObj) {
@@ -1042,27 +1159,26 @@ export class GameScene {
     const pts = targetObj.isBoss ? 1000 : 500;
     const coinBounty = targetObj.isBoss ? 30 : 15;
     this.score += pts;
-    this.levelCoinsEarned += coinBounty;
-    this.storage.addCoins(coinBounty);
+    if (!this.isLevelAlreadyCompleted) {
+      this.levelCoinsEarned += coinBounty;
+    }
 
-    this.onToast?.(`🎯 Target Eliminated! +${pts} pts (+${coinBounty} 🪙)`);
-    this.spawnBurstParticles(pos, 0x38bdf8, 22);
+    this.spawnBurstParticles(pos, 0x38bdf8, 18);
     this.emitHudStats();
   }
 
-  spawnBurstParticles(origin, colorHex, count = 16) {
-    const geo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+  spawnBurstParticles(origin, colorHex, count = 14) {
     const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.45 });
 
     for (let i = 0; i < count; i++) {
-      const mesh = new THREE.Mesh(geo, mat);
-      const scale = 0.5 + Math.random() * 0.9;
+      const mesh = new THREE.Mesh(this.sharedUnitBoxGeo, mat);
+      const scale = 0.12 + Math.random() * 0.14;
       mesh.scale.set(scale, scale, scale);
       mesh.position.copy(origin);
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 11,
-        Math.random() * 8 + 2,
-        (Math.random() - 0.5) * 4
+        (Math.random() - 0.5) * 10,
+        Math.random() * 7 + 2,
+        (Math.random() - 0.5) * 3.5
       );
       this.scene.add(mesh);
       this.particles.push({
@@ -1070,7 +1186,7 @@ export class GameScene {
         mesh,
         vel,
         rotVel: new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, 0),
-        baseScale: 1.0,
+        baseScale: scale,
         life: 1.0,
         decay: 1.5
       });
@@ -1113,8 +1229,10 @@ export class GameScene {
       const birdBonus = unusedBirds * 1000;
       this.score += birdBonus;
 
-      const stageReward = this.currentLevel.coinReward || 100;
-      this.levelCoinsEarned += stageReward;
+      if (!this.isLevelAlreadyCompleted) {
+        const stageReward = this.currentLevel.coinReward || 100;
+        this.levelCoinsEarned += stageReward;
+      }
 
       const starsEarned = unusedBirds >= 2 ? 3 : unusedBirds === 1 ? 2 : 1;
 
@@ -1156,8 +1274,10 @@ export class GameScene {
           setTimeout(() => {
             if (this.targets.length === 0) {
               this.audio?.playVictory();
-              const stageReward = this.currentLevel.coinReward || 100;
-              this.levelCoinsEarned += stageReward;
+              if (!this.isLevelAlreadyCompleted) {
+                const stageReward = this.currentLevel.coinReward || 100;
+                this.levelCoinsEarned += stageReward;
+              }
               this.onLevelComplete?.({
                 won: true,
                 levelId: this.currentLevel.id,
@@ -1166,11 +1286,12 @@ export class GameScene {
                 starsEarned: 1
               });
             } else {
+              this.audio?.playDefeat();
               this.onLevelComplete?.({
                 won: false,
                 levelId: this.currentLevel.id,
                 score: this.score,
-                coinsEarned: this.levelCoinsEarned,
+                coinsEarned: 0,
                 starsEarned: 0
               });
             }
@@ -1190,16 +1311,48 @@ export class GameScene {
   }
 
   pause() {
+    if (this.isPaused) return;
     this.isPaused = true;
+    this.pauseStartTime = performance.now();
+
     if (this.slingshot) {
+      // If player was actively dragging the slingshot when paused, reset drag smoothly
+      if (this.slingshot.isDragging) {
+        this.slingshot.isDragging = false;
+        this.slingshot.activeTouchId = null;
+        this.slingshot.hideTrajectory();
+        this.slingshot.currentPullPos.set(this.slingshot.anchor.x, this.slingshot.anchor.y, 0);
+        if (this.slingshot.currentBirdMesh) {
+          this.slingshot.currentBirdMesh.position.set(this.slingshot.anchor.x, this.slingshot.anchor.y, 0);
+          this.slingshot.currentBirdMesh.rotation.set(0, 0, 0);
+        }
+        this.slingshot.updateBands(this.slingshot.anchor);
+        this.onAimEnd?.();
+      }
       this.slingshot.canInteract = false;
     }
   }
 
   resume() {
+    if (!this.isPaused) return;
     this.isPaused = false;
-    if (this.slingshot && !this.levelResolved && this.birdsQueue.length > 0 && !this.activeBird) {
-      this.slingshot.canInteract = true;
+
+    // Reset clock delta so no time jump accumulates during pause
+    this.clock.getDelta();
+
+    // If bird is currently in flight, shift launchTime by the paused duration so it doesn't instantly timeout
+    if (this.activeBird && this.activeBird.body && this.pauseStartTime) {
+      const pausedDuration = performance.now() - this.pauseStartTime;
+      this.activeBird.launchTime += pausedDuration;
+    }
+
+    // Restore slingshot interaction if level is active and bird has not been launched yet
+    if (this.slingshot && !this.levelResolved && this.birdsQueue.length > 0) {
+      const birdIsLaunched = Boolean(this.activeBird && this.activeBird.body);
+      if (!birdIsLaunched) {
+        this.slingshot.canInteract = true;
+        this.slingshot.birdInFlight = false;
+      }
     }
   }
 
@@ -1264,7 +1417,16 @@ export class GameScene {
       }
     }
 
-    // Update explosion / debris / smoke / shockwave / light particles
+    // Update pre-allocated explosion point light (zero runtime shader recompilation)
+    if (this.explosionLight && this.explosionLightTimer > 0) {
+      this.explosionLightTimer -= deltaTime;
+      const progress = Math.max(0, this.explosionLightTimer / 0.28);
+      this.explosionLight.intensity = 5.5 * progress;
+    } else if (this.explosionLight && this.explosionLight.intensity > 0) {
+      this.explosionLight.intensity = 0;
+    }
+
+    // Update explosion / debris / smoke / shockwave particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       const decay = p.decay || 1.5;
@@ -1273,7 +1435,24 @@ export class GameScene {
       if (p.life <= 0) {
         if (p.mesh) {
           this.scene.remove(p.mesh);
-          p.mesh.geometry?.dispose?.();
+          if (
+            p.mesh.geometry &&
+            p.mesh.geometry !== this.sharedUnitBoxGeo &&
+            p.mesh.geometry !== this.sharedUnitSphereGeo &&
+            p.mesh.geometry !== this.sharedShockwaveGeo &&
+            p.mesh.geometry !== this.sharedFireballGeo &&
+            p.mesh.geometry !== this.sharedSparkGeo
+          ) {
+            p.mesh.geometry.dispose();
+          }
+          if (
+            p.mesh.material &&
+            p.mesh.material !== this.sharedSparkMat1 &&
+            p.mesh.material !== this.sharedSparkMat2 &&
+            !p.sharedMaterial
+          ) {
+            p.mesh.material.dispose?.();
+          }
         }
         if (p.light) {
           this.scene.remove(p.light);
@@ -1283,13 +1462,9 @@ export class GameScene {
         continue;
       }
 
-      if (p.type === 'light') {
-        if (p.light) {
-          p.light.intensity = (p.baseIntensity || 6.0) * Math.max(0, p.life);
-        }
-      } else if (p.type === 'shockwave') {
+      if (p.type === 'shockwave') {
         const progress = 1.0 - Math.max(0, p.life);
-        const currentScale = (p.baseScale || 0.3) + progress * (p.maxExpansion || 6.8);
+        const currentScale = (p.baseScale || 0.3) + progress * (p.maxExpansion || 6.5);
         p.mesh.scale.set(currentScale, currentScale, 1.0);
         if (p.mesh.material) {
           p.mesh.material.opacity = (p.baseOpacity || 0.95) * (p.life * p.life);
@@ -1339,7 +1514,12 @@ export class GameScene {
           p.mesh.rotation.y += 5 * deltaTime;
         }
 
-        p.mesh.scale.setScalar(Math.max(0.01, p.life * (p.baseScale || 1.0)));
+        if (p.baseScaleVec) {
+          const s = Math.max(0.01, p.life);
+          p.mesh.scale.set(p.baseScaleVec.x * s, p.baseScaleVec.y * s, p.baseScaleVec.z * s);
+        } else {
+          p.mesh.scale.setScalar(Math.max(0.01, p.life * (p.baseScale || 1.0)));
+        }
       }
     }
 

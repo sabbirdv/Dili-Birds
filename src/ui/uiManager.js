@@ -48,6 +48,9 @@ export class UIManager {
     this.summaryCoinsTextEl = document.getElementById('summary-coins-text');
     this.summaryStarsEl = document.getElementById('summary-stars');
 
+    // Tracks the current playing level ID so top bar displays current level instead of max level
+    this.currentPlayingLevelId = null;
+
     this.profileModal = new ProfileModal(
       this.storage,
       ({ username, brandName }) => {
@@ -65,6 +68,7 @@ export class UIManager {
 
     this.hud = new HudController({
       storage: this.storage,
+      audio: this.audio,
       totalLevelsCount: this.totalLevelsCount,
       onRetryLevel,
       onNextLevel,
@@ -112,7 +116,17 @@ export class UIManager {
 
     if (this.displayUsernameEl) this.displayUsernameEl.textContent = username;
     if (this.topAvatarImgEl) this.topAvatarImgEl.src = avatarUrl;
-    if (this.displayLevelEl) this.displayLevelEl.textContent = `LVL ${unlockedLevel}`;
+    // CRITICAL: Display the currently played stage when in game, or progression level in menu
+    const activeLevelNumber = this.currentPlayingLevelId ?? unlockedLevel;
+    if (this.displayLevelEl) this.displayLevelEl.textContent = `LVL ${activeLevelNumber}`;
+
+    const navLevelPill = document.getElementById('nav-level-pill');
+    if (navLevelPill) {
+      navLevelPill.title = this.currentPlayingLevelId
+        ? `Current Stage: Level ${this.currentPlayingLevelId}`
+        : `Current Progression: Level ${unlockedLevel}`;
+    }
+
     if (this.displayCoinsEl) this.displayCoinsEl.textContent = coins.toLocaleString();
     if (this.heroBrandTagEl) this.heroBrandTagEl.textContent = `${brandName} • 3D WORLD`;
 
@@ -133,6 +147,8 @@ export class UIManager {
   }
 
   showMainMenu() {
+    this.currentPlayingLevelId = null;
+    this.audio?.enterMenu();
     this.hud.closeResultModal();
     this.hud.hide();
     this.menuScreenEl?.classList.remove('hidden');
@@ -141,8 +157,11 @@ export class UIManager {
   }
 
   showGameView(levelConfig) {
+    this.audio?.enterGameplay();
+    this.currentPlayingLevelId = levelConfig ? Number(levelConfig.id) : null;
     this.menuScreenEl?.classList.add('hidden');
     this.hud.updateLevelHeader(levelConfig);
+    this.refreshHeaderStats();
     this.hud.show();
   }
 }

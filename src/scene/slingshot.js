@@ -368,13 +368,7 @@ export class SlingshotController {
       this.updateBands(this.currentPullPos);
       this.updateTrajectoryPreview(this.currentPullPos, launchVel);
 
-      // Play subtle elastic stretch sound periodically
-      const now = performance.now();
       const pullRatio = pullVec.length() / this.maxPullDistance;
-      if (now - this.lastStretchSoundTime > 120 && pullRatio > 0.15) {
-        this.audio?.playStretch(pullRatio);
-        this.lastStretchSoundTime = now;
-      }
 
       // Notify HUD of power % and elevation angle
       const powerPercent = Math.min(100, Math.round(pullRatio * 100));
@@ -462,7 +456,8 @@ export class SlingshotController {
     this.canInteract = false;
     this.birdInFlight = true;
 
-    this.audio?.playLaunch();
+    const powerRatio = Math.min(1.4, Math.max(0.6, pullDist / (this.maxPullDistance * 0.75)));
+    this.audio?.playLaunch(powerRatio);
     this.onLaunch?.(launchPos, velocity);
   }
 }

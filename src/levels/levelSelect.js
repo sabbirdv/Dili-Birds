@@ -158,6 +158,8 @@ export class LevelSelect {
           : 'unlocked completed-node'
         : 'locked';
 
+      const isClaimed = this.storage.hasClaimedCoins(level.id);
+
       html += `
         <article
           class="roadmap-square-node ${statusClass}"
@@ -188,9 +190,9 @@ export class LevelSelect {
             <div class="node-big-number">${level.id}</div>
 
             <div class="node-coin-footer">
-              <span class="coin-reward-badge">
+              <span class="coin-reward-badge ${isClaimed ? 'claimed' : ''}" title="${isClaimed ? 'Coins already claimed for this stage' : `Stage clear reward: +${level.coinReward} Coins`}">
                 <img src="${coinLogoUrl}" class="coin-asset-icon" alt="Coins" />
-                <span>+${level.coinReward}</span>
+                <span>${isClaimed ? 'Claimed' : `+${level.coinReward}`}</span>
               </span>
             </div>
           </div>

@@ -40,6 +40,7 @@ class DiliBirdsApp {
         }
       },
       onReturnToMenu: () => {
+        this.audio?.enterMenu();
         const previewLevel =
           LEVELS.find((l) => l.id === this.storage.getUnlockedLevel()) || LEVELS[0];
         this.levelSelect.focusedLevelId = previewLevel.id;
@@ -55,9 +56,11 @@ class DiliBirdsApp {
       },
       onPauseGame: () => {
         this.gameScene?.pause();
+        this.audio?.enterMenu();
       },
       onResumeGame: () => {
         this.gameScene?.resume();
+        this.audio?.enterGameplay();
       }
     });
 
@@ -86,14 +89,18 @@ class DiliBirdsApp {
         this.ui.refreshHeaderStats();
       },
       onLevelComplete: ({ won, levelId, score, coinsEarned, starsEarned }) => {
+        let actualCoinsAwarded = 0;
+        let isFirstTimeWin = false;
         if (won) {
-          this.storage.recordLevelWin(
+          const result = this.storage.recordLevelWin(
             levelId,
             score,
             starsEarned,
-            this.currentLevelConfig.coinReward || 0,
+            coinsEarned,
             LEVELS.length
           );
+          actualCoinsAwarded = result?.actualCoinsAwarded || 0;
+          isFirstTimeWin = Boolean(result?.isFirstTimeWin);
           this.levelSelect.focusedLevelId = this.storage.getUnlockedLevel();
         }
         this.ui.refreshHeaderAndMenu();
@@ -103,7 +110,8 @@ class DiliBirdsApp {
           levelId,
           hasNextLevel,
           score,
-          coinsEarned,
+          coinsEarned: won ? actualCoinsAwarded : 0,
+          isFirstTimeWin,
           starsEarned
         });
       }
@@ -119,6 +127,7 @@ class DiliBirdsApp {
   startLevel(levelConfig) {
     if (!levelConfig) return;
     this.currentLevelConfig = levelConfig;
+    this.audio?.enterGameplay();
     tryLockLandscape();
     // Auto-request fullscreen on touch devices to ensure full-screen mobile gameplay
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {

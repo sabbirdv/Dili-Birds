@@ -30,12 +30,40 @@
         </div>
 
         <div class="stat-pill level-pill" id="nav-level-pill" title="Current Level / Stage">
-          <span class="stat-icon">⭐</span>
+          <span class="stat-icon">
+            <svg class="pill-star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
           <span class="stat-value" id="display-player-level">LVL 1</span>
         </div>
       </div>
 
-      <!-- Center: In-Game Active Mission HUD Cluster (Targets, Birds, Score - Only visible when playing level) -->
+      <!-- Center (Menu State): Upper Navigational Dashboard Actions (Leaderboard, Missions, Characters) -->
+      <nav id="nav-dashboard-actions" class="nav-dashboard-actions" aria-label="Dashboard Quick Navigation">
+        <button id="btn-nav-leaderboard" class="nav-action-pill" type="button" title="Global Leaderboard Rankings">
+          <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+          </svg>
+          <span class="nav-pill-label">Rankings</span>
+        </button>
+
+        <button id="btn-nav-missions" class="nav-action-pill" type="button" title="Daily Missions & Quests">
+          <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+          <span class="nav-pill-label">Missions</span>
+          <span class="nav-badge-dot" aria-hidden="true"></span>
+        </button>
+
+        <button id="btn-nav-characters" class="nav-action-pill" type="button" title="Character Collection & Milestone Rewards">
+          <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+          <span class="nav-pill-label">Heroes</span>
+          <span class="nav-milestone-pill" id="top-nav-milestone-tag">REWARDS</span>
+        </button>
+      </nav>
+
+      <!-- Center (Gameplay State): In-Game Active Mission HUD Cluster (Only visible when playing level) -->
       <div id="gameplay-hud-cluster" class="gameplay-hud-cluster hidden">
         <div class="hud-metric" title="Targets Remaining">
           <span class="metric-label">TARGETS</span>
@@ -58,9 +86,11 @@
           <span class="stat-value" id="display-coins">100</span>
         </div>
 
-        <button id="btn-pause-menu" class="nav-btn pause-btn" type="button" title="Pause Game (⏸️)" aria-label="Pause Game">
-          <span class="btn-icon">⏸️</span>
-          <span class="btn-text">Pause</span>
+        <button id="btn-pause-menu" class="nav-btn pause-btn" type="button" title="Settings / Pause Menu" aria-label="Pause Menu">
+          <span class="btn-icon">
+            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
+          </span>
+          <span class="btn-text">Menu</span>
         </button>
       </div>
     </header>
@@ -107,10 +137,95 @@
             <div class="summary-divider"></div>
             <div class="summary-item">
               <span class="summary-title">Stars</span>
-              <strong class="summary-val star-accent" id="summary-stars">0 / 24 ★</strong>
+              <strong class="summary-val star-accent" id="summary-stars">
+                <svg class="pill-star-svg gold-star" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span id="summary-stars-val">0 / 24</span>
+              </strong>
             </div>
           </section>
         </div>
+
+        <!-- Central "Start Game" Hero Module & Character Milestones -->
+        <section class="dashboard-hero-module glass-panel" aria-label="Active Mission Launch Center">
+          <div class="hero-module-glow-orbit" aria-hidden="true"></div>
+
+          <div class="hero-module-main-row">
+            <!-- Active Mission Briefing Card -->
+            <div class="hero-mission-briefing">
+              <div class="mission-tag-row">
+                <span class="mission-live-pill" id="hero-stage-badge">ACTIVE CAMPAIGN • STAGE 1</span>
+                <span class="difficulty-chip" id="hero-difficulty-pill">EASY</span>
+              </div>
+              <h2 class="hero-mission-title" id="hero-mission-name">Timber Watchtower</h2>
+              <p class="hero-mission-desc" id="hero-mission-desc">A 3-story timber guard tower with outer sentry outpost and rooftop coin vault.</p>
+
+              <div class="hero-metric-chips">
+                <div class="metric-chip">
+                  <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+                  </svg>
+                  <span id="hero-target-chip">4 Targets</span>
+                </div>
+                <div class="metric-chip">
+                  <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                  </svg>
+                  <span id="hero-bird-chip">3 Birds Queue</span>
+                </div>
+                <div class="metric-chip reward-accent">
+                  <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
+                  <span id="hero-reward-chip">+85 Coins</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Central START GAME Action Column -->
+            <div class="hero-cta-column">
+              <button type="button" id="btn-dashboard-start-game" class="btn-start-game-cta" title="Launch Active Stage">
+                <span class="cta-pulse-glow" aria-hidden="true"></span>
+                <span class="cta-play-badge">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </span>
+                <div class="cta-text-block">
+                  <span class="cta-headline">START GAME</span>
+                  <span class="cta-subline" id="hero-start-sub">Launch Stage 1</span>
+                </div>
+                <svg class="cta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+
+              <button type="button" id="btn-toggle-roadmap" class="btn-roadmap-toggle" title="View Full 8-Stage Roadmap">
+                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
+                </svg>
+                <span id="btn-roadmap-toggle-text">Explore Campaign Roadmap</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Character Unlock Progression Milestones Strip -->
+          <div class="hero-milestones-strip" id="hero-milestones-strip">
+            <div class="milestones-bar-header">
+              <div class="milestones-header-left">
+                <svg class="milestone-star-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="milestones-heading-title">Character Progression Milestones</span>
+                <span class="milestones-next-teaser" id="hero-milestone-hint">Next Unlock: Speedster Swift at Level 3</span>
+              </div>
+              <button type="button" id="btn-view-all-heroes" class="btn-heroes-codex-link">
+                <span>Roster &amp; Perks</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+
+            <div class="milestones-track-container">
+              <div class="milestones-progress-line">
+                <div class="milestones-progress-fill" id="milestones-progress-fill" style="width: 25%;"></div>
+              </div>
+              <div class="milestones-nodes-row" id="milestones-nodes-row">
+                <!-- Rendered dynamically with 4 character steps -->
+              </div>
+            </div>
+          </div>
+        </section>
 
         <!-- Square-Shaped Roadmap Section -->
         <section class="level-select-section" aria-labelledby="level-select-heading">
@@ -140,16 +255,113 @@
     </main>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       1. GLOBAL COMMANDER LEADERBOARD DIALOG
+       ═══════════════════════════════════════════════════════════ -->
+  <dialog id="leaderboard-dialog" class="game-dialog modal-dashboard-dialog" closedby="any" aria-labelledby="leaderboard-title">
+    <div class="modal-dialog-shell glass-card">
+      <header class="modal-dialog-header">
+        <div class="modal-title-wrap">
+          <span class="modal-kicker">HALL OF FAME • GLOBAL RANKINGS</span>
+          <h2 id="leaderboard-title" class="modal-heading">
+            <svg class="modal-head-svg gold-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+            </svg>
+            Global Commander Rankings
+          </h2>
+        </div>
+        <button type="button" id="btn-close-leaderboard" class="dialog-close-btn" aria-label="Close Rankings" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+
+      <div class="leaderboard-table-wrap">
+        <div class="leaderboard-header-row">
+          <span class="col-rank">RANK</span>
+          <span class="col-player">COMMANDER</span>
+          <span class="col-stars">STARS</span>
+          <span class="col-score">SCORE</span>
+        </div>
+        <div id="leaderboard-list-body" class="leaderboard-list-body">
+          <!-- Populated dynamically by DashboardModals -->
+        </div>
+      </div>
+
+      <div id="leaderboard-player-card" class="leaderboard-player-footer">
+        <!-- Live Player Personal Rank Card -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       2. COMMAND MISSIONS & QUESTS DIALOG
+       ═══════════════════════════════════════════════════════════ -->
+  <dialog id="missions-dialog" class="game-dialog modal-dashboard-dialog" closedby="any" aria-labelledby="missions-title">
+    <div class="modal-dialog-shell glass-card">
+      <header class="modal-dialog-header">
+        <div class="modal-title-wrap">
+          <span class="modal-kicker">DAILY &amp; CAMPAIGN DIRECTIVES</span>
+          <h2 id="missions-title" class="modal-heading">
+            <svg class="modal-head-svg cyan-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+            Command Missions &amp; Quests
+          </h2>
+        </div>
+        <button type="button" id="btn-close-missions" class="dialog-close-btn" aria-label="Close Missions" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+
+      <div id="missions-list-container" class="missions-list-container">
+        <!-- Populated dynamically by DashboardModals -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       3. CHARACTER COLLECTION & MILESTONE REWARDS CODEX DIALOG
+       ═══════════════════════════════════════════════════════════ -->
+  <dialog id="characters-dialog" class="game-dialog modal-dashboard-dialog modal-wide" closedby="any" aria-labelledby="characters-title">
+    <div class="modal-dialog-shell glass-card">
+      <header class="modal-dialog-header">
+        <div class="modal-title-wrap">
+          <span class="modal-kicker">SPECIAL HEROES &amp; MILESTONE UNLOCKS</span>
+          <h2 id="characters-title" class="modal-heading">
+            <svg class="modal-head-svg sakura-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            Character Collection Codex
+          </h2>
+        </div>
+        <button type="button" id="btn-close-characters" class="dialog-close-btn" aria-label="Close Heroes Codex" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+
+      <div id="modal-milestone-banner" class="modal-milestone-banner">
+        <!-- Dynamic milestone unlock hint -->
+      </div>
+
+      <div id="characters-roster-grid" class="characters-roster-grid">
+        <!-- Populated dynamically by DashboardModals -->
+      </div>
+    </div>
+  </dialog>
+
   <!-- Structured In-Game Pause Dialog -->
   <dialog id="game-menu-dialog" class="game-dialog in-game-menu-dialog" closedby="any" aria-labelledby="game-menu-title">
     <div class="game-menu-shell glass-card">
       <div class="game-menu-header">
         <div class="menu-title-group">
           <span class="menu-kicker">MISSION STATUS</span>
-          <h2 id="game-menu-title">⏸️ Game Paused</h2>
+          <h2 id="game-menu-title">
+            <svg class="menu-title-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
+            Game Paused
+          </h2>
         </div>
         <button type="button" id="btn-close-game-menu" class="dialog-close-btn" aria-label="Resume Game" title="Resume Game (Esc)">
-          ✕
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
@@ -163,16 +375,19 @@
           <strong class="menu-profile-name" id="menu-username">Commander</strong>
         </div>
         <button type="button" id="btn-menu-edit-profile" class="action-btn secondary-btn menu-edit-btn" title="Customize Username and Avatar">
-          <span>✎ Edit Profile</span>
+          <svg class="btn-sub-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <span>Edit Profile</span>
         </button>
       </section>
 
       <!-- Player Progress Stats Summary -->
       <section class="menu-stats-row">
         <div class="menu-stat-pill">
-          <span class="m-icon">⭐</span>
+          <span class="m-icon">
+            <svg class="pill-star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
           <div class="m-content">
-            <span class="m-label">PLAYER LEVEL</span>
+            <span class="m-label">STAGE LEVEL</span>
             <strong class="m-val" id="menu-player-level">LVL 1</strong>
           </div>
         </div>
@@ -184,7 +399,9 @@
           </div>
         </div>
         <div class="menu-stat-pill">
-          <span class="m-icon">★</span>
+          <span class="m-icon">
+            <svg class="pill-star-svg gold-star" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
           <div class="m-content">
             <span class="m-label">STARS</span>
             <strong class="m-val" id="menu-stars">0 / 24</strong>
@@ -195,13 +412,17 @@
       <!-- Primary Action Buttons (Resume, Restart, Main Menu) -->
       <section class="menu-action-list">
         <button type="button" id="btn-menu-resume" class="action-btn primary-btn resume-cta-btn">
-          <span class="btn-icon">▶</span>
+          <span class="btn-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          </span>
           <span class="btn-text">Resume Game</span>
         </button>
 
         <button type="button" id="btn-menu-retry" class="menu-list-btn">
           <div class="list-left">
-            <span class="list-icon">↻</span>
+            <span class="list-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </span>
             <span class="list-text">Restart Level</span>
           </div>
           <span class="list-arrow">➔</span>
@@ -209,21 +430,27 @@
 
         <button type="button" id="btn-menu-main-menu" class="menu-list-btn main-menu-list-btn" title="Return to Main Menu / Level Select Roadmap">
           <div class="list-left">
-            <span class="list-icon">🏠</span>
-            <span class="list-text">Main Menu (New Game / Level Select)</span>
+            <span class="list-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </span>
+            <span class="list-text">Main Menu (Dashboard / Roadmap)</span>
           </div>
           <span class="list-arrow">➔</span>
         </button>
 
         <div class="menu-settings-split">
           <button type="button" id="btn-menu-audio-toggle" class="menu-sub-btn">
-            <span class="sub-icon" id="menu-audio-icon">🔊</span>
+            <span class="sub-icon" id="menu-audio-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </span>
             <span class="sub-text">Sound</span>
             <span class="sub-badge" id="menu-audio-status">ON</span>
           </button>
 
           <button type="button" id="btn-menu-fullscreen" class="menu-sub-btn">
-            <span class="sub-icon" id="menu-fullscreen-icon">⛶</span>
+            <span class="sub-icon" id="menu-fullscreen-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </span>
             <span class="sub-text">Fullscreen</span>
             <span class="sub-badge" id="menu-fullscreen-status">TOGGLE</span>
           </button>
@@ -233,7 +460,7 @@
         <div class="menu-volume-panel" aria-label="Audio Volume Settings">
           <div class="menu-volume-row">
             <div class="menu-volume-label">
-              <span class="v-icon">💥</span>
+              <svg class="volume-row-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               <span>SFX Volume</span>
             </div>
             <div class="menu-volume-ctrl">
@@ -243,7 +470,7 @@
           </div>
           <div class="menu-volume-row">
             <div class="menu-volume-label">
-              <span class="v-icon">🎵</span>
+              <svg class="volume-row-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
               <span>BGM Music</span>
             </div>
             <div class="menu-volume-ctrl">
@@ -265,7 +492,7 @@
 
       <!-- Close Button (Top Right) -->
       <button type="button" id="btn-close-profile" class="dialog-close-btn" aria-label="Close Profile Setup" title="Close (Esc)">
-        ✕
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
 
       <div class="profile-setup-grid">
@@ -276,7 +503,7 @@
               <img id="profile-avatar-preview" src="" alt="Selected Profile Picture Preview" />
               <input type="file" id="avatar-upload-input" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
               <button type="button" id="btn-avatar-camera" class="avatar-camera-trigger" title="Upload Custom Profile Photo" aria-label="Upload Custom Profile Photo">
-                📷
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </button>
             </div>
             <div class="live-id-meta">
@@ -315,7 +542,9 @@
             </div>
 
             <div class="prominent-input-wrapper">
-              <span class="input-lead-icon" aria-hidden="true">🦅</span>
+              <span class="input-lead-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </span>
               <input
                 type="text"
                 id="username-input"
@@ -334,13 +563,17 @@
                 title="Generate Random Bird Callsign"
                 aria-label="Generate Random Callsign"
               >
-                🎲 Random
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor"/><circle cx="16.5" cy="16.5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+                <span>Random</span>
               </button>
             </div>
 
             <!-- Accessible Error Message (shown via :user-invalid + fallback) -->
             <div id="username-error" class="error-msg" role="alert">
-              <span aria-hidden="true">❌</span> Please enter a Commander username (2–24 characters).
+              <span class="err-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              </span>
+              <span>Please enter a Commander username (2–24 characters).</span>
             </div>
           </div>
 
@@ -366,9 +599,9 @@
       <div class="result-badge" id="result-badge">STAGE COMPLETE</div>
       <h2 id="result-dialog-title">Victory!</h2>
       <div class="result-stars" id="result-stars" aria-label="Stars Earned">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
+        <span class="star"><svg class="res-star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+        <span class="star"><svg class="res-star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+        <span class="star"><svg class="res-star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
       </div>
       <p class="result-message" id="result-message">All targets eliminated!</p>
 
@@ -385,13 +618,16 @@
 
       <div class="dialog-actions result-actions">
         <button type="button" id="btn-result-menu" class="action-btn secondary-btn">
-          🗺️ Roadmap
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          <span>Roadmap</span>
         </button>
         <button type="button" id="btn-result-retry" class="action-btn secondary-btn">
-          ↻ Replay
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>Replay</span>
         </button>
         <button type="button" id="btn-result-next" class="action-btn primary-btn">
-          Next Level ➔
+          <span>Next Level</span>
+          <span class="cta-arrow" aria-hidden="true">➔</span>
         </button>
       </div>
     </div>

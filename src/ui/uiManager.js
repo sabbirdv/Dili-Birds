@@ -1,11 +1,12 @@
 import { ProfileModal } from './profileModal.js';
 import { HudController } from './hud.js';
+import { DashboardModals, HEROES_DATA } from './dashboardModals.js';
 import { LEVELS } from '../levels/levelData.js';
 import coinLogoUrl from '../assets/coin-with-logo.png';
 
 /**
  * High-level UI orchestrator connecting the Single Top Nav Bar, Initial Menu, Level Select,
- * Profile Setup Screen, and In-Game HUD.
+ * Profile Setup Screen, In-Game HUD, and Dashboard Modals.
  */
 export class UIManager {
   constructor({
@@ -47,6 +48,17 @@ export class UIManager {
     this.summaryCoinsEl = document.getElementById('summary-coins');
     this.summaryCoinsTextEl = document.getElementById('summary-coins-text');
     this.summaryStarsEl = document.getElementById('summary-stars');
+    this.summaryStarsValEl = document.getElementById('summary-stars-val');
+
+    // Dashboard Hero Module elements
+    this.heroStageBadgeEl = document.getElementById('hero-stage-badge');
+    this.heroMissionNameEl = document.getElementById('hero-mission-name');
+    this.heroMissionDescEl = document.getElementById('hero-mission-desc');
+    this.heroDifficultyPillEl = document.getElementById('hero-difficulty-pill');
+    this.heroTargetChipEl = document.getElementById('hero-target-chip');
+    this.heroBirdChipEl = document.getElementById('hero-bird-chip');
+    this.heroRewardChipEl = document.getElementById('hero-reward-chip');
+    this.heroStartSubEl = document.getElementById('hero-start-sub');
 
     // Tracks the current playing level ID so top bar displays current level instead of max level
     this.currentPlayingLevelId = null;
@@ -66,6 +78,12 @@ export class UIManager {
       }
     );
 
+    this.dashboardModals = new DashboardModals({
+      storage: this.storage,
+      audio: this.audio,
+      onRefreshHeader: () => this.refreshHeaderAndMenu()
+    });
+
     this.hud = new HudController({
       storage: this.storage,
       audio: this.audio,
@@ -79,7 +97,30 @@ export class UIManager {
     });
 
     this.bindTopBarEvents();
+    this.bindHeroModuleEvents();
     this.refreshHeaderAndMenu();
+  }
+
+  bindHeroModuleEvents() {
+    // Primary Central "START GAME" Launch Button
+    const startGameBtn = document.getElementById('btn-dashboard-start-game');
+    startGameBtn?.addEventListener('click', () => {
+      const unlockedLevel = this.storage.getUnlockedLevel();
+      const activeLevel = LEVELS.find((l) => l.id === unlockedLevel) || LEVELS[0];
+      this.onSelectLevel?.(activeLevel);
+    });
+
+    // Roadmap View Toggle Button
+    const toggleRoadmapBtn = document.getElementById('btn-toggle-roadmap');
+    toggleRoadmapBtn?.addEventListener('click', () => {
+      const roadmapSection = document.querySelector('.level-select-section');
+      roadmapSection?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // View All Heroes Button
+    document.getElementById('btn-view-all-heroes')?.addEventListener('click', () => {
+      this.dashboardModals?.openCharacters();
+    });
   }
 
   bindTopBarEvents() {
@@ -103,7 +144,7 @@ export class UIManager {
   }
 
   /**
-   * Updates only the Top Bar and Summary Bar text/avatar values without destroying
+   * Updates only the Top Bar, Summary Bar, and Dashboard Hero Module text/avatar values without destroying
    * and re-rendering the #level-grid DOM nodes.
    */
   refreshHeaderStats() {
@@ -138,7 +179,83 @@ export class UIManager {
     } else if (this.summaryCoinsEl) {
       this.summaryCoinsEl.innerHTML = `<img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" /> <span id="summary-coins-text">${coins.toLocaleString()} Coins</span>`;
     }
-    if (this.summaryStarsEl) this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
+    if (this.summaryStarsValEl) {
+      this.summaryStarsValEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3}`;
+    } else if (this.summaryStarsEl) {
+      this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
+    }
+
+    // Dashboard Hero Launch Module Data
+    const activeLevel = LEVELS.find((l) => l.id === unlockedLevel) || LEVELS[0];
+    if (this.heroStageBadgeEl) this.heroStageBadgeEl.textContent = `ACTIVE CAMPAIGN • STAGE ${activeLevel.id}`;
+    if (this.heroMissionNameEl) this.heroMissionNameEl.textContent = activeLevel.name;
+    if (this.heroMissionDescEl) this.heroMissionDescEl.textContent = activeLevel.description;
+    if (this.heroDifficultyPillEl) {
+      this.heroDifficultyPillEl.textContent = activeLevel.difficulty.toUpperCase();
+      this.heroDifficultyPillEl.className = `difficulty-chip ${activeLevel.difficulty.toLowerCase()}`;
+    }
+    if (this.heroTargetChipEl) this.heroTargetChipEl.textContent = `${activeLevel.targets.length} Targets`;
+    if (this.heroBirdChipEl) this.heroBirdChipEl.textContent = `${activeLevel.birds.length} Slingshot Birds`;
+    if (this.heroRewardChipEl) this.heroRewardChipEl.textContent = `+${activeLevel.coinReward} Coins`;
+    if (this.heroStartSubEl) this.heroStartSubEl.textContent = `Launch Stage ${activeLevel.id}`;
+
+    // Render Milestone Character Stepper
+    this.renderMilestoneSteps(unlockedLevel);
+  }
+
+  renderMilestoneSteps(unlockedLevel) {
+    const nodesRow = document.getElementById('milestones-nodes-row');
+    const fillBar = document.getElementById('milestones-progress-fill');
+    const hintEl = document.getElementById('hero-milestone-hint');
+    if (!nodesRow) return;
+
+    const milestones = HEROES_DATA;
+    let nextLocked = milestones.find((m) => m.milestoneLevel > unlockedLevel);
+
+    if (hintEl) {
+      hintEl.textContent = nextLocked
+        ? `Next Unlock: ${nextLocked.name} at Level ${nextLocked.milestoneLevel}`
+        : 'All 4 Heroes Unlocked!';
+    }
+
+    // Progress percentage
+    const maxMilestone = 7;
+    const pct = Math.min(100, Math.max(16, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
+    if (fillBar) fillBar.style.width = `${pct}%`;
+
+    let html = '';
+    milestones.forEach((hero) => {
+      const isUnlocked = unlockedLevel >= hero.milestoneLevel;
+      html += `
+        <div class="milestone-step-node ${isUnlocked ? 'unlocked' : 'locked'}" data-hero-id="${hero.id}" role="button" tabindex="0" title="${hero.name} (Milestone: Level ${hero.milestoneLevel})">
+          <div class="node-avatar-frame" style="--accent-hero: ${hero.themeColor};">
+            <img class="node-hero-img ${!isUnlocked ? 'silhouetted' : ''}" src="${hero.avatarUrl}" alt="${hero.name}" />
+            <span class="node-status-badge ${isUnlocked ? 'unlocked' : 'locked'}">
+              ${isUnlocked
+                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
+                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>`
+              }
+            </span>
+          </div>
+          <span class="node-step-lvl">LVL ${hero.milestoneLevel}</span>
+          <span class="node-hero-name">${hero.name.split(' ')[0]}</span>
+        </div>
+      `;
+    });
+
+    nodesRow.innerHTML = html;
+
+    nodesRow.querySelectorAll('.milestone-step-node').forEach((node) => {
+      node.addEventListener('click', () => {
+        this.dashboardModals?.openCharacters();
+      });
+      node.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.dashboardModals?.openCharacters();
+        }
+      });
+    });
   }
 
   refreshHeaderAndMenu() {
@@ -152,6 +269,8 @@ export class UIManager {
     this.hud.closeResultModal();
     this.hud.hide();
     this.menuScreenEl?.classList.remove('hidden');
+    document.getElementById('nav-dashboard-actions')?.classList.remove('hidden');
+    document.getElementById('gameplay-hud-cluster')?.classList.add('hidden');
     this.refreshHeaderAndMenu();
     this.onReturnToMenu?.();
   }
@@ -160,6 +279,8 @@ export class UIManager {
     this.audio?.enterGameplay();
     this.currentPlayingLevelId = levelConfig ? Number(levelConfig.id) : null;
     this.menuScreenEl?.classList.add('hidden');
+    document.getElementById('nav-dashboard-actions')?.classList.add('hidden');
+    document.getElementById('gameplay-hud-cluster')?.classList.remove('hidden');
     this.hud.updateLevelHeader(levelConfig);
     this.refreshHeaderStats();
     this.hud.show();

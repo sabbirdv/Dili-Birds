@@ -13,6 +13,7 @@ const DEFAULT_STATE = {
   levelStars: {}, // e.g., { 1: 3, 2: 2 }
   levelHighScores: {},
   claimedCoinLevels: {}, // Tracks level IDs where coins have already been awarded
+  claimedMissions: {}, // Tracks mission IDs where quest rewards have been claimed
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
   sfxVolume: 0.85,
@@ -58,7 +59,8 @@ export class StorageManager {
         bgmVolume: typeof parsed.bgmVolume === 'number' ? Math.max(0, Math.min(1, parsed.bgmVolume)) : 0.45,
         levelStars: { ...(parsed.levelStars || {}) },
         levelHighScores: { ...(parsed.levelHighScores || {}) },
-        claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) }
+        claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
+        claimedMissions: { ...(parsed.claimedMissions || {}) }
       };
     } catch (err) {
       console.warn('LocalStorage unavailable or corrupted, using in-memory fallback:', err);
@@ -238,6 +240,28 @@ export class StorageManager {
     this.state.bgmVolume = Math.max(0, Math.min(1, Number(val) || 0));
     this.saveState();
     return this.state.bgmVolume;
+  }
+
+  hasClaimedMission(missionId) {
+    return Boolean(this.state.claimedMissions?.[missionId]);
+  }
+
+  claimMission(missionId, coinReward = 0) {
+    if (this.hasClaimedMission(missionId)) return false;
+    if (!this.state.claimedMissions) this.state.claimedMissions = {};
+    this.state.claimedMissions[missionId] = true;
+    if (coinReward > 0) {
+      this.state.coins = (this.state.coins || 0) + coinReward;
+    }
+    this.saveState();
+    return true;
+  }
+
+  addCoins(amount) {
+    if (!amount || amount <= 0) return this.state.coins;
+    this.state.coins = (this.state.coins || 0) + amount;
+    this.saveState();
+    return this.state.coins;
   }
 
   resetProgress() {

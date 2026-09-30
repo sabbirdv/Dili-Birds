@@ -23,6 +23,10 @@ export class BrandingElements {
 
     this.clouds = [];   // { group, speed, baseY, phase }
     this.petals = [];   // { mesh, vy, vx, phase, rotSpeed }
+    this.driftingPieces = []; // 3D drifting structural blocks & game assets
+    this.targetTilt = { x: 0, y: 0 };
+    this.currentTilt = { x: 0, y: 0 };
+    this.initPointerParallax();
 
     this.buildAnimeSkyBackdrop();
     this.buildParallaxHills();
@@ -30,6 +34,7 @@ export class BrandingElements {
     this.buildWildflowers();
     this.buildAnimeClouds();
     this.buildCherryBlossomPetals();
+    this.buildDrifting3DAssets();
     this.buildStaticBrandMonument();
   }
 
@@ -622,7 +627,138 @@ export class BrandingElements {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * UPDATE — Animates clouds, petals, and rotating logo each frame
+   * 3D DRIFTING ASSETS & INTERACTIVE PARALLAX
+   * ═════════════════════════════════════════════════════════════ */
+
+  initPointerParallax() {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('pointermove', (e) => {
+      this.targetTilt.x = ((e.clientX / window.innerWidth) - 0.5) * 2;
+      this.targetTilt.y = ((e.clientY / window.innerHeight) - 0.5) * 2;
+    }, { passive: true });
+  }
+
+  /**
+   * Builds a multi-layer 3D animated background system where game assets and structural pieces
+   * (timber planks, stone blocks, golden coins, TNT crates, and glowing celestial crystals)
+   * drift across deep, midground, and peripheral depths to create rich environmental perspective.
+   */
+  buildDrifting3DAssets() {
+    this.driftingGroup = new THREE.Group();
+    this.root.add(this.driftingGroup);
+
+    // High-quality anime-stylized materials
+    const woodMat = new THREE.MeshStandardMaterial({
+      color: 0xc27838,
+      roughness: 0.68,
+      metalness: 0.08
+    });
+
+    const stoneMat = new THREE.MeshStandardMaterial({
+      color: 0x64748b,
+      roughness: 0.82,
+      metalness: 0.05
+    });
+
+    const coinMat = new THREE.MeshStandardMaterial({
+      color: 0xf59e0b,
+      roughness: 0.22,
+      metalness: 0.88,
+      emissive: 0xd97706,
+      emissiveIntensity: 0.22
+    });
+
+    const tntMat = new THREE.MeshStandardMaterial({
+      color: 0xef4444,
+      roughness: 0.52,
+      metalness: 0.08
+    });
+
+    const crystalCyanMat = new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      emissive: 0x0284c7,
+      emissiveIntensity: 0.65,
+      roughness: 0.15,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    const crystalMagentaMat = new THREE.MeshStandardMaterial({
+      color: 0xf43f5e,
+      emissive: 0xbe123c,
+      emissiveIntensity: 0.65,
+      roughness: 0.15,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    const assetTemplates = [
+      { geo: new THREE.BoxGeometry(0.55, 2.4, 0.45), mat: woodMat, baseScale: 0.95 },
+      { geo: new THREE.BoxGeometry(1.0, 1.0, 0.9), mat: woodMat, baseScale: 0.85 },
+      { geo: new THREE.BoxGeometry(1.25, 1.25, 1.05), mat: stoneMat, baseScale: 0.9 },
+      { geo: new THREE.BoxGeometry(0.7, 2.2, 0.7), mat: stoneMat, baseScale: 0.85 },
+      { geo: new THREE.CylinderGeometry(0.6, 0.6, 0.16, 24), mat: coinMat, baseScale: 1.05 },
+      { geo: new THREE.BoxGeometry(0.95, 0.95, 0.95), mat: tntMat, baseScale: 0.85 },
+      { geo: new THREE.OctahedronGeometry(0.7, 0), mat: crystalCyanMat, baseScale: 0.9 },
+      { geo: new THREE.IcosahedronGeometry(0.65, 0), mat: crystalMagentaMat, baseScale: 0.85 }
+    ];
+
+    const totalPieces = 24;
+    for (let i = 0; i < totalPieces; i++) {
+      const tmpl = assetTemplates[i % assetTemplates.length];
+      const mesh = new THREE.Mesh(tmpl.geo, tmpl.mat);
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
+
+      // 3 Depth layers:
+      // Layer 0 (Deep backdrop): z ~ -24 to -18
+      // Layer 1 (Midground): z ~ -14 to -8
+      // Layer 2 (Atmospheric foreground periphery): z ~ 4 to 12
+      const layer = i % 3;
+      let x, y, z;
+      if (layer === 0) {
+        x = -48 + (i * 4.4) % 96;
+        y = 5 + (Math.sin(i * 1.6) * 0.5 + 0.5) * 20;
+        z = -23 + (i % 5) * 1.2;
+      } else if (layer === 1) {
+        x = -42 + (i * 3.9) % 84;
+        y = 3.5 + (Math.cos(i * 2.2) * 0.5 + 0.5) * 17;
+        z = -13 + (i % 4) * 1.6;
+      } else {
+        const isLeft = i % 2 === 0;
+        x = isLeft ? (-34 + Math.random() * 8) : (24 + Math.random() * 10);
+        y = 2 + Math.random() * 15;
+        z = 4 + Math.random() * 8;
+      }
+
+      mesh.position.set(x, y, z);
+      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+      const s = tmpl.baseScale * (0.8 + Math.random() * 0.4);
+      mesh.scale.set(s, s, s);
+
+      this.driftingGroup.add(mesh);
+
+      this.driftingPieces.push({
+        mesh,
+        baseX: x,
+        baseY: y,
+        baseZ: z,
+        driftSpeed: (0.18 + Math.random() * 0.32) * (layer === 0 ? 0.6 : 1.0),
+        floatFreq: 0.55 + Math.random() * 0.8,
+        floatAmp: 0.35 + Math.random() * 0.55,
+        phase: Math.random() * Math.PI * 2,
+        tiltFactor: layer === 0 ? 0.8 : (layer === 1 ? 1.6 : 2.5),
+        rotSpeed: {
+          x: (Math.random() - 0.5) * 0.35,
+          y: (Math.random() - 0.5) * 0.45,
+          z: (Math.random() - 0.5) * 0.3
+        }
+      });
+    }
+  }
+
+  /* ═════════════════════════════════════════════════════════════
+   * UPDATE — Animates clouds, petals, drifting assets, and logo
    * ═════════════════════════════════════════════════════════════ */
 
   update(elapsedTime, deltaTime) {
@@ -631,31 +767,43 @@ export class BrandingElements {
       this.rotatingLogoGroup.rotation.y += 0.85 * deltaTime;
     }
 
+    // ── Smooth Interactive Parallax Pointer Sway ──
+    this.currentTilt.x += (this.targetTilt.x - this.currentTilt.x) * 3.5 * deltaTime;
+    this.currentTilt.y += (this.targetTilt.y - this.currentTilt.y) * 3.5 * deltaTime;
+
+    // ── Animate 3D drifting structural blocks & game assets ──
+    this.driftingPieces.forEach((p) => {
+      p.mesh.position.x += p.driftSpeed * deltaTime;
+      if (p.mesh.position.x > 50) {
+        p.mesh.position.x = -50;
+      }
+
+      const floatOffset = Math.sin(elapsedTime * p.floatFreq + p.phase) * p.floatAmp;
+      p.mesh.position.y = p.baseY + floatOffset - (this.currentTilt.y * p.tiltFactor * 0.65);
+      p.mesh.position.z = p.baseZ + (this.currentTilt.x * p.tiltFactor * 0.75);
+
+      p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
+      p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
+      p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
+    });
+
     // ── Drift clouds ──
     this.clouds.forEach((c) => {
       c.group.position.x += c.speed * deltaTime;
-      // Gentle vertical bob for breathing life
       c.group.position.y = c.baseY + Math.sin(elapsedTime * 0.45 + c.phase) * 0.18;
-
-      // Wrap around when drifting off-screen (expanded bounds for wide-angle camera)
       if (c.group.position.x > 52) c.group.position.x = -52;
     });
 
     // ── Animate falling cherry blossom petals ──
     this.petals.forEach((p) => {
-      // Gravity / fall
       p.mesh.position.y += p.vy * deltaTime;
-
-      // Horizontal wind drift + sinusoidal sway
       p.mesh.position.x += (p.vx + Math.sin(elapsedTime * 1.3 + p.phase) * 0.55) * deltaTime;
       p.mesh.position.z += Math.cos(elapsedTime * 0.9 + p.phase * 1.3) * 0.28 * deltaTime;
 
-      // Tumble rotation
       p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
       p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
       p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
 
-      // Reset petals that fell below the ground
       if (p.mesh.position.y < -1.5) {
         p.mesh.position.set(
           -42 + Math.random() * 84,
@@ -663,8 +811,6 @@ export class BrandingElements {
           -32 + Math.random() * 40
         );
       }
-
-      // Reset petals that drifted too far right
       if (p.mesh.position.x > 45) {
         p.mesh.position.x = -42;
         p.mesh.position.y = 10 + Math.random() * 16;

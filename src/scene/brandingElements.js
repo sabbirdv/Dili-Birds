@@ -771,6 +771,9 @@ export class BrandingElements {
     if (this.driftingGroup) {
       this.driftingGroup.visible = Boolean(isDashboard);
     }
+    if (this.monumentGroup) {
+      this.monumentGroup.visible = !isDashboard;
+    }
   }
 
   /* ═════════════════════════════════════════════════════════════

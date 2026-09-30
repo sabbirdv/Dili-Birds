@@ -58,18 +58,9 @@ export class UIManager {
     this.summaryStarsEl = document.getElementById('summary-stars');
     this.summaryStarsValEl = document.getElementById('summary-stars-val');
 
-    // Dashboard Hero Module elements
-    this.heroStageBadgeEl = document.getElementById('hero-stage-badge');
-    this.heroMissionNameEl = document.getElementById('hero-mission-name');
-    this.heroMissionDescEl = document.getElementById('hero-mission-desc');
-    this.heroDifficultyPillEl = document.getElementById('hero-difficulty-pill');
-    this.heroTargetChipEl = document.getElementById('hero-target-chip');
-    this.heroBirdChipEl = document.getElementById('hero-bird-chip');
-    this.heroRewardChipEl = document.getElementById('hero-reward-chip');
-    this.heroStartSubEl = document.getElementById('hero-start-sub');
-
     // Tracks the current playing level ID so top bar displays current level instead of max level
     this.currentPlayingLevelId = null;
+
 
     this.profileModal = new ProfileModal(
       this.storage,
@@ -118,25 +109,13 @@ export class UIManager {
       this.showRoadmapView();
     });
 
-    // Quick Play Active Stage Directly
-    const quickPlayBtn = document.getElementById('btn-dashboard-quick-play');
-    quickPlayBtn?.addEventListener('click', () => {
-      const unlockedLevel = this.storage.getUnlockedLevel();
-      const activeLevel = LEVELS.find((l) => l.id === unlockedLevel) || LEVELS[0];
-      this.onSelectLevel?.(activeLevel);
-    });
-
     // Return to Dashboard from Roadmap screen
     const roadmapBackBtn = document.getElementById('btn-roadmap-back');
     roadmapBackBtn?.addEventListener('click', () => {
       this.showDashboardView();
     });
-
-    // View All Heroes Button
-    document.getElementById('btn-view-all-heroes')?.addEventListener('click', () => {
-      this.dashboardModals?.openCharacters();
-    });
   }
+
 
 
   bindTopBarEvents() {
@@ -201,77 +180,6 @@ export class UIManager {
       this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
     }
 
-    // Dashboard Hero Launch Module Data
-    const activeLevel = LEVELS.find((l) => l.id === unlockedLevel) || LEVELS[0];
-    if (this.heroStageBadgeEl) this.heroStageBadgeEl.textContent = `ACTIVE CAMPAIGN • STAGE ${activeLevel.id}`;
-    if (this.heroMissionNameEl) this.heroMissionNameEl.textContent = activeLevel.name;
-    if (this.heroMissionDescEl) this.heroMissionDescEl.textContent = activeLevel.description;
-    if (this.heroDifficultyPillEl) {
-      this.heroDifficultyPillEl.textContent = activeLevel.difficulty.toUpperCase();
-      this.heroDifficultyPillEl.className = `difficulty-chip ${activeLevel.difficulty.toLowerCase()}`;
-    }
-    if (this.heroTargetChipEl) this.heroTargetChipEl.textContent = `${activeLevel.targets.length} Targets`;
-    if (this.heroBirdChipEl) this.heroBirdChipEl.textContent = `${activeLevel.birds.length} Slingshot Birds`;
-    if (this.heroRewardChipEl) this.heroRewardChipEl.textContent = `+${activeLevel.coinReward} Coins`;
-    if (this.heroStartSubEl) this.heroStartSubEl.textContent = `Launch Stage ${activeLevel.id}`;
-
-    // Render Milestone Character Stepper
-    this.renderMilestoneSteps(unlockedLevel);
-  }
-
-  renderMilestoneSteps(unlockedLevel) {
-    const nodesRow = document.getElementById('milestones-nodes-row');
-    const fillBar = document.getElementById('milestones-progress-fill');
-    const hintEl = document.getElementById('hero-milestone-hint');
-    if (!nodesRow) return;
-
-    const milestones = HEROES_DATA;
-    let nextLocked = milestones.find((m) => m.milestoneLevel > unlockedLevel);
-
-    if (hintEl) {
-      hintEl.textContent = nextLocked
-        ? `Next Unlock: ${nextLocked.name} at Level ${nextLocked.milestoneLevel}`
-        : 'All 4 Heroes Unlocked!';
-    }
-
-    // Progress percentage
-    const maxMilestone = 7;
-    const pct = Math.min(100, Math.max(16, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
-    if (fillBar) fillBar.style.width = `${pct}%`;
-
-    let html = '';
-    milestones.forEach((hero) => {
-      const isUnlocked = unlockedLevel >= hero.milestoneLevel;
-      html += `
-        <div class="milestone-step-node ${isUnlocked ? 'unlocked' : 'locked'}" data-hero-id="${hero.id}" role="button" tabindex="0" title="${hero.name} (Milestone: Level ${hero.milestoneLevel})">
-          <div class="node-avatar-frame" style="--accent-hero: ${hero.themeColor};">
-            <img class="node-hero-img ${!isUnlocked ? 'silhouetted' : ''}" src="${hero.avatarUrl}" alt="${hero.name}" />
-            <span class="node-status-badge ${isUnlocked ? 'unlocked' : 'locked'}">
-              ${isUnlocked
-                ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
-                : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>`
-              }
-            </span>
-          </div>
-          <span class="node-step-lvl">LVL ${hero.milestoneLevel}</span>
-          <span class="node-hero-name">${hero.name.split(' ')[0]}</span>
-        </div>
-      `;
-    });
-
-    nodesRow.innerHTML = html;
-
-    nodesRow.querySelectorAll('.milestone-step-node').forEach((node) => {
-      node.addEventListener('click', () => {
-        this.dashboardModals?.openCharacters();
-      });
-      node.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this.dashboardModals?.openCharacters();
-        }
-      });
-    });
   }
 
   refreshHeaderAndMenu() {

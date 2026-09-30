@@ -107,43 +107,19 @@
          ═══════════════════════════════════════════════════════════ -->
     <main id="dashboard-screen" class="fullscreen-page dashboard-page">
       <div class="dashboard-scroll-shell">
-        <!-- Hero Launch Section -->
-        <section class="dashboard-hero-module glass-card" aria-label="Active Campaign Mission Launch">
+        <!-- Grand Centered Hero Game Launch Section -->
+        <section class="dashboard-hero-module dashboard-hero-center glass-card" aria-label="Campaign Launch Center">
           <div class="hero-module-glow-orbit" aria-hidden="true"></div>
 
-          <div class="hero-module-main-row">
-            <!-- Active Mission Briefing -->
-            <div class="hero-mission-briefing">
-              <div class="mission-tag-row">
-                <span class="mission-live-pill" id="hero-stage-badge">ACTIVE CAMPAIGN • STAGE 1</span>
-                <span class="difficulty-chip" id="hero-difficulty-pill">EASY</span>
-              </div>
-              <h2 class="hero-mission-title" id="hero-mission-name">Timber Watchtower</h2>
-              <p class="hero-mission-desc" id="hero-mission-desc">A 3-story timber guard tower with outer sentry outpost and rooftop coin vault.</p>
+          <div class="hero-center-content">
+            <div class="hero-brand-pill">✿ OFFICIAL 3D ANIME WORLD ✿</div>
+            <h1 class="dash-grand-title">Dili-Birds <span class="accent-3d">3D</span></h1>
+            <p class="dash-grand-sub">
+              Command the flock, master precision slingshot trajectories, and demolish enemy fortifications across the 8-stage campaign circuit.
+            </p>
 
-              <div class="hero-metric-chips">
-                <div class="metric-chip">
-                  <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-                  </svg>
-                  <span id="hero-target-chip">4 Targets</span>
-                </div>
-                <div class="metric-chip">
-                  <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                  </svg>
-                  <span id="hero-bird-chip">3 Birds Queue</span>
-                </div>
-                <div class="metric-chip reward-accent">
-                  <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
-                  <span id="hero-reward-chip">+85 Coins</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Central START GAME Action Column (Navigates to Level Select Roadmap) -->
-            <div class="hero-cta-column">
-              <button type="button" id="btn-dashboard-start-game" class="btn-start-game-cta" title="Open Level Select Roadmap">
+            <div class="hero-cta-wrap">
+              <button type="button" id="btn-dashboard-start-game" class="btn-start-game-cta grand-cta" title="Open Level Select Roadmap">
                 <span class="cta-pulse-glow" aria-hidden="true"></span>
                 <span class="cta-play-badge">
                   <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
@@ -154,35 +130,6 @@
                 </div>
                 <svg class="cta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
-
-              <button type="button" id="btn-dashboard-quick-play" class="btn-roadmap-toggle" title="Launch Active Stage Directly">
-                <svg class="chip-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span id="hero-start-sub">Quick Play Stage 1</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Character Unlock Progression Milestones Strip -->
-          <div class="hero-milestones-strip" id="hero-milestones-strip">
-            <div class="milestones-bar-header">
-              <div class="milestones-header-left">
-                <svg class="milestone-star-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span class="milestones-heading-title">Character Progression Milestones</span>
-                <span class="milestones-next-teaser" id="hero-milestone-hint">Next Unlock: Speedster Swift at Level 3</span>
-              </div>
-              <button type="button" id="btn-view-all-heroes" class="btn-heroes-codex-link">
-                <span>Roster &amp; Perks</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-
-            <div class="milestones-track-container">
-              <div class="milestones-progress-line">
-                <div class="milestones-progress-fill" id="milestones-progress-fill" style="width: 25%;"></div>
-              </div>
-              <div class="milestones-nodes-row" id="milestones-nodes-row">
-                <!-- Rendered dynamically with 4 character steps -->
-              </div>
             </div>
           </div>
         </section>

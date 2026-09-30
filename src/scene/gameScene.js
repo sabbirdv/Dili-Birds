@@ -289,6 +289,8 @@ export class GameScene {
   }
 
   buildEnvironment() {
+    this.stageGroup = new THREE.Group();
+
     // Main grassy game stage (expanded to 88 units width for grand structures)
     const grassGeo = new THREE.BoxGeometry(88, 2.0, 16);
     const grassMat = new THREE.MeshStandardMaterial({
@@ -298,7 +300,7 @@ export class GameScene {
     const grassMesh = new THREE.Mesh(grassGeo, grassMat);
     grassMesh.position.set(1.5, -1.0, 0);
     grassMesh.receiveShadow = true;
-    this.scene.add(grassMesh);
+    this.stageGroup.add(grassMesh);
 
     // Clean front trim bevel along the grass edge for a crisp 2D/3D hybrid stage look
     const trimGeo = new THREE.BoxGeometry(88.4, 0.35, 16.2);
@@ -308,7 +310,7 @@ export class GameScene {
     });
     const trimMesh = new THREE.Mesh(trimGeo, trimMat);
     trimMesh.position.set(1.5, -0.18, 0);
-    this.scene.add(trimMesh);
+    this.stageGroup.add(trimMesh);
 
     // Sub-surface rocky foundation under the stage
     const cliffGeo = new THREE.BoxGeometry(84, 10.0, 15);
@@ -318,7 +320,7 @@ export class GameScene {
     });
     const cliffMesh = new THREE.Mesh(cliffGeo, cliffMat);
     cliffMesh.position.set(1.5, -6.8, 0);
-    this.scene.add(cliffMesh);
+    this.stageGroup.add(cliffMesh);
 
     // Fortress stone foundation pad on the right side
     const padMesh = new THREE.Mesh(
@@ -327,7 +329,9 @@ export class GameScene {
     );
     padMesh.position.set(13.5, 0.04, 0);
     padMesh.receiveShadow = true;
-    this.scene.add(padMesh);
+    this.stageGroup.add(padMesh);
+
+    this.scene.add(this.stageGroup);
   }
 
   updateBrandName(brandName) {
@@ -380,6 +384,9 @@ export class GameScene {
 
   setDashboardMode(isDashboard) {
     this.isDashboardMode = Boolean(isDashboard);
+    if (this.stageGroup) {
+      this.stageGroup.visible = !isDashboard;
+    }
     if (this.branding) {
       this.branding.setDashboardMode(isDashboard);
     }

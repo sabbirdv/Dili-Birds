@@ -330,17 +330,21 @@ html, body {
 /* 1. Dashboard Page Shell */
 .dashboard-page {
   padding: 0;
+  background: radial-gradient(circle at 50% 25%, rgba(15, 23, 42, 0.72) 0%, rgba(10, 15, 30, 0.92) 100%);
+  backdrop-filter: blur(2px);
 }
 
 .dashboard-scroll-shell {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 72px 20px 36px 20px;
-  min-height: 100%;
+  padding: 78px 24px 36px 24px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: center;
+  gap: 20px;
+  box-sizing: border-box;
 }
 
 /* 3 Dedicated Dashboard Hub Cards Grid */
@@ -2807,6 +2811,94 @@ html, body {
   gap: 14px;
 }
 
+/* Centered Grand Hero Module on Dashboard */
+.dashboard-hero-module.dashboard-hero-center {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 38px 28px;
+  margin: 0;
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(26, 38, 64, 0.88));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.hero-center-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 720px;
+  gap: 12px;
+}
+
+.hero-brand-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.dash-grand-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.0rem, 4vw, 3.2rem);
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.dash-grand-title .accent-3d {
+  background: linear-gradient(135deg, #38bdf8 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.dash-grand-sub {
+  font-size: clamp(0.92rem, 1.25vw, 1.05rem);
+  color: #94a3b8;
+  line-height: 1.55;
+  max-width: 620px;
+  margin: 0;
+}
+
+.hero-cta-wrap {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-start-game-cta.grand-cta {
+  padding: 16px 36px;
+  border-radius: 22px;
+  gap: 16px;
+  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.55), 0 0 28px rgba(56, 189, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.btn-start-game-cta.grand-cta:hover {
+  transform: scale(1.08) translateY(-3px);
+  box-shadow: 0 18px 44px rgba(2, 132, 199, 0.75), 0 0 36px rgba(56, 189, 248, 0.55);
+}
+
+.btn-start-game-cta.grand-cta .cta-headline {
+  font-size: 1.45rem;
+  letter-spacing: 0.08em;
+}
+
+.btn-start-game-cta.grand-cta .cta-subline {
+  font-size: 0.82rem;
+}
+
 .hero-module-glow-orbit {
   position: absolute;
   top: -50px;
@@ -3057,6 +3149,39 @@ html, body {
 }
 
 /* 3. Character Unlock Progression Milestones Strip */
+#modal-milestone-banner {
+  margin-bottom: 22px;
+}
+
+.modal-milestone-info {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.milestone-banner-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.milestone-badge-lead {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #f8fafc;
+}
+
+.milestones-track-container.modal-track {
+  padding: 4px 8px 4px 8px;
+}
+
 .hero-milestones-strip {
   position: relative;
   z-index: 2;

@@ -378,20 +378,54 @@ export class DashboardModals {
 
     const unlockedLevel = this.storage.getUnlockedLevel();
 
-    // Render Milestone Progression Banner
+    // Render Milestone Progression Stepper Track inside Characters Codex
     if (milestoneBannerEl) {
       let nextLockedHero = HEROES_DATA.find((h) => h.milestoneLevel > unlockedLevel);
       let bannerHint = nextLockedHero
-        ? `Next Special Character: <strong>${nextLockedHero.name}</strong> unlocks at <strong>Level ${nextLockedHero.milestoneLevel}</strong>!`
-        : `All 4 Special Characters have been unlocked! Commander roster fully operational.`;
+        ? `Next Unlock: <strong>${nextLockedHero.name}</strong> at <strong>Level ${nextLockedHero.milestoneLevel}</strong>!`
+        : `All 4 Heroes Unlocked!`;
+
+      const maxMilestone = 7;
+      const pct = Math.min(100, Math.max(16, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
+
+      let nodesHtml = '';
+      HEROES_DATA.forEach((hero) => {
+        const isUnlocked = unlockedLevel >= hero.milestoneLevel;
+        nodesHtml += `
+          <div class="milestone-step-node ${isUnlocked ? 'unlocked' : 'locked'}" title="${hero.name} (Milestone: Level ${hero.milestoneLevel})">
+            <div class="node-avatar-frame" style="--accent-hero: ${hero.themeColor};">
+              <img class="node-hero-img ${!isUnlocked ? 'silhouetted' : ''}" src="${hero.avatarUrl}" alt="${hero.name}" />
+              <span class="node-status-badge ${isUnlocked ? 'unlocked' : 'locked'}">
+                ${isUnlocked
+                  ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
+                  : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>`
+                }
+              </span>
+            </div>
+            <span class="node-step-lvl">LVL ${hero.milestoneLevel}</span>
+            <span class="node-hero-name">${hero.name.split(' ')[0]}</span>
+          </div>
+        `;
+      });
 
       milestoneBannerEl.innerHTML = `
         <div class="modal-milestone-info">
-          <span class="milestone-badge-lead">PROGRESSION MILESTONE STATUS</span>
-          <p class="milestone-desc-lead">${bannerHint}</p>
+          <div class="milestone-banner-top">
+            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES</span>
+            <span class="milestones-next-teaser">${bannerHint}</span>
+          </div>
+          <div class="milestones-track-container modal-track">
+            <div class="milestones-progress-line">
+              <div class="milestones-progress-fill" style="width: ${pct}%;"></div>
+            </div>
+            <div class="milestones-nodes-row">
+              ${nodesHtml}
+            </div>
+          </div>
         </div>
       `;
     }
+
 
     let html = '';
     HEROES_DATA.forEach((hero) => {

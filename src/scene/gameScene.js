@@ -374,7 +374,32 @@ export class GameScene {
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
     this.updateDynamicCamera(width / Math.max(1, height));
+
+    this.setDashboardMode(isMenuPreview);
   }
+
+  setDashboardMode(isDashboard) {
+    this.isDashboardMode = Boolean(isDashboard);
+    if (this.branding) {
+      this.branding.setDashboardMode(isDashboard);
+    }
+    if (this.slingshot) {
+      this.slingshot.setVisible(!isDashboard);
+    }
+    this.blocks.forEach((b) => {
+      if (b.mesh) b.mesh.visible = !isDashboard;
+    });
+    this.targets.forEach((t) => {
+      if (t.mesh) t.mesh.visible = !isDashboard;
+    });
+    this.waitingBirdMeshes.forEach((m) => {
+      m.visible = !isDashboard;
+    });
+    if (this.activeBird?.mesh) {
+      this.activeBird.mesh.visible = !isDashboard;
+    }
+  }
+
 
   clearLevelEntities() {
     if (this.activeBird) {

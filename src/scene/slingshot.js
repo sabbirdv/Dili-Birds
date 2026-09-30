@@ -150,6 +150,14 @@ export class SlingshotController {
     this.scene.add(this.trajectoryGroup);
   }
 
+  setVisible(visible) {
+    if (this.slingshotGroup) this.slingshotGroup.visible = visible;
+    if (this.trajectoryGroup) this.trajectoryGroup.visible = visible;
+    if (this.currentBirdMesh) this.currentBirdMesh.visible = visible;
+    this.canInteract = visible;
+  }
+
+
   /**
    * Positions the two 3D elastic rubber bands and leather pouch to wrap behind the bird.
    */

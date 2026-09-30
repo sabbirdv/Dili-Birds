@@ -13,6 +13,8 @@ export class HudController {
     onRetryLevel,
     onNextLevel,
     onReturnToMenu,
+    onReturnToRoadmap,
+    onReturnToDashboard,
     onOpenProfile,
     onPauseGame,
     onResumeGame
@@ -23,9 +25,12 @@ export class HudController {
     this.onRetryLevel = onRetryLevel;
     this.onNextLevel = onNextLevel;
     this.onReturnToMenu = onReturnToMenu;
+    this.onReturnToRoadmap = onReturnToRoadmap || onReturnToMenu;
+    this.onReturnToDashboard = onReturnToDashboard || onReturnToMenu;
     this.onOpenProfile = onOpenProfile;
     this.onPauseGame = onPauseGame;
     this.onResumeGame = onResumeGame;
+
 
     // HUD DOM elements on the single unified Top Bar
     this.gameplayHudCluster = document.getElementById('gameplay-hud-cluster');
@@ -104,14 +109,19 @@ export class HudController {
       this.onRetryLevel?.();
     });
 
-    document.getElementById('btn-menu-main-menu')?.addEventListener('click', () => {
-      this.closeGameMenu();
-      this.onReturnToMenu?.();
-    });
-
     document.getElementById('btn-menu-roadmap')?.addEventListener('click', () => {
       this.closeGameMenu();
-      this.onReturnToMenu?.();
+      this.onReturnToRoadmap?.();
+    });
+
+    document.getElementById('btn-menu-dashboard')?.addEventListener('click', () => {
+      this.closeGameMenu();
+      this.onReturnToDashboard?.();
+    });
+
+    document.getElementById('btn-menu-main-menu')?.addEventListener('click', () => {
+      this.closeGameMenu();
+      this.onReturnToDashboard?.();
     });
 
     document.getElementById('btn-menu-fullscreen')?.addEventListener('click', async () => {
@@ -152,10 +162,16 @@ export class HudController {
     });
 
     // Result Modal Buttons
+    document.getElementById('btn-result-dashboard')?.addEventListener('click', () => {
+      this.closeResultModal();
+      this.onReturnToDashboard?.();
+    });
+
     this.btnResultMenu?.addEventListener('click', () => {
       this.closeResultModal();
-      this.onReturnToMenu?.();
+      this.onReturnToRoadmap?.();
     });
+
 
     this.btnResultRetry?.addEventListener('click', () => {
       this.closeResultModal();

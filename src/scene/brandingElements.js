@@ -714,26 +714,33 @@ export class BrandingElements {
       // Layer 0 (Deep backdrop): z ~ -24 to -18
       // Layer 1 (Midground): z ~ -14 to -8
       // Layer 2 (Atmospheric foreground periphery): z ~ 4 to 12
-      const layer = i % 3;
+      const quadrant = i % 4;
       let x, y, z;
-      if (layer === 0) {
-        x = -48 + (i * 4.4) % 96;
-        y = 5 + (Math.sin(i * 1.6) * 0.5 + 0.5) * 20;
-        z = -23 + (i % 5) * 1.2;
-      } else if (layer === 1) {
-        x = -42 + (i * 3.9) % 84;
-        y = 3.5 + (Math.cos(i * 2.2) * 0.5 + 0.5) * 17;
-        z = -13 + (i % 4) * 1.6;
+      if (quadrant === 0) {
+        // Left flank
+        x = -32 + Math.random() * 14;
+        y = 2 + Math.random() * 16;
+        z = -14 + Math.random() * 24;
+      } else if (quadrant === 1) {
+        // Right flank
+        x = 18 + Math.random() * 16;
+        y = 2 + Math.random() * 16;
+        z = -14 + Math.random() * 24;
+      } else if (quadrant === 2) {
+        // Upper canopy / zenith
+        x = -24 + Math.random() * 48;
+        y = 13 + Math.random() * 9;
+        z = -16 + Math.random() * 20;
       } else {
-        const isLeft = i % 2 === 0;
-        x = isLeft ? (-34 + Math.random() * 8) : (24 + Math.random() * 10);
-        y = 2 + Math.random() * 15;
-        z = 4 + Math.random() * 8;
+        // Lower atmosphere / floating foreground
+        x = -26 + Math.random() * 52;
+        y = -1.5 + Math.random() * 5.5;
+        z = -8 + Math.random() * 22;
       }
 
       mesh.position.set(x, y, z);
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-      const s = tmpl.baseScale * (0.8 + Math.random() * 0.4);
+      const s = tmpl.baseScale * (0.8 + Math.random() * 0.45);
       mesh.scale.set(s, s, s);
 
       this.driftingGroup.add(mesh);
@@ -743,17 +750,26 @@ export class BrandingElements {
         baseX: x,
         baseY: y,
         baseZ: z,
-        driftSpeed: (0.18 + Math.random() * 0.32) * (layer === 0 ? 0.6 : 1.0),
-        floatFreq: 0.55 + Math.random() * 0.8,
-        floatAmp: 0.35 + Math.random() * 0.55,
+        driftSpeed: (0.16 + Math.random() * 0.28) * (quadrant % 2 === 0 ? 1 : -0.8),
+        floatFreq: 0.55 + Math.random() * 0.75,
+        floatAmp: 0.4 + Math.random() * 0.6,
         phase: Math.random() * Math.PI * 2,
-        tiltFactor: layer === 0 ? 0.8 : (layer === 1 ? 1.6 : 2.5),
+        tiltFactor: 1.2 + Math.random() * 1.4,
         rotSpeed: {
           x: (Math.random() - 0.5) * 0.35,
           y: (Math.random() - 0.5) * 0.45,
           z: (Math.random() - 0.5) * 0.3
         }
       });
+    }
+
+    // Default to true (in dashboard/menu)
+    this.driftingGroup.visible = true;
+  }
+
+  setDashboardMode(isDashboard) {
+    if (this.driftingGroup) {
+      this.driftingGroup.visible = Boolean(isDashboard);
     }
   }
 
@@ -771,21 +787,25 @@ export class BrandingElements {
     this.currentTilt.x += (this.targetTilt.x - this.currentTilt.x) * 3.5 * deltaTime;
     this.currentTilt.y += (this.targetTilt.y - this.currentTilt.y) * 3.5 * deltaTime;
 
-    // ── Animate 3D drifting structural blocks & game assets ──
-    this.driftingPieces.forEach((p) => {
-      p.mesh.position.x += p.driftSpeed * deltaTime;
-      if (p.mesh.position.x > 50) {
-        p.mesh.position.x = -50;
-      }
+    // ── Animate 3D drifting structural blocks & game assets (ONLY in dashboard mode) ──
+    if (this.driftingGroup && this.driftingGroup.visible) {
+      this.driftingPieces.forEach((p) => {
+        p.mesh.position.x += p.driftSpeed * deltaTime;
+        if (p.mesh.position.x > 48) {
+          p.mesh.position.x = -48;
+        } else if (p.mesh.position.x < -48) {
+          p.mesh.position.x = 48;
+        }
 
-      const floatOffset = Math.sin(elapsedTime * p.floatFreq + p.phase) * p.floatAmp;
-      p.mesh.position.y = p.baseY + floatOffset - (this.currentTilt.y * p.tiltFactor * 0.65);
-      p.mesh.position.z = p.baseZ + (this.currentTilt.x * p.tiltFactor * 0.75);
+        const floatOffset = Math.sin(elapsedTime * p.floatFreq + p.phase) * p.floatAmp;
+        p.mesh.position.y = p.baseY + floatOffset - (this.currentTilt.y * p.tiltFactor * 0.65);
+        p.mesh.position.z = p.baseZ + (this.currentTilt.x * p.tiltFactor * 0.75);
 
-      p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
-      p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
-      p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
-    });
+        p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
+        p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
+        p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
+      });
+    }
 
     // ── Drift clouds ──
     this.clouds.forEach((c) => {

@@ -61,6 +61,9 @@ class DiliBirdsApp {
       onResumeGame: () => {
         this.gameScene?.resume();
         this.audio?.enterGameplay();
+      },
+      onSetDashboard3DMode: (isDash) => {
+        this.gameScene?.setDashboardMode(isDash);
       }
     });
 

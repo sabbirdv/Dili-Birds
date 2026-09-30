@@ -21,7 +21,8 @@ export class UIManager {
     onBrandChanged,
     onToggleCameraView,
     onPauseGame,
-    onResumeGame
+    onResumeGame,
+    onSetDashboard3DMode
   }) {
     this.storage = storage;
     this.audio = audio;
@@ -32,6 +33,14 @@ export class UIManager {
     this.onBrandChanged = onBrandChanged;
     this.onPauseGame = onPauseGame;
     this.onResumeGame = onResumeGame;
+    this.onSetDashboard3DMode = onSetDashboard3DMode;
+
+    // Dedicated Full-Screen Pages
+    this.dashboardScreenEl = document.getElementById('dashboard-screen');
+    this.roadmapScreenEl = document.getElementById('roadmap-screen');
+    this.topBarEl = document.getElementById('top-bar');
+    this.navDashboardActionsEl = document.getElementById('nav-dashboard-actions');
+    this.gameplayHudClusterEl = document.getElementById('gameplay-hud-cluster');
 
     // Single unified top bar elements
     this.displayUsernameEl = document.getElementById('display-username');
@@ -39,7 +48,6 @@ export class UIManager {
     this.displayLevelEl = document.getElementById('display-player-level');
     this.displayCoinsEl = document.getElementById('display-coins');
     this.heroBrandTagEl = document.getElementById('hero-brand-tag');
-    this.menuScreenEl = document.getElementById('menu-screen');
 
     // Summary bar elements on Roadmap screen
     this.summaryUsernameEl = document.getElementById('summary-username');
@@ -90,7 +98,9 @@ export class UIManager {
       totalLevelsCount: this.totalLevelsCount,
       onRetryLevel,
       onNextLevel,
-      onReturnToMenu: () => this.showMainMenu(),
+      onReturnToRoadmap: () => this.showRoadmapView(),
+      onReturnToDashboard: () => this.showDashboardView(),
+      onReturnToMenu: () => this.showDashboardView(),
       onOpenProfile: () => this.profileModal.open('username'),
       onPauseGame: () => this.onPauseGame?.(),
       onResumeGame: () => this.onResumeGame?.()
@@ -98,23 +108,28 @@ export class UIManager {
 
     this.bindTopBarEvents();
     this.bindHeroModuleEvents();
-    this.refreshHeaderAndMenu();
+    this.showDashboardView();
   }
 
   bindHeroModuleEvents() {
-    // Primary Central "START GAME" Launch Button
+    // Primary Central "START GAME" Launch Button -> Navigates to Level Select Roadmap
     const startGameBtn = document.getElementById('btn-dashboard-start-game');
     startGameBtn?.addEventListener('click', () => {
+      this.showRoadmapView();
+    });
+
+    // Quick Play Active Stage Directly
+    const quickPlayBtn = document.getElementById('btn-dashboard-quick-play');
+    quickPlayBtn?.addEventListener('click', () => {
       const unlockedLevel = this.storage.getUnlockedLevel();
       const activeLevel = LEVELS.find((l) => l.id === unlockedLevel) || LEVELS[0];
       this.onSelectLevel?.(activeLevel);
     });
 
-    // Roadmap View Toggle Button
-    const toggleRoadmapBtn = document.getElementById('btn-toggle-roadmap');
-    toggleRoadmapBtn?.addEventListener('click', () => {
-      const roadmapSection = document.querySelector('.level-select-section');
-      roadmapSection?.scrollIntoView({ behavior: 'smooth' });
+    // Return to Dashboard from Roadmap screen
+    const roadmapBackBtn = document.getElementById('btn-roadmap-back');
+    roadmapBackBtn?.addEventListener('click', () => {
+      this.showDashboardView();
     });
 
     // View All Heroes Button
@@ -122,6 +137,7 @@ export class UIManager {
       this.dashboardModals?.openCharacters();
     });
   }
+
 
   bindTopBarEvents() {
     const badgeBtn = document.getElementById('player-badge-btn');
@@ -260,29 +276,61 @@ export class UIManager {
 
   refreshHeaderAndMenu() {
     this.refreshHeaderStats();
-    this.levelSelect.render();
+    this.levelSelect?.render();
+  }
+
+  showDashboardView() {
+    this.currentPlayingLevelId = null;
+    this.audio?.enterMenu();
+    this.hud?.closeGameMenu();
+    this.hud?.closeResultModal();
+    this.hud?.hide();
+
+    this.dashboardScreenEl?.classList.remove('hidden');
+    this.roadmapScreenEl?.classList.add('hidden');
+    this.topBarEl?.classList.remove('hidden');
+    this.navDashboardActionsEl?.classList.remove('hidden');
+    this.gameplayHudClusterEl?.classList.add('hidden');
+
+    this.onSetDashboard3DMode?.(true);
+    this.refreshHeaderStats();
+    this.onReturnToMenu?.();
+  }
+
+  showRoadmapView() {
+    this.currentPlayingLevelId = null;
+    this.audio?.enterMenu();
+    this.hud?.closeGameMenu();
+    this.hud?.closeResultModal();
+    this.hud?.hide();
+
+    this.dashboardScreenEl?.classList.add('hidden');
+    this.roadmapScreenEl?.classList.remove('hidden');
+    this.topBarEl?.classList.add('hidden');
+
+    this.onSetDashboard3DMode?.(true);
+    this.levelSelect?.render();
+    this.refreshHeaderStats();
   }
 
   showMainMenu() {
-    this.currentPlayingLevelId = null;
-    this.audio?.enterMenu();
-    this.hud.closeResultModal();
-    this.hud.hide();
-    this.menuScreenEl?.classList.remove('hidden');
-    document.getElementById('nav-dashboard-actions')?.classList.remove('hidden');
-    document.getElementById('gameplay-hud-cluster')?.classList.add('hidden');
-    this.refreshHeaderAndMenu();
-    this.onReturnToMenu?.();
+    this.showDashboardView();
   }
 
   showGameView(levelConfig) {
     this.audio?.enterGameplay();
     this.currentPlayingLevelId = levelConfig ? Number(levelConfig.id) : null;
-    this.menuScreenEl?.classList.add('hidden');
-    document.getElementById('nav-dashboard-actions')?.classList.add('hidden');
-    document.getElementById('gameplay-hud-cluster')?.classList.remove('hidden');
-    this.hud.updateLevelHeader(levelConfig);
+
+    this.dashboardScreenEl?.classList.add('hidden');
+    this.roadmapScreenEl?.classList.add('hidden');
+    this.topBarEl?.classList.remove('hidden');
+    this.navDashboardActionsEl?.classList.add('hidden');
+    this.gameplayHudClusterEl?.classList.remove('hidden');
+
+    this.onSetDashboard3DMode?.(false);
+    this.hud?.updateLevelHeader(levelConfig);
     this.refreshHeaderStats();
-    this.hud.show();
+    this.hud?.show();
   }
 }
+

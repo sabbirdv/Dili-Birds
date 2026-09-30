@@ -134,6 +134,34 @@ export class DashboardModals {
       this.openCharacters();
     });
 
+    // Dashboard Hub Feature Card Triggers
+    const lbCard = document.getElementById('card-dashboard-leaderboard');
+    lbCard?.addEventListener('click', () => this.openLeaderboard());
+    lbCard?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.openLeaderboard();
+      }
+    });
+
+    const missionsCard = document.getElementById('card-dashboard-missions');
+    missionsCard?.addEventListener('click', () => this.openMissions());
+    missionsCard?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.openMissions();
+      }
+    });
+
+    const charactersCard = document.getElementById('card-dashboard-characters');
+    charactersCard?.addEventListener('click', () => this.openCharacters());
+    charactersCard?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.openCharacters();
+      }
+    });
+
     // Close buttons
     document.getElementById('btn-close-leaderboard')?.addEventListener('click', () => {
       this.leaderboardDialog?.close();

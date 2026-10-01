@@ -267,7 +267,7 @@
             <span class="modal-kicker">HALL OF FAME • GLOBAL RANKINGS</span>
             <div id="leaderboard-sync-badge" class="leaderboard-sync-badge live" title="Worldwide Real-Time Standings">
               <span class="sync-dot"></span>
-              <span class="sync-text" id="leaderboard-sync-text">Worldwide Live</span>
+              <span class="sync-text" id="leaderboard-sync-text">Live Server Data</span>
             </div>
           </div>
           <h2 id="leaderboard-title" class="modal-heading">
@@ -282,7 +282,39 @@
         </button>
       </header>
 
-      <div class="leaderboard-table-wrap">
+      <!-- Live Connection Error State Card (shown if Supabase connection fails) -->
+      <div id="leaderboard-error-state" class="leaderboard-state-card error-card hidden">
+        <div class="state-icon-wrap error-icon-wrap">
+          <svg class="state-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h3 class="state-heading">Live Server Connection Failed</h3>
+        <p id="leaderboard-error-desc" class="state-desc">
+          Unable to establish a live connection to the <code>Dili-Birds-Data</code> database. Please check your internet connection or verify the Supabase configuration.
+        </p>
+        <button type="button" id="btn-leaderboard-retry" class="action-btn primary-btn state-retry-btn">
+          <svg class="retry-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+          </svg>
+          <span>Retry Live Connection</span>
+        </button>
+      </div>
+
+      <!-- Live Empty State Card (shown if database returns 0 records) -->
+      <div id="leaderboard-empty-state" class="leaderboard-state-card empty-card hidden">
+        <div class="state-icon-wrap empty-icon-wrap">
+          <svg class="state-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h3 class="state-heading">No Records in Database</h3>
+        <p class="state-desc">The live <code>Dili-Birds-Data</code> table currently has no player entries. Clear any stage to be the first ranked pilot worldwide!</p>
+      </div>
+
+      <div id="leaderboard-table-wrap" class="leaderboard-table-wrap">
         <div class="leaderboard-header-row">
           <span class="col-rank">RANK</span>
           <span class="col-player">COMMANDER</span>

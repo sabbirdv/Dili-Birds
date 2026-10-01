@@ -3680,6 +3680,109 @@ html, body {
   100% { opacity: 1; }
 }
 
+/* Leaderboard Live State Cards (Error & Empty States) */
+.leaderboard-state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 20px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 10px 0;
+  gap: 10px;
+  animation: fadeIn 0.25s ease;
+}
+
+.leaderboard-state-card.error-card {
+  border-color: rgba(239, 68, 68, 0.32);
+  background: radial-gradient(circle at 50% 25%, rgba(239, 68, 68, 0.12), rgba(15, 23, 42, 0.8));
+}
+
+.leaderboard-state-card.empty-card {
+  border-color: rgba(56, 189, 248, 0.3);
+  background: radial-gradient(circle at 50% 25%, rgba(56, 189, 248, 0.1), rgba(15, 23, 42, 0.8));
+}
+
+.state-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: 2px;
+}
+
+.error-icon-wrap {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.empty-icon-wrap {
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: var(--accent-cyan);
+}
+
+.state-svg {
+  width: 26px;
+  height: 26px;
+}
+
+.state-heading {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.state-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  max-width: 380px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.state-desc code {
+  color: var(--accent-cyan);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.state-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 12px;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+.state-retry-btn .retry-svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.state-retry-btn.loading .retry-svg {
+  animation: spinRefresh 0.8s linear infinite;
+}
+
+@keyframes spinRefresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Skeleton Loading Shimmer Animation */
 .skeleton-row {
   pointer-events: none;

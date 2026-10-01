@@ -4,7 +4,7 @@ import char2Url from '../assets/character-2.png';
 import char3Url from '../assets/character-3.png';
 import char4Url from '../assets/sub-character-4.png';
 import { AVATAR_PRESETS } from './avatarPresets.js';
-import { leaderboardService, FALLBACK_GLOBAL_PILOTS } from '../services/leaderboardService.js';
+import { leaderboardService } from '../services/leaderboardService.js';
 
 export const HEROES_DATA = [
   {
@@ -163,9 +163,13 @@ export class DashboardModals {
       }
     });
 
-    // Close buttons
+    // Close buttons & Leaderboard controls
     document.getElementById('btn-close-leaderboard')?.addEventListener('click', () => {
       this.leaderboardDialog?.close();
+    });
+
+    document.getElementById('btn-leaderboard-retry')?.addEventListener('click', () => {
+      this.loadLeaderboardData();
     });
 
     document.getElementById('btn-close-missions')?.addEventListener('click', () => {
@@ -187,12 +191,12 @@ export class DashboardModals {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * GLOBAL LEADERBOARD MODAL (Supabase Dili-Birds-Data Backend)
+   * GLOBAL LEADERBOARD MODAL (Strict Live Supabase Backend)
    * ═════════════════════════════════════════════════════════════ */
   openLeaderboard() {
     if (!this.leaderboardDialog) return;
     this.leaderboardDialog.showModal();
-    this.loadLeaderboardData(false);
+    this.loadLeaderboardData();
   }
 
   renderLeaderboardLoading() {
@@ -225,14 +229,27 @@ export class DashboardModals {
   }
 
   async loadLeaderboardData() {
+    const tableWrapEl = document.getElementById('leaderboard-table-wrap');
     const bodyEl = document.getElementById('leaderboard-list-body');
+    const playerCardEl = document.getElementById('leaderboard-player-card');
+    const errorStateEl = document.getElementById('leaderboard-error-state');
+    const emptyStateEl = document.getElementById('leaderboard-empty-state');
     const syncBadgeEl = document.getElementById('leaderboard-sync-badge');
     const syncTextEl = document.getElementById('leaderboard-sync-text');
+    const retryBtn = document.getElementById('btn-leaderboard-retry');
 
-    if (syncTextEl) syncTextEl.textContent = 'Syncing...';
-    if (syncBadgeEl) {
-      syncBadgeEl.classList.remove('offline');
+    if (retryBtn) retryBtn.classList.add('loading');
+
+    // Reset to loading state: show table skeleton, hide error and empty states
+    errorStateEl?.classList.add('hidden');
+    emptyStateEl?.classList.add('hidden');
+    tableWrapEl?.classList.remove('hidden');
+    playerCardEl?.classList.remove('hidden');
+
+    if (syncBadgeEl && syncTextEl) {
+      syncBadgeEl.classList.remove('hidden', 'live');
       syncBadgeEl.classList.add('syncing');
+      syncTextEl.textContent = 'Connecting to Server...';
     }
 
     this.renderLeaderboardLoading();
@@ -245,7 +262,7 @@ export class DashboardModals {
     const currentScore = this.storage.getTotalScore();
     const playerId = this.storage.getPlayerId();
 
-    // Render preliminary player footer card while calculating
+    // Render calculating state on personal footer card
     this.renderPlayerFooterCard({
       rank: '...',
       totalPlayers: null,
@@ -254,48 +271,82 @@ export class DashboardModals {
       level: currentLevel,
       stars: currentStars,
       score: currentScore,
+      coins: currentCoins,
       isCalculating: true
     });
 
     try {
-      // 1. Asynchronously sync current player's data to Supabase (Dili-Birds-Data)
+      // 1. Sync current player's data to live Dili-Birds-Data table
       await leaderboardService.syncPlayerScore({
         playerId,
         username: currentUsername,
         score: currentScore,
         stars: currentStars,
         level: currentLevel,
+        coins: currentCoins,
         avatarUrl: currentAvatar
       });
 
-      // 2. Fetch top worldwide players & calculate exact worldwide rank concurrently
-      const [topRes, rankRes] = await Promise.all([
-        leaderboardService.fetchTopPlayersWorldwide(50),
-        leaderboardService.calculateCurrentPlayerGlobalRank(currentScore, playerId)
-      ]);
+      // 2. Fetch all live records from the server (STRICT: no demo or placeholder data)
+      const res = await leaderboardService.fetchLiveLeaderboard();
 
-      if (syncBadgeEl && syncTextEl) {
-        syncBadgeEl.classList.remove('syncing', 'offline');
-        syncBadgeEl.classList.add('live');
-        syncTextEl.textContent = 'Worldwide Live';
+      if (!res.success) {
+        // Live server connection failed: hide rankings and display error message with Retry button
+        tableWrapEl?.classList.add('hidden');
+        playerCardEl?.classList.add('hidden');
+        emptyStateEl?.classList.add('hidden');
+        errorStateEl?.classList.remove('hidden');
+
+        if (syncBadgeEl) syncBadgeEl.classList.add('hidden');
+        return;
       }
 
-      const pilots = Array.isArray(topRes.data) && topRes.data.length > 0
-        ? topRes.data
-        : FALLBACK_GLOBAL_PILOTS;
+      // Connection succeeded: show Live Server Data badge
+      if (syncBadgeEl && syncTextEl) {
+        syncBadgeEl.classList.remove('hidden', 'syncing');
+        syncBadgeEl.classList.add('live');
+        syncTextEl.textContent = 'Live Server Data';
+      }
 
-      // Render top worldwide pilots rows
+      errorStateEl?.classList.add('hidden');
+
+      if (res.isEmpty || !res.data || res.data.length === 0) {
+        // Table is currently empty on Supabase
+        tableWrapEl?.classList.add('hidden');
+        emptyStateEl?.classList.remove('hidden');
+        playerCardEl?.classList.remove('hidden');
+
+        this.renderPlayerFooterCard({
+          rank: 1,
+          totalPlayers: 1,
+          percentile: 100,
+          username: currentUsername,
+          avatar: currentAvatar,
+          level: currentLevel,
+          stars: currentStars,
+          score: currentScore,
+          coins: currentCoins,
+          isLive: true,
+          isCalculating: false
+        });
+        return;
+      }
+
+      // Live data retrieved successfully
+      emptyStateEl?.classList.add('hidden');
+      tableWrapEl?.classList.remove('hidden');
+      playerCardEl?.classList.remove('hidden');
+
       let html = '';
-      pilots.forEach((pilot, idx) => {
-        const rankNum = pilot.rank || (idx + 1);
-        const isTop3 = rankNum <= 3;
-        const rankBadgeClass = rankNum === 1 ? 'gold' : rankNum === 2 ? 'silver' : rankNum === 3 ? 'bronze' : '';
-        const isCurrent = (pilot.playerId && pilot.playerId === playerId) || (pilot.name === currentUsername && Math.abs(pilot.score - currentScore) < 5);
+      res.data.forEach((pilot) => {
+        const isTop3 = pilot.rank <= 3;
+        const rankBadgeClass = pilot.rank === 1 ? 'gold' : pilot.rank === 2 ? 'silver' : pilot.rank === 3 ? 'bronze' : '';
+        const isCurrent = (pilot.playerId && pilot.playerId === playerId) || (pilot.name === currentUsername);
 
         html += `
           <div class="leaderboard-row ${isTop3 ? 'top-rank' : ''} ${isCurrent ? 'current-player-row' : ''}">
             <div class="col-rank">
-              <span class="rank-pill ${rankBadgeClass}">#${rankNum}</span>
+              <span class="rank-pill ${rankBadgeClass}">#${pilot.rank}</span>
             </div>
             <div class="col-player">
               <img class="row-avatar" src="${pilot.avatar}" alt="${pilot.name}" />
@@ -314,7 +365,7 @@ export class DashboardModals {
               </span>
             </div>
             <div class="col-score">
-              <strong>${pilot.score.toLocaleString()}</strong>
+              <strong title="Combined score: ${pilot.combinedScore.toLocaleString()}">${pilot.score.toLocaleString()}</strong>
             </div>
           </div>
         `;
@@ -324,37 +375,49 @@ export class DashboardModals {
         bodyEl.innerHTML = html;
       }
 
-      // Render exact current player's worldwide rank (even if outside top 10)
+      // Calculate exact live rank for current player
+      const rankInfo = leaderboardService.calculateCurrentPlayerRankFromRecords(
+        res.data,
+        playerId,
+        currentStars,
+        currentScore,
+        currentCoins
+      );
+
       this.renderPlayerFooterCard({
-        rank: rankRes.rank || 1,
-        totalPlayers: rankRes.totalPlayers,
+        rank: rankInfo.rank,
+        totalPlayers: rankInfo.totalPlayers,
+        percentile: rankInfo.percentile,
         username: currentUsername,
         avatar: currentAvatar,
         level: currentLevel,
         stars: currentStars,
         score: currentScore,
+        coins: currentCoins,
         isLive: true,
         isCalculating: false
       });
 
     } catch (err) {
-      console.warn('[Leaderboard] Handled error gracefully:', err);
-      if (syncBadgeEl && syncTextEl) {
-        syncBadgeEl.classList.remove('syncing', 'offline');
-        syncBadgeEl.classList.add('live');
-        syncTextEl.textContent = 'Worldwide Live';
-      }
+      console.warn('[Leaderboard] Connection failure:', err);
+      tableWrapEl?.classList.add('hidden');
+      playerCardEl?.classList.add('hidden');
+      emptyStateEl?.classList.add('hidden');
+      errorStateEl?.classList.remove('hidden');
+      if (syncBadgeEl) syncBadgeEl.classList.add('hidden');
+    } finally {
+      if (retryBtn) retryBtn.classList.remove('loading');
     }
   }
 
-  renderPlayerFooterCard({ rank, totalPlayers, username, avatar, level, stars, score, isLive, isCalculating }) {
+  renderPlayerFooterCard({ rank, totalPlayers, percentile, username, avatar, level, stars, score, coins, isLive, isCalculating }) {
     const playerCardEl = document.getElementById('leaderboard-player-card');
     if (!playerCardEl) return;
 
     const rankDisplay = isCalculating ? '...' : `#${typeof rank === 'number' ? rank.toLocaleString() : rank}`;
     const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'player-badge-pill';
     const totalWorldwideStr = totalPlayers && totalPlayers > 1
-      ? ` • Top ${Math.max(1, Math.round((rank / totalPlayers) * 100))}% Worldwide`
+      ? ` • Top ${percentile || Math.max(1, Math.round((rank / totalPlayers) * 100))}% (${totalPlayers} Pilots)`
       : '';
 
     playerCardEl.innerHTML = `

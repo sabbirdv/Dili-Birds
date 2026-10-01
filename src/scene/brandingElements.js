@@ -1,5 +1,14 @@
 import * as THREE from 'three';
 import dilicomLogoBlueUrl from '../assets/logo-blue.png';
+import logoWhiteUrl from '../assets/logo-white.png';
+import coinLogoUrl from '../assets/coin-with-logo.png';
+import characterRedUrl from '../assets/character.png';
+import characterYellowUrl from '../assets/character-2.png';
+import characterBlackUrl from '../assets/character-3.png';
+import subCharPinkUrl from '../assets/sub-character.png';
+import subCharGreenUrl from '../assets/sub-character-2.png';
+import subCharBlueUrl from '../assets/sub-character-3.png';
+import subCharSparkUrl from '../assets/sub-character-4.png';
 
 /**
  * High-quality anime-style environment with 3D parallax depth and subtle dynamic elements.
@@ -639,127 +648,288 @@ export class BrandingElements {
   }
 
   /**
-   * Builds a multi-layer 3D animated background system where game assets and structural pieces
-   * (timber planks, stone blocks, golden coins, TNT crates, and glowing celestial crystals)
-   * drift across deep, midground, and peripheral depths to create rich environmental perspective.
+   * Builds a vibrant 3D animated background floating system featuring official
+   * game logo icons (Dili Birds Blue Logo, White Hologram Logo, Golden Coin)
+   * and signature game characters (Crimson Dili, Speedy Dash, Boom, and Sweetheart/Target Birds).
+   * They gently float, drift, bob, and slowly spin in 3D with interactive pointer parallax.
    */
   buildDrifting3DAssets() {
     this.driftingGroup = new THREE.Group();
     this.root.add(this.driftingGroup);
 
-    // High-quality anime-stylized materials
-    const woodMat = new THREE.MeshStandardMaterial({
-      color: 0xc27838,
-      roughness: 0.68,
-      metalness: 0.08
-    });
+    const textureLoader = new THREE.TextureLoader();
 
-    const stoneMat = new THREE.MeshStandardMaterial({
-      color: 0x64748b,
-      roughness: 0.82,
-      metalness: 0.05
-    });
+    // Cache textures for optimal performance & crisp sRGB presentation
+    const loadTex = (url) => {
+      return textureLoader.load(url, (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+      });
+    };
 
-    const coinMat = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b,
-      roughness: 0.22,
-      metalness: 0.88,
-      emissive: 0xd97706,
-      emissiveIntensity: 0.22
-    });
+    const textures = {
+      logoBlue: loadTex(dilicomLogoBlueUrl),
+      logoWhite: loadTex(logoWhiteUrl),
+      coinLogo: loadTex(coinLogoUrl),
+      charRed: loadTex(characterRedUrl),
+      charYellow: loadTex(characterYellowUrl),
+      charBlack: loadTex(characterBlackUrl),
+      charPink: loadTex(subCharPinkUrl),
+      charGreen: loadTex(subCharGreenUrl),
+      charBlue: loadTex(subCharBlueUrl),
+      charSpark: loadTex(subCharSparkUrl)
+    };
 
-    const tntMat = new THREE.MeshStandardMaterial({
-      color: 0xef4444,
-      roughness: 0.52,
-      metalness: 0.08
-    });
-
-    const crystalCyanMat = new THREE.MeshStandardMaterial({
-      color: 0x38bdf8,
-      emissive: 0x0284c7,
-      emissiveIntensity: 0.65,
-      roughness: 0.15,
-      transparent: true,
-      opacity: 0.85
-    });
-
-    const crystalMagentaMat = new THREE.MeshStandardMaterial({
-      color: 0xf43f5e,
-      emissive: 0xbe123c,
-      emissiveIntensity: 0.65,
-      roughness: 0.15,
-      transparent: true,
-      opacity: 0.85
-    });
-
-    const assetTemplates = [
-      { geo: new THREE.BoxGeometry(0.55, 2.4, 0.45), mat: woodMat, baseScale: 0.95 },
-      { geo: new THREE.BoxGeometry(1.0, 1.0, 0.9), mat: woodMat, baseScale: 0.85 },
-      { geo: new THREE.BoxGeometry(1.25, 1.25, 1.05), mat: stoneMat, baseScale: 0.9 },
-      { geo: new THREE.BoxGeometry(0.7, 2.2, 0.7), mat: stoneMat, baseScale: 0.85 },
-      { geo: new THREE.CylinderGeometry(0.6, 0.6, 0.16, 24), mat: coinMat, baseScale: 1.05 },
-      { geo: new THREE.BoxGeometry(0.95, 0.95, 0.95), mat: tntMat, baseScale: 0.85 },
-      { geo: new THREE.OctahedronGeometry(0.7, 0), mat: crystalCyanMat, baseScale: 0.9 },
-      { geo: new THREE.IcosahedronGeometry(0.65, 0), mat: crystalMagentaMat, baseScale: 0.85 }
+    const itemTemplates = [
+      // 1. Official Dilicom Blue Logo Badge
+      {
+        name: 'logo-blue',
+        tex: textures.logoBlue,
+        width: 2.7,
+        height: 1.64,
+        rimColor: 0x0284c7,
+        emissiveColor: 0x38bdf8,
+        coreColor: 0xffffff,
+        shape: 'pill'
+      },
+      // 2. Dili Birds White Hologram Logo Badge
+      {
+        name: 'logo-white',
+        tex: textures.logoWhite,
+        width: 2.7,
+        height: 1.64,
+        rimColor: 0x38bdf8,
+        emissiveColor: 0x0ea5e9,
+        coreColor: 0x0f172a,
+        shape: 'pill'
+      },
+      // 3. 3D Golden Dili Coin Medallion
+      {
+        name: 'coin-gold',
+        tex: textures.coinLogo,
+        width: 2.2,
+        height: 2.2,
+        rimColor: 0xf59e0b,
+        emissiveColor: 0xfbbf24,
+        coreColor: 0xd97706,
+        shape: 'circle'
+      },
+      // 4. Dili - The Crimson Leader (character.png)
+      {
+        name: 'char-red',
+        tex: textures.charRed,
+        width: 2.5,
+        height: 1.76,
+        rimColor: 0xef4444,
+        emissiveColor: 0xf87171,
+        coreColor: 0x7f1d1d,
+        shape: 'pill'
+      },
+      // 5. Dash - Sonic Swift Bird (character-2.png)
+      {
+        name: 'char-yellow',
+        tex: textures.charYellow,
+        width: 2.8,
+        height: 1.58,
+        rimColor: 0xfbbf24,
+        emissiveColor: 0xfde047,
+        coreColor: 0x78350f,
+        shape: 'pill'
+      },
+      // 6. Boom - Shockwave Master (character-3.png)
+      {
+        name: 'char-black',
+        tex: textures.charBlack,
+        width: 2.8,
+        height: 1.58,
+        rimColor: 0xf97316,
+        emissiveColor: 0xfb923c,
+        coreColor: 0x18181b,
+        shape: 'pill'
+      },
+      // 7. Sweetheart Pink Bird (sub-character.png)
+      {
+        name: 'char-pink',
+        tex: textures.charPink,
+        width: 2.3,
+        height: 1.86,
+        rimColor: 0xec4899,
+        emissiveColor: 0xf472b6,
+        coreColor: 0x831843,
+        shape: 'pill'
+      },
+      // 8. Emerald Target Bird (sub-character-2.png)
+      {
+        name: 'char-green',
+        tex: textures.charGreen,
+        width: 2.3,
+        height: 1.86,
+        rimColor: 0x10b981,
+        emissiveColor: 0x34d399,
+        coreColor: 0x064e3b,
+        shape: 'pill'
+      },
+      // 9. Azure Blue Target Bird (sub-character-3.png)
+      {
+        name: 'char-blue',
+        tex: textures.charBlue,
+        width: 2.4,
+        height: 1.8,
+        rimColor: 0x06b6d4,
+        emissiveColor: 0x22d3ee,
+        coreColor: 0x164e63,
+        shape: 'pill'
+      },
+      // 10. Spark Violet Bird (sub-character-4.png)
+      {
+        name: 'char-spark',
+        tex: textures.charSpark,
+        width: 2.3,
+        height: 1.86,
+        rimColor: 0xa855f7,
+        emissiveColor: 0xc084fc,
+        coreColor: 0x581c87,
+        shape: 'pill'
+      }
     ];
 
-    const totalPieces = 24;
-    for (let i = 0; i < totalPieces; i++) {
-      const tmpl = assetTemplates[i % assetTemplates.length];
-      const mesh = new THREE.Mesh(tmpl.geo, tmpl.mat);
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
+    const createFloatingToken = (tmpl) => {
+      const group = new THREE.Group();
+      const w = tmpl.width;
+      const h = tmpl.height;
+      const depth = 0.16;
 
-      // 3 Depth layers:
-      // Layer 0 (Deep backdrop): z ~ -24 to -18
-      // Layer 1 (Midground): z ~ -14 to -8
-      // Layer 2 (Atmospheric foreground periphery): z ~ 4 to 12
+      if (tmpl.shape === 'circle') {
+        const radius = w * 0.5;
+        // Central coin disc
+        const discGeo = new THREE.CylinderGeometry(radius, radius, depth, 32);
+        discGeo.rotateX(Math.PI / 2);
+        const discMat = new THREE.MeshStandardMaterial({
+          color: tmpl.coreColor,
+          roughness: 0.25,
+          metalness: 0.85
+        });
+        const disc = new THREE.Mesh(discGeo, discMat);
+        group.add(disc);
+
+        // Glowing outer metallic bezel ring
+        const ringGeo = new THREE.TorusGeometry(radius, 0.08, 16, 36);
+        const ringMat = new THREE.MeshStandardMaterial({
+          color: tmpl.rimColor,
+          emissive: tmpl.emissiveColor,
+          emissiveIntensity: 0.6,
+          roughness: 0.2,
+          metalness: 0.85
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        group.add(ring);
+      } else {
+        // Backing core plate
+        const boxGeo = new THREE.BoxGeometry(w + 0.12, h + 0.12, depth);
+        const boxMat = new THREE.MeshStandardMaterial({
+          color: tmpl.coreColor,
+          roughness: 0.35,
+          metalness: 0.4
+        });
+        const box = new THREE.Mesh(boxGeo, boxMat);
+        group.add(box);
+
+        // Outer vibrant glowing bezel frame
+        const frameGeo = new THREE.BoxGeometry(w + 0.22, h + 0.22, depth * 0.85);
+        const frameMat = new THREE.MeshStandardMaterial({
+          color: tmpl.rimColor,
+          emissive: tmpl.emissiveColor,
+          emissiveIntensity: 0.55,
+          roughness: 0.25,
+          metalness: 0.5
+        });
+        const frame = new THREE.Mesh(frameGeo, frameMat);
+        frame.position.z = -0.005;
+        group.add(frame);
+      }
+
+      // Front & Back face materials: MeshBasicMaterial for bright, vivid, un-shadowed character/logo art
+      const faceMat = new THREE.MeshBasicMaterial({
+        map: tmpl.tex,
+        transparent: true,
+        alphaTest: 0.05,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+        polygonOffsetUnits: -1
+      });
+
+      // Front Face (+Z)
+      const frontPlane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), faceMat);
+      frontPlane.position.z = depth * 0.5 + 0.012;
+      group.add(frontPlane);
+
+      // Back Face (-Z, un-mirrored scale so text & characters read properly from both sides)
+      const backPlane = new THREE.Mesh(new THREE.PlaneGeometry(w, h), faceMat);
+      backPlane.position.z = -(depth * 0.5 + 0.012);
+      backPlane.rotation.y = Math.PI;
+      backPlane.scale.x = -1;
+      group.add(backPlane);
+
+      return group;
+    };
+
+    const totalPieces = 22;
+    for (let i = 0; i < totalPieces; i++) {
+      const tmpl = itemTemplates[i % itemTemplates.length];
+      const tokenMesh = createFloatingToken(tmpl);
+      tokenMesh.castShadow = false;
+      tokenMesh.receiveShadow = false;
+
+      // Spread strategically around the screen margins and background
       const quadrant = i % 4;
       let x, y, z;
       if (quadrant === 0) {
         // Left flank
-        x = -32 + Math.random() * 14;
+        x = -34 + Math.random() * 16;
         y = 2 + Math.random() * 16;
-        z = -14 + Math.random() * 24;
+        z = 0 + Math.random() * 16;
       } else if (quadrant === 1) {
         // Right flank
         x = 18 + Math.random() * 16;
         y = 2 + Math.random() * 16;
-        z = -14 + Math.random() * 24;
+        z = 0 + Math.random() * 16;
       } else if (quadrant === 2) {
         // Upper canopy / zenith
-        x = -24 + Math.random() * 48;
-        y = 13 + Math.random() * 9;
-        z = -16 + Math.random() * 20;
+        x = -26 + Math.random() * 52;
+        y = 12 + Math.random() * 8;
+        z = -2 + Math.random() * 16;
       } else {
         // Lower atmosphere / floating foreground
-        x = -26 + Math.random() * 52;
-        y = -1.5 + Math.random() * 5.5;
-        z = -8 + Math.random() * 22;
+        x = -28 + Math.random() * 56;
+        y = -0.5 + Math.random() * 4.5;
+        z = 2 + Math.random() * 16;
       }
 
-      mesh.position.set(x, y, z);
-      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-      const s = tmpl.baseScale * (0.8 + Math.random() * 0.45);
-      mesh.scale.set(s, s, s);
+      tokenMesh.position.set(x, y, z);
+      const initialRotY = Math.random() * Math.PI * 2;
+      tokenMesh.rotation.set(0, initialRotY, 0);
 
-      this.driftingGroup.add(mesh);
+      // Scale variation for natural depth perspective
+      const scaleMult = 0.9 + Math.random() * 0.25;
+      tokenMesh.scale.set(scaleMult, scaleMult, scaleMult);
+
+      this.driftingGroup.add(tokenMesh);
 
       this.driftingPieces.push({
-        mesh,
+        mesh: tokenMesh,
         baseX: x,
         baseY: y,
         baseZ: z,
-        driftSpeed: (0.16 + Math.random() * 0.28) * (quadrant % 2 === 0 ? 1 : -0.8),
-        floatFreq: 0.55 + Math.random() * 0.75,
-        floatAmp: 0.4 + Math.random() * 0.6,
+        driftSpeed: (0.28 + Math.random() * 0.35) * (quadrant % 2 === 0 ? 1 : -0.85),
+        floatFreq: 0.55 + Math.random() * 0.65,
+        floatAmp: 0.45 + Math.random() * 0.6,
         phase: Math.random() * Math.PI * 2,
-        tiltFactor: 1.2 + Math.random() * 1.4,
-        rotSpeed: {
-          x: (Math.random() - 0.5) * 0.35,
-          y: (Math.random() - 0.5) * 0.45,
-          z: (Math.random() - 0.5) * 0.3
-        }
+        tiltFactor: 1.1 + Math.random() * 1.2,
+        rotSpeedY: (0.45 + Math.random() * 0.55) * (quadrant % 2 === 0 ? 1 : -1),
+        wobbleFreq: 0.75 + Math.random() * 0.6,
+        wobbleAmp: 0.08 + Math.random() * 0.08
       });
     }
 
@@ -790,7 +960,7 @@ export class BrandingElements {
     this.currentTilt.x += (this.targetTilt.x - this.currentTilt.x) * 3.5 * deltaTime;
     this.currentTilt.y += (this.targetTilt.y - this.currentTilt.y) * 3.5 * deltaTime;
 
-    // ── Animate 3D drifting structural blocks & game assets (ONLY in dashboard mode) ──
+    // ── Animate 3D drifting game logo icons & character tokens (ONLY in dashboard mode) ──
     if (this.driftingGroup && this.driftingGroup.visible) {
       this.driftingPieces.forEach((p) => {
         p.mesh.position.x += p.driftSpeed * deltaTime;
@@ -804,9 +974,11 @@ export class BrandingElements {
         p.mesh.position.y = p.baseY + floatOffset - (this.currentTilt.y * p.tiltFactor * 0.65);
         p.mesh.position.z = p.baseZ + (this.currentTilt.x * p.tiltFactor * 0.75);
 
-        p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
-        p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
-        p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
+        // Smooth slow 3D Y rotation showcasing front & back of character/logo badge
+        p.mesh.rotation.y += p.rotSpeedY * deltaTime;
+        // Subtle natural floating wobble on Z and X
+        p.mesh.rotation.z = Math.sin(elapsedTime * p.wobbleFreq + p.phase) * p.wobbleAmp;
+        p.mesh.rotation.x = Math.cos(elapsedTime * p.wobbleFreq * 0.7 + p.phase) * 0.06;
       });
     }
 

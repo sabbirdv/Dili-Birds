@@ -22,6 +22,14 @@ export function calculateCombinedScore(stars = 0, coins = 0) {
   return s * 1000 + c;
 }
 
+export function isRlsError(error) {
+  if (!error) return false;
+  return (
+    error.code === '42501' ||
+    (typeof error.message === 'string' && error.message.toLowerCase().includes('row-level security'))
+  );
+}
+
 export class LeaderboardService {
   constructor() {
     this.projectUrl = SUPABASE_URL;
@@ -51,6 +59,7 @@ export class LeaderboardService {
   /**
    * Data Insertion on Username Entry:
    * Inserts a fresh player profile (with 0 coins and 0 stars) into the Dili-Birds-Data table.
+   * Checks if player already exists to avoid duplicates.
    * Returns the newly generated primary key `id` for subsequent updates.
    */
   async registerNewPlayerProfile({ username }) {
@@ -60,6 +69,26 @@ export class LeaderboardService {
 
     try {
       const cleanName = (username || '').trim().slice(0, 24) || 'Commander';
+
+      // 1. Check if a profile with this exact name already exists in database
+      const { data: existing, error: selectErr } = await this.supabase
+        .from(LEADERBOARD_TABLE)
+        .select('id, player_name, score, star, created_at')
+        .eq('player_name', cleanName)
+        .limit(1);
+
+      if (isRlsError(selectErr)) {
+        console.error(
+          '[LeaderboardService] Supabase RLS Policy Violation on SELECT! Table "Dili-Birds-Data" requires a SELECT policy for anon role.'
+        );
+        return { success: false, isRlsBlocked: true, error: selectErr.message };
+      }
+
+      if (existing && existing.length > 0) {
+        return { success: true, rowId: existing[0].id, data: existing[0] };
+      }
+
+      // 2. Insert fresh profile
       const { data, error } = await this.supabase
         .from(LEADERBOARD_TABLE)
         .insert([
@@ -69,15 +98,21 @@ export class LeaderboardService {
             star: 0
           }
         ])
-        .select('id, player_name, score, star, created_at')
-        .single();
+        .select('id, player_name, score, star, created_at');
 
       if (error) {
+        if (isRlsError(error)) {
+          console.error(
+            '[LeaderboardService] Supabase RLS Policy Violation on INSERT! Table "Dili-Birds-Data" requires an INSERT policy for anon role.'
+          );
+          return { success: false, isRlsBlocked: true, error: error.message };
+        }
         console.warn('[LeaderboardService] Error inserting fresh profile:', error.message);
         return { success: false, error: error.message };
       }
 
-      return { success: true, rowId: data.id, data };
+      const insertedRow = Array.isArray(data) ? data[0] : data;
+      return { success: true, rowId: insertedRow?.id, data: insertedRow };
     } catch (err) {
       console.warn('[LeaderboardService] Exception inserting profile:', err.message);
       return { success: false, error: err.message };
@@ -103,11 +138,15 @@ export class LeaderboardService {
           .from(LEADERBOARD_TABLE)
           .update({ player_name: cleanName })
           .eq('id', serverRowId)
-          .select('id, player_name, score, star')
-          .maybeSingle();
+          .select('id, player_name, score, star');
 
-        if (!error && data) {
-          return { success: true, rowId: data.id, data };
+        if (isRlsError(error)) {
+          console.error('[LeaderboardService] Supabase RLS Policy Violation on UPDATE!');
+          return { success: false, isRlsBlocked: true, error: error.message };
+        }
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return { success: true, rowId: data[0].id, data: data[0] };
         }
       }
 
@@ -117,11 +156,15 @@ export class LeaderboardService {
           .from(LEADERBOARD_TABLE)
           .update({ player_name: cleanName })
           .eq('player_name', oldUsername.trim())
-          .select('id, player_name, score, star')
-          .maybeSingle();
+          .select('id, player_name, score, star');
 
-        if (!error && data) {
-          return { success: true, rowId: data.id, data };
+        if (isRlsError(error)) {
+          console.error('[LeaderboardService] Supabase RLS Policy Violation on UPDATE!');
+          return { success: false, isRlsBlocked: true, error: error.message };
+        }
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return { success: true, rowId: data[0].id, data: data[0] };
         }
       }
 
@@ -147,7 +190,7 @@ export class LeaderboardService {
       const coinScore = Math.max(0, Number(score) || 0);
       const starCount = Math.max(0, Number(star) || 0);
 
-      // If serverRowId is provided, update by ID
+      // 1. If serverRowId is provided, update by ID
       if (serverRowId) {
         const { data, error } = await this.supabase
           .from(LEADERBOARD_TABLE)
@@ -157,30 +200,51 @@ export class LeaderboardService {
             player_name: cleanName
           })
           .eq('id', serverRowId)
-          .select('id, player_name, score, star')
-          .maybeSingle();
+          .select('id, player_name, score, star');
 
-        if (!error && data) {
-          return { success: true, rowId: data.id, data };
+        if (isRlsError(error)) {
+          console.error('[LeaderboardService] Supabase RLS Policy Violation on UPDATE score! Code 42501');
+          return { success: false, isRlsBlocked: true, error: error.message };
+        }
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return { success: true, rowId: data[0].id, data: data[0] };
         }
       }
 
-      // If no serverRowId, try to update by player_name
-      const { data, error } = await this.supabase
+      // 2. If no serverRowId or ID was not found, check if record exists with this player_name
+      const { data: existing, error: existErr } = await this.supabase
         .from(LEADERBOARD_TABLE)
-        .update({
-          score: coinScore,
-          star: starCount
-        })
+        .select('id')
         .eq('player_name', cleanName)
-        .select('id, player_name, score, star')
-        .maybeSingle();
+        .limit(1);
 
-      if (!error && data) {
-        return { success: true, rowId: data.id, data };
+      if (isRlsError(existErr)) {
+        console.error('[LeaderboardService] Supabase RLS Policy Violation on SELECT existing! Code 42501');
+        return { success: false, isRlsBlocked: true, error: existErr.message };
       }
 
-      // If record doesn't exist yet, insert fresh
+      if (existing && existing.length > 0) {
+        const targetId = existing[0].id;
+        const { data, error } = await this.supabase
+          .from(LEADERBOARD_TABLE)
+          .update({
+            score: coinScore,
+            star: starCount
+          })
+          .eq('id', targetId)
+          .select('id, player_name, score, star');
+
+        if (isRlsError(error)) {
+          return { success: false, isRlsBlocked: true, error: error.message };
+        }
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return { success: true, rowId: data[0].id, data: data[0] };
+        }
+      }
+
+      // 3. If record doesn't exist yet, insert fresh
       const { data: inserted, error: insertErr } = await this.supabase
         .from(LEADERBOARD_TABLE)
         .insert([
@@ -190,16 +254,48 @@ export class LeaderboardService {
             star: starCount
           }
         ])
-        .select('id, player_name, score, star')
-        .single();
+        .select('id, player_name, score, star');
 
       if (insertErr) {
+        if (isRlsError(insertErr)) {
+          console.error(
+            '[LeaderboardService] Supabase RLS Policy Violation on INSERT score! Code 42501: new row violates row-level security policy for table "Dili-Birds-Data"'
+          );
+          return { success: false, isRlsBlocked: true, error: insertErr.message };
+        }
         return { success: false, error: insertErr.message };
       }
 
-      return { success: true, rowId: inserted?.id, data: inserted };
+      const insertedRow = Array.isArray(inserted) ? inserted[0] : inserted;
+      return { success: true, rowId: insertedRow?.id, data: insertedRow };
     } catch (err) {
       return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Syncs per-level progression, best scores, and stars to Supabase & global rankings.
+   * Ensures that level progression and achievements are preserved across sessions.
+   */
+  async syncLevelProgress({ serverRowId, username, levelId, score, stars, totalScore, totalStars }) {
+    try {
+      const syncRes = await this.syncPlayerScore({
+        serverRowId,
+        username,
+        score: totalScore,
+        star: totalStars
+      });
+
+      return {
+        success: syncRes.success,
+        rowId: syncRes.rowId || serverRowId,
+        levelId,
+        score,
+        stars,
+        error: syncRes.error
+      };
+    } catch (err) {
+      return { success: false, levelId, error: err.message };
     }
   }
 
@@ -224,10 +320,14 @@ export class LeaderboardService {
         .select('*');
 
       if (error) {
+        const isRls = isRlsError(error);
         return {
           success: false,
           isLive: false,
-          error: ERROR_CONNECTION_FAILED,
+          isRlsBlocked: isRls,
+          error: isRls
+            ? 'Supabase Row-Level Security (RLS) is blocking access to "Dili-Birds-Data". Please execute the RLS policy in Supabase SQL editor.'
+            : ERROR_CONNECTION_FAILED,
           details: error.message,
           data: []
         };

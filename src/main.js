@@ -22,7 +22,8 @@ class DiliBirdsApp {
       },
       (previewLevel) => {
         this.gameScene?.loadLevel(previewLevel, true);
-      }
+      },
+      this.audio
     );
 
     this.ui = new UIManager({
@@ -105,14 +106,25 @@ class DiliBirdsApp {
           );
           actualCoinsAwarded = result?.actualCoinsAwarded || 0;
           isFirstTimeWin = Boolean(result?.isFirstTimeWin);
-          this.levelSelect.focusedLevelId = this.storage.getUnlockedLevel();
+          const unlockedNewZone = Boolean(result?.unlockedNewZone);
+          const newUnlockedLevel = result?.newUnlockedLevel || this.storage.getUnlockedLevel();
+          this.levelSelect.focusedLevelId = newUnlockedLevel;
 
-          // Sync player's updated coins and stars to Supabase Dili-Birds-Data globally
-          leaderboardService.syncPlayerScore({
+          if (unlockedNewZone || (levelId === 10 && !this.storage.isZoneRevealed(2))) {
+            this.levelSelect.pendingZone2Unlock = true;
+          } else if (newUnlockedLevel > levelId) {
+            this.levelSelect.pendingLevelUnlock = newUnlockedLevel;
+          }
+
+          // Save best score and stars per level using Supabase, and preserve progress across sessions
+          leaderboardService.syncLevelProgress({
             serverRowId: this.storage.getServerRowId(),
             username: this.storage.getUsername(),
-            score: this.storage.getCoins(),
-            star: this.storage.getTotalStars()
+            levelId,
+            score,
+            stars: starsEarned,
+            totalScore: this.storage.getCoins(),
+            totalStars: this.storage.getTotalStars()
           }).then((res) => {
             if (res?.success && res.rowId && !this.storage.getServerRowId()) {
               this.storage.setServerRowId(res.rowId);

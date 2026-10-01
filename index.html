@@ -38,6 +38,15 @@
           </span>
           <span class="stat-value" id="display-player-level">LVL 1</span>
         </div>
+
+        <div class="stat-pill rank-pill-nav" id="nav-rank-pill" role="button" tabindex="0" title="Global Leaderboard Standing (Click to View)">
+          <span class="stat-icon">
+            <svg class="pill-trophy-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
+            </svg>
+          </span>
+          <span class="stat-value" id="display-player-rank">#1</span>
+        </div>
       </div>
 
       <!-- Center (Gameplay State): In-Game Active Mission HUD Cluster (Only visible when playing level) -->
@@ -232,8 +241,8 @@
         <section class="roadmap-stage-board-card glass-card" aria-labelledby="level-select-heading">
           <div class="section-header roadmap-controls-bar">
             <div class="roadmap-heading-group">
-              <h2 id="level-select-heading">Square Campaign Roadmap</h2>
-              <span class="sequential-hint">Follow the clockwise square circuit (1 → 8). Click any unlocked stage to launch!</span>
+              <h2 id="level-select-heading">3D Campaign Roadmap</h2>
+              <span class="sequential-hint">Conquer Zone 1 (Levels 1–10) to dispel the clouds and reveal Zone 2 (Levels 11–20)! Click any unlocked stage to launch!</span>
             </div>
 
             <div class="roadmap-legend-actions">
@@ -247,7 +256,7 @@
 
           <!-- Square Roadmap Viewport -->
           <div id="roadmap-viewport" class="roadmap-3d-viewport">
-            <div id="level-grid" class="roadmap-square-board">
+            <div id="level-grid" class="roadmap-grid-wrapper">
               <!-- Dynamically populated by src/levels/levelSelect.js -->
             </div>
           </div>
@@ -660,15 +669,19 @@
       </div>
 
       <div class="dialog-actions result-actions">
-        <button type="button" id="btn-result-menu" class="action-btn secondary-btn">
+        <button type="button" id="btn-result-dashboard" class="action-btn secondary-btn" title="Return to Dashboard Home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button type="button" id="btn-result-menu" class="action-btn secondary-btn" title="Open Campaign Roadmap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
           <span>Roadmap</span>
         </button>
-        <button type="button" id="btn-result-retry" class="action-btn secondary-btn">
+        <button type="button" id="btn-result-retry" class="action-btn secondary-btn" title="Replay Stage">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           <span>Replay</span>
         </button>
-        <button type="button" id="btn-result-next" class="action-btn primary-btn">
+        <button type="button" id="btn-result-next" class="action-btn primary-btn" title="Advance to Next Stage">
           <span>Next Level</span>
           <span class="cta-arrow" aria-hidden="true">➔</span>
         </button>

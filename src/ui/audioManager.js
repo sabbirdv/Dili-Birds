@@ -1256,4 +1256,78 @@ export class AudioManager {
       osc.stop(noteTime + 0.48);
     });
   }
+
+  playLevelUnlock() {
+    const ctx = this.ensureContext();
+    if (!ctx || this.isMuted) return;
+    const now = ctx.currentTime;
+    // Pleasant rising arpeggio: C5, E5, G5, C6
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const noteTime = now + idx * 0.08;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.001, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, noteTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.38);
+    });
+  }
+
+  playCloudWhoosh() {
+    const ctx = this.ensureContext();
+    if (!ctx || this.isMuted) return;
+    const now = ctx.currentTime;
+
+    // Atmospheric sweeping wind using pink noise buffer & resonant filter sweep
+    if (this.pinkNoiseBuffer) {
+      const src = ctx.createBufferSource();
+      src.buffer = this.pinkNoiseBuffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(300, now);
+      filter.frequency.exponentialRampToValueAtTime(1400, now + 0.6);
+      filter.frequency.exponentialRampToValueAtTime(400, now + 1.4);
+      filter.Q.setValueAtTime(3.0, now);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.25, now + 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.45);
+
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.sfxGain);
+      src.start(now);
+      src.stop(now + 1.5);
+    }
+  }
+
+  playMarkerStep() {
+    const ctx = this.ensureContext();
+    if (!ctx || this.isMuted) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+
+    gain.gain.setValueAtTime(0.09, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  }
 }

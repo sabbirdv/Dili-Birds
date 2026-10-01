@@ -49,6 +49,8 @@ export class UIManager {
     this.displayLevelEl = document.getElementById('display-player-level');
     this.displayCoinsEl = document.getElementById('display-coins');
     this.heroBrandTagEl = document.getElementById('hero-brand-tag');
+    this.displayPlayerRankEl = document.getElementById('display-player-rank');
+    this.navRankPillEl = document.getElementById('nav-rank-pill');
 
     // Summary bar elements on Roadmap screen
     this.summaryUsernameEl = document.getElementById('summary-username');
@@ -124,6 +126,9 @@ export class UIManager {
         this.profileModal.open();
       });
     }
+
+    // Background sync of global leaderboard rank
+    this.syncLeaderboardRank();
   }
 
   bindHeroModuleEvents() {
@@ -168,6 +173,17 @@ export class UIManager {
       this.updateNavFullscreenIcon();
     });
 
+    // Top Nav Leaderboard Rank Pill -> Opens Leaderboard Modal
+    this.navRankPillEl?.addEventListener('click', () => {
+      this.dashboardModals?.openLeaderboard();
+    });
+    this.navRankPillEl?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.dashboardModals?.openLeaderboard();
+      }
+    });
+
     document.addEventListener('fullscreenchange', () => {
       this.updateNavFullscreenIcon();
     });
@@ -200,12 +216,14 @@ export class UIManager {
     const coins = this.storage.getCoins();
     const totalStars = this.storage.getTotalStars();
     const brandName = this.storage.getBrandName();
+    const currentRank = this.storage.getLeaderboardRank() || 1;
 
     if (this.displayUsernameEl) this.displayUsernameEl.textContent = username;
     if (this.topAvatarImgEl) this.topAvatarImgEl.src = avatarUrl;
     // CRITICAL: Display the currently played stage when in game, or progression level in menu
     const activeLevelNumber = this.currentPlayingLevelId ?? unlockedLevel;
     if (this.displayLevelEl) this.displayLevelEl.textContent = `LVL ${activeLevelNumber}`;
+    if (this.displayPlayerRankEl) this.displayPlayerRankEl.textContent = `#${currentRank}`;
 
     const navLevelPill = document.getElementById('nav-level-pill');
     if (navLevelPill) {
@@ -230,7 +248,30 @@ export class UIManager {
     } else if (this.summaryStarsEl) {
       this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
     }
+  }
 
+  /**
+   * Background rank synchronizer with Supabase live records
+   */
+  async syncLeaderboardRank() {
+    try {
+      const res = await leaderboardService.fetchLiveLeaderboard();
+      if (res?.success && Array.isArray(res.data) && res.data.length > 0) {
+        const rankInfo = leaderboardService.calculateCurrentPlayerRankFromRecords(
+          res.data,
+          this.storage.getServerRowId(),
+          this.storage.getUsername(),
+          this.storage.getTotalStars(),
+          this.storage.getCoins()
+        );
+        if (rankInfo?.rank) {
+          this.storage.setLeaderboardRank(rankInfo.rank);
+          if (this.displayPlayerRankEl) this.displayPlayerRankEl.textContent = `#${rankInfo.rank}`;
+        }
+      }
+    } catch {
+      // Background rank sync is non-blocking
+    }
   }
 
   refreshHeaderAndMenu() {
@@ -269,6 +310,20 @@ export class UIManager {
     this.onSetDashboard3DMode?.(true);
     this.levelSelect?.render();
     this.refreshHeaderStats();
+
+    if (this.levelSelect?.pendingZone2Unlock) {
+      this.levelSelect.pendingZone2Unlock = false;
+      setTimeout(() => {
+        this.levelSelect.animateCloudRemoval();
+      }, 400);
+    } else if (this.levelSelect?.pendingLevelUnlock) {
+      const nextId = this.levelSelect.pendingLevelUnlock;
+      this.levelSelect.pendingLevelUnlock = null;
+      setTimeout(() => {
+        this.levelSelect.panToNode(nextId, true);
+        this.levelSelect.animatePlayerMarker(nextId - 1, nextId);
+      }, 400);
+    }
   }
 
   showMainMenu() {

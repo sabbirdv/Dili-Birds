@@ -259,34 +259,32 @@ export class DashboardModals {
     const currentLevel = this.storage.getUnlockedLevel();
     const currentStars = this.storage.getTotalStars();
     const currentCoins = this.storage.getCoins();
-    const currentScore = this.storage.getTotalScore();
     const playerId = this.storage.getPlayerId();
 
     // Render calculating state on personal footer card
     this.renderPlayerFooterCard({
-      rank: '...',
+      rank: this.storage.getLeaderboardRank() || '...',
       totalPlayers: null,
       username: currentUsername,
       avatar: currentAvatar,
       level: currentLevel,
       stars: currentStars,
-      score: currentScore,
+      score: currentCoins,
       coins: currentCoins,
       isCalculating: true
     });
 
     try {
-      // 1. Sync current player's data to live Dili-Birds-Data table if profile has been entered
-      if (this.storage.isProfileConfigured()) {
-        const syncRes = await leaderboardService.syncPlayerScore({
-          serverRowId: this.storage.getServerRowId(),
-          username: currentUsername,
-          score: currentCoins,
-          star: currentStars
-        });
-        if (syncRes?.success && syncRes.rowId && !this.storage.getServerRowId()) {
-          this.storage.setServerRowId(syncRes.rowId);
-        }
+      // 1. Sync current player's data to live Dili-Birds-Data table
+      const syncUsername = this.storage.getUsername() || 'Commander';
+      const syncRes = await leaderboardService.syncPlayerScore({
+        serverRowId: this.storage.getServerRowId(),
+        username: syncUsername,
+        score: currentCoins,
+        star: currentStars
+      });
+      if (syncRes?.success && syncRes.rowId && !this.storage.getServerRowId()) {
+        this.storage.setServerRowId(syncRes.rowId);
       }
 
       // 2. Fetch all live records from the server (STRICT: no demo or placeholder data)
@@ -298,6 +296,15 @@ export class DashboardModals {
         playerCardEl?.classList.add('hidden');
         emptyStateEl?.classList.add('hidden');
         errorStateEl?.classList.remove('hidden');
+
+        const errorDescEl = document.getElementById('leaderboard-error-desc');
+        if (errorDescEl) {
+          if (res.isRlsBlocked || syncRes?.isRlsBlocked) {
+            errorDescEl.innerHTML = `Supabase Row-Level Security (RLS) is blocking data operations on table <code>Dili-Birds-Data</code>.<br><span style="font-size:0.85em;color:#94a3b8;">Please enable public read/write RLS policies in your Supabase SQL Editor.</span>`;
+          } else {
+            errorDescEl.textContent = res.error || ERROR_CONNECTION_FAILED;
+          }
+        }
 
         if (syncBadgeEl) syncBadgeEl.classList.add('hidden');
         return;
@@ -347,6 +354,7 @@ export class DashboardModals {
         const isCurrent = (serverRowId && String(pilot.id) === String(serverRowId)) || (pilot.name && pilot.name.toLowerCase() === currentUsername.trim().toLowerCase());
         const starVal = Number(pilot.star !== undefined ? pilot.star : pilot.stars) || 0;
         const scoreVal = Number(pilot.score) || 0;
+        const pilotAvatar = pilot.avatar || (isCurrent ? currentAvatar : (AVATAR_PRESETS[(Math.abs(Number(pilot.id)) || 0) % AVATAR_PRESETS.length]?.url || currentAvatar));
 
         html += `
           <div class="leaderboard-row ${isTop3 ? 'top-rank' : ''} ${isCurrent ? 'current-player-row' : ''}">
@@ -354,7 +362,7 @@ export class DashboardModals {
               <span class="rank-pill ${rankBadgeClass}">#${pilot.rank}</span>
             </div>
             <div class="col-player">
-              <img class="row-avatar" src="${pilot.avatar || currentAvatar}" alt="${pilot.name}" />
+              <img class="row-avatar" src="${pilotAvatar}" alt="${pilot.name}" />
               <div class="row-pilot-info">
                 <strong class="row-name">
                   ${pilot.name}
@@ -389,6 +397,18 @@ export class DashboardModals {
         currentCoins
       );
 
+      // Find player's matching record from live server data to display exact matching score
+      const matchingPilot = res.data.find((pilot) => {
+        return (serverRowId && String(pilot.id) === String(serverRowId)) ||
+               (pilot.name && pilot.name.trim().toLowerCase() === currentUsername.trim().toLowerCase());
+      });
+      const exactScore = matchingPilot ? (Number(matchingPilot.score) || 0) : currentCoins;
+
+      if (rankInfo?.rank) {
+        this.storage.setLeaderboardRank(rankInfo.rank);
+        this.onRefreshHeader?.();
+      }
+
       this.renderPlayerFooterCard({
         rank: rankInfo.rank,
         totalPlayers: rankInfo.totalPlayers,
@@ -397,7 +417,7 @@ export class DashboardModals {
         avatar: currentAvatar,
         level: currentLevel,
         stars: currentStars,
-        score: currentScore,
+        score: exactScore,
         coins: currentCoins,
         isLive: true,
         isCalculating: false
@@ -446,7 +466,7 @@ export class DashboardModals {
           </span>
         </div>
         <div class="col-score">
-          <strong class="highlight-score">${score.toLocaleString()} PTS</strong>
+          <strong class="highlight-score" title="Your Leaderboard Score">${score.toLocaleString()}</strong>
         </div>
       </div>
     `;

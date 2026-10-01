@@ -469,5 +469,504 @@ export const LEVELS = [
       { pos: [11.8, 7.65, 0], radius: 0.55, isBoss: false },
       { pos: [12.3, 9.95, 0], radius: 0.55, isBoss: false }
     ]
+  },
+  {
+    id: 9,
+    name: 'Obsidian Rampart',
+    zone: 'Obsidian Peaks',
+    icon: '🛡️',
+    difficulty: 'Hard',
+    description: 'Heavily fortified obsidian stone columns with recessed explosive chambers protecting high-value target sentries.',
+    coinReward: 550,
+    birds: ['speed', 'red', 'heavy', 'speed'],
+    blocks: [
+      // Foundation (y = 0 to 2.0)
+      { type: 'stone', pos: [7.5, 0.9, 0], size: [0.55, 1.8, 1.3] },
+      { type: 'stone', pos: [10.0, 0.9, 0], size: [0.55, 1.8, 1.3] },
+      { type: 'stone', pos: [12.5, 0.9, 0], size: [0.55, 1.8, 1.3] },
+      { type: 'stone', pos: [15.0, 0.9, 0], size: [0.55, 1.8, 1.3] },
+      { type: 'stone', pos: [17.5, 0.9, 0], size: [0.55, 1.8, 1.3] },
+      // Level 1 Continuous Beam
+      { type: 'stone', pos: [12.5, 1.95, 0], size: [11.0, 0.3, 1.3] },
+
+      // Second Tier (y = 2.1 to 4.1)
+      { type: 'wood', pos: [8.5, 3.05, 0], size: [0.5, 1.9, 1.2] },
+      { type: 'stone', pos: [12.5, 3.05, 0], size: [0.6, 1.9, 1.3] },
+      { type: 'wood', pos: [16.5, 3.05, 0], size: [0.5, 1.9, 1.2] },
+      // Level 2 Continuous Beam
+      { type: 'wood', pos: [12.5, 4.15, 0], size: [9.0, 0.3, 1.2] },
+
+      // Third Tier Battlements (y = 4.3 to 6.3)
+      { type: 'glass', pos: [10.5, 5.25, 0], size: [0.45, 1.9, 1.0] },
+      { type: 'glass', pos: [14.5, 5.25, 0], size: [0.45, 1.9, 1.0] },
+      // Roof Deck
+      { type: 'stone', pos: [12.5, 6.35, 0], size: [5.0, 0.3, 1.2] },
+
+      // Rooftop Spire & Treasures
+      { type: 'wood', pos: [12.5, 7.35, 0], size: [0.45, 1.7, 1.0] },
+      { type: 'coin', pos: [12.5, 8.4, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'coin', pos: [8.5, 4.75, 0], size: [0.7, 0.7, 0.7] },
+      { type: 'coin', pos: [16.5, 4.75, 0], size: [0.7, 0.7, 0.7] },
+
+      // Explosives
+      { type: 'tnt', pos: [10.0, 2.6, 0], size: [0.8, 0.8, 0.8] },
+      { type: 'tnt', pos: [15.0, 2.6, 0], size: [0.8, 0.8, 0.8] }
+    ],
+    targets: [
+      { pos: [8.75, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [16.25, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [12.5, 5.0, 0], radius: 0.75, isBoss: true },
+      { pos: [12.5, 0.55, 0], radius: 0.55, isBoss: false }
+    ]
+  },
+  {
+    id: 10,
+    name: 'Overlord Sky Fortress',
+    zone: 'Overlord Reach',
+    icon: '🏰',
+    difficulty: 'Boss',
+    description: 'Zone 1 Final Stronghold! Defeating the Sky Overlord dispels the celestial fog veil, revealing Zone 2 (Levels 11–20)!',
+    coinReward: 650,
+    birds: ['red', 'speed', 'heavy', 'speed', 'heavy'],
+    blocks: [
+      // Ground Bastion Foundation (y = 0 to 2.2)
+      { type: 'stone', pos: [6.5, 1.0, 0], size: [0.7, 2.0, 1.5] },
+      { type: 'stone', pos: [9.0, 1.0, 0], size: [0.7, 2.0, 1.5] },
+      { type: 'stone', pos: [11.5, 1.0, 0], size: [0.7, 2.0, 1.5] },
+      { type: 'stone', pos: [14.0, 1.0, 0], size: [0.7, 2.0, 1.5] },
+      { type: 'stone', pos: [16.5, 1.0, 0], size: [0.7, 2.0, 1.5] },
+      { type: 'stone', pos: [19.0, 1.0, 0], size: [0.7, 2.0, 1.5] },
+      // Tier 1 Reinforced Deck
+      { type: 'stone', pos: [12.75, 2.15, 0], size: [13.5, 0.35, 1.5] },
+
+      // Tier 2 Sentry Hall (y = 2.3 to 4.5)
+      { type: 'wood', pos: [7.5, 3.4, 0], size: [0.55, 2.1, 1.3] },
+      { type: 'stone', pos: [10.5, 3.4, 0], size: [0.6, 2.1, 1.4] },
+      { type: 'stone', pos: [15.0, 3.4, 0], size: [0.6, 2.1, 1.4] },
+      { type: 'wood', pos: [18.0, 3.4, 0], size: [0.55, 2.1, 1.3] },
+      // Tier 2 Deck
+      { type: 'stone', pos: [12.75, 4.6, 0], size: [11.5, 0.35, 1.4] },
+
+      // Tier 3 Boss Throne Chamber (y = 4.8 to 7.2)
+      { type: 'glass', pos: [10.5, 5.95, 0], size: [0.5, 2.3, 1.2] },
+      { type: 'glass', pos: [15.0, 5.95, 0], size: [0.5, 2.3, 1.2] },
+      // Tier 3 Deck
+      { type: 'stone', pos: [12.75, 7.25, 0], size: [6.0, 0.35, 1.3] },
+
+      // Tier 4 Crown Spire (y = 7.4 to 9.6)
+      { type: 'wood', pos: [11.5, 8.5, 0], size: [0.45, 2.1, 1.1] },
+      { type: 'wood', pos: [14.0, 8.5, 0], size: [0.45, 2.1, 1.1] },
+      { type: 'stone', pos: [12.75, 9.7, 0], size: [3.8, 0.3, 1.1] },
+
+      // Grand Overlord Golden Chest
+      { type: 'coin', pos: [12.75, 10.45, 0], size: [1.0, 1.0, 1.0] },
+      { type: 'coin', pos: [7.5, 5.15, 0], size: [0.75, 0.75, 0.75] },
+      { type: 'coin', pos: [18.0, 5.15, 0], size: [0.75, 0.75, 0.75] },
+
+      // TNT Demolition Cores
+      { type: 'tnt', pos: [10.25, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [15.25, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [12.75, 3.2, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [12.75, 8.2, 0], size: [0.8, 0.8, 0.8] }
+    ],
+    targets: [
+      { pos: [7.75, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [17.75, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [12.75, 5.65, 0], radius: 0.95, isBoss: true }, // The Zone 1 Overlord Boss
+      { pos: [11.0, 3.15, 0], radius: 0.55, isBoss: false },
+      { pos: [14.5, 3.15, 0], radius: 0.55, isBoss: false }
+    ]
+  },
+  {
+    id: 11,
+    name: 'Skybridge Outpost',
+    zone: 'Celestial Haven',
+    icon: '🌉',
+    difficulty: 'Medium',
+    description: 'Welcome to Zone 2! A suspended wooden suspension outpost guarding the celestial skybridge gateway.',
+    coinReward: 700,
+    birds: ['speed', 'red', 'speed', 'heavy'],
+    blocks: [
+      { type: 'wood', pos: [8.0, 0.9, 0], size: [0.5, 1.8, 1.2] },
+      { type: 'wood', pos: [10.5, 0.9, 0], size: [0.5, 1.8, 1.2] },
+      { type: 'wood', pos: [13.0, 0.9, 0], size: [0.5, 1.8, 1.2] },
+      { type: 'wood', pos: [15.5, 0.9, 0], size: [0.5, 1.8, 1.2] },
+      { type: 'wood', pos: [11.75, 1.95, 0], size: [8.5, 0.3, 1.2] },
+
+      { type: 'glass', pos: [9.25, 3.05, 0], size: [0.45, 1.9, 1.0] },
+      { type: 'glass', pos: [14.25, 3.05, 0], size: [0.45, 1.9, 1.0] },
+      { type: 'wood', pos: [11.75, 4.15, 0], size: [6.0, 0.3, 1.2] },
+
+      { type: 'tnt', pos: [11.75, 2.75, 0], size: [0.8, 0.8, 0.8] },
+      { type: 'coin', pos: [11.75, 4.75, 0], size: [0.8, 0.8, 0.8] }
+    ],
+    targets: [
+      { pos: [9.25, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [14.25, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [11.75, 3.5, 0], radius: 0.65, isBoss: false }
+    ]
+  },
+  {
+    id: 12,
+    name: 'Frozen Crystal Pagoda',
+    zone: 'Frost Spire',
+    icon: '❄️',
+    difficulty: 'Medium',
+    description: 'A 3-tier pagoda carved from shimmering glacier ice and supported by solid granite foundations.',
+    coinReward: 750,
+    birds: ['speed', 'speed', 'heavy', 'red'],
+    blocks: [
+      { type: 'stone', pos: [8.5, 0.9, 0], size: [0.6, 1.8, 1.2] },
+      { type: 'stone', pos: [11.5, 0.9, 0], size: [0.6, 1.8, 1.2] },
+      { type: 'stone', pos: [14.5, 0.9, 0], size: [0.6, 1.8, 1.2] },
+      { type: 'stone', pos: [11.5, 1.95, 0], size: [7.2, 0.3, 1.2] },
+
+      { type: 'glass', pos: [9.25, 3.1, 0], size: [0.45, 2.0, 1.0] },
+      { type: 'glass', pos: [13.75, 3.1, 0], size: [0.45, 2.0, 1.0] },
+      { type: 'glass', pos: [11.5, 4.25, 0], size: [5.4, 0.3, 1.1] },
+
+      { type: 'glass', pos: [10.25, 5.35, 0], size: [0.4, 1.9, 1.0] },
+      { type: 'glass', pos: [12.75, 5.35, 0], size: [0.4, 1.9, 1.0] },
+      { type: 'wood', pos: [11.5, 6.45, 0], size: [3.4, 0.3, 1.0] },
+
+      { type: 'coin', pos: [11.5, 7.15, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [11.5, 0.5, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [10.0, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [13.0, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [11.5, 2.75, 0], radius: 0.65, isBoss: false },
+      { pos: [11.5, 5.0, 0], radius: 0.7, isBoss: true }
+    ]
+  },
+  {
+    id: 13,
+    name: 'Twin Turbine Bastion',
+    zone: 'Aether Vale',
+    icon: '⚙️',
+    difficulty: 'Hard',
+    description: 'Dual industrial energy towers flanking a central TNT dynamo chamber in the sky.',
+    coinReward: 800,
+    birds: ['heavy', 'speed', 'red', 'heavy'],
+    blocks: [
+      // Left Tower
+      { type: 'stone', pos: [7.5, 1.0, 0], size: [0.6, 2.0, 1.2] },
+      { type: 'stone', pos: [9.5, 1.0, 0], size: [0.6, 2.0, 1.2] },
+      { type: 'stone', pos: [8.5, 2.15, 0], size: [2.8, 0.3, 1.2] },
+      { type: 'wood', pos: [8.5, 3.25, 0], size: [0.5, 1.9, 1.1] },
+      { type: 'wood', pos: [8.5, 4.35, 0], size: [2.0, 0.3, 1.1] },
+
+      // Right Tower
+      { type: 'stone', pos: [14.5, 1.0, 0], size: [0.6, 2.0, 1.2] },
+      { type: 'stone', pos: [16.5, 1.0, 0], size: [0.6, 2.0, 1.2] },
+      { type: 'stone', pos: [15.5, 2.15, 0], size: [2.8, 0.3, 1.2] },
+      { type: 'wood', pos: [15.5, 3.25, 0], size: [0.5, 1.9, 1.1] },
+      { type: 'wood', pos: [15.5, 4.35, 0], size: [2.0, 0.3, 1.1] },
+
+      // Center Bridge
+      { type: 'wood', pos: [12.0, 3.25, 0], size: [4.4, 0.3, 1.1] },
+      { type: 'tnt', pos: [12.0, 3.85, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [12.0, 0.5, 0], size: [0.85, 0.85, 0.85] },
+
+      { type: 'coin', pos: [8.5, 4.95, 0], size: [0.75, 0.75, 0.75] },
+      { type: 'coin', pos: [15.5, 4.95, 0], size: [0.75, 0.75, 0.75] }
+    ],
+    targets: [
+      { pos: [8.5, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [15.5, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [12.0, 4.75, 0], radius: 0.75, isBoss: true }
+    ]
+  },
+  {
+    id: 14,
+    name: 'Gilded Vault of Aether',
+    zone: 'Sunken Vaults',
+    icon: '🏺',
+    difficulty: 'Hard',
+    description: 'Thick granite obelisks guarding ancient celestial treasures and vulnerable support struts.',
+    coinReward: 850,
+    birds: ['red', 'heavy', 'speed', 'heavy'],
+    blocks: [
+      { type: 'stone', pos: [8.0, 1.1, 0], size: [0.7, 2.2, 1.3] },
+      { type: 'stone', pos: [11.0, 1.1, 0], size: [0.7, 2.2, 1.3] },
+      { type: 'stone', pos: [14.0, 1.1, 0], size: [0.7, 2.2, 1.3] },
+      { type: 'stone', pos: [17.0, 1.1, 0], size: [0.7, 2.2, 1.3] },
+      { type: 'stone', pos: [12.5, 2.35, 0], size: [10.2, 0.35, 1.4] },
+
+      { type: 'wood', pos: [9.5, 3.65, 0], size: [0.55, 2.25, 1.2] },
+      { type: 'stone', pos: [12.5, 3.65, 0], size: [0.65, 2.25, 1.3] },
+      { type: 'wood', pos: [15.5, 3.65, 0], size: [0.55, 2.25, 1.2] },
+      { type: 'stone', pos: [12.5, 4.95, 0], size: [7.5, 0.35, 1.3] },
+
+      { type: 'glass', pos: [11.0, 6.15, 0], size: [0.45, 2.05, 1.0] },
+      { type: 'glass', pos: [14.0, 6.15, 0], size: [0.45, 2.05, 1.0] },
+      { type: 'wood', pos: [12.5, 7.35, 0], size: [4.2, 0.3, 1.1] },
+
+      { type: 'coin', pos: [12.5, 8.1, 0], size: [0.95, 0.95, 0.95] },
+      { type: 'tnt', pos: [9.5, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [15.5, 0.5, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [12.5, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [11.0, 3.2, 0], radius: 0.55, isBoss: false },
+      { pos: [14.0, 3.2, 0], radius: 0.55, isBoss: false },
+      { pos: [12.5, 5.8, 0], radius: 0.8, isBoss: true }
+    ]
+  },
+  {
+    id: 15,
+    name: 'The Cloud Colosseum',
+    zone: 'Aegis Arena',
+    icon: '⚔️',
+    difficulty: 'Boss',
+    description: 'Zone 2 Midpoint Boss Arena! A vast open colosseum ringed with marble battlements and guardian pigs.',
+    coinReward: 900,
+    birds: ['speed', 'heavy', 'heavy', 'speed', 'red'],
+    blocks: [
+      { type: 'stone', pos: [6.5, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [9.5, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [12.5, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [15.5, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [18.5, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [12.5, 2.15, 0], size: [13.2, 0.35, 1.4] },
+
+      { type: 'wood', pos: [8.0, 3.4, 0], size: [0.55, 2.15, 1.2] },
+      { type: 'stone', pos: [12.5, 3.4, 0], size: [0.7, 2.15, 1.3] },
+      { type: 'wood', pos: [17.0, 3.4, 0], size: [0.55, 2.15, 1.2] },
+      { type: 'stone', pos: [12.5, 4.65, 0], size: [10.5, 0.35, 1.3] },
+
+      { type: 'glass', pos: [10.5, 5.85, 0], size: [0.5, 2.05, 1.1] },
+      { type: 'glass', pos: [14.5, 5.85, 0], size: [0.5, 2.05, 1.1] },
+      { type: 'wood', pos: [12.5, 7.05, 0], size: [5.2, 0.3, 1.2] },
+
+      { type: 'coin', pos: [12.5, 7.8, 0], size: [0.95, 0.95, 0.95] },
+      { type: 'tnt', pos: [8.0, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [17.0, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [12.5, 5.4, 0], size: [0.8, 0.8, 0.8] }
+    ],
+    targets: [
+      { pos: [11.0, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [14.0, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [10.0, 3.15, 0], radius: 0.6, isBoss: false },
+      { pos: [15.0, 3.15, 0], radius: 0.6, isBoss: false },
+      { pos: [12.5, 5.65, 0], radius: 0.9, isBoss: true } // Arena Champion Boss
+    ]
+  },
+  {
+    id: 16,
+    name: 'Sunken Temple Spire',
+    zone: 'Mystic Spires',
+    icon: '🏛️',
+    difficulty: 'Hard',
+    description: 'An ancient cloud-temple with monolithic columns anchored around deep subterranean TNT reservoirs.',
+    coinReward: 950,
+    birds: ['speed', 'red', 'heavy', 'speed'],
+    blocks: [
+      { type: 'stone', pos: [8.5, 1.1, 0], size: [0.65, 2.2, 1.3] },
+      { type: 'stone', pos: [11.5, 1.1, 0], size: [0.65, 2.2, 1.3] },
+      { type: 'stone', pos: [14.5, 1.1, 0], size: [0.65, 2.2, 1.3] },
+      { type: 'stone', pos: [17.5, 1.1, 0], size: [0.65, 2.2, 1.3] },
+      { type: 'stone', pos: [13.0, 2.35, 0], size: [10.2, 0.35, 1.3] },
+
+      { type: 'glass', pos: [10.0, 3.65, 0], size: [0.5, 2.25, 1.1] },
+      { type: 'glass', pos: [16.0, 3.65, 0], size: [0.5, 2.25, 1.1] },
+      { type: 'wood', pos: [13.0, 4.95, 0], size: [7.5, 0.35, 1.2] },
+
+      { type: 'wood', pos: [11.5, 6.15, 0], size: [0.45, 2.05, 1.0] },
+      { type: 'wood', pos: [14.5, 6.15, 0], size: [0.45, 2.05, 1.0] },
+      { type: 'stone', pos: [13.0, 7.35, 0], size: [4.4, 0.3, 1.1] },
+
+      { type: 'coin', pos: [13.0, 8.1, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [13.0, 0.5, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [10.0, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [16.0, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [13.0, 3.5, 0], radius: 0.75, isBoss: true },
+      { pos: [13.0, 5.8, 0], radius: 0.55, isBoss: false }
+    ]
+  },
+  {
+    id: 17,
+    name: 'Prismatic Mirror Fortress',
+    zone: 'Crystal Highlands',
+    icon: '🔮',
+    difficulty: 'Hard',
+    description: 'A labyrinth of delicate crystal prisms, balanced cantilever beams, and volatile explosive relays.',
+    coinReward: 1000,
+    birds: ['heavy', 'speed', 'heavy', 'red'],
+    blocks: [
+      { type: 'stone', pos: [7.5, 0.9, 0], size: [0.55, 1.8, 1.2] },
+      { type: 'stone', pos: [10.0, 0.9, 0], size: [0.55, 1.8, 1.2] },
+      { type: 'stone', pos: [12.5, 0.9, 0], size: [0.55, 1.8, 1.2] },
+      { type: 'stone', pos: [15.0, 0.9, 0], size: [0.55, 1.8, 1.2] },
+      { type: 'stone', pos: [17.5, 0.9, 0], size: [0.55, 1.8, 1.2] },
+      { type: 'stone', pos: [12.5, 1.95, 0], size: [11.2, 0.3, 1.3] },
+
+      { type: 'glass', pos: [8.75, 3.15, 0], size: [0.45, 2.1, 1.0] },
+      { type: 'glass', pos: [11.25, 3.15, 0], size: [0.45, 2.1, 1.0] },
+      { type: 'glass', pos: [13.75, 3.15, 0], size: [0.45, 2.1, 1.0] },
+      { type: 'glass', pos: [16.25, 3.15, 0], size: [0.45, 2.1, 1.0] },
+      { type: 'wood', pos: [12.5, 4.35, 0], size: [9.0, 0.3, 1.2] },
+
+      { type: 'glass', pos: [10.5, 5.5, 0], size: [0.4, 2.0, 1.0] },
+      { type: 'glass', pos: [14.5, 5.5, 0], size: [0.4, 2.0, 1.0] },
+      { type: 'stone', pos: [12.5, 6.65, 0], size: [5.2, 0.3, 1.1] },
+
+      { type: 'coin', pos: [12.5, 7.4, 0], size: [0.9, 0.9, 0.9] },
+      { type: 'tnt', pos: [12.5, 2.7, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [8.75, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [16.25, 0.55, 0], radius: 0.55, isBoss: false },
+      { pos: [12.5, 5.25, 0], radius: 0.8, isBoss: true }
+    ]
+  },
+  {
+    id: 18,
+    name: 'Thunder Peak Battery',
+    zone: 'Storm Crags',
+    icon: '⚡',
+    difficulty: 'Expert',
+    description: 'High altitude artillery compound with tiered explosive magazines ready for cascading chain reactions.',
+    coinReward: 1100,
+    birds: ['speed', 'heavy', 'speed', 'heavy', 'red'],
+    blocks: [
+      { type: 'stone', pos: [7.0, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [10.0, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [13.0, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [16.0, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [19.0, 1.0, 0], size: [0.7, 2.0, 1.4] },
+      { type: 'stone', pos: [13.0, 2.15, 0], size: [13.2, 0.35, 1.4] },
+
+      { type: 'stone', pos: [8.5, 3.4, 0], size: [0.65, 2.15, 1.3] },
+      { type: 'stone', pos: [13.0, 3.4, 0], size: [0.65, 2.15, 1.3] },
+      { type: 'stone', pos: [17.5, 3.4, 0], size: [0.65, 2.15, 1.3] },
+      { type: 'wood', pos: [13.0, 4.65, 0], size: [10.5, 0.35, 1.3] },
+
+      { type: 'glass', pos: [10.5, 5.85, 0], size: [0.5, 2.05, 1.1] },
+      { type: 'glass', pos: [15.5, 5.85, 0], size: [0.5, 2.05, 1.1] },
+      { type: 'stone', pos: [13.0, 7.05, 0], size: [6.2, 0.35, 1.2] },
+
+      { type: 'coin', pos: [13.0, 7.85, 0], size: [1.0, 1.0, 1.0] },
+      { type: 'tnt', pos: [8.5, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [17.5, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [13.0, 5.4, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [11.5, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [14.5, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [10.75, 3.15, 0], radius: 0.6, isBoss: false },
+      { pos: [15.25, 3.15, 0], radius: 0.6, isBoss: false },
+      { pos: [13.0, 5.8, 0], radius: 0.85, isBoss: true }
+    ]
+  },
+  {
+    id: 19,
+    name: 'Valkyrie Sky Sanctuary',
+    zone: 'Valkyrie Ridge',
+    icon: '🪶',
+    difficulty: 'Expert',
+    description: 'Sweeping winged architectural towers flanked by high-velocity wind chambers and reinforced marble bunkers.',
+    coinReward: 1200,
+    birds: ['heavy', 'speed', 'heavy', 'speed', 'heavy'],
+    blocks: [
+      { type: 'stone', pos: [6.5, 1.1, 0], size: [0.75, 2.2, 1.5] },
+      { type: 'stone', pos: [9.5, 1.1, 0], size: [0.75, 2.2, 1.5] },
+      { type: 'stone', pos: [12.5, 1.1, 0], size: [0.75, 2.2, 1.5] },
+      { type: 'stone', pos: [15.5, 1.1, 0], size: [0.75, 2.2, 1.5] },
+      { type: 'stone', pos: [18.5, 1.1, 0], size: [0.75, 2.2, 1.5] },
+      { type: 'stone', pos: [12.5, 2.35, 0], size: [13.5, 0.35, 1.5] },
+
+      { type: 'wood', pos: [8.0, 3.7, 0], size: [0.55, 2.35, 1.3] },
+      { type: 'stone', pos: [12.5, 3.7, 0], size: [0.7, 2.35, 1.4] },
+      { type: 'wood', pos: [17.0, 3.7, 0], size: [0.55, 2.35, 1.3] },
+      { type: 'stone', pos: [12.5, 5.05, 0], size: [10.5, 0.35, 1.4] },
+
+      { type: 'glass', pos: [10.0, 6.35, 0], size: [0.5, 2.25, 1.2] },
+      { type: 'glass', pos: [15.0, 6.35, 0], size: [0.5, 2.25, 1.2] },
+      { type: 'wood', pos: [12.5, 7.65, 0], size: [6.5, 0.35, 1.3] },
+
+      { type: 'coin', pos: [12.5, 8.45, 0], size: [1.0, 1.0, 1.0] },
+      { type: 'coin', pos: [8.0, 5.6, 0], size: [0.8, 0.8, 0.8] },
+      { type: 'coin', pos: [17.0, 5.6, 0], size: [0.8, 0.8, 0.8] },
+
+      { type: 'tnt', pos: [8.0, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [17.0, 0.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'tnt', pos: [12.5, 6.1, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [11.0, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [14.0, 0.6, 0], radius: 0.6, isBoss: false },
+      { pos: [10.25, 3.4, 0], radius: 0.6, isBoss: false },
+      { pos: [14.75, 3.4, 0], radius: 0.6, isBoss: false },
+      { pos: [12.5, 6.15, 0], radius: 0.9, isBoss: true }
+    ]
+  },
+  {
+    id: 20,
+    name: 'Emperor Supreme Citadel',
+    zone: 'Crown of the Heavens',
+    icon: '👑',
+    difficulty: 'Boss',
+    description: 'The Ultimate Campaign Climax! The colossal 5-tier Imperial Sky Palace where the Supreme Emperor pig rules the clouds!',
+    coinReward: 1500,
+    birds: ['red', 'speed', 'heavy', 'speed', 'heavy', 'heavy'],
+    blocks: [
+      // ── TIER 1: Colossal Monolithic Foundation (y = 0 to 2.4) ──
+      { type: 'stone', pos: [6.0, 1.1, 0], size: [0.75, 2.2, 1.6] },
+      { type: 'stone', pos: [8.5, 1.1, 0], size: [0.75, 2.2, 1.6] },
+      { type: 'stone', pos: [11.0, 1.1, 0], size: [0.75, 2.2, 1.6] },
+      { type: 'stone', pos: [13.5, 1.1, 0], size: [0.75, 2.2, 1.6] },
+      { type: 'stone', pos: [16.0, 1.1, 0], size: [0.75, 2.2, 1.6] },
+      { type: 'stone', pos: [18.5, 1.1, 0], size: [0.75, 2.2, 1.6] },
+      // Tier 1 Grand Deck
+      { type: 'stone', pos: [12.25, 2.35, 0], size: [14.0, 0.4, 1.6] },
+
+      // ── TIER 2: Imperial Guard Bastion (y = 2.5 to 4.8) ──
+      { type: 'wood', pos: [7.0, 3.65, 0], size: [0.6, 2.2, 1.4] },
+      { type: 'stone', pos: [9.5, 3.65, 0], size: [0.65, 2.2, 1.4] },
+      { type: 'stone', pos: [12.25, 3.65, 0], size: [0.75, 2.2, 1.5] },
+      { type: 'stone', pos: [15.0, 3.65, 0], size: [0.65, 2.2, 1.4] },
+      { type: 'wood', pos: [17.5, 3.65, 0], size: [0.6, 2.2, 1.4] },
+      // Tier 2 Deck
+      { type: 'stone', pos: [12.25, 4.95, 0], size: [12.0, 0.4, 1.5] },
+
+      // ── TIER 3: Grand Throne Room (y = 5.1 to 7.4) ──
+      { type: 'glass', pos: [9.5, 6.25, 0], size: [0.55, 2.2, 1.3] },
+      { type: 'glass', pos: [15.0, 6.25, 0], size: [0.55, 2.2, 1.3] },
+      // Tier 3 Deck
+      { type: 'stone', pos: [12.25, 7.55, 0], size: [7.0, 0.4, 1.4] },
+
+      // ── TIER 4: Imperial Spire (y = 7.7 to 9.8) ──
+      { type: 'wood', pos: [10.5, 8.75, 0], size: [0.5, 2.0, 1.2] },
+      { type: 'wood', pos: [14.0, 8.75, 0], size: [0.5, 2.0, 1.2] },
+      // Tier 4 Deck
+      { type: 'wood', pos: [12.25, 9.95, 0], size: [4.5, 0.35, 1.2] },
+
+      // ── TIER 5: Crown of Heavens Spire (y = 10.1 to 12.0) ──
+      { type: 'glass', pos: [11.25, 11.0, 0], size: [0.45, 1.75, 1.0] },
+      { type: 'glass', pos: [13.25, 11.0, 0], size: [0.45, 1.75, 1.0] },
+      { type: 'stone', pos: [12.25, 12.05, 0], size: [2.8, 0.35, 1.1] },
+
+      // Master Imperial Crown Vault Treasure
+      { type: 'coin', pos: [12.25, 12.8, 0], size: [1.2, 1.2, 1.2] },
+      { type: 'coin', pos: [7.0, 5.5, 0], size: [0.85, 0.85, 0.85] },
+      { type: 'coin', pos: [17.5, 5.5, 0], size: [0.85, 0.85, 0.85] },
+
+      // Royal Demolition TNT Chambers
+      { type: 'tnt', pos: [9.75, 0.5, 0], size: [0.9, 0.9, 0.9] },
+      { type: 'tnt', pos: [14.75, 0.5, 0], size: [0.9, 0.9, 0.9] },
+      { type: 'tnt', pos: [12.25, 3.0, 0], size: [0.9, 0.9, 0.9] },
+      { type: 'tnt', pos: [12.25, 8.2, 0], size: [0.85, 0.85, 0.85] }
+    ],
+    targets: [
+      { pos: [7.25, 0.65, 0], radius: 0.65, isBoss: false },
+      { pos: [17.25, 0.65, 0], radius: 0.65, isBoss: false },
+      { pos: [12.25, 5.95, 0], radius: 1.05, isBoss: true }, // The Emperor Supreme Boss!
+      { pos: [11.0, 8.25, 0], radius: 0.6, isBoss: false },
+      { pos: [13.5, 8.25, 0], radius: 0.6, isBoss: false },
+      { pos: [12.25, 10.65, 0], radius: 0.55, isBoss: false }
+    ]
   }
 ];

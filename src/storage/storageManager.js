@@ -15,13 +15,15 @@ const DEFAULT_STATE = {
   levelHighScores: {},
   claimedCoinLevels: {}, // Tracks level IDs where coins have already been awarded
   claimedMissions: {}, // Tracks mission IDs where quest rewards have been claimed
+  zoneRevealed: { 1: true, 2: false }, // Tracks revealed zones on roadmap
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
   sfxVolume: 0.85,
   bgmVolume: 0.45,
   bgmMode: 'dashboard', // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
   playerId: '',
-  serverRowId: null // Unique ID in Supabase Dili-Birds-Data table
+  serverRowId: null, // Unique ID in Supabase Dili-Birds-Data table
+  leaderboardRank: 1
 };
 
 export class StorageManager {
@@ -78,6 +80,7 @@ export class StorageManager {
         levelHighScores: { ...(parsed.levelHighScores || {}) },
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
         claimedMissions: { ...(parsed.claimedMissions || {}) },
+        zoneRevealed: { 1: true, 2: Boolean(parsed.zoneRevealed?.[2] || Number(parsed.unlockedLevel) > 10) },
         playerId: typeof parsed.playerId === 'string' && parsed.playerId ? parsed.playerId : '',
         serverRowId: parsed.serverRowId !== undefined ? parsed.serverRowId : null
       };
@@ -158,6 +161,27 @@ export class StorageManager {
     return Number(this.state.levelStars[levelId]) || 0;
   }
 
+  getHighScoreForLevel(levelId) {
+    return Number(this.state.levelHighScores[levelId]) || 0;
+  }
+
+  isZoneRevealed(zoneId) {
+    const zid = Number(zoneId);
+    if (zid <= 1) return true;
+    if (this.getUnlockedLevel() > 10) return true;
+    return Boolean(this.state.zoneRevealed?.[zid]);
+  }
+
+  setZoneRevealed(zoneId, revealed = true) {
+    const zid = Number(zoneId);
+    if (!this.state.zoneRevealed) {
+      this.state.zoneRevealed = { 1: true };
+    }
+    this.state.zoneRevealed[zid] = Boolean(revealed);
+    this.saveState();
+    return this.state.zoneRevealed[zid];
+  }
+
   getTotalStars() {
     return Object.values(this.state.levelStars).reduce((acc, s) => acc + (Number(s) || 0), 0);
   }
@@ -180,6 +204,16 @@ export class StorageManager {
       this.saveState();
     }
     return this.state.playerId;
+  }
+
+  getLeaderboardRank() {
+    return this.state.leaderboardRank || 1;
+  }
+
+  setLeaderboardRank(rank) {
+    const num = Math.max(1, Number(rank) || 1);
+    this.state.leaderboardRank = num;
+    this.saveState();
   }
 
   getTotalScore() {
@@ -243,13 +277,19 @@ export class StorageManager {
       }
     }
 
+    const prevUnlocked = this.getUnlockedLevel();
+    let unlockedNewZone = false;
+
     // Sequential level unlocking
     if (id >= this.state.unlockedLevel && id < totalLevelsCount) {
       this.state.unlockedLevel = id + 1;
+      if (id === 10 && prevUnlocked <= 10) {
+        unlockedNewZone = true;
+      }
     }
 
     this.saveState();
-    return { actualCoinsAwarded, isFirstTimeWin };
+    return { actualCoinsAwarded, isFirstTimeWin, unlockedNewZone, newUnlockedLevel: this.state.unlockedLevel };
   }
 
   isSoundEnabled() {
@@ -345,6 +385,7 @@ export class StorageManager {
       levelHighScores: {},
       claimedCoinLevels: {},
       claimedMissions: {},
+      zoneRevealed: { 1: true, 2: false },
       serverRowId: this.state.serverRowId
     };
     this.saveState();

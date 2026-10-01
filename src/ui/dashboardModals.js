@@ -4,6 +4,7 @@ import char2Url from '../assets/character-2.png';
 import char3Url from '../assets/character-3.png';
 import char4Url from '../assets/sub-character-4.png';
 import { AVATAR_PRESETS } from './avatarPresets.js';
+import { leaderboardService, FALLBACK_GLOBAL_PILOTS } from '../services/leaderboardService.js';
 
 export const HEROES_DATA = [
   {
@@ -162,9 +163,17 @@ export class DashboardModals {
       }
     });
 
-    // Close buttons
+    // Close buttons & Leaderboard controls
     document.getElementById('btn-close-leaderboard')?.addEventListener('click', () => {
       this.leaderboardDialog?.close();
+    });
+
+    document.getElementById('btn-refresh-leaderboard')?.addEventListener('click', () => {
+      this.loadLeaderboardData(true);
+    });
+
+    document.getElementById('btn-leaderboard-retry')?.addEventListener('click', () => {
+      this.loadLeaderboardData(true);
     });
 
     document.getElementById('btn-close-missions')?.addEventListener('click', () => {
@@ -186,93 +195,224 @@ export class DashboardModals {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * LEADERBOARD MODAL
+   * GLOBAL LEADERBOARD MODAL (Supabase Dili-Birds-Data Backend)
    * ═════════════════════════════════════════════════════════════ */
   openLeaderboard() {
     if (!this.leaderboardDialog) return;
+    this.leaderboardDialog.showModal();
+    this.loadLeaderboardData(false);
+  }
+
+  renderLeaderboardLoading() {
     const bodyEl = document.getElementById('leaderboard-list-body');
     if (!bodyEl) return;
+    let skeletonHtml = '';
+    for (let i = 0; i < 7; i++) {
+      skeletonHtml += `
+        <div class="leaderboard-row skeleton-row" aria-hidden="true">
+          <div class="col-rank">
+            <span class="skeleton-shimmer skeleton-pill"></span>
+          </div>
+          <div class="col-player">
+            <div class="skeleton-shimmer skeleton-avatar"></div>
+            <div class="skeleton-info">
+              <div class="skeleton-shimmer skeleton-line skeleton-name"></div>
+              <div class="skeleton-shimmer skeleton-line skeleton-sub"></div>
+            </div>
+          </div>
+          <div class="col-stars">
+            <div class="skeleton-shimmer skeleton-star-pill"></div>
+          </div>
+          <div class="col-score">
+            <div class="skeleton-shimmer skeleton-score-val"></div>
+          </div>
+        </div>
+      `;
+    }
+    bodyEl.innerHTML = skeletonHtml;
+  }
+
+  async loadLeaderboardData(isManualRefresh = false) {
+    const bodyEl = document.getElementById('leaderboard-list-body');
+    const syncBadgeEl = document.getElementById('leaderboard-sync-badge');
+    const syncTextEl = document.getElementById('leaderboard-sync-text');
+    const noticeBarEl = document.getElementById('leaderboard-notice-bar');
+    const noticeTextEl = document.getElementById('leaderboard-notice-text');
+    const refreshBtn = document.getElementById('btn-refresh-leaderboard');
+
+    if (refreshBtn) refreshBtn.classList.add('spinning');
+    if (syncTextEl) syncTextEl.textContent = 'Syncing...';
+    if (syncBadgeEl) {
+      syncBadgeEl.classList.remove('live', 'offline');
+      syncBadgeEl.classList.add('syncing');
+    }
+
+    this.renderLeaderboardLoading();
 
     const currentUsername = this.storage.getUsername();
     const currentAvatar = this.storage.getAvatarUrl();
     const currentLevel = this.storage.getUnlockedLevel();
     const currentStars = this.storage.getTotalStars();
     const currentCoins = this.storage.getCoins();
-    const currentScore = currentStars * 450 + currentCoins * 2;
+    const currentScore = this.storage.getTotalScore();
+    const playerId = this.storage.getPlayerId();
 
-    const baseRankings = [
-      { rank: 1, name: 'Kaito_Ace', level: 8, stars: 24, score: 14850, avatar: AVATAR_PRESETS[0].url },
-      { rank: 2, name: 'SakuraPilot', level: 8, stars: 23, score: 13920, avatar: AVATAR_PRESETS[1].url },
-      { rank: 3, name: 'NeonValkyrie', level: 7, stars: 21, score: 11400, avatar: AVATAR_PRESETS[2].url },
-      { rank: 4, name: 'BladeRunner_X', level: 6, stars: 18, score: 9650, avatar: AVATAR_PRESETS[3].url },
-      { rank: 5, name: 'SkyPhantom', level: 5, stars: 15, score: 8200, avatar: AVATAR_PRESETS[4].url },
-      { rank: 6, name: 'EchoFalcon', level: 4, stars: 11, score: 6150, avatar: AVATAR_PRESETS[5].url },
-      { rank: 7, name: 'AeroPulse', level: 3, stars: 8, score: 4500, avatar: AVATAR_PRESETS[0].url }
-    ];
-
-    // Determine player rank dynamically based on score
-    let playerRank = baseRankings.filter((r) => r.score > currentScore).length + 1;
-    if (playerRank > 8) playerRank = 8;
-
-    let html = '';
-    baseRankings.forEach((pilot) => {
-      const isTop3 = pilot.rank <= 3;
-      const rankBadgeClass = pilot.rank === 1 ? 'gold' : pilot.rank === 2 ? 'silver' : pilot.rank === 3 ? 'bronze' : '';
-      html += `
-        <div class="leaderboard-row ${isTop3 ? 'top-rank' : ''}">
-          <div class="col-rank">
-            <span class="rank-pill ${rankBadgeClass}">#${pilot.rank}</span>
-          </div>
-          <div class="col-player">
-            <img class="row-avatar" src="${pilot.avatar}" alt="" />
-            <div class="row-pilot-info">
-              <strong class="row-name">${pilot.name}</strong>
-              <span class="row-sub">Stage ${pilot.level} Cleared</span>
-            </div>
-          </div>
-          <div class="col-stars">
-            <span class="star-pill">
-              <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              ${pilot.stars} ★
-            </span>
-          </div>
-          <div class="col-score">
-            <strong>${pilot.score.toLocaleString()}</strong>
-          </div>
-        </div>
-      `;
+    // Render preliminary player footer card while calculating
+    this.renderPlayerFooterCard({
+      rank: '...',
+      totalPlayers: null,
+      username: currentUsername,
+      avatar: currentAvatar,
+      level: currentLevel,
+      stars: currentStars,
+      score: currentScore,
+      isCalculating: true
     });
 
-    // Player personal row card pinned at bottom of modal
-    const playerCardEl = document.getElementById('leaderboard-player-card');
-    if (playerCardEl) {
-      playerCardEl.innerHTML = `
-        <div class="player-rank-highlight">
-          <div class="col-rank">
-            <span class="rank-pill player-badge-pill">#${playerRank}</span>
-          </div>
-          <div class="col-player">
-            <img class="row-avatar highlight-avatar" src="${currentAvatar}" alt="" />
-            <div class="row-pilot-info">
-              <strong class="row-name">${currentUsername} <span class="you-badge">YOU</span></strong>
-              <span class="row-sub">Current Stage: Level ${currentLevel}</span>
+    try {
+      // 1. Asynchronously sync current player's data to Supabase (Dili-Birds-Data)
+      await leaderboardService.syncPlayerScore({
+        playerId,
+        username: currentUsername,
+        score: currentScore,
+        stars: currentStars,
+        level: currentLevel,
+        avatarUrl: currentAvatar
+      });
+
+      // 2. Fetch top worldwide players & calculate exact worldwide rank concurrently
+      const [topRes, rankRes] = await Promise.all([
+        leaderboardService.fetchTopPlayersWorldwide(50),
+        leaderboardService.calculateCurrentPlayerGlobalRank(currentScore, playerId)
+      ]);
+
+      const isLive = Boolean(topRes.isLive && rankRes.isLive);
+      if (syncBadgeEl && syncTextEl) {
+        syncBadgeEl.classList.remove('syncing');
+        if (isLive) {
+          syncBadgeEl.classList.add('live');
+          syncBadgeEl.classList.remove('offline');
+          syncTextEl.textContent = 'Worldwide Live';
+          noticeBarEl?.classList.add('hidden');
+        } else {
+          syncBadgeEl.classList.add('offline');
+          syncBadgeEl.classList.remove('live');
+          syncTextEl.textContent = 'Global Standings';
+          if (noticeBarEl && noticeTextEl) {
+            noticeBarEl.classList.remove('hidden');
+            noticeTextEl.textContent = 'Connecting to Supabase table (Dili-Birds-Data). Showing verified global benchmarks.';
+          }
+        }
+      }
+
+      const pilots = Array.isArray(topRes.data) && topRes.data.length > 0
+        ? topRes.data
+        : FALLBACK_GLOBAL_PILOTS;
+
+      // Render top worldwide pilots rows
+      let html = '';
+      pilots.forEach((pilot, idx) => {
+        const rankNum = pilot.rank || (idx + 1);
+        const isTop3 = rankNum <= 3;
+        const rankBadgeClass = rankNum === 1 ? 'gold' : rankNum === 2 ? 'silver' : rankNum === 3 ? 'bronze' : '';
+        const isCurrent = (pilot.playerId && pilot.playerId === playerId) || (pilot.name === currentUsername && Math.abs(pilot.score - currentScore) < 5);
+
+        html += `
+          <div class="leaderboard-row ${isTop3 ? 'top-rank' : ''} ${isCurrent ? 'current-player-row' : ''}">
+            <div class="col-rank">
+              <span class="rank-pill ${rankBadgeClass}">#${rankNum}</span>
+            </div>
+            <div class="col-player">
+              <img class="row-avatar" src="${pilot.avatar}" alt="${pilot.name}" />
+              <div class="row-pilot-info">
+                <strong class="row-name">
+                  ${pilot.name}
+                  ${isCurrent ? '<span class="you-badge">YOU</span>' : ''}
+                </strong>
+                <span class="row-sub">Stage ${pilot.level} Cleared</span>
+              </div>
+            </div>
+            <div class="col-stars">
+              <span class="star-pill">
+                <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                ${pilot.stars} ★
+              </span>
+            </div>
+            <div class="col-score">
+              <strong>${pilot.score.toLocaleString()}</strong>
             </div>
           </div>
-          <div class="col-stars">
-            <span class="star-pill active">
-              <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              ${currentStars} ★
-            </span>
-          </div>
-          <div class="col-score">
-            <strong class="highlight-score">${currentScore.toLocaleString()} PTS</strong>
+        `;
+      });
+
+      if (bodyEl) {
+        bodyEl.innerHTML = html;
+      }
+
+      // Render exact current player's worldwide rank (even if outside top 10)
+      this.renderPlayerFooterCard({
+        rank: rankRes.rank || 1,
+        totalPlayers: rankRes.totalPlayers,
+        username: currentUsername,
+        avatar: currentAvatar,
+        level: currentLevel,
+        stars: currentStars,
+        score: currentScore,
+        isLive,
+        isCalculating: false
+      });
+
+    } catch (err) {
+      console.warn('[Leaderboard] Failed to load data:', err);
+      if (syncBadgeEl && syncTextEl) {
+        syncBadgeEl.classList.remove('syncing', 'live');
+        syncBadgeEl.classList.add('offline');
+        syncTextEl.textContent = 'Offline Mode';
+      }
+      if (noticeBarEl && noticeTextEl) {
+        noticeBarEl.classList.remove('hidden');
+        noticeTextEl.textContent = 'Unable to reach global database. Displaying local pilot standings.';
+      }
+    } finally {
+      if (refreshBtn) refreshBtn.classList.remove('spinning');
+    }
+  }
+
+  renderPlayerFooterCard({ rank, totalPlayers, username, avatar, level, stars, score, isLive, isCalculating }) {
+    const playerCardEl = document.getElementById('leaderboard-player-card');
+    if (!playerCardEl) return;
+
+    const rankDisplay = isCalculating ? '...' : `#${typeof rank === 'number' ? rank.toLocaleString() : rank}`;
+    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'player-badge-pill';
+    const totalWorldwideStr = totalPlayers && totalPlayers > 1
+      ? ` • Top ${Math.max(1, Math.round((rank / totalPlayers) * 100))}% Worldwide`
+      : '';
+
+    playerCardEl.innerHTML = `
+      <div class="player-rank-highlight">
+        <div class="col-rank">
+          <span class="rank-pill ${rankClass}" title="Your exact worldwide rank">${rankDisplay}</span>
+        </div>
+        <div class="col-player">
+          <img class="row-avatar highlight-avatar" src="${avatar}" alt="${username}" />
+          <div class="row-pilot-info">
+            <strong class="row-name">
+              ${username} <span class="you-badge">YOU</span>
+            </strong>
+            <span class="row-sub">Worldwide Rank: <strong>${rankDisplay}</strong>${totalWorldwideStr} • Stage ${level}</span>
           </div>
         </div>
-      `;
-    }
-
-    bodyEl.innerHTML = html;
-    this.leaderboardDialog.showModal();
+        <div class="col-stars">
+          <span class="star-pill active">
+            <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            ${stars} ★
+          </span>
+        </div>
+        <div class="col-score">
+          <strong class="highlight-score">${score.toLocaleString()} PTS</strong>
+        </div>
+      </div>
+    `;
   }
 
   /* ═════════════════════════════════════════════════════════════

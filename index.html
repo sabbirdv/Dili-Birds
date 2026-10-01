@@ -271,10 +271,33 @@
             Global Commander Rankings
           </h2>
         </div>
-        <button type="button" id="btn-close-leaderboard" class="dialog-close-btn" aria-label="Close Rankings" title="Close (Esc)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+        <div class="modal-header-actions">
+          <div id="leaderboard-sync-badge" class="leaderboard-sync-badge" title="Worldwide Supabase Real-Time Standings">
+            <span class="sync-dot"></span>
+            <span class="sync-text" id="leaderboard-sync-text">Worldwide Sync</span>
+          </div>
+          <button type="button" id="btn-refresh-leaderboard" class="dialog-icon-btn" aria-label="Refresh Global Rankings" title="Refresh Live Rankings">
+            <svg class="refresh-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+          </button>
+          <button type="button" id="btn-close-leaderboard" class="dialog-close-btn" aria-label="Close Rankings" title="Close (Esc)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
       </header>
+
+      <div id="leaderboard-notice-bar" class="leaderboard-notice-bar hidden">
+        <div class="notice-info">
+          <svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span id="leaderboard-notice-text">Connecting to worldwide database (Dili-Birds-Data)...</span>
+        </div>
+        <button type="button" id="btn-leaderboard-retry" class="notice-retry-btn">
+          <span>Retry</span>
+        </button>
+      </div>
 
       <div class="leaderboard-table-wrap">
         <div class="leaderboard-header-row">

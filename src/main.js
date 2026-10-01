@@ -5,6 +5,7 @@ import { LEVELS } from './levels/levelData.js';
 import { UIManager } from './ui/uiManager.js';
 import { GameScene } from './scene/gameScene.js';
 import { requestFullscreen } from './ui/fullscreenHelper.js';
+import { leaderboardService } from './services/leaderboardService.js';
 
 class DiliBirdsApp {
   constructor() {
@@ -105,6 +106,16 @@ class DiliBirdsApp {
           actualCoinsAwarded = result?.actualCoinsAwarded || 0;
           isFirstTimeWin = Boolean(result?.isFirstTimeWin);
           this.levelSelect.focusedLevelId = this.storage.getUnlockedLevel();
+
+          // Sync player's updated score and level to Supabase Dili-Birds-Data globally
+          leaderboardService.syncPlayerScore({
+            playerId: this.storage.getPlayerId(),
+            username: this.storage.getUsername(),
+            score: this.storage.getTotalScore(),
+            stars: this.storage.getTotalStars(),
+            level: this.storage.getUnlockedLevel(),
+            avatarUrl: this.storage.getAvatarUrl()
+          }).catch(() => {});
         }
         this.ui.refreshHeaderAndMenu();
         const hasNextLevel = levelId < LEVELS.length;

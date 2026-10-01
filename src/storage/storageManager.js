@@ -18,7 +18,8 @@ const DEFAULT_STATE = {
   soundEnabled: true,
   sfxVolume: 0.85,
   bgmVolume: 0.45,
-  bgmMode: 'dashboard' // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
+  bgmMode: 'dashboard', // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
+  playerId: ''
 };
 
 export class StorageManager {
@@ -62,7 +63,8 @@ export class StorageManager {
         levelStars: { ...(parsed.levelStars || {}) },
         levelHighScores: { ...(parsed.levelHighScores || {}) },
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
-        claimedMissions: { ...(parsed.claimedMissions || {}) }
+        claimedMissions: { ...(parsed.claimedMissions || {}) },
+        playerId: typeof parsed.playerId === 'string' && parsed.playerId ? parsed.playerId : ''
       };
     } catch (err) {
       console.warn('LocalStorage unavailable or corrupted, using in-memory fallback:', err);
@@ -143,6 +145,21 @@ export class StorageManager {
 
   getTotalStars() {
     return Object.values(this.state.levelStars).reduce((acc, s) => acc + (Number(s) || 0), 0);
+  }
+
+  getPlayerId() {
+    if (!this.state.playerId) {
+      this.state.playerId = 'pilot_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+      this.saveState();
+    }
+    return this.state.playerId;
+  }
+
+  getTotalScore() {
+    const stars = this.getTotalStars();
+    const coins = this.getCoins();
+    const highScoresSum = Object.values(this.state.levelHighScores || {}).reduce((acc, v) => acc + (Number(v) || 0), 0);
+    return Math.max(stars * 450 + coins * 2, highScoresSum);
   }
 
   /**

@@ -4,6 +4,7 @@ import { DashboardModals, HEROES_DATA } from './dashboardModals.js';
 import { LEVELS } from '../levels/levelData.js';
 import { isFullscreen, toggleFullscreen } from './fullscreenHelper.js';
 import coinLogoUrl from '../assets/coin-with-logo.png';
+import { leaderboardService } from '../services/leaderboardService.js';
 
 /**
  * High-level UI orchestrator connecting the Single Top Nav Bar, Initial Menu, Level Select,
@@ -67,6 +68,17 @@ export class UIManager {
       ({ username, brandName }) => {
         this.refreshHeaderAndMenu();
         this.onBrandChanged?.(brandName);
+
+        // Sync updated commander profile to Supabase Dili-Birds-Data globally
+        leaderboardService.syncPlayerScore({
+          playerId: this.storage.getPlayerId(),
+          username: this.storage.getUsername(),
+          score: this.storage.getTotalScore(),
+          stars: this.storage.getTotalStars(),
+          level: this.storage.getUnlockedLevel(),
+          avatarUrl: this.storage.getAvatarUrl()
+        }).catch(() => {});
+
         // Launch active unlocked stage immediately on "Save Profile & Launch"
         const activeLevel =
           LEVELS.find((l) => l.id === this.storage.getUnlockedLevel()) || LEVELS[0];

@@ -15,9 +15,9 @@ import dilicomLogoBlueUrl from '../assets/logo-blue.png';
  *   7. Stationary "Dili-Birds" brand monument
  */
 export class BrandingElements {
-  constructor(scene, initialBrandName = 'Dili-Birds') {
+  constructor(scene, initialBrandName = 'Dili Birds') {
     this.scene = scene;
-    this.brandName = initialBrandName || 'Dili-Birds';
+    this.brandName = initialBrandName || 'Dili Birds';
     this.root = new THREE.Group();
     this.scene.add(this.root);
 

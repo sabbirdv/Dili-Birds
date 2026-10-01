@@ -2,6 +2,7 @@ import { ProfileModal } from './profileModal.js';
 import { HudController } from './hud.js';
 import { DashboardModals, HEROES_DATA } from './dashboardModals.js';
 import { LEVELS } from '../levels/levelData.js';
+import { isFullscreen, toggleFullscreen } from './fullscreenHelper.js';
 import coinLogoUrl from '../assets/coin-with-logo.png';
 
 /**
@@ -119,11 +120,11 @@ export class UIManager {
 
   bindTopBarEvents() {
     const badgeBtn = document.getElementById('player-badge-btn');
-    badgeBtn?.addEventListener('click', () => this.hud.openGameMenu());
+    badgeBtn?.addEventListener('click', () => this.profileModal.open('username'));
     badgeBtn?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        this.hud.openGameMenu();
+        this.profileModal.open('username');
       }
     });
 
@@ -135,6 +136,33 @@ export class UIManager {
         this.profileModal.open('username');
       }
     });
+
+    // Top Nav Fullscreen Button
+    const navFullscreenBtn = document.getElementById('btn-nav-fullscreen');
+    navFullscreenBtn?.addEventListener('click', async () => {
+      await toggleFullscreen();
+      this.updateNavFullscreenIcon();
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      this.updateNavFullscreenIcon();
+    });
+
+    this.updateNavFullscreenIcon();
+  }
+
+  updateNavFullscreenIcon() {
+    const iconEl = document.getElementById('nav-fullscreen-icon');
+    const btnEl = document.getElementById('btn-nav-fullscreen');
+    if (!iconEl) return;
+    const full = isFullscreen();
+    if (full) {
+      iconEl.innerHTML = `<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>`;
+      btnEl?.setAttribute('title', 'Exit Fullscreen');
+    } else {
+      iconEl.innerHTML = `<path d="M8 3H5a2.5 2.5 0 0 0-2.5 2.5v3m18.5 0v-3A2.5 2.5 0 0 0 18.5 3h-3m0 18.5h3a2.5 2.5 0 0 0 2.5-2.5v-3M2.5 15.5v3A2.5 2.5 0 0 0 5 21h3"/>`;
+      btnEl?.setAttribute('title', 'Enter Fullscreen');
+    }
   }
 
   /**

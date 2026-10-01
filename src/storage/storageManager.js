@@ -1,7 +1,7 @@
 import { AVATAR_PRESETS } from '../ui/avatarPresets.js';
 
 const STORAGE_KEY = 'dili_birds_3d_player_session_v1';
-const DEFAULT_BRAND_NAME = 'Dili-Birds';
+const DEFAULT_BRAND_NAME = 'Dili Birds';
 
 const DEFAULT_STATE = {
   username: '',
@@ -33,19 +33,19 @@ export class StorageManager {
       }
       const parsed = JSON.parse(raw);
 
-      // Migrate any legacy inline SVG preset to the new src/assets character presets
+      // If user hasn't explicitly configured a custom profile and was on default pet avatar, migrate to commander avatar
+      if (!parsed.profileConfigured && (parsed.avatarPresetId === 'orb-blue' || !parsed.avatarPresetId)) {
+        parsed.avatarPresetId = AVATAR_PRESETS[0].id;
+        parsed.avatarUrl = AVATAR_PRESETS[0].url;
+      }
+
+      // Migrate any legacy inline SVG preset or match known preset
       const matchedPreset = AVATAR_PRESETS.find((p) => p.id === parsed.avatarPresetId);
       let resolvedAvatarUrl = parsed.avatarUrl || AVATAR_PRESETS[0].url;
       let resolvedPresetId = parsed.avatarPresetId || AVATAR_PRESETS[0].id;
 
       if (matchedPreset) {
         resolvedAvatarUrl = matchedPreset.url;
-      } else if (
-        typeof resolvedAvatarUrl === 'string' &&
-        resolvedAvatarUrl.startsWith('data:image/svg+xml')
-      ) {
-        resolvedAvatarUrl = AVATAR_PRESETS[0].url;
-        resolvedPresetId = AVATAR_PRESETS[0].id;
       }
 
       return {

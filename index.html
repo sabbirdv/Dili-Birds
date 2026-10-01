@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Dili-Birds 3D — Slingshot Physics Game</title>
+  <title>Dili Birds — Slingshot Physics Game</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,11 +22,14 @@
     <header id="top-bar" class="top-nav glass-panel" aria-label="Game Navigation Bar">
       <!-- Left: Profile Pic & Name + Current Level Badge -->
       <div class="nav-left-group">
-        <div class="player-badge" id="player-badge-btn" role="button" tabindex="0" title="Commander Profile">
+        <div class="player-badge" id="player-badge-btn" role="button" tabindex="0" title="Commander Profile Settings">
           <div class="avatar-circle" id="player-avatar">
             <img id="top-avatar-img" src="" alt="Player Avatar" />
           </div>
           <span class="player-name" id="display-username">Commander</span>
+          <svg class="profile-edit-cue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
         </div>
 
         <div class="stat-pill level-pill" id="nav-level-pill" title="Current Level / Stage">
@@ -53,12 +56,18 @@
         </div>
       </div>
 
-      <!-- Right: Treasury Coins and Game Pause / Menu Button -->
+      <!-- Right: Treasury Coins, Fullscreen Toggle, and Game Pause / Menu Button -->
       <div class="nav-right-group">
         <div class="stat-pill coin-pill" title="Treasury Coins">
           <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
           <span class="stat-value" id="display-coins">100</span>
         </div>
+
+        <button id="btn-nav-fullscreen" class="nav-btn menu-icon-btn" type="button" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+          <svg id="nav-fullscreen-icon" class="nav-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2.5 2.5 0 0 0-2.5 2.5v3m18.5 0v-3A2.5 2.5 0 0 0 18.5 3h-3m0 18.5h3a2.5 2.5 0 0 0 2.5-2.5v-3M2.5 15.5v3A2.5 2.5 0 0 0 5 21h3"/>
+          </svg>
+        </button>
 
         <button id="btn-pause-menu" class="nav-btn menu-icon-btn" type="button" title="Settings / Menu" aria-label="Menu">
           <svg class="nav-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -88,7 +97,7 @@
 
           <div class="hero-center-content">
             <div class="hero-brand-pill">THE OFFICIAL DLICOM BIRD ADVENTURE</div>
-            <h1 class="dash-grand-title">Dili-Birds <span class="accent-3d">3D</span></h1>
+            <h1 class="dash-grand-title">Dili Birds</h1>
             <p class="dash-grand-sub">
               Launch Dili, master the slingshot, smash the obstacles, and conquer every level.
             </p>
@@ -182,7 +191,7 @@
           </button>
 
           <div class="roadmap-title-lockup">
-            <div class="brand-tag" id="hero-brand-tag">Dili-Birds • 3D WORLD</div>
+            <div class="brand-tag" id="hero-brand-tag">Dili Birds</div>
             <h1 class="roadmap-page-title">Campaign <span class="accent-3d">Roadmap</span></h1>
           </div>
 
@@ -357,21 +366,6 @@
         </button>
       </div>
 
-      <!-- Commander Profile Card -->
-      <section class="menu-profile-card">
-        <div class="menu-avatar-wrap">
-          <img id="menu-avatar-img" src="" alt="Commander Avatar" />
-        </div>
-        <div class="menu-profile-info">
-          <span class="menu-profile-label">COMMANDER</span>
-          <strong class="menu-profile-name" id="menu-username">Commander</strong>
-        </div>
-        <button type="button" id="btn-menu-edit-profile" class="action-btn secondary-btn menu-edit-btn" title="Customize Username and Avatar">
-          <svg class="btn-sub-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          <span>Edit Profile</span>
-        </button>
-      </section>
-
       <!-- Player Progress Stats Summary -->
       <section class="menu-stats-row">
         <div class="menu-stat-pill">
@@ -430,23 +424,15 @@
           <span class="list-arrow">➔</span>
         </button>
 
-        <div class="menu-settings-split">
-          <button type="button" id="btn-menu-audio-toggle" class="menu-sub-btn">
-            <span class="sub-icon" id="menu-audio-icon">
+        <button type="button" id="btn-menu-audio-toggle" class="menu-list-btn" title="Toggle Master Audio">
+          <div class="list-left">
+            <span class="list-icon" id="menu-audio-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
             </span>
-            <span class="sub-text">Sound</span>
-            <span class="sub-badge" id="menu-audio-status">ON</span>
-          </button>
-
-          <button type="button" id="btn-menu-fullscreen" class="menu-sub-btn">
-            <span class="sub-icon" id="menu-fullscreen-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-            </span>
-            <span class="sub-text">Fullscreen</span>
-            <span class="sub-badge" id="menu-fullscreen-status">TOGGLE</span>
-          </button>
-        </div>
+            <span class="list-text">Sound Effects &amp; Music</span>
+          </div>
+          <span class="sub-badge" id="menu-audio-status">ON</span>
+        </button>
 
         <!-- Audio State & Independent Volume Controls -->
         <div class="menu-volume-panel" aria-label="Audio Volume Settings">
@@ -517,10 +503,10 @@
         <!-- RIGHT COLUMN: Prominent Username Input & Save Actions -->
         <section class="profile-form-column">
           <div class="profile-header-block">
-            <div class="dialog-badge">DILI-BIRDS COMMANDER SETUP</div>
+            <div class="dialog-badge">DILI BIRDS COMMANDER SETUP</div>
             <h2 id="profile-dialog-title">Create Your Pilot Profile</h2>
             <p class="dialog-desc">
-              Personalize your commander identity and choose a Dili-Birds avatar or upload your own photo using the camera icon. Your profile, unlocked stages, and treasury are automatically saved in Local Storage.
+              Personalize your commander identity and choose a Dili Birds avatar or upload your own photo using the camera icon. Your profile, unlocked stages, and treasury are automatically saved in Local Storage.
             </p>
           </div>
 
@@ -637,7 +623,7 @@
       </div>
       <h2 class="orientation-title">Landscape Mode Required</h2>
       <p class="orientation-msg">
-        Please rotate your device to landscape mode to play <strong>Dili-Birds</strong>.
+        Please rotate your device to landscape mode to play <strong>Dili Birds</strong>.
       </p>
       <button type="button" id="btn-force-landscape" class="action-btn primary-btn orientation-btn">
         <span>🔄 Rotate to Landscape</span>

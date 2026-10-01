@@ -229,14 +229,14 @@ export class HudController {
   }
 
   updateAudioUI(enabled) {
-    if (this.menuAudioIcon) this.menuAudioIcon.textContent = enabled ? '🔊' : '🔇';
-    if (this.menuAudioStatus) this.menuAudioStatus.textContent = enabled ? 'ON' : 'OFF';
+    if (this.menuAudioStatus) this.menuAudioStatus.textContent = enabled ? 'ON' : 'MUTED';
+    if (this.menuAudioIcon) {
+      this.menuAudioIcon.style.opacity = enabled ? '1' : '0.45';
+    }
   }
 
   updateFullscreenUI() {
-    const full = isFullscreen();
-    if (this.menuFullscreenIcon) this.menuFullscreenIcon.textContent = full ? '⛶' : '⛶';
-    if (this.menuFullscreenStatus) this.menuFullscreenStatus.textContent = full ? 'FULLSCREEN' : 'WINDOWED';
+    // Nav fullscreen is handled in UIManager
   }
 
   show() {

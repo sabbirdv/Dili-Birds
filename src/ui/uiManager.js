@@ -39,7 +39,6 @@ export class UIManager {
     this.dashboardScreenEl = document.getElementById('dashboard-screen');
     this.roadmapScreenEl = document.getElementById('roadmap-screen');
     this.topBarEl = document.getElementById('top-bar');
-    this.navDashboardActionsEl = document.getElementById('nav-dashboard-actions');
     this.gameplayHudClusterEl = document.getElementById('gameplay-hud-cluster');
 
     // Single unified top bar elements
@@ -197,7 +196,6 @@ export class UIManager {
     this.dashboardScreenEl?.classList.remove('hidden');
     this.roadmapScreenEl?.classList.add('hidden');
     this.topBarEl?.classList.remove('hidden');
-    this.navDashboardActionsEl?.classList.remove('hidden');
     this.gameplayHudClusterEl?.classList.add('hidden');
 
     this.onSetDashboard3DMode?.(true);
@@ -232,7 +230,6 @@ export class UIManager {
     this.dashboardScreenEl?.classList.add('hidden');
     this.roadmapScreenEl?.classList.add('hidden');
     this.topBarEl?.classList.remove('hidden');
-    this.navDashboardActionsEl?.classList.add('hidden');
     this.gameplayHudClusterEl?.classList.remove('hidden');
 
     this.onSetDashboard3DMode?.(false);

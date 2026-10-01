@@ -37,32 +37,6 @@
         </div>
       </div>
 
-      <!-- Center (Menu State): Upper Navigational Dashboard Actions (Leaderboard, Missions, Characters) -->
-      <nav id="nav-dashboard-actions" class="nav-dashboard-actions" aria-label="Dashboard Quick Navigation">
-        <button id="btn-nav-leaderboard" class="nav-action-pill" type="button" title="Global Leaderboard Rankings">
-          <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
-          </svg>
-          <span class="nav-pill-label">Rankings</span>
-        </button>
-
-        <button id="btn-nav-missions" class="nav-action-pill" type="button" title="Daily Missions & Quests">
-          <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-          </svg>
-          <span class="nav-pill-label">Missions</span>
-          <span class="nav-badge-dot" aria-hidden="true"></span>
-        </button>
-
-        <button id="btn-nav-characters" class="nav-action-pill" type="button" title="Character Collection & Milestone Rewards">
-          <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
-          <span class="nav-pill-label">Heroes</span>
-          <span class="nav-milestone-pill" id="top-nav-milestone-tag">REWARDS</span>
-        </button>
-      </nav>
-
       <!-- Center (Gameplay State): In-Game Active Mission HUD Cluster (Only visible when playing level) -->
       <div id="gameplay-hud-cluster" class="gameplay-hud-cluster hidden">
         <div class="hud-metric" title="Targets Remaining">
@@ -86,11 +60,12 @@
           <span class="stat-value" id="display-coins">100</span>
         </div>
 
-        <button id="btn-pause-menu" class="nav-btn pause-btn" type="button" title="Settings / Pause Menu" aria-label="Pause Menu">
-          <span class="btn-icon">
-            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
-          </span>
-          <span class="btn-text">Menu</span>
+        <button id="btn-pause-menu" class="nav-btn menu-icon-btn" type="button" title="Settings / Menu" aria-label="Menu">
+          <svg class="nav-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="6.5" x2="20" y2="6.5"/>
+            <line x1="4" y1="12" x2="20" y2="12"/>
+            <line x1="4" y1="17.5" x2="20" y2="17.5"/>
+          </svg>
         </button>
       </div>
     </header>
@@ -112,10 +87,10 @@
           <div class="hero-module-glow-orbit" aria-hidden="true"></div>
 
           <div class="hero-center-content">
-            <div class="hero-brand-pill">✿ OFFICIAL 3D ANIME WORLD ✿</div>
+            <div class="hero-brand-pill">THE OFFICIAL DLICOM BIRD ADVENTURE</div>
             <h1 class="dash-grand-title">Dili-Birds <span class="accent-3d">3D</span></h1>
             <p class="dash-grand-sub">
-              Command the flock, master precision slingshot trajectories, and demolish enemy fortifications across the 8-stage campaign circuit.
+              Launch Dili, master the slingshot, smash the obstacles, and conquer every level.
             </p>
 
             <div class="hero-cta-wrap">

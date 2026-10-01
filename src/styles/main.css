@@ -303,6 +303,41 @@ html, body {
   transform: translateY(-1px);
 }
 
+.menu-icon-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.menu-icon-btn:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: var(--accent-cyan);
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.28);
+}
+
+.menu-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.nav-menu-icon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+}
+
 /* ============================================================================
    3D SQUARE-SHAPED ROADMAP LEVEL SELECTION SCREEN
    ============================================================================ */

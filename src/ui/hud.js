@@ -161,6 +161,20 @@ export class HudController {
       if (this.valBgmVolume) this.valBgmVolume.textContent = `${Math.round(pct)}%`;
     });
 
+    // BGM Playback Mode Selectors
+    const setBgmMode = (mode) => {
+      if (this.audio) {
+        this.audio.setBgmMode(mode);
+      } else if (this.storage) {
+        this.storage.setBgmMode(mode);
+      }
+      this.updateBgmModeUI(mode);
+    };
+
+    document.getElementById('btn-bgm-mode-dashboard')?.addEventListener('click', () => setBgmMode('dashboard'));
+    document.getElementById('btn-bgm-mode-always')?.addEventListener('click', () => setBgmMode('always'));
+    document.getElementById('btn-bgm-mode-off')?.addEventListener('click', () => setBgmMode('off'));
+
     // Result Modal Buttons
     document.getElementById('btn-result-dashboard')?.addEventListener('click', () => {
       this.closeResultModal();
@@ -213,6 +227,7 @@ export class HudController {
       if (this.valBgmVolume) this.valBgmVolume.textContent = `${Math.round(bgmVal * 100)}%`;
 
       this.updateAudioUI(this.storage.isSoundEnabled());
+      this.updateBgmModeUI(this.storage.getBgmMode());
       this.updateFullscreenUI();
     }
 
@@ -232,6 +247,24 @@ export class HudController {
     if (this.menuAudioStatus) this.menuAudioStatus.textContent = enabled ? 'ON' : 'MUTED';
     if (this.menuAudioIcon) {
       this.menuAudioIcon.style.opacity = enabled ? '1' : '0.45';
+    }
+  }
+
+  updateBgmModeUI(mode) {
+    const activeMode = mode || this.storage?.getBgmMode() || 'dashboard';
+    const btnDash = document.getElementById('btn-bgm-mode-dashboard');
+    const btnAlways = document.getElementById('btn-bgm-mode-always');
+    const btnOff = document.getElementById('btn-bgm-mode-off');
+    const badge = document.getElementById('badge-bgm-mode');
+
+    btnDash?.classList.toggle('active', activeMode === 'dashboard');
+    btnAlways?.classList.toggle('active', activeMode === 'always');
+    btnOff?.classList.toggle('active', activeMode === 'off');
+
+    if (badge) {
+      if (activeMode === 'always') badge.textContent = 'In-Game + Dash';
+      else if (activeMode === 'off') badge.textContent = 'Off Everywhere';
+      else badge.textContent = 'Dashboard Only';
     }
   }
 

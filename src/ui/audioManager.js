@@ -204,12 +204,41 @@ export class AudioManager {
 
   enterGameplay() {
     this.isPlayingGameplay = true;
-    this.stopBGM(0.15);
+    const mode = this.storage?.getBgmMode?.() || 'dashboard';
+    if (mode === 'always') {
+      if (!this.isBgmPlaying && !this.isMuted) {
+        this.startBGM(0.35);
+      }
+    } else {
+      this.stopBGM(0.15);
+    }
   }
 
   enterMenu() {
     this.isPlayingGameplay = false;
-    this.startBGM(0.35);
+    const mode = this.storage?.getBgmMode?.() || 'dashboard';
+    if (mode === 'off' || this.isMuted) {
+      this.stopBGM(0.15);
+    } else {
+      this.startBGM(0.35);
+    }
+  }
+
+  setBgmMode(mode) {
+    if (this.storage) {
+      this.storage.setBgmMode(mode);
+    }
+    if (mode === 'off') {
+      this.stopBGM(0.15);
+    } else if (mode === 'dashboard') {
+      if (this.isPlayingGameplay) {
+        this.stopBGM(0.15);
+      } else {
+        this.startBGM(0.35);
+      }
+    } else if (mode === 'always') {
+      this.startBGM(0.35);
+    }
   }
 
   /**
@@ -222,7 +251,10 @@ export class AudioManager {
    * Precision lookahead scheduler guarantees sample-accurate, gapless, non-repetitive looping.
    */
   startBGM(fadeDuration = 0.35) {
-    if (this.isPlayingGameplay) return;
+    const mode = this.storage?.getBgmMode?.() || 'dashboard';
+    if (mode === 'off' || this.isMuted) return;
+    if (mode === 'dashboard' && this.isPlayingGameplay) return;
+
     const ctx = this.ensureContext();
     if (!ctx || this.isBgmPlaying) return;
     this.isBgmPlaying = true;
@@ -241,7 +273,17 @@ export class AudioManager {
     this.bgmNextStepTime = ctx.currentTime + 0.05;
 
     const runScheduler = () => {
-      if (!this.isBgmPlaying || !this.ctx || this.isPlayingGameplay) return;
+      const currentMode = this.storage?.getBgmMode?.() || 'dashboard';
+      if (!this.isBgmPlaying || !this.ctx || this.isMuted) return;
+      if (currentMode === 'off') {
+        this.stopBGM(0.15);
+        return;
+      }
+      if (currentMode === 'dashboard' && this.isPlayingGameplay) {
+        this.stopBGM(0.15);
+        return;
+      }
+
       // Tab throttle / background safety: advance clock if stalled
       if (this.bgmNextStepTime < this.ctx.currentTime) {
         this.bgmNextStepTime = this.ctx.currentTime + 0.04;

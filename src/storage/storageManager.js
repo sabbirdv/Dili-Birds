@@ -17,7 +17,8 @@ const DEFAULT_STATE = {
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
   sfxVolume: 0.85,
-  bgmVolume: 0.45
+  bgmVolume: 0.45,
+  bgmMode: 'dashboard' // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
 };
 
 export class StorageManager {
@@ -57,6 +58,7 @@ export class StorageManager {
         soundEnabled: parsed.soundEnabled !== undefined ? Boolean(parsed.soundEnabled) : true,
         sfxVolume: typeof parsed.sfxVolume === 'number' ? Math.max(0, Math.min(1, parsed.sfxVolume)) : 0.85,
         bgmVolume: typeof parsed.bgmVolume === 'number' ? Math.max(0, Math.min(1, parsed.bgmVolume)) : 0.45,
+        bgmMode: ['dashboard', 'always', 'off'].includes(parsed.bgmMode) ? parsed.bgmMode : 'dashboard',
         levelStars: { ...(parsed.levelStars || {}) },
         levelHighScores: { ...(parsed.levelHighScores || {}) },
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
@@ -240,6 +242,18 @@ export class StorageManager {
     this.state.bgmVolume = Math.max(0, Math.min(1, Number(val) || 0));
     this.saveState();
     return this.state.bgmVolume;
+  }
+
+  getBgmMode() {
+    return this.state.bgmMode || 'dashboard';
+  }
+
+  setBgmMode(mode) {
+    if (['dashboard', 'always', 'off'].includes(mode)) {
+      this.state.bgmMode = mode;
+      this.saveState();
+    }
+    return this.state.bgmMode;
   }
 
   hasClaimedMission(missionId) {

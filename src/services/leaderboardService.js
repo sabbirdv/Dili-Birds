@@ -1,35 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
-import { AVATAR_PRESETS } from '../ui/avatarPresets.js';
 
 /**
  * Supabase configuration constants for Dilibirds Global Leaderboard.
- * Public Anon Key provided by project specification.
- * Project URL supports dynamic configuration via VITE_SUPABASE_URL, localStorage, or placeholder.
+ * Credentials provided by project specification.
  */
-export const SUPABASE_ANON_KEY = 'sb_publishable_5rn_ZhJjoROCfJj2LfQJ6Q_RQuSd5P0';
-
-const getInitialProjectUrl = () => {
-  if (typeof window !== 'undefined' && window.localStorage?.getItem('dilibirds_supabase_url')) {
-    return window.localStorage.getItem('dilibirds_supabase_url');
-  }
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) {
-    return import.meta.env.VITE_SUPABASE_URL;
-  }
-  return 'https://placeholder-project-ref.supabase.co';
-};
-
-export const SUPABASE_URL = getInitialProjectUrl();
+export const SUPABASE_URL = 'https://gfkquqqzuvmyjnrftapb.supabase.co';
+export const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdma3F1cXF6dXZteWpucmZ0YXBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3Nzc1NDksImV4cCI6MjEwNjM1MzU0OX0.92ojpMop-USWdIQEu8HNT24uwogEMrzDB0lYnAdOVYk';
 export const LEADERBOARD_TABLE = 'Dili-Birds-Data';
 
+export const ERROR_CONNECTION_FAILED =
+  'Live server connection failed. Unable to establish the live connection to the Dilibirds database. Please check your internet connection or verify the Supabase configuration.';
+
 /**
- * Calculates a verified composite score combining campaign stars and stage score (coins).
- * Stars reward strategic mission mastery, while score & coins reflect precision demolition.
+ * Calculates a verified composite ranking score combining star and coin values.
+ * Stars reflect campaign stage mastery (1000 pts per star), coins reflect demolition wealth.
  */
-export function calculateCombinedScore(stars, score, coins = 0) {
+export function calculateCombinedScore(stars = 0, coins = 0) {
   const s = Math.max(0, Number(stars) || 0);
-  const pts = Math.max(0, Number(score) || 0);
   const c = Math.max(0, Number(coins) || 0);
-  return (s * 1000) + pts + (c * 2);
+  return s * 1000 + c;
 }
 
 export class LeaderboardService {
@@ -58,76 +48,177 @@ export class LeaderboardService {
     }
   }
 
-  setProjectUrl(newUrl) {
-    if (newUrl && typeof newUrl === 'string') {
-      this.projectUrl = newUrl.trim();
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem('dilibirds_supabase_url', this.projectUrl);
+  /**
+   * Data Insertion on Username Entry:
+   * Inserts a fresh player profile (with 0 coins and 0 stars) into the Dili-Birds-Data table.
+   * Returns the newly generated primary key `id` for subsequent updates.
+   */
+  async registerNewPlayerProfile({ username }) {
+    if (!this.supabase) {
+      return { success: false, error: ERROR_CONNECTION_FAILED };
+    }
+
+    try {
+      const cleanName = (username || '').trim().slice(0, 24) || 'Commander';
+      const { data, error } = await this.supabase
+        .from(LEADERBOARD_TABLE)
+        .insert([
+          {
+            player_name: cleanName,
+            score: 0,
+            star: 0
+          }
+        ])
+        .select('id, player_name, score, star, created_at')
+        .single();
+
+      if (error) {
+        console.warn('[LeaderboardService] Error inserting fresh profile:', error.message);
+        return { success: false, error: error.message };
       }
-      this.initClient();
+
+      return { success: true, rowId: data.id, data };
+    } catch (err) {
+      console.warn('[LeaderboardService] Exception inserting profile:', err.message);
+      return { success: false, error: err.message };
     }
   }
 
   /**
-   * Syncs the current player's stats to the Dili-Birds-Data table on Supabase.
-   * Upserts on unique player_id or id.
+   * Username Change Logic:
+   * Updates existing record in Supabase using unique ID/reference instead of creating a new row.
+   * Their rank, coins (score), and stars remain completely intact.
    */
-  async syncPlayerScore({ playerId, username, score, stars, level, avatarUrl, coins = 0 }) {
+  async updateUsername({ serverRowId, newUsername, oldUsername }) {
     if (!this.supabase) {
-      return { success: false, error: 'Database client not initialized' };
+      return { success: false, error: ERROR_CONNECTION_FAILED };
     }
 
     try {
-      const payload = {
-        player_id: playerId,
-        username: username || 'Commander',
-        score: Number(score) || 0,
-        stars: Number(stars) || 0,
-        level: Number(level) || 1,
-        coins: Number(coins) || 0,
-        avatar_url: avatarUrl || '',
-        updated_at: new Date().toISOString()
-      };
+      const cleanName = (newUsername || '').trim().slice(0, 24) || 'Commander';
 
-      const { data, error } = await this.supabase
-        .from(LEADERBOARD_TABLE)
-        .upsert(payload, { onConflict: 'player_id' });
-
-      if (error) {
-        // Fallback try with 'id' if primary key constraint uses id
-        const fallbackPayload = { ...payload, id: playerId };
-        const { error: err2 } = await this.supabase
+      // 1. Update existing row by unique serverRowId if available
+      if (serverRowId) {
+        const { data, error } = await this.supabase
           .from(LEADERBOARD_TABLE)
-          .upsert(fallbackPayload, { onConflict: 'id' });
+          .update({ player_name: cleanName })
+          .eq('id', serverRowId)
+          .select('id, player_name, score, star')
+          .maybeSingle();
 
-        if (err2) {
-          return { success: false, error: error.message };
+        if (!error && data) {
+          return { success: true, rowId: data.id, data };
         }
       }
 
-      return { success: true, data };
+      // 2. If no serverRowId yet or ID not found, attempt to update by oldUsername
+      if (oldUsername && oldUsername.trim()) {
+        const { data, error } = await this.supabase
+          .from(LEADERBOARD_TABLE)
+          .update({ player_name: cleanName })
+          .eq('player_name', oldUsername.trim())
+          .select('id, player_name, score, star')
+          .maybeSingle();
+
+        if (!error && data) {
+          return { success: true, rowId: data.id, data };
+        }
+      }
+
+      // 3. Fallback: If no existing record exists in database, register fresh profile
+      return await this.registerNewPlayerProfile({ username: cleanName });
+    } catch (err) {
+      console.warn('[LeaderboardService] Exception updating username:', err.message);
+      return { success: false, error: err.message };
+    }
+  }
+
+  /**
+   * Syncs the current player's stars and coin values to the Dili-Birds-Data table.
+   * Uses existing serverRowId so no duplicate row is ever created.
+   */
+  async syncPlayerScore({ serverRowId, username, score, star }) {
+    if (!this.supabase) {
+      return { success: false, error: ERROR_CONNECTION_FAILED };
+    }
+
+    try {
+      const cleanName = (username || '').trim().slice(0, 24) || 'Commander';
+      const coinScore = Math.max(0, Number(score) || 0);
+      const starCount = Math.max(0, Number(star) || 0);
+
+      // If serverRowId is provided, update by ID
+      if (serverRowId) {
+        const { data, error } = await this.supabase
+          .from(LEADERBOARD_TABLE)
+          .update({
+            score: coinScore,
+            star: starCount,
+            player_name: cleanName
+          })
+          .eq('id', serverRowId)
+          .select('id, player_name, score, star')
+          .maybeSingle();
+
+        if (!error && data) {
+          return { success: true, rowId: data.id, data };
+        }
+      }
+
+      // If no serverRowId, try to update by player_name
+      const { data, error } = await this.supabase
+        .from(LEADERBOARD_TABLE)
+        .update({
+          score: coinScore,
+          star: starCount
+        })
+        .eq('player_name', cleanName)
+        .select('id, player_name, score, star')
+        .maybeSingle();
+
+      if (!error && data) {
+        return { success: true, rowId: data.id, data };
+      }
+
+      // If record doesn't exist yet, insert fresh
+      const { data: inserted, error: insertErr } = await this.supabase
+        .from(LEADERBOARD_TABLE)
+        .insert([
+          {
+            player_name: cleanName,
+            score: coinScore,
+            star: starCount
+          }
+        ])
+        .select('id, player_name, score, star')
+        .single();
+
+      if (insertErr) {
+        return { success: false, error: insertErr.message };
+      }
+
+      return { success: true, rowId: inserted?.id, data: inserted };
     } catch (err) {
       return { success: false, error: err.message };
     }
   }
 
   /**
-   * Retrieves all live records from the Dili-Birds-Data table on Supabase.
-   * STRICT: Zero demo or placeholder data. Only live server data is returned.
-   * Computes combination ranking score (stars * 1000 + score + coins * 2) and sorts in descending order.
+   * Retrieves all live records directly from the Dili-Birds-Data table on Supabase.
+   * STRICT RULE: Zero demo, mock, or fake data. ONLY live server data is returned.
+   * Ranks players based on a combination of their star and coin values in descending order.
    */
   async fetchLiveLeaderboard() {
     if (!this.supabase) {
       return {
         success: false,
         isLive: false,
-        error: 'Database connection not initialized',
+        error: ERROR_CONNECTION_FAILED,
         data: []
       };
     }
 
     try {
-      // Query all records live from the Dili-Birds-Data table
       const { data, error } = await this.supabase
         .from(LEADERBOARD_TABLE)
         .select('*');
@@ -136,7 +227,8 @@ export class LeaderboardService {
         return {
           success: false,
           isLive: false,
-          error: error.message || 'Error querying Dili-Birds-Data table',
+          error: ERROR_CONNECTION_FAILED,
+          details: error.message,
           data: []
         };
       }
@@ -145,7 +237,7 @@ export class LeaderboardService {
         return {
           success: false,
           isLive: false,
-          error: 'Unexpected response format from server',
+          error: ERROR_CONNECTION_FAILED,
           data: []
         };
       }
@@ -159,29 +251,37 @@ export class LeaderboardService {
         };
       }
 
-      // Calculate combined score for every record and sort worldwide in descending order
-      const rankedPlayers = data.map((row, idx) => {
-        const stars = Number(row.stars) || 0;
+      // Calculate combination score: star and coin (score column)
+      const rankedPlayers = data.map((row) => {
+        const stars = Number(row.star) || 0;
         const score = Number(row.score) || 0;
-        const coins = Number(row.coins) || 0;
-        const combined = calculateCombinedScore(stars, score, coins);
+        const combined = calculateCombinedScore(stars, score);
 
         return {
-          playerId: row.player_id || row.id || `pilot_${idx}`,
-          name: (row.username || row.name || row.player_name || 'Anonymous Pilot').trim(),
+          id: row.id,
+          rowId: row.id,
+          name: (row.player_name || 'Commander').trim(),
           score,
+          coins: score,
+          star: stars,
           stars,
-          coins,
-          level: Number(row.level) || 1,
-          avatar: row.avatar_url || row.avatar || AVATAR_PRESETS[0].url,
-          combinedScore: combined
+          combinedScore: combined,
+          createdAt: row.created_at
         };
       });
 
-      // Sort descending by combination of stars, score and coins
-      rankedPlayers.sort((a, b) => b.combinedScore - a.combinedScore);
+      // Rank players based on combination of star and coin values descending
+      rankedPlayers.sort((a, b) => {
+        if (b.combinedScore !== a.combinedScore) {
+          return b.combinedScore - a.combinedScore;
+        }
+        if (b.star !== a.star) {
+          return b.star - a.star;
+        }
+        return b.score - a.score;
+      });
 
-      // Assign exact sequential rank
+      // Assign sequential rank 1, 2, 3...
       rankedPlayers.forEach((player, i) => {
         player.rank = i + 1;
       });
@@ -196,25 +296,32 @@ export class LeaderboardService {
       return {
         success: false,
         isLive: false,
-        error: err.message || 'Network connection failed',
+        error: ERROR_CONNECTION_FAILED,
+        details: err.message,
         data: []
       };
     }
   }
 
   /**
-   * Calculates the exact worldwide rank for the current player based on the live records list.
-   * Accurately determines their position even if outside the top 10.
+   * Calculates the exact worldwide rank for the current player based on live server records.
+   * Matches by serverRowId or player_name, accurately determining rank even outside the top 10.
    */
-  calculateCurrentPlayerRankFromRecords(records, currentPlayerId, currentStars, currentScore, currentCoins) {
-    if (!Array.isArray(records)) {
+  calculateCurrentPlayerRankFromRecords(records, serverRowId, currentUsername, currentStars, currentCoins) {
+    if (!Array.isArray(records) || records.length === 0) {
       return { rank: 1, totalPlayers: 1, percentile: 100 };
     }
 
-    const playerCombined = calculateCombinedScore(currentStars, currentScore, currentCoins);
+    let foundIndex = -1;
+    if (serverRowId) {
+      foundIndex = records.findIndex((r) => String(r.id) === String(serverRowId));
+    }
+    if (foundIndex === -1 && currentUsername) {
+      foundIndex = records.findIndex(
+        (r) => r.name.toLowerCase() === (currentUsername || '').trim().toLowerCase()
+      );
+    }
 
-    // If current player is in the live records
-    const foundIndex = records.findIndex((r) => r.playerId && r.playerId === currentPlayerId);
     if (foundIndex !== -1) {
       const exactRank = foundIndex + 1;
       const total = records.length;
@@ -222,7 +329,8 @@ export class LeaderboardService {
       return { rank: exactRank, totalPlayers: total, percentile };
     }
 
-    // If player record has not synced yet, calculate rank against all other live players
+    // If player record has not yet synced to server list, compute relative position
+    const playerCombined = calculateCombinedScore(currentStars, currentCoins);
     const higherCount = records.filter((r) => r.combinedScore > playerCombined).length;
     const exactRank = higherCount + 1;
     const total = records.length + 1;

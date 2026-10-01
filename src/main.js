@@ -107,14 +107,16 @@ class DiliBirdsApp {
           isFirstTimeWin = Boolean(result?.isFirstTimeWin);
           this.levelSelect.focusedLevelId = this.storage.getUnlockedLevel();
 
-          // Sync player's updated score and level to Supabase Dili-Birds-Data globally
+          // Sync player's updated coins and stars to Supabase Dili-Birds-Data globally
           leaderboardService.syncPlayerScore({
-            playerId: this.storage.getPlayerId(),
+            serverRowId: this.storage.getServerRowId(),
             username: this.storage.getUsername(),
-            score: this.storage.getTotalScore(),
-            stars: this.storage.getTotalStars(),
-            level: this.storage.getUnlockedLevel(),
-            avatarUrl: this.storage.getAvatarUrl()
+            score: this.storage.getCoins(),
+            star: this.storage.getTotalStars()
+          }).then((res) => {
+            if (res?.success && res.rowId && !this.storage.getServerRowId()) {
+              this.storage.setServerRowId(res.rowId);
+            }
           }).catch(() => {});
         }
         this.ui.refreshHeaderAndMenu();

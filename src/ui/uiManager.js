@@ -65,24 +65,29 @@ export class UIManager {
 
     this.profileModal = new ProfileModal(
       this.storage,
-      ({ username, brandName }) => {
+      async ({ username, avatarUrl, previousUsername, isFirstProfileSetup }) => {
         this.refreshHeaderAndMenu();
-        this.onBrandChanged?.(brandName);
 
-        // Sync updated commander profile to Supabase Dili-Birds-Data globally
-        leaderboardService.syncPlayerScore({
-          playerId: this.storage.getPlayerId(),
-          username: this.storage.getUsername(),
-          score: this.storage.getTotalScore(),
-          stars: this.storage.getTotalStars(),
-          level: this.storage.getUnlockedLevel(),
-          avatarUrl: this.storage.getAvatarUrl()
-        }).catch(() => {});
-
-        // Launch active unlocked stage immediately on "Save Profile & Launch"
-        const activeLevel =
-          LEVELS.find((l) => l.id === this.storage.getUnlockedLevel()) || LEVELS[0];
-        this.onSelectLevel?.(activeLevel);
+        if (isFirstProfileSetup) {
+          // Data Insertion on Username Entry:
+          // Immediately insert fresh profile (with 0 coins/stars) into the Supabase Dili-Birds-Data table
+          const regRes = await leaderboardService.registerNewPlayerProfile({ username });
+          if (regRes.success && regRes.rowId) {
+            this.storage.setServerRowId(regRes.rowId);
+          }
+        } else {
+          // Username Change Logic:
+          // Update existing record in Supabase table (using unique ID/reference) instead of creating a new row.
+          // Their rank, coins, and stars remain completely intact.
+          const updRes = await leaderboardService.updateUsername({
+            serverRowId: this.storage.getServerRowId(),
+            newUsername: username,
+            oldUsername: previousUsername
+          });
+          if (updRes.success && updRes.rowId && !this.storage.getServerRowId()) {
+            this.storage.setServerRowId(updRes.rowId);
+          }
+        }
       },
       () => {
         this.refreshHeaderAndMenu();
@@ -112,6 +117,13 @@ export class UIManager {
     this.bindTopBarEvents();
     this.bindHeroModuleEvents();
     this.showDashboardView();
+
+    // Once local data is reset to zero, prompt the user to enter a username
+    if (!this.storage.isProfileConfigured()) {
+      requestAnimationFrame(() => {
+        this.profileModal.open();
+      });
+    }
   }
 
   bindHeroModuleEvents() {

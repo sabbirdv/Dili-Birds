@@ -60,7 +60,7 @@
       <div class="nav-right-group">
         <div class="stat-pill coin-pill" title="Treasury Coins">
           <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
-          <span class="stat-value" id="display-coins">100</span>
+          <span class="stat-value" id="display-coins">0</span>
         </div>
 
         <button id="btn-nav-fullscreen" class="nav-btn menu-icon-btn" type="button" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
@@ -214,7 +214,7 @@
               <span class="summary-title">Treasury</span>
               <strong class="summary-val coin-accent" id="summary-coins">
                 <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
-                <span id="summary-coins-text">100 Coins</span>
+                <span id="summary-coins-text">0 Coins</span>
               </strong>
             </div>
             <div class="summary-divider"></div>
@@ -293,13 +293,13 @@
         </div>
         <h3 class="state-heading">Live Server Connection Failed</h3>
         <p id="leaderboard-error-desc" class="state-desc">
-          Unable to establish a live connection to the <code>Dili-Birds-Data</code> database. Please check your internet connection or verify the Supabase configuration.
+          Live server connection failed. Unable to establish the live connection to the Dilibirds database. Please check your internet connection or verify the Supabase configuration.
         </p>
         <button type="button" id="btn-leaderboard-retry" class="action-btn primary-btn state-retry-btn">
           <svg class="retry-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
           </svg>
-          <span>Retry Live Connection</span>
+          <span>Retry</span>
         </button>
       </div>
 
@@ -419,7 +419,7 @@
           <img class="coin-icon-img" src="/src/assets/coin-with-logo.png" alt="Coin" />
           <div class="m-content">
             <span class="m-label">TREASURY</span>
-            <strong class="m-val" id="menu-coins">100</strong>
+            <strong class="m-val" id="menu-coins">0</strong>
           </div>
         </div>
         <div class="menu-stat-pill">
@@ -551,7 +551,7 @@
             </div>
             <div class="live-id-meta">
               <span class="live-id-callsign" id="preview-callsign">Commander</span>
-              <span class="live-id-rank" id="preview-rank-badge">LVL 1 • 100 COINS</span>
+              <span class="live-id-rank" id="preview-rank-badge">LVL 1 • 0 COINS</span>
             </div>
             <div id="avatar-upload-status" class="upload-status hidden" role="status"></div>
           </div>
@@ -627,7 +627,7 @@
             </button>
             <div class="spacer"></div>
             <button type="submit" id="btn-save-profile" class="action-btn primary-btn save-profile-cta">
-              <span>Save Profile &amp; Launch</span>
+              <span>Save Profile</span>
               <span class="cta-arrow" aria-hidden="true">➔</span>
             </button>
           </div>

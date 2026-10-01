@@ -235,13 +235,16 @@ export class ProfileModal {
         return;
       }
 
+      const isFirstProfileSetup = !this.storage.isProfileConfigured() || !this.storage.getServerRowId();
+      const previousUsername = this.storage.getUsername();
+
       const username = this.storage.setUsername(rawUsername);
       const avatarUrl = this.storage.setAvatar(this.selectedAvatarUrl, this.selectedPresetId);
 
       if (this.dialog.open) {
         this.dialog.close();
       }
-      this.onProfileUpdated?.({ username, avatarUrl });
+      this.onProfileUpdated?.({ username, avatarUrl, previousUsername, isFirstProfileSetup });
     });
 
     if (this.resetBtn) {

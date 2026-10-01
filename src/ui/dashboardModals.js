@@ -276,16 +276,18 @@ export class DashboardModals {
     });
 
     try {
-      // 1. Sync current player's data to live Dili-Birds-Data table
-      await leaderboardService.syncPlayerScore({
-        playerId,
-        username: currentUsername,
-        score: currentScore,
-        stars: currentStars,
-        level: currentLevel,
-        coins: currentCoins,
-        avatarUrl: currentAvatar
-      });
+      // 1. Sync current player's data to live Dili-Birds-Data table if profile has been entered
+      if (this.storage.isProfileConfigured()) {
+        const syncRes = await leaderboardService.syncPlayerScore({
+          serverRowId: this.storage.getServerRowId(),
+          username: currentUsername,
+          score: currentCoins,
+          star: currentStars
+        });
+        if (syncRes?.success && syncRes.rowId && !this.storage.getServerRowId()) {
+          this.storage.setServerRowId(syncRes.rowId);
+        }
+      }
 
       // 2. Fetch all live records from the server (STRICT: no demo or placeholder data)
       const res = await leaderboardService.fetchLiveLeaderboard();
@@ -324,7 +326,7 @@ export class DashboardModals {
           avatar: currentAvatar,
           level: currentLevel,
           stars: currentStars,
-          score: currentScore,
+          score: currentCoins,
           coins: currentCoins,
           isLive: true,
           isCalculating: false
@@ -337,11 +339,14 @@ export class DashboardModals {
       tableWrapEl?.classList.remove('hidden');
       playerCardEl?.classList.remove('hidden');
 
+      const serverRowId = this.storage.getServerRowId();
       let html = '';
       res.data.forEach((pilot) => {
         const isTop3 = pilot.rank <= 3;
         const rankBadgeClass = pilot.rank === 1 ? 'gold' : pilot.rank === 2 ? 'silver' : pilot.rank === 3 ? 'bronze' : '';
-        const isCurrent = (pilot.playerId && pilot.playerId === playerId) || (pilot.name === currentUsername);
+        const isCurrent = (serverRowId && String(pilot.id) === String(serverRowId)) || (pilot.name && pilot.name.toLowerCase() === currentUsername.trim().toLowerCase());
+        const starVal = Number(pilot.star !== undefined ? pilot.star : pilot.stars) || 0;
+        const scoreVal = Number(pilot.score) || 0;
 
         html += `
           <div class="leaderboard-row ${isTop3 ? 'top-rank' : ''} ${isCurrent ? 'current-player-row' : ''}">
@@ -349,23 +354,23 @@ export class DashboardModals {
               <span class="rank-pill ${rankBadgeClass}">#${pilot.rank}</span>
             </div>
             <div class="col-player">
-              <img class="row-avatar" src="${pilot.avatar}" alt="${pilot.name}" />
+              <img class="row-avatar" src="${pilot.avatar || currentAvatar}" alt="${pilot.name}" />
               <div class="row-pilot-info">
                 <strong class="row-name">
                   ${pilot.name}
                   ${isCurrent ? '<span class="you-badge">YOU</span>' : ''}
                 </strong>
-                <span class="row-sub">Stage ${pilot.level} Cleared</span>
+                <span class="row-sub">Global Standing • #${pilot.rank}</span>
               </div>
             </div>
             <div class="col-stars">
               <span class="star-pill">
                 <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                ${pilot.stars} ★
+                ${starVal} ★
               </span>
             </div>
             <div class="col-score">
-              <strong title="Combined score: ${pilot.combinedScore.toLocaleString()}">${pilot.score.toLocaleString()}</strong>
+              <strong title="Coins/Score: ${scoreVal.toLocaleString()}">${scoreVal.toLocaleString()}</strong>
             </div>
           </div>
         `;
@@ -378,9 +383,9 @@ export class DashboardModals {
       // Calculate exact live rank for current player
       const rankInfo = leaderboardService.calculateCurrentPlayerRankFromRecords(
         res.data,
-        playerId,
+        serverRowId,
+        currentUsername,
         currentStars,
-        currentScore,
         currentCoins
       );
 

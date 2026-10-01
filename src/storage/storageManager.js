@@ -1,5 +1,6 @@
 import { AVATAR_PRESETS } from '../ui/avatarPresets.js';
 
+const HARD_RESET_KEY = 'dili_birds_v2_hard_reset_applied_v1';
 const STORAGE_KEY = 'dili_birds_3d_player_session_v1';
 const DEFAULT_BRAND_NAME = 'Dili Birds';
 
@@ -9,8 +10,8 @@ const DEFAULT_STATE = {
   avatarPresetId: AVATAR_PRESETS[0].id,
   profileConfigured: false,
   unlockedLevel: 1,
-  coins: 100, // Starter coin bonus for new players
-  levelStars: {}, // e.g., { 1: 3, 2: 2 }
+  coins: 0, // Fresh start: 0 coins for all players
+  levelStars: {}, // e.g., { 1: 3, 2: 2 } - Total stars: 0
   levelHighScores: {},
   claimedCoinLevels: {}, // Tracks level IDs where coins have already been awarded
   claimedMissions: {}, // Tracks mission IDs where quest rewards have been claimed
@@ -19,7 +20,8 @@ const DEFAULT_STATE = {
   sfxVolume: 0.85,
   bgmVolume: 0.45,
   bgmMode: 'dashboard', // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
-  playerId: ''
+  playerId: '',
+  serverRowId: null // Unique ID in Supabase Dili-Birds-Data table
 };
 
 export class StorageManager {
@@ -29,6 +31,17 @@ export class StorageManager {
 
   loadState() {
     try {
+      // Hard Data Reset for All Players (New or Existing)
+      // When opened after this update, completely wipe previous localStorage and start at 0
+      const hasAppliedHardReset = window.localStorage.getItem(HARD_RESET_KEY);
+      if (!hasAppliedHardReset) {
+        window.localStorage.clear();
+        window.localStorage.setItem(HARD_RESET_KEY, 'true');
+        const freshState = { ...DEFAULT_STATE };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(freshState));
+        return freshState;
+      }
+
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) {
         return { ...DEFAULT_STATE };
@@ -60,11 +73,13 @@ export class StorageManager {
         sfxVolume: typeof parsed.sfxVolume === 'number' ? Math.max(0, Math.min(1, parsed.sfxVolume)) : 0.85,
         bgmVolume: typeof parsed.bgmVolume === 'number' ? Math.max(0, Math.min(1, parsed.bgmVolume)) : 0.45,
         bgmMode: ['dashboard', 'always', 'off'].includes(parsed.bgmMode) ? parsed.bgmMode : 'dashboard',
+        coins: Math.max(0, Number(parsed.coins) || 0),
         levelStars: { ...(parsed.levelStars || {}) },
         levelHighScores: { ...(parsed.levelHighScores || {}) },
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
         claimedMissions: { ...(parsed.claimedMissions || {}) },
-        playerId: typeof parsed.playerId === 'string' && parsed.playerId ? parsed.playerId : ''
+        playerId: typeof parsed.playerId === 'string' && parsed.playerId ? parsed.playerId : '',
+        serverRowId: parsed.serverRowId !== undefined ? parsed.serverRowId : null
       };
     } catch (err) {
       console.warn('LocalStorage unavailable or corrupted, using in-memory fallback:', err);
@@ -145,6 +160,18 @@ export class StorageManager {
 
   getTotalStars() {
     return Object.values(this.state.levelStars).reduce((acc, s) => acc + (Number(s) || 0), 0);
+  }
+
+  getServerRowId() {
+    return this.state.serverRowId || null;
+  }
+
+  setServerRowId(rowId) {
+    if (rowId !== undefined && rowId !== null) {
+      this.state.serverRowId = rowId;
+      this.saveState();
+    }
+    return this.state.serverRowId;
   }
 
   getPlayerId() {
@@ -313,9 +340,12 @@ export class StorageManager {
       soundEnabled: currentSound,
       sfxVolume: currentSfx,
       bgmVolume: currentBgm,
+      coins: 0,
       levelStars: {},
       levelHighScores: {},
-      claimedCoinLevels: {}
+      claimedCoinLevels: {},
+      claimedMissions: {},
+      serverRowId: this.state.serverRowId
     };
     this.saveState();
     return this.state;

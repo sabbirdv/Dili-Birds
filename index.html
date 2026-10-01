@@ -263,7 +263,13 @@
     <div class="modal-dialog-shell glass-card">
       <header class="modal-dialog-header">
         <div class="modal-title-wrap">
-          <span class="modal-kicker">HALL OF FAME • GLOBAL RANKINGS</span>
+          <div class="modal-header-lead-row">
+            <span class="modal-kicker">HALL OF FAME • GLOBAL RANKINGS</span>
+            <div id="leaderboard-sync-badge" class="leaderboard-sync-badge live" title="Worldwide Real-Time Standings">
+              <span class="sync-dot"></span>
+              <span class="sync-text" id="leaderboard-sync-text">Worldwide Live</span>
+            </div>
+          </div>
           <h2 id="leaderboard-title" class="modal-heading">
             <svg class="modal-head-svg gold-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
@@ -271,33 +277,10 @@
             Global Commander Rankings
           </h2>
         </div>
-        <div class="modal-header-actions">
-          <div id="leaderboard-sync-badge" class="leaderboard-sync-badge" title="Worldwide Supabase Real-Time Standings">
-            <span class="sync-dot"></span>
-            <span class="sync-text" id="leaderboard-sync-text">Worldwide Sync</span>
-          </div>
-          <button type="button" id="btn-refresh-leaderboard" class="dialog-icon-btn" aria-label="Refresh Global Rankings" title="Refresh Live Rankings">
-            <svg class="refresh-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-            </svg>
-          </button>
-          <button type="button" id="btn-close-leaderboard" class="dialog-close-btn" aria-label="Close Rankings" title="Close (Esc)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-      </header>
-
-      <div id="leaderboard-notice-bar" class="leaderboard-notice-bar hidden">
-        <div class="notice-info">
-          <svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span id="leaderboard-notice-text">Connecting to worldwide database (Dili-Birds-Data)...</span>
-        </div>
-        <button type="button" id="btn-leaderboard-retry" class="notice-retry-btn">
-          <span>Retry</span>
+        <button type="button" id="btn-close-leaderboard" class="dialog-close-btn" aria-label="Close Rankings" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
-      </div>
+      </header>
 
       <div class="leaderboard-table-wrap">
         <div class="leaderboard-header-row">

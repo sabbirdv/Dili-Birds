@@ -862,12 +862,12 @@ html, body {
   --tilt-y: 0deg;
   position: relative;
   width: min(100%, 640px);
-  aspect-ratio: 1.28 / 1;
+  aspect-ratio: 1.18 / 1;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 18px;
-  padding: 18px;
+  gap: 16px;
+  padding: 16px;
   border-radius: 26px;
   background:
     radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), rgba(15, 23, 42, 0.88) 72%),
@@ -1143,22 +1143,22 @@ html, body {
   position: relative;
   z-index: 3;
   border-radius: 22px;
-  padding: 10px;
+  padding: 8px 10px;
   background: radial-gradient(circle at 50% 42%, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.94) 75%);
   border: 1.5px solid rgba(56, 189, 248, 0.35);
   box-shadow: inset 0 0 24px rgba(56, 189, 248, 0.12), 0 8px 24px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  justify-content: space-evenly;
+  gap: 3px;
   overflow: hidden;
 }
 
 .center-glow-ring {
   position: absolute;
-  width: 110px;
-  height: 110px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   border: 1.5px dashed rgba(56, 189, 248, 0.35);
   pointer-events: none;
@@ -1176,8 +1176,8 @@ html, body {
 .center-mascot-wrap {
   position: relative;
   z-index: 2;
-  width: 68px;
-  height: 68px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
 }
@@ -1195,14 +1195,14 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .center-brand-title {
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   color: #e2e8f0;
 }
 
@@ -1210,36 +1210,36 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 10px;
+  padding: 1.5px 8px;
   border-radius: 999px;
   background: rgba(251, 191, 36, 0.14);
   border: 1px solid rgba(251, 191, 36, 0.35);
   color: var(--accent-gold);
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
 
 .roadmap-center-play-cta {
   position: relative;
   z-index: 4;
-  margin-top: 4px;
+  margin-top: 2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 8px 18px;
+  gap: 6px;
+  padding: 6px 15px;
   border-radius: 999px;
   background: linear-gradient(135deg, #0284c7, #0369a1 60%, #075985);
   border: 1.5px solid rgba(255, 255, 255, 0.45);
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(2, 132, 199, 0.55), 0 2px 0 #0c4a6e, inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.5), 0 2px 0 #0c4a6e, inset 0 1px 0 rgba(255, 255, 255, 0.4);
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
   animation: playPulse 2.2s infinite ease-in-out;
 }
@@ -3574,7 +3574,13 @@ html, body {
 }
 
 .modal-dashboard-dialog.modal-wide {
-  width: min(96vw, 760px);
+  width: min(96vw, 780px);
+}
+
+.modal-dashboard-dialog.modal-wide .modal-dialog-shell {
+  max-height: 92vh;
+  padding: 20px 24px;
+  gap: 12px;
 }
 
 .modal-dialog-shell {
@@ -4178,11 +4184,11 @@ html, body {
 
 /* Characters Codex Sub-components */
 .modal-milestone-banner {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(56, 189, 248, 0.1));
   border: 1px solid rgba(236, 72, 153, 0.3);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .milestone-badge-lead {
@@ -4201,21 +4207,24 @@ html, body {
 .characters-roster-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-auto-rows: auto;
   gap: 14px;
-  max-height: 420px;
+  max-height: min(490px, calc(90vh - 210px));
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 6px;
+  padding-bottom: 10px;
 }
 
 .hero-collection-card {
   position: relative;
   display: flex;
   gap: 14px;
-  padding: 16px;
+  padding: 14px 16px;
   border-radius: 18px;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  overflow: visible;
+  min-height: auto;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
@@ -4264,11 +4273,12 @@ html, body {
 }
 
 .hero-details {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  min-height: min-content;
 }
 
 .hero-meta-row {

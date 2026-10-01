@@ -216,14 +216,31 @@ export class UIManager {
     const coins = this.storage.getCoins();
     const totalStars = this.storage.getTotalStars();
     const brandName = this.storage.getBrandName();
-    const currentRank = this.storage.getLeaderboardRank() || 1;
+    const currentRank = Number(this.storage.getLeaderboardRank()) || 1;
 
     if (this.displayUsernameEl) this.displayUsernameEl.textContent = username;
     if (this.topAvatarImgEl) this.topAvatarImgEl.src = avatarUrl;
     // CRITICAL: Display the currently played stage when in game, or progression level in menu
     const activeLevelNumber = this.currentPlayingLevelId ?? unlockedLevel;
     if (this.displayLevelEl) this.displayLevelEl.textContent = `LVL ${activeLevelNumber}`;
-    if (this.displayPlayerRankEl) this.displayPlayerRankEl.textContent = `#${currentRank}`;
+    if (this.displayPlayerRankEl) this.displayPlayerRankEl.textContent = currentRank === 1 ? '👑 #1' : `#${currentRank}`;
+
+    if (this.navRankPillEl) {
+      this.navRankPillEl.classList.remove('rank-top-1', 'rank-top-2', 'rank-top-3', 'rank-normal');
+      if (currentRank === 1) {
+        this.navRankPillEl.classList.add('rank-top-1');
+        this.navRankPillEl.title = 'Rank #1 Worldwide Champion! (Click to View Leaderboard)';
+      } else if (currentRank === 2) {
+        this.navRankPillEl.classList.add('rank-top-2');
+        this.navRankPillEl.title = 'Rank #2 Worldwide Standing! (Click to View Leaderboard)';
+      } else if (currentRank === 3) {
+        this.navRankPillEl.classList.add('rank-top-3');
+        this.navRankPillEl.title = 'Rank #3 Worldwide Standing! (Click to View Leaderboard)';
+      } else {
+        this.navRankPillEl.classList.add('rank-normal');
+        this.navRankPillEl.title = `Global Standing: Rank #${currentRank} (Click to View Leaderboard)`;
+      }
+    }
 
     const navLevelPill = document.getElementById('nav-level-pill');
     if (navLevelPill) {
@@ -266,7 +283,7 @@ export class UIManager {
         );
         if (rankInfo?.rank) {
           this.storage.setLeaderboardRank(rankInfo.rank);
-          if (this.displayPlayerRankEl) this.displayPlayerRankEl.textContent = `#${rankInfo.rank}`;
+          this.refreshHeaderStats();
         }
       }
     } catch {

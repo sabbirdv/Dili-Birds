@@ -221,30 +221,112 @@ html, body {
   color: var(--accent-gold);
 }
 
+/* Top Nav Leaderboard Rank Pill */
 .rank-pill-nav {
-  border-color: rgba(251, 191, 36, 0.45);
-  background: rgba(251, 191, 36, 0.12);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.rank-pill-nav:hover {
-  background: rgba(251, 191, 36, 0.25);
-  border-color: rgba(251, 191, 36, 0.75);
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
-  transform: translateY(-1px);
+  padding: 4px 11px;
+  border-radius: 999px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .rank-pill-nav:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
-.rank-pill-nav .stat-value {
-  color: var(--accent-gold);
+/* Rank > 3: Standard un-highlighted state */
+.rank-pill-nav.rank-normal {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(15, 23, 42, 0.6);
+  box-shadow: none;
+}
+
+.rank-pill-nav.rank-normal .stat-value {
+  color: #94a3b8;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.rank-pill-nav.rank-normal .pill-trophy-svg {
+  stroke: #94a3b8;
+  fill: none;
+  filter: none;
+}
+
+/* Top 3: Rank 2 (Silver Shine) */
+.rank-pill-nav.rank-top-2 {
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.22), rgba(148, 163, 184, 0.12));
+  box-shadow: 0 0 12px rgba(226, 232, 240, 0.35);
+}
+
+.rank-pill-nav.rank-top-2 .stat-value {
+  color: #f8fafc;
   font-weight: 800;
+  text-shadow: 0 0 8px rgba(226, 232, 240, 0.5);
+}
+
+.rank-pill-nav.rank-top-2 .pill-trophy-svg {
+  stroke: #f1f5f9;
+  fill: rgba(226, 232, 240, 0.2);
+  filter: drop-shadow(0 0 4px rgba(226, 232, 240, 0.5));
+}
+
+/* Top 3: Rank 3 (Bronze / Amber Shine) */
+.rank-pill-nav.rank-top-3 {
+  border: 1px solid rgba(251, 146, 60, 0.6);
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.22), rgba(217, 119, 6, 0.12));
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.35);
+}
+
+.rank-pill-nav.rank-top-3 .stat-value {
+  color: #fed7aa;
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
+}
+
+.rank-pill-nav.rank-top-3 .pill-trophy-svg {
+  stroke: #fb923c;
+  fill: rgba(251, 146, 60, 0.2);
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.5));
+}
+
+/* Rank 1: Supreme Champion Golden Glow & Pulse */
+.rank-pill-nav.rank-top-1 {
+  border: 1.5px solid #fbbf24;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.38), rgba(251, 191, 36, 0.22));
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.6), 0 0 28px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  animation: rankOneNavGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes rankOneNavGlow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.55), 0 0 24px rgba(245, 158, 11, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    border-color: #fbbf24;
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(251, 191, 36, 0.9), 0 0 38px rgba(245, 158, 11, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    border-color: #fde047;
+  }
+}
+
+.rank-pill-nav.rank-top-1 .stat-value {
+  color: #fffbeb;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.9);
+}
+
+.rank-pill-nav.rank-top-1 .pill-trophy-svg {
+  stroke: #fef08a;
+  fill: rgba(251, 191, 36, 0.35);
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.85));
+}
+
+.rank-pill-nav:hover {
+  transform: translateY(-1px) scale(1.04);
 }
 
 .pill-trophy-svg {
@@ -4440,6 +4522,81 @@ html, body {
 
 .leaderboard-row:hover {
   background: rgba(255, 255, 255, 0.04);
+}
+
+/* Golden Highlight for Rank #1 Champion Row in Leaderboard */
+.leaderboard-row.rank-1-highlight {
+  position: relative;
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.28) 0%, rgba(251, 191, 36, 0.16) 50%, rgba(245, 158, 11, 0.08) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.55);
+  border-left: 4px solid #f59e0b;
+  border-radius: 12px;
+  margin: 4px 0;
+  box-shadow: 0 4px 24px rgba(245, 158, 11, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: rankOneRowGlow 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes rankOneRowGlow {
+  0% {
+    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(251, 191, 36, 0.45);
+  }
+  100% {
+    box-shadow: 0 4px 28px rgba(245, 158, 11, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(251, 191, 36, 0.85);
+  }
+}
+
+.leaderboard-row.rank-1-highlight:hover {
+  background: linear-gradient(90deg, rgba(245, 158, 11, 0.38) 0%, rgba(251, 191, 36, 0.24) 50%, rgba(245, 158, 11, 0.14) 100%);
+}
+
+.col-rank .rank-pill.rank-1-badge {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #0f172a;
+  font-weight: 900;
+  border: 1px solid #fef08a;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.75);
+  padding: 3px 9px;
+  letter-spacing: 0.04em;
+}
+
+.row-avatar.avatar-rank-1 {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.7) !important;
+}
+
+.row-name.name-rank-1 {
+  color: #fffbeb !important;
+  text-shadow: 0 0 12px rgba(251, 191, 36, 0.55);
+}
+
+.crown-badge {
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  margin-left: 6px;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.65);
+  vertical-align: middle;
+}
+
+.score-rank-1 {
+  color: #fbbf24 !important;
+  font-weight: 800;
+  font-size: 1.05rem !important;
+  text-shadow: 0 0 14px rgba(251, 191, 36, 0.65);
+}
+
+/* Footer card golden highlight when player is #1 */
+.leaderboard-player-footer.rank-1-footer-highlight {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.32), rgba(251, 191, 36, 0.18)) !important;
+  border: 1.5px solid rgba(251, 191, 36, 0.7) !important;
+  box-shadow: 0 4px 28px rgba(245, 158, 11, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  animation: rankOneRowGlow 3.5s ease-in-out infinite alternate;
 }
 
 .col-rank .rank-pill {

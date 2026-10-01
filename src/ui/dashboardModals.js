@@ -349,36 +349,38 @@ export class DashboardModals {
       const serverRowId = this.storage.getServerRowId();
       let html = '';
       res.data.forEach((pilot) => {
+        const isRank1 = pilot.rank === 1;
         const isTop3 = pilot.rank <= 3;
-        const rankBadgeClass = pilot.rank === 1 ? 'gold' : pilot.rank === 2 ? 'silver' : pilot.rank === 3 ? 'bronze' : '';
+        const rankBadgeClass = pilot.rank === 1 ? 'gold rank-1-badge' : pilot.rank === 2 ? 'silver' : pilot.rank === 3 ? 'bronze' : '';
         const isCurrent = (serverRowId && String(pilot.id) === String(serverRowId)) || (pilot.name && pilot.name.toLowerCase() === currentUsername.trim().toLowerCase());
         const starVal = Number(pilot.star !== undefined ? pilot.star : pilot.stars) || 0;
         const scoreVal = Number(pilot.score) || 0;
         const pilotAvatar = pilot.avatar || (isCurrent ? currentAvatar : (AVATAR_PRESETS[(Math.abs(Number(pilot.id)) || 0) % AVATAR_PRESETS.length]?.url || currentAvatar));
 
         html += `
-          <div class="leaderboard-row ${isTop3 ? 'top-rank' : ''} ${isCurrent ? 'current-player-row' : ''}">
+          <div class="leaderboard-row ${isRank1 ? 'rank-1-highlight' : ''} ${isTop3 ? 'top-rank' : ''} ${isCurrent ? 'current-player-row' : ''}">
             <div class="col-rank">
-              <span class="rank-pill ${rankBadgeClass}">#${pilot.rank}</span>
+              <span class="rank-pill ${rankBadgeClass}">${pilot.rank === 1 ? '👑 #1' : `#${pilot.rank}`}</span>
             </div>
             <div class="col-player">
-              <img class="row-avatar" src="${pilotAvatar}" alt="${pilot.name}" />
+              <img class="row-avatar ${isRank1 ? 'avatar-rank-1' : ''}" src="${pilotAvatar}" alt="${pilot.name}" />
               <div class="row-pilot-info">
-                <strong class="row-name">
+                <strong class="row-name ${isRank1 ? 'name-rank-1' : ''}">
                   ${pilot.name}
                   ${isCurrent ? '<span class="you-badge">YOU</span>' : ''}
+                  ${isRank1 ? '<span class="crown-badge">CHAMPION</span>' : ''}
                 </strong>
-                <span class="row-sub">Global Standing • #${pilot.rank}</span>
+                <span class="row-sub">${isRank1 ? '★ Worldwide #1 Leader ★' : `Global Standing • #${pilot.rank}`}</span>
               </div>
             </div>
             <div class="col-stars">
-              <span class="star-pill">
+              <span class="star-pill ${isRank1 ? 'star-rank-1' : ''}">
                 <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                 ${starVal} ★
               </span>
             </div>
             <div class="col-score">
-              <strong title="Coins/Score: ${scoreVal.toLocaleString()}">${scoreVal.toLocaleString()}</strong>
+              <strong class="${isRank1 ? 'score-rank-1' : ''}" title="Coins/Score: ${scoreVal.toLocaleString()}">${scoreVal.toLocaleString()}</strong>
             </div>
           </div>
         `;
@@ -439,11 +441,14 @@ export class DashboardModals {
     const playerCardEl = document.getElementById('leaderboard-player-card');
     if (!playerCardEl) return;
 
-    const rankDisplay = isCalculating ? '...' : `#${typeof rank === 'number' ? rank.toLocaleString() : rank}`;
-    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'player-badge-pill';
+    const isRank1 = rank === 1;
+    const rankDisplay = isCalculating ? '...' : (rank === 1 ? '👑 #1' : `#${typeof rank === 'number' ? rank.toLocaleString() : rank}`);
+    const rankClass = rank === 1 ? 'gold rank-1-badge' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'player-badge-pill';
     const totalWorldwideStr = totalPlayers && totalPlayers > 1
       ? ` • Top ${percentile || Math.max(1, Math.round((rank / totalPlayers) * 100))}% (${totalPlayers} Pilots)`
       : '';
+
+    playerCardEl.className = `leaderboard-player-footer ${isRank1 ? 'rank-1-footer-highlight' : ''}`;
 
     playerCardEl.innerHTML = `
       <div class="player-rank-highlight">
@@ -451,22 +456,23 @@ export class DashboardModals {
           <span class="rank-pill ${rankClass}" title="Your exact worldwide rank">${rankDisplay}</span>
         </div>
         <div class="col-player">
-          <img class="row-avatar highlight-avatar" src="${avatar}" alt="${username}" />
+          <img class="row-avatar highlight-avatar ${isRank1 ? 'avatar-rank-1' : ''}" src="${avatar}" alt="${username}" />
           <div class="row-pilot-info">
-            <strong class="row-name">
+            <strong class="row-name ${isRank1 ? 'name-rank-1' : ''}">
               ${username} <span class="you-badge">YOU</span>
+              ${isRank1 ? '<span class="crown-badge">CHAMPION</span>' : ''}
             </strong>
-            <span class="row-sub">Worldwide Rank: <strong>${rankDisplay}</strong>${totalWorldwideStr} • Stage ${level}</span>
+            <span class="row-sub">${isRank1 ? '★ Worldwide #1 Champion ★' : `Worldwide Rank: <strong>${rankDisplay}</strong>${totalWorldwideStr} • Stage ${level}`}</span>
           </div>
         </div>
         <div class="col-stars">
-          <span class="star-pill active">
+          <span class="star-pill active ${isRank1 ? 'star-rank-1' : ''}">
             <svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             ${stars} ★
           </span>
         </div>
         <div class="col-score">
-          <strong class="highlight-score" title="Your Leaderboard Score">${score.toLocaleString()}</strong>
+          <strong class="highlight-score ${isRank1 ? 'score-rank-1' : ''}" title="Your Leaderboard Score">${score.toLocaleString()}</strong>
         </div>
       </div>
     `;

@@ -244,6 +244,7 @@ export class SlingshotController {
       if (isHitOnSlingshotOrBird(touch.clientX, touch.clientY)) {
         this.activeTouchId = touch.identifier;
         this.isDragging = true;
+        this.audio?.playBirdGrab?.();
         const rect = this.domElement.getBoundingClientRect();
         this.updatePullFromInput(touch.clientX, touch.clientY, rect);
       }
@@ -306,6 +307,7 @@ export class SlingshotController {
       if (isHitOnSlingshotOrBird(e.clientX, e.clientY)) {
         if (e.cancelable) e.preventDefault();
         this.isDragging = true;
+        this.audio?.playBirdGrab?.();
         const rect = this.domElement.getBoundingClientRect();
         this.updatePullFromInput(e.clientX, e.clientY, rect);
       }
@@ -377,6 +379,7 @@ export class SlingshotController {
       this.updateTrajectoryPreview(this.currentPullPos, launchVel);
 
       const pullRatio = pullVec.length() / this.maxPullDistance;
+      this.audio?.updateSlingshotPull?.(pullRatio);
 
       // Notify HUD of power % and elevation angle
       const powerPercent = Math.min(100, Math.round(pullRatio * 100));
@@ -446,6 +449,7 @@ export class SlingshotController {
 
     const pullDist = this.anchor.distanceTo(this.currentPullPos);
     if (pullDist < this.minPullDistance) {
+      this.audio?.playSlingshotCancel?.();
       this.currentPullPos.set(this.anchor.x, this.anchor.y, 0);
       if (this.currentBirdMesh) {
         this.currentBirdMesh.position.set(this.anchor.x, this.anchor.y, 0);

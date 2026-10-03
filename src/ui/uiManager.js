@@ -93,7 +93,8 @@ export class UIManager {
       },
       () => {
         this.refreshHeaderAndMenu();
-      }
+      },
+      this.audio
     );
 
     this.dashboardModals = new DashboardModals({
@@ -135,33 +136,41 @@ export class UIManager {
     // Primary Central "START GAME" Launch Button -> Navigates to Level Select Roadmap
     const startGameBtn = document.getElementById('btn-dashboard-start-game');
     startGameBtn?.addEventListener('click', () => {
+      this.audio?.playMenuOpen?.();
       this.showRoadmapView();
     });
 
     // Return to Dashboard from Roadmap screen
     const roadmapBackBtn = document.getElementById('btn-roadmap-back');
     roadmapBackBtn?.addEventListener('click', () => {
+      this.audio?.playMenuBack?.();
       this.showDashboardView();
     });
   }
 
-
-
   bindTopBarEvents() {
     const badgeBtn = document.getElementById('player-badge-btn');
-    badgeBtn?.addEventListener('click', () => this.profileModal.open('username'));
+    badgeBtn?.addEventListener('click', () => {
+      this.audio?.playMenuOpen?.();
+      this.profileModal.open('username');
+    });
     badgeBtn?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
+        this.audio?.playMenuOpen?.();
         this.profileModal.open('username');
       }
     });
 
     const summaryProfileBtn = document.getElementById('summary-profile-btn');
-    summaryProfileBtn?.addEventListener('click', () => this.profileModal.open('username'));
+    summaryProfileBtn?.addEventListener('click', () => {
+      this.audio?.playMenuOpen?.();
+      this.profileModal.open('username');
+    });
     summaryProfileBtn?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
+        this.audio?.playMenuOpen?.();
         this.profileModal.open('username');
       }
     });
@@ -169,17 +178,20 @@ export class UIManager {
     // Top Nav Fullscreen Button
     const navFullscreenBtn = document.getElementById('btn-nav-fullscreen');
     navFullscreenBtn?.addEventListener('click', async () => {
+      this.audio?.playUiClick?.();
       await toggleFullscreen();
       this.updateNavFullscreenIcon();
     });
 
     // Top Nav Leaderboard Rank Pill -> Opens Leaderboard Modal
     this.navRankPillEl?.addEventListener('click', () => {
+      this.audio?.playMenuOpen?.();
       this.dashboardModals?.openLeaderboard();
     });
     this.navRankPillEl?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
+        this.audio?.playMenuOpen?.();
         this.dashboardModals?.openLeaderboard();
       }
     });

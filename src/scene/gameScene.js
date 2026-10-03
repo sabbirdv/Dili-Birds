@@ -284,6 +284,9 @@ export class GameScene {
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     groundBody.addEventListener('collide', (event) => {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      if (event.body === this.activeBird?.body) {
+        this.audio?.stopFlightSound?.();
+      }
       if (normalImpact > 1.2) {
         this.audio?.playMaterialImpact('ground', Math.min(1.0, normalImpact * 0.05));
       }
@@ -749,6 +752,7 @@ export class GameScene {
 
       // Direct impact from player bird
       if (isBirdHit) {
+        this.audio?.stopFlightSound?.();
         // Awaken full structure physics when bird actually strikes the tower
         if (!this.structureAwakened) {
           this.structureAwakened = true;
@@ -956,6 +960,7 @@ export class GameScene {
     this.world.addBody(body);
     this.activeBird.body = body;
     this.activeBird.launchTime = performance.now();
+    this.audio?.startFlightSound?.();
 
     if (this.activeBird.type === 'speed') {
       this.onShowAbilityPrompt?.('⚡ Tap or Click in mid-flight for Turbo Speed Boost!');
@@ -1568,6 +1573,7 @@ export class GameScene {
         bBody.position.y < -1.8 || bBody.position.x > 28 || bBody.position.x < -24;
 
       if (outOfBounds || (flightDuration > 1.1 && speed < 0.45) || flightDuration > 5.0) {
+        this.audio?.stopFlightSound?.();
         this.cameraState = 'RETURN';
         this.onHideAbilityPrompt?.();
         this.scene.remove(this.activeBird.mesh);
@@ -1624,6 +1630,8 @@ export class GameScene {
   pause() {
     if (this.isPaused) return;
     this.isPaused = true;
+    this.audio?.stopFlightSound?.();
+    this.audio?.stopSlingshotPull?.();
     this.pauseStartTime = performance.now();
 
     if (this.slingshot) {
@@ -1690,6 +1698,9 @@ export class GameScene {
       this.activeBird.body.position.z = 0;
       this.activeBird.body.velocity.z = 0;
       this.activeBird.mesh.quaternion.copy(this.activeBird.body.quaternion);
+
+      const birdSpeed = Math.hypot(this.activeBird.body.velocity.x, this.activeBird.body.velocity.y);
+      this.audio?.updateFlightSound?.(birdSpeed);
     }
 
     // Sync blocks strictly on z = 0 plane

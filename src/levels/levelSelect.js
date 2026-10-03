@@ -1176,7 +1176,7 @@ export class LevelSelect {
       void el.offsetWidth;
       el.classList.add('node-lock-shake');
     }
-    this.audio?.playMaterialImpact?.('wood', 0.5);
+    this.audio?.playError?.();
     this.spawnMapSpeechBubble(
       el,
       `🔒 Stage ${levelId} is locked! Clear Stage ${levelId - 1} first.`
@@ -1205,7 +1205,7 @@ export class LevelSelect {
       setTimeout(() => nodeEl.classList.remove('node-tap-pop'), 200);
     }
 
-    this.audio?.playMarkerStep?.();
+    this.audio?.playLevelSelect?.();
     this.onSelectLevel?.(levelObj);
   }
 

@@ -3144,6 +3144,26 @@ html, body {
   transform: scale(1.1);
 }
 
+.star-upgrade-text {
+  display: inline-block;
+  color: #facc15;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-shadow: 0 0 12px rgba(250, 204, 21, 0.45);
+}
+
+.replay-coin-text {
+  display: inline-block;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.first-win-coin-text {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
 .result-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

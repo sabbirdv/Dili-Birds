@@ -103,7 +103,8 @@ export class LevelSelect {
     this.viewportEl = document.getElementById('roadmap-viewport');
 
     const unlocked = this.storage.getUnlockedLevel();
-    this.focusedLevelId = unlocked;
+    this.activeLevelId = Math.min(20, Math.max(1, unlocked));
+    this.focusedLevelId = this.activeLevelId;
     this.lastPreviewedLevelId = null;
     this.currentZoneId = unlocked > 10 ? 2 : 1;
 
@@ -114,6 +115,7 @@ export class LevelSelect {
     // Drag / Pan interaction state
     this.isPointerDown = false;
     this.hasDragged = false;
+    this.isDragSuppressingClick = false;
     this.startX = 0;
     this.startY = 0;
     this.scrollLeftStart = 0;
@@ -124,8 +126,6 @@ export class LevelSelect {
     this.currentScale = 1.0;
 
     this.bindViewportInteractions();
-    this.bindQuickZoneJumps();
-    this.bindFloatingNavButtons();
     this.bindResizeListener();
   }
 
@@ -150,7 +150,6 @@ export class LevelSelect {
   bindResizeListener() {
     const handleResize = () => {
       this.updateMobileScaling();
-      this.updateScrubberAndNavControls();
     };
     window.addEventListener('resize', handleResize);
     window.addEventListener('orientationchange', () => {
@@ -170,7 +169,7 @@ export class LevelSelect {
     // In mobile landscape or short viewports, scale down to fit comfortably
     let scale = 1.0;
     if (vpHeight < baseHeight) {
-      scale = Math.max(0.58, Math.min(1.0, (vpHeight - 4) / baseHeight));
+      scale = Math.max(0.60, Math.min(1.0, (vpHeight - 2) / baseHeight));
     } else {
       scale = Math.min(1.25, vpHeight / baseHeight);
     }
@@ -203,17 +202,13 @@ export class LevelSelect {
 
       this.isPointerDown = true;
       this.hasDragged = false;
+      this.isDragSuppressingClick = false;
       this.startX = e.clientX;
       this.startY = e.clientY;
       this.lastX = e.clientX;
       this.scrollLeftStart = vp.scrollLeft;
       this.lastTime = performance.now();
       this.velocityX = 0;
-      vp.classList.add('is-panning');
-
-      try {
-        vp.setPointerCapture(e.pointerId);
-      } catch {}
     });
 
     vp.addEventListener('pointermove', (e) => {
@@ -221,9 +216,13 @@ export class LevelSelect {
       const dx = e.clientX - this.startX;
       const dy = e.clientY - this.startY;
 
-      // 6px drag threshold
-      if (!this.hasDragged && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+      // 8px movement threshold to declare a drag
+      if (!this.hasDragged && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
         this.hasDragged = true;
+        vp.classList.add('is-panning');
+        try {
+          vp.setPointerCapture(e.pointerId);
+        } catch {}
       }
 
       if (this.hasDragged) {
@@ -250,11 +249,20 @@ export class LevelSelect {
         }
       } catch {}
 
-      if (this.hasDragged && Math.abs(this.velocityX) > 0.18) {
-        this.startMomentumGlide(this.velocityX);
-      }
+      if (this.hasDragged) {
+        this.isDragSuppressingClick = true;
+        setTimeout(() => {
+          this.isDragSuppressingClick = false;
+          this.hasDragged = false;
+        }, 140);
 
-      this.updateScrubberAndNavControls();
+        if (Math.abs(this.velocityX) > 0.18) {
+          this.startMomentumGlide(this.velocityX);
+        }
+      } else {
+        this.hasDragged = false;
+        this.isDragSuppressingClick = false;
+      }
     };
 
     vp.addEventListener('pointerup', handlePointerEnd);
@@ -267,14 +275,8 @@ export class LevelSelect {
       if (Math.abs(delta) > 0.5) {
         e.preventDefault();
         vp.scrollLeft += delta * 1.15;
-        this.updateScrubberAndNavControls();
       }
     }, { passive: false });
-
-    // Sync scrubber on scroll
-    vp.addEventListener('scroll', () => {
-      this.updateScrubberAndNavControls();
-    }, { passive: true });
   }
 
   startMomentumGlide(initialVelocity) {
@@ -291,54 +293,10 @@ export class LevelSelect {
       }
       vp.scrollLeft -= v;
       v *= friction;
-      this.updateScrubberAndNavControls();
       this.momentumRafId = requestAnimationFrame(step);
     };
 
     this.momentumRafId = requestAnimationFrame(step);
-  }
-
-  bindFloatingNavButtons() {
-    const btnLeft = document.getElementById('btn-map-pan-left');
-    const btnRight = document.getElementById('btn-map-pan-right');
-
-    btnLeft?.addEventListener('click', () => {
-      if (this.isInputLocked || !this.viewportEl) return;
-      const panAmount = Math.max(300, (this.viewportEl.clientWidth || 600) * 0.7);
-      this.viewportEl.scrollBy({ left: -panAmount, behavior: 'smooth' });
-    });
-
-    btnRight?.addEventListener('click', () => {
-      if (this.isInputLocked || !this.viewportEl) return;
-      const panAmount = Math.max(300, (this.viewportEl.clientWidth || 600) * 0.7);
-      this.viewportEl.scrollBy({ left: panAmount, behavior: 'smooth' });
-    });
-  }
-
-  bindQuickZoneJumps() {
-    const jumpBtn1 = document.getElementById('btn-jump-zone-1');
-    const jumpBtn2 = document.getElementById('btn-jump-zone-2');
-
-    jumpBtn1?.addEventListener('click', () => {
-      this.panToZone(1, true);
-    });
-
-    jumpBtn2?.addEventListener('click', () => {
-      this.panToZone(2, true);
-    });
-  }
-
-  panToZone(zoneId, smooth = true) {
-    if (!this.viewportEl) return;
-    this.currentZoneId = Number(zoneId);
-    let targetX = 0;
-    if (zoneId === 1) {
-      targetX = 0;
-    } else {
-      targetX = (1860 - 80) * this.currentScale;
-    }
-    this.viewportEl.scrollTo({ left: Math.max(0, targetX), behavior: smooth ? 'smooth' : 'auto' });
-    this.updateZoneButtons();
   }
 
   centerOnLevel(levelId, smooth = true) {
@@ -350,7 +308,6 @@ export class LevelSelect {
       left: Math.max(0, targetScroll),
       behavior: smooth ? 'smooth' : 'auto'
     });
-    this.updateScrubberAndNavControls();
   }
 
   panToNode(levelId, gentleZoom = true) {
@@ -363,43 +320,6 @@ export class LevelSelect {
     }
   }
 
-  updateZoneButtons() {
-    const jumpBtn1 = document.getElementById('btn-jump-zone-1');
-    const jumpBtn2 = document.getElementById('btn-jump-zone-2');
-    if (!this.viewportEl) return;
-
-    const scrollLeft = this.viewportEl.scrollLeft;
-    const isZone2 = scrollLeft >= 1350 * this.currentScale;
-    this.currentZoneId = isZone2 ? 2 : 1;
-
-    jumpBtn1?.classList.toggle('active', !isZone2);
-    jumpBtn2?.classList.toggle('active', isZone2);
-  }
-
-  updateScrubberAndNavControls() {
-    if (!this.viewportEl) return;
-    const vp = this.viewportEl;
-    const maxScroll = Math.max(1, vp.scrollWidth - vp.clientWidth);
-    const currentScroll = vp.scrollLeft;
-
-    const btnLeft = document.getElementById('btn-map-pan-left');
-    const btnRight = document.getElementById('btn-map-pan-right');
-    if (btnLeft) {
-      btnLeft.classList.toggle('disabled', currentScroll <= 10);
-    }
-    if (btnRight) {
-      btnRight.classList.toggle('disabled', currentScroll >= maxScroll - 10);
-    }
-
-    const scrubberMarker = document.getElementById('scrubber-marker');
-    if (scrubberMarker) {
-      const pct = Math.max(0, Math.min(100, (currentScroll / maxScroll) * 100));
-      scrubberMarker.style.left = `${pct}%`;
-    }
-
-    this.updateZoneButtons();
-  }
-
   /* ═════════════════════════════════════════════════════════════
    * MAP RENDERING & TERRAIN GRAPHICS
    * ═════════════════════════════════════════════════════════════ */
@@ -410,7 +330,6 @@ export class LevelSelect {
    * 2. Lush green rolling hills, cliffs, lagoon, and celestial crags.
    * 3. Winding wavy road layers.
    * 4. Official characters & icons embedded into scenery.
-   */
   buildWorldSvgTerrain(unlockedLevel) {
     const fullPathD = buildWavySplinePath(LEVEL_NODES, LEVEL_NODES.length);
     const activePathD = buildWavySplinePath(LEVEL_NODES, Math.min(unlockedLevel, LEVEL_NODES.length));
@@ -425,19 +344,26 @@ export class LevelSelect {
         aria-hidden="true"
       >
         <defs>
-          <!-- Atmosphere & Sky Gradient across 3800px -->
+          <!-- Panoramic Atmosphere Sky Gradient (0 to 3800px) -->
           <linearGradient id="skyAtmosphereGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#38bdf8" />
-            <stop offset="28%" stop-color="#60a5fa" />
-            <stop offset="46%" stop-color="#f59e0b" stop-opacity="0.35" />
-            <stop offset="54%" stop-color="#4f46e5" />
-            <stop offset="78%" stop-color="#3b0764" />
-            <stop offset="100%" stop-color="#1e1b4b" />
+            <stop offset="26%" stop-color="#60a5fa" />
+            <stop offset="48%" stop-color="#818cf8" />
+            <stop offset="68%" stop-color="#6366f1" />
+            <stop offset="85%" stop-color="#4f46e5" />
+            <stop offset="100%" stop-color="#312e81" />
+          </linearGradient>
+
+          <!-- Horizon Soft Warmth Glow -->
+          <linearGradient id="skyHorizonGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+            <stop offset="60%" stop-color="#fed7aa" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#ffedd5" stop-opacity="0.38" />
           </linearGradient>
 
           <!-- Golden Winding Road Gradient -->
           <linearGradient id="roadSurfaceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fef08a" />
+            <stop offset="0%" stop-color="#fef3c7" />
             <stop offset="35%" stop-color="#f59e0b" />
             <stop offset="100%" stop-color="#d97706" />
           </linearGradient>
@@ -450,31 +376,50 @@ export class LevelSelect {
             <stop offset="100%" stop-color="#ef4444" />
           </linearGradient>
 
-          <!-- Vibrant Lush Green Hills Gradients -->
-          <linearGradient id="greenHillGrad1" x1="0%" y1="0%" x2="0%" y2="100%">
+          <!-- Far Mountain Backdrop Gradient -->
+          <linearGradient id="farMountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#64748b" />
+            <stop offset="40%" stop-color="#475569" />
+            <stop offset="100%" stop-color="#1e293b" />
+          </linearGradient>
+
+          <!-- Mid-Distance Mountain Ridge Gradient -->
+          <linearGradient id="midMountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#475569" />
+            <stop offset="45%" stop-color="#334155" />
+            <stop offset="100%" stop-color="#0f172a" />
+          </linearGradient>
+
+          <!-- Zone 1: Lush Rolling Meadow Far Hills -->
+          <linearGradient id="greenHillGradFar" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stop-color="#86efac" />
-            <stop offset="25%" stop-color="#22c55e" />
-            <stop offset="80%" stop-color="#15803d" />
+            <stop offset="30%" stop-color="#22c55e" />
+            <stop offset="70%" stop-color="#15803d" />
             <stop offset="100%" stop-color="#14532d" />
           </linearGradient>
-          <linearGradient id="greenHillGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#4ade80" />
-            <stop offset="45%" stop-color="#16a34a" />
+
+          <!-- Zone 1: Lush Rolling Pasture Near Hills -->
+          <linearGradient id="greenHillGradNear" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#bbf7d0" />
+            <stop offset="25%" stop-color="#4ade80" />
+            <stop offset="65%" stop-color="#16a34a" />
             <stop offset="100%" stop-color="#166534" />
           </linearGradient>
 
-          <!-- Amber Canyon Rock Gradient -->
-          <linearGradient id="amberCanyonGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#fde68a" />
-            <stop offset="35%" stop-color="#d97706" />
-            <stop offset="100%" stop-color="#78350f" />
+          <!-- Zone 2: Enchanted Celestial Far Hills -->
+          <linearGradient id="celestialHillGradFar" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#d8b4fe" />
+            <stop offset="35%" stop-color="#a855f7" />
+            <stop offset="75%" stop-color="#7e22ce" />
+            <stop offset="100%" stop-color="#3b0764" />
           </linearGradient>
 
-          <!-- Celestial Mountain Gradient (Zone 2) -->
-          <linearGradient id="celestialPeakGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#c084fc" />
-            <stop offset="40%" stop-color="#7e22ce" />
-            <stop offset="100%" stop-color="#3b0764" />
+          <!-- Zone 2: Enchanted Celestial Near Hills -->
+          <linearGradient id="celestialHillGradNear" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#e9d5ff" />
+            <stop offset="30%" stop-color="#c084fc" />
+            <stop offset="70%" stop-color="#9333ea" />
+            <stop offset="100%" stop-color="#581c87" />
           </linearGradient>
 
           <!-- Turquoise Coastal Water Lagoon Gradient -->
@@ -483,20 +428,6 @@ export class LevelSelect {
             <stop offset="50%" stop-color="#06b6d4" />
             <stop offset="100%" stop-color="#0284c7" />
           </linearGradient>
-
-          <!-- Volumetric Cloud Gradients (Sunlit Top, Soft Blue/Slate Shadow Underside) -->
-          <radialGradient id="cloudVolumeGrad1" cx="45%" cy="30%" r="70%">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="45%" stop-color="#f8fafc" />
-            <stop offset="75%" stop-color="#e2e8f0" />
-            <stop offset="100%" stop-color="#94a3b8" />
-          </radialGradient>
-          <radialGradient id="cloudVolumeGrad2" cx="40%" cy="25%" r="75%">
-            <stop offset="0%" stop-color="#ffffff" />
-            <stop offset="50%" stop-color="#f1f5f9" />
-            <stop offset="80%" stop-color="#cbd5e1" />
-            <stop offset="100%" stop-color="#64748b" />
-          </radialGradient>
 
           <!-- Soft Glow Filters -->
           <filter id="roadGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
@@ -507,50 +438,215 @@ export class LevelSelect {
             <feGaussianBlur stdDeviation="8" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
-          <filter id="cloudSoftShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="6" />
-            <feOffset dx="-4" dy="8" />
-            <feComponentTransfer><feFuncA type="linear" slope="0.32" /></feComponentTransfer>
-            <feMerge>
-              <feMergeNode />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
+
+          <!-- Reusable Stylized Nature Elements -->
+          <!-- 1. Cartoon Deciduous Tree -->
+          <g id="decoTreeRound">
+            <ellipse cx="14" cy="46" rx="15" ry="4" fill="#0f291e" opacity="0.3" />
+            <!-- Trunk -->
+            <path d="M 11 44 L 11 26 Q 14 28 17 26 L 17 44 Z" fill="#78350f" />
+            <!-- Leaf Puffs -->
+            <circle cx="8" cy="22" r="11" fill="#15803d" />
+            <circle cx="20" cy="22" r="11" fill="#15803d" />
+            <circle cx="14" cy="14" r="13" fill="#22c55e" />
+            <!-- Highlight Arc -->
+            <path d="M 6 12 Q 14 6 22 12" fill="none" stroke="#86efac" stroke-width="3" stroke-linecap="round" />
+          </g>
+
+          <!-- 2. Cartoon Pine Tree -->
+          <g id="decoTreePine">
+            <ellipse cx="12" cy="44" rx="12" ry="3.5" fill="#0f291e" opacity="0.25" />
+            <rect x="10" y="32" width="4" height="12" rx="1.5" fill="#78350f" />
+            <!-- Pine tiers -->
+            <polygon points="12,6 23,20 1,20" fill="#065f46" />
+            <polygon points="12,12 21,27 3,27" fill="#047857" />
+            <polygon points="12,18 20,34 4,34" fill="#059669" />
+            <path d="M 7 19 Q 12 15 17 19" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" />
+          </g>
+
+          <!-- 3. Fluffy Cartoon Bush -->
+          <g id="decoBush">
+            <ellipse cx="14" cy="18" rx="14" ry="4" fill="#0f291e" opacity="0.22" />
+            <circle cx="7" cy="12" r="7" fill="#15803d" />
+            <circle cx="21" cy="12" r="7" fill="#15803d" />
+            <circle cx="14" cy="8" r="9" fill="#22c55e" />
+            <circle cx="11" cy="6" r="2" fill="#fef08a" />
+            <circle cx="18" cy="9" r="1.8" fill="#fef08a" />
+          </g>
+
+          <!-- 4. Wildflower Patch -->
+          <g id="decoFlowers">
+            <!-- Daisy 1 -->
+            <circle cx="5" cy="5" r="2" fill="#fef08a" />
+            <circle cx="5" cy="2" r="1.4" fill="#ffffff" /><circle cx="5" cy="8" r="1.4" fill="#ffffff" />
+            <circle cx="2" cy="5" r="1.4" fill="#ffffff" /><circle cx="8" cy="5" r="1.4" fill="#ffffff" />
+            <!-- Daisy 2 -->
+            <circle cx="16" cy="8" r="1.8" fill="#f59e0b" />
+            <circle cx="16" cy="5" r="1.2" fill="#fef08a" /><circle cx="16" cy="11" r="1.2" fill="#fef08a" />
+            <circle cx="13" cy="8" r="1.2" fill="#fef08a" /><circle cx="19" cy="8" r="1.2" fill="#fef08a" />
+          </g>
+
+          <!-- 5. Celestial Enchanted Tree (Zone 2) -->
+          <g id="decoTreeCelestial">
+            <ellipse cx="14" cy="46" rx="16" ry="4" fill="#1e1b4b" opacity="0.35" />
+            <path d="M 11 44 L 11 26 Q 14 28 17 26 L 17 44 Z" fill="#4c1d95" />
+            <circle cx="8" cy="22" r="11" fill="#6b21a8" />
+            <circle cx="20" cy="22" r="11" fill="#7e22ce" />
+            <circle cx="14" cy="14" r="13" fill="#a855f7" />
+            <path d="M 6 12 Q 14 6 22 12" fill="none" stroke="#e9d5ff" stroke-width="3" stroke-linecap="round" />
+            <circle cx="10" cy="12" r="1.5" fill="#fef08a" filter="url(#roadGlowFilter)" />
+            <circle cx="18" cy="15" r="1.2" fill="#fef08a" filter="url(#roadGlowFilter)" />
+          </g>
+
+          <!-- 6. Soft Background Cloud Puff -->
+          <g id="decoBgCloud" opacity="0.55">
+            <circle cx="25" cy="22" r="18" fill="#ffffff" />
+            <circle cx="45" cy="18" r="22" fill="#ffffff" />
+            <circle cx="68" cy="22" r="17" fill="#ffffff" />
+            <rect x="15" y="22" width="65" height="18" rx="9" fill="#ffffff" />
+          </g>
         </defs>
 
         <!-- 1. SKY BACKDROP & AMBIENCE -->
-        <rect x="0" y="0" width="${MAP_TOTAL_WIDTH}" height="${MAP_TOTAL_HEIGHT}" fill="url(#skyAtmosphereGrad)" opacity="0.35" />
+        <rect x="0" y="0" width="${MAP_TOTAL_WIDTH}" height="${MAP_TOTAL_HEIGHT}" fill="url(#skyAtmosphereGrad)" opacity="0.4" />
+        <rect x="0" y="0" width="${MAP_TOTAL_WIDTH}" height="${MAP_TOTAL_HEIGHT}" fill="url(#skyHorizonGlow)" />
 
-        <!-- Distant Mountain Silhouettes -->
-        <path d="M 0 250 Q 300 130 600 230 T 1200 220 T 1800 210 T 2400 200 T 3000 210 T 3800 230 L 3800 460 L 0 460 Z" fill="#0f291e" opacity="0.45" />
-        <path d="M 0 270 Q 250 180 500 260 T 1000 250 T 1500 230 T 2000 240 T 2600 220 T 3200 240 T 3800 260 L 3800 460 L 0 460 Z" fill="#133d26" opacity="0.55" />
+        <!-- Distant Soft Background Clouds -->
+        <use href="#decoBgCloud" x="220" y="35" transform="scale(0.85)" />
+        <use href="#decoBgCloud" x="900" y="45" transform="scale(0.95)" />
+        <use href="#decoBgCloud" x="1650" y="30" transform="scale(0.8)" />
+        <use href="#decoBgCloud" x="2400" y="40" transform="scale(0.9)" />
+        <use href="#decoBgCloud" x="3150" y="35" transform="scale(0.85)" />
 
-        <!-- 2. MIDGROUND TERRAIN ISLANDS & PLATEAUS -->
+        <!-- 2. LAYERED MOUNTAIN RIDGES (SMOOTH ORGANIC CURVES - NO JAGGED POLYGONS) -->
+        <!-- Layer 1: Far Mountain Silhouettes -->
+        <path
+          d="M 0 240 C 250 140, 500 130, 750 230 C 1000 150, 1250 140, 1500 220 C 1750 160, 2000 150, 2250 210 C 2500 140, 2750 150, 3000 210 C 3300 140, 3550 150, 3800 230 L 3800 460 L 0 460 Z"
+          fill="url(#farMountainGrad)"
+          opacity="0.38"
+        />
 
-        <!-- Zone 1: Emerald Valley Rolling Hills (x: 0 to 1100) -->
-        <path d="M -40 310 Q 180 190 400 300 T 800 260 T 1150 310 L 1150 460 L -40 460 Z" fill="url(#greenHillGrad1)" />
-        <path d="M 120 350 Q 360 80 600 340 T 980 340 L 980 460 L 120 460 Z" fill="url(#greenHillGrad2)" opacity="0.85" />
+        <!-- Layer 2: Mid-Distance Mountain Ridge -->
+        <path
+          d="M 0 270 C 200 180, 400 170, 650 260 C 900 190, 1150 180, 1400 250 C 1650 190, 1900 190, 2150 240 C 2400 180, 2650 170, 2900 230 C 3200 170, 3500 180, 3800 250 L 3800 460 L 0 460 Z"
+          fill="url(#midMountainGrad)"
+          opacity="0.5"
+        />
 
-        <!-- Coastal Water Cove at start (Levels 1–3) -->
-        <path d="M 0 370 Q 140 340 260 390 T 480 410 L 480 460 L 0 460 Z" fill="url(#lagoonWaterGrad)" opacity="0.75" />
-        <path d="M 0 365 Q 140 335 260 385 T 490 405" fill="none" stroke="#fef08a" stroke-width="7" stroke-linecap="round" opacity="0.8" />
+        <!-- 3. CONTINUOUS ROLLING MEADOW HILLS (HARMONIOUS BIO-TRANSITION ACROSS 3800PX) -->
 
-        <!-- Amber Canyon Rocky Cliffs (x: 1050 to 1950) -->
-        <path d="M 1050 330 Q 1250 100 1450 300 T 1750 260 T 1980 330 L 1980 460 L 1050 460 Z" fill="url(#amberCanyonGrad)" />
-        <polygon points="1080,340 1100,105 1135,340" fill="#b45309" opacity="0.9" />
-        <polygon points="1440,340 1460,135 1490,340" fill="#92400e" opacity="0.9" />
+        <!-- Zone 1 Far Rolling Hills (x: 0 to 1950) -->
+        <path
+          d="M -40 310 C 180 170, 380 160, 560 300 C 740 170, 930 160, 1120 290 C 1310 170, 1490 180, 1670 300 C 1850 180, 2030 170, 2220 300 L 2220 460 L -40 460 Z"
+          fill="url(#greenHillGradFar)"
+        />
+        <!-- Zone 1 Far Hill Crest Rim Highlight -->
+        <path
+          d="M -40 310 C 180 170, 380 160, 560 300 C 740 170, 930 160, 1120 290 C 1310 170, 1490 180, 1670 300 C 1850 180, 2030 170, 2220 300"
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.28)"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
 
-        <!-- Zone 2: Celestial Citadel & Frost Peaks (x: 1950 to 3800) -->
-        <path d="M 1950 330 Q 2200 110 2450 300 T 2950 260 T 3450 240 T 3800 300 L 3800 460 L 1950 460 Z" fill="url(#celestialPeakGrad)" />
-        <polygon points="2180,340 2210,125 2245,340" fill="#6b21a8" opacity="0.85" />
-        <polygon points="2540,340 2570,125 2605,340" fill="#581c87" opacity="0.85" />
-        <polygon points="3250,340 3280,135 3315,340" fill="#4c1d95" opacity="0.85" />
+        <!-- Zone 2 Far Celestial Hills (x: 1950 to 3840) -->
+        <path
+          d="M 2000 310 C 2200 170, 2400 180, 2600 290 C 2800 170, 3000 180, 3200 290 C 3400 170, 3600 180, 3840 280 L 3840 460 L 2000 460 Z"
+          fill="url(#celestialHillGradFar)"
+        />
+        <!-- Zone 2 Far Hill Crest Starlight Highlight -->
+        <path
+          d="M 2000 310 C 2200 170, 2400 180, 2600 290 C 2800 170, 3000 180, 3200 290 C 3400 170, 3600 180, 3840 280"
+          fill="none"
+          stroke="#f3e8ff"
+          stroke-width="4"
+          stroke-linecap="round"
+          opacity="0.5"
+        />
 
-        <!-- 3. SCENERY PROPS & STRUCTURES WITH OFFICIAL CHARACTERS & ICONS -->
+        <!-- Zone 1 Near Rolling Pastures (x: 0 to 2050) -->
+        <path
+          d="M -40 350 C 160 260, 340 250, 520 360 C 700 260, 890 250, 1080 360 C 1260 260, 1450 270, 1630 360 C 1810 270, 2000 260, 2190 360 L 2190 460 L -40 460 Z"
+          fill="url(#greenHillGradNear)"
+        />
+        <path
+          d="M -40 350 C 160 260, 340 250, 520 360 C 700 260, 890 250, 1080 360 C 1260 260, 1450 270, 1630 360 C 1810 270, 2000 260, 2190 360"
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.35)"
+          stroke-width="4"
+          stroke-linecap="round"
+        />
+
+        <!-- Zone 2 Near Celestial Highlands (x: 2000 to 3840) -->
+        <path
+          d="M 2050 360 C 2240 260, 2430 270, 2620 360 C 2810 260, 3000 270, 3190 360 C 3380 260, 3560 270, 3840 340 L 3840 460 L 2050 460 Z"
+          fill="url(#celestialHillGradNear)"
+        />
+        <path
+          d="M 2050 360 C 2240 260, 2430 270, 2620 360 C 2810 260, 3000 270, 3190 360 C 3380 260, 3560 270, 3840 340"
+          fill="none"
+          stroke="#e9d5ff"
+          stroke-width="4.5"
+          stroke-linecap="round"
+          opacity="0.6"
+        />
+
+        <!-- Smooth Coastal Lagoon Cove at Stage 1–2 -->
+        <path
+          d="M 0 380 C 120 360, 220 395, 340 420 C 420 435, 470 450, 510 460 L 0 460 Z"
+          fill="url(#lagoonWaterGrad)"
+          opacity="0.8"
+        />
+        <!-- Sandy Beach Shoreline -->
+        <path
+          d="M 0 376 C 120 356, 220 391, 342 416 C 422 431, 472 446, 512 458"
+          fill="none"
+          stroke="#fef08a"
+          stroke-width="5"
+          stroke-linecap="round"
+          opacity="0.85"
+        />
+
+        <!-- 4. NATURAL SCENERY DECORATIONS & CHARMING VEGETATION -->
+
+        <!-- Zone 1 Trees, Bushes & Flowers along the gentle meadows -->
+        <use href="#decoTreeRound" x="220" y="165" />
+        <use href="#decoTreePine" x="290" y="180" />
+        <use href="#decoFlowers" x="240" y="325" />
+        <use href="#decoBush" x="330" y="275" />
+
+        <use href="#decoTreePine" x="480" y="175" />
+        <use href="#decoTreeRound" x="610" y="170" />
+        <use href="#decoFlowers" x="590" y="330" />
+        <use href="#decoBush" x="650" y="280" />
+
+        <use href="#decoTreeRound" x="840" y="260" />
+        <use href="#decoTreePine" x="980" y="165" />
+        <use href="#decoFlowers" x="960" y="315" />
+        <use href="#decoBush" x="1030" y="270" />
+
+        <use href="#decoTreeRound" x="1200" y="168" />
+        <use href="#decoTreePine" x="1350" y="275" />
+        <use href="#decoFlowers" x="1320" y="330" />
+
+        <use href="#decoTreeRound" x="1530" y="170" />
+        <use href="#decoTreePine" x="1690" y="275" />
+
+        <!-- Zone 2 Celestial Starlight Trees along the enchanted twilight peaks -->
+        <use href="#decoTreeCelestial" x="2100" y="168" />
+        <use href="#decoTreePine" x="2260" y="275" />
+        <use href="#decoTreeCelestial" x="2460" y="170" />
+        <use href="#decoTreeCelestial" x="2640" y="275" />
+        <use href="#decoTreeCelestial" x="2820" y="170" />
+        <use href="#decoTreeCelestial" x="3000" y="275" />
+        <use href="#decoTreeCelestial" x="3200" y="170" />
+        <use href="#decoTreeCelestial" x="3370" y="275" />
+
+        <!-- 5. SCENERY PROPS WITH OFFICIAL CHARACTERS & BRANDING -->
 
         <!-- Stage 2: Official Character-2 (Yellow Bird) Cheering atop the Hill -->
         <g class="map-bg-actor actor-bob-slow" transform="translate(390, 85)">
-          <ellipse cx="24" cy="46" rx="16" ry="5" fill="#000000" opacity="0.25" />
+          <ellipse cx="24" cy="46" rx="16" ry="5" fill="#0f291e" opacity="0.3" />
           <image href="${char2Url}" x="0" y="0" width="48" height="48" preserveAspectRatio="xMidYMid meet" />
         </g>
 
@@ -561,7 +657,7 @@ export class LevelSelect {
           <image href="${coinLogoUrl}" x="6" y="-6" width="20" height="20" class="coin-glint-bob" />
         </g>
 
-        <!-- Stage 4: Wooden Watchtower with Official Sub-Character-2 on Lookout -->
+        <!-- Stage 4: Cozy Wooden Watchtower with Official Sub-Character-2 on Lookout -->
         <g transform="translate(680, 50)" opacity="0.95">
           <!-- Timber posts -->
           <line x1="15" y1="105" x2="25" y2="40" stroke="#78350f" stroke-width="4.5" stroke-linecap="round" />
@@ -576,17 +672,17 @@ export class LevelSelect {
           <polygon points="5,36 35,12 65,36" fill="#ca8a04" stroke="#854d0e" stroke-width="2" />
         </g>
 
-        <!-- Stage 6: Barricade with Official Sub-Character-3 Peeking -->
+        <!-- Stage 6: Wooden Outpost Barricade with Official Sub-Character-3 Peeking -->
         <g transform="translate(1145, 75)">
           <rect x="12" y="24" width="32" height="36" rx="3" fill="#78350f" stroke="#451a03" stroke-width="2" />
           <image href="${subChar3Url}" x="2" y="4" width="36" height="36" class="actor-peek" />
         </g>
 
-        <!-- Stage 7: Wooden Suspension Bridge over Ravine -->
+        <!-- Stage 7: Wooden Suspension Bridge over Scenic Ravine -->
         <path d="M 1210 325 Q 1280 345 1350 325" fill="none" stroke="#78350f" stroke-width="5" stroke-linecap="round" />
         <path d="M 1210 325 Q 1280 345 1350 325" fill="none" stroke="#ca8a04" stroke-width="3" stroke-dasharray="4 8" stroke-linecap="round" />
 
-        <!-- Stage 8: Official Character-3 (Heavy Black Bird) Standing Valiantly near TNT -->
+        <!-- Stage 8: Official Character-3 (Heavy Black Bird) Standing near TNT Depot -->
         <g class="map-bg-actor actor-stand" transform="translate(1495, 95)">
           <ellipse cx="24" cy="46" rx="18" ry="6" fill="#000000" opacity="0.3" />
           <!-- TNT Barrel -->
@@ -657,6 +753,7 @@ export class LevelSelect {
 
         <!-- Stage 15: Glowing Nebula Monolith with Official Golden Logo Crest -->
         <g transform="translate(2700, 240)">
+          <ellipse cx="34" cy="38" rx="28" ry="7" fill="#1e1b4b" opacity="0.4" />
           <polygon points="12,35 22,5 32,35" fill="#c084fc" stroke="#e9d5ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
           <polygon points="32,35 44,-10 56,35" fill="#a855f7" stroke="#f3e8ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
           <image href="${logoWhiteUrl}" x="28" y="2" width="30" height="16" style="filter: drop-shadow(0 0 10px #fbbf24);" />
@@ -691,33 +788,33 @@ export class LevelSelect {
         </g>
 
         <!-- ═════════════════════════════════════════════════════════════
-             4. THE CONTINUOUS WAVY PATH (MULTI-LAYER RIBBON)
+             6. THE CONTINUOUS WAVY PATH (MULTI-LAYER RIBBON)
              ═════════════════════════════════════════════════════════════ -->
 
         <!-- Layer 1: Soil Bed Drop Shadow -->
-        <path d="${fullPathD}" fill="none" stroke="#14290d" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />
+        <path d="${fullPathD}" fill="none" stroke="#0f291e" stroke-width="58" stroke-linecap="round" stroke-linejoin="round" opacity="0.6" />
 
         <!-- Layer 2: Green Grass Berm / Shoulder -->
-        <path d="${fullPathD}" fill="none" stroke="#2d5312" stroke-width="44" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${fullPathD}" fill="none" stroke="#22541c" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Layer 3: Cobblestone Earth Curb -->
-        <path d="${fullPathD}" fill="none" stroke="#78350f" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${fullPathD}" fill="none" stroke="#78350f" stroke-width="42" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Layer 4: Golden Sandy Paved Wavy Roadway -->
-        <path d="${fullPathD}" fill="none" stroke="url(#roadSurfaceGrad)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${fullPathD}" fill="none" stroke="url(#roadSurfaceGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Layer 5: Cobblestone Edge Texture -->
-        <path d="${fullPathD}" fill="none" stroke="#d97706" stroke-width="16" stroke-dasharray="2 16" stroke-linecap="round" opacity="0.65" />
+        <path d="${fullPathD}" fill="none" stroke="#d97706" stroke-width="18" stroke-dasharray="2 16" stroke-linecap="round" opacity="0.6" />
 
         <!-- Layer 6: Center Glowing Trail Dashes -->
-        <path d="${fullPathD}" fill="none" stroke="#ffffff" stroke-width="4" stroke-dasharray="8 14" stroke-linecap="round" opacity="0.85" />
+        <path d="${fullPathD}" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-dasharray="8 14" stroke-linecap="round" opacity="0.85" />
 
         <!-- Layer 7: Active Journey Progress Line -->
         <path
           d="${activePathD}"
           fill="none"
           stroke="url(#activeRoadProgressGrad)"
-          stroke-width="7.5"
+          stroke-width="8"
           stroke-linecap="round"
           stroke-linejoin="round"
           filter="url(#roadGlowFilter)"
@@ -729,7 +826,8 @@ export class LevelSelect {
 
   /**
    * Builds the 20 Circular Level Nodes positioned along the wavy path.
-   * Prominently sized (82px) for effortless tapping on mobile touchscreen.
+   * Prominently sized (96px) for effortless tapping on mobile touchscreen.
+   * Visually highlights the Active Level with Red Bird mascot, pulsing beacon ring, and juicy PLAY! button.
    */
   buildLevelNodesHtml(unlockedLevel, avatarUrl) {
     let html = '';
@@ -738,13 +836,14 @@ export class LevelSelect {
       const levelId = node.id;
       const levelObj = LEVELS.find((l) => l.id === levelId) || { id: levelId, name: node.name, coinReward: 100 };
       const isUnlocked = levelId <= unlockedLevel;
-      const isFrontier = levelId === unlockedLevel;
+      const isActive = levelId === this.activeLevelId;
       const starsEarned = this.storage.getStarsForLevel(levelId) || 0;
+      const isCompleted = levelId < unlockedLevel || starsEarned > 0;
       const isClaimed = this.storage.hasClaimedCoins(levelId);
 
-      // Stars crowning completed node (arched above circular disk, matching reference screenshot)
+      // Stars crowning completed node (arched above circular disk)
       let starsHtml = '';
-      if (starsEarned > 0 || !isUnlocked) {
+      if (starsEarned > 0 || isCompleted) {
         starsHtml = `
           <div class="node-stars-crown" title="${starsEarned} / 3 Stars Earned">
             <span class="crown-star ${starsEarned >= 1 ? 'earned' : ''}">★</span>
@@ -752,9 +851,9 @@ export class LevelSelect {
             <span class="crown-star ${starsEarned >= 3 ? 'earned' : ''}">★</span>
           </div>
         `;
-      } else if (isFrontier) {
+      } else if (isUnlocked) {
         starsHtml = `
-          <div class="node-stars-crown frontier-crown" title="Unconquered Stage">
+          <div class="node-stars-crown unearned-crown" title="Unconquered Stage">
             <span class="crown-star">★</span>
             <span class="crown-star center">★</span>
             <span class="crown-star">★</span>
@@ -774,11 +873,13 @@ export class LevelSelect {
         milestoneBadgeHtml = `<div class="milestone-crown-apex" aria-hidden="true">👑</div>`;
       }
 
-      // Active Frontier Bird Mascot Pin and Juicy PLAY! Button (Matching Image 1)
-      let frontierMarkerHtml = '';
-      if (isFrontier) {
-        frontierMarkerHtml = `
-          <div class="active-commander-mascot" id="commander-pin-${levelId}" title="You are here!">
+      // Active Level Elements (Mascot Pin, Pulsing Beacon Ring, Juicy PLAY! CTA)
+      let activeIndicatorHtml = '';
+      if (isActive) {
+        activeIndicatorHtml = `
+          <div class="active-beacon-pulse" aria-hidden="true"></div>
+
+          <div class="active-commander-mascot" id="commander-pin-${levelId}" title="Active Stage ${levelId}">
             <div class="mascot-speech-cloud">Stage ${levelId}</div>
             <img src="${mascotCharUrl}" alt="Dili Bird" class="mascot-bird-img" />
           </div>
@@ -786,7 +887,6 @@ export class LevelSelect {
           <button
             type="button"
             class="roadmap-juicy-play-cta"
-            id="btn-play-frontier-node"
             data-level-id="${levelId}"
             title="Launch Stage ${levelId}"
             aria-label="Play Level ${levelId}"
@@ -794,16 +894,21 @@ export class LevelSelect {
             <div class="play-cta-pointer-hand" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 8H9L12 2Z"/></svg>
             </div>
-            <span class="play-cta-text">PLAY!</span>
+            <span class="play-cta-text">PLAY! ▶</span>
           </button>
         `;
       }
 
-      const nodeClass = isUnlocked
-        ? isFrontier
-          ? 'unlocked frontier'
-          : 'unlocked completed'
-        : 'locked';
+      let nodeClass = '';
+      if (!isUnlocked) {
+        nodeClass = 'locked';
+      } else if (isActive) {
+        nodeClass = isCompleted ? 'unlocked active completed' : 'unlocked active frontier';
+      } else if (isCompleted) {
+        nodeClass = 'unlocked completed';
+      } else {
+        nodeClass = 'unlocked frontier';
+      }
 
       html += `
         <article
@@ -813,12 +918,12 @@ export class LevelSelect {
           data-level-id="${levelId}"
           role="button"
           tabindex="${isUnlocked ? '0' : '-1'}"
-          aria-label="Level ${levelId}: ${node.name} (${isUnlocked ? 'Unlocked' : 'Locked'})"
+          aria-label="Level ${levelId}: ${node.name} (${isUnlocked ? (isActive ? 'Active Stage' : 'Unlocked') : 'Locked'})"
         >
           ${milestoneBadgeHtml}
           ${starsHtml}
 
-          <!-- 3D Circular Disk (Enlarged for Mobile Touch) -->
+          <!-- 3D Circular Disk (Enlarged to 96px for Mobile Touch) -->
           <div class="node-circle-body">
             <div class="node-circle-bevel"></div>
             <div class="node-circle-core">
@@ -843,7 +948,7 @@ export class LevelSelect {
             <span>${isClaimed ? '✓' : `+${levelObj.coinReward}`}</span>
           </div>
 
-          ${frontierMarkerHtml}
+          ${activeIndicatorHtml}
         </article>
       `;
     });
@@ -936,6 +1041,11 @@ export class LevelSelect {
     const unlockedLevel = this.storage.getUnlockedLevel();
     const avatarUrl = this.storage.getAvatarUrl();
 
+    // Default activeLevelId to highest unlocked level if unset or beyond unlocked boundary
+    if (!this.activeLevelId || this.activeLevelId > Math.min(20, unlockedLevel)) {
+      this.activeLevelId = Math.min(20, Math.max(1, unlockedLevel));
+    }
+
     const html = `
       <div class="map-world-container" id="map-world-container" style="width: ${MAP_TOTAL_WIDTH}px; height: ${MAP_TOTAL_HEIGHT}px;">
         <!-- 1. Multi-Layer SVG Landscape, Terrain & Continuous Wavy Road -->
@@ -954,24 +1064,10 @@ export class LevelSelect {
     this.gridEl.innerHTML = html;
     this.bindNodeEvents();
 
-    // Auto-scale to landscape screen height and center on active node
+    // Auto-scale to landscape screen height and center on the active node
     requestAnimationFrame(() => {
       this.updateMobileScaling();
-      this.centerOnLevel(unlockedLevel, false);
-      this.updateScrubberAndNavControls();
-
-      const scrubberFill = document.getElementById('scrubber-progress-fill');
-      if (scrubberFill) {
-        const pct = Math.min(100, Math.max(5, (unlockedLevel / 20) * 100));
-        scrubberFill.style.width = `${pct}%`;
-      }
-      const labelZ2 = document.getElementById('label-jump-zone-2');
-      if (labelZ2) {
-        const isRevealed = this.storage.isZoneRevealed(2) || unlockedLevel > 10;
-        labelZ2.textContent = isRevealed
-          ? 'Zone 2: Celestial Citadel (11–20) ★'
-          : 'Zone 2: Celestial Citadel (11–20) ☁️';
-      }
+      this.centerOnLevel(this.activeLevelId, false);
     });
   }
 
@@ -980,51 +1076,37 @@ export class LevelSelect {
    * ═════════════════════════════════════════════════════════════ */
 
   bindNodeEvents() {
-    if (!this.gridEl) return;
+    if (!this.viewportEl) return;
 
-    this.gridEl.addEventListener('click', (e) => {
-      if (this.isInputLocked || this.hasDragged) {
+    // Viewport-level delegated click listener
+    this.viewportEl.addEventListener('click', (e) => {
+      if (this.isInputLocked || this.isDragSuppressingClick) {
         e.preventDefault();
         e.stopPropagation();
         return;
       }
 
       // Check PLAY! Button click
-      const playBtn = e.target.closest('#btn-play-frontier-node, .roadmap-juicy-play-cta');
+      const playBtn = e.target.closest('.roadmap-juicy-play-cta');
       if (playBtn) {
+        e.preventDefault();
+        e.stopPropagation();
         const levelId = Number(playBtn.dataset.levelId);
-        const levelObj = LEVELS.find((l) => l.id === levelId) || LEVELS[0];
-        this.audio?.playMarkerStep?.();
-        this.onSelectLevel?.(levelObj);
+        this.launchLevel(levelId);
         return;
       }
 
-      // Check Unlocked Node Click
-      const nodeEl = e.target.closest('.map-level-node.unlocked');
+      // Check Level Node Click
+      const nodeEl = e.target.closest('.map-level-node');
       if (nodeEl) {
+        e.preventDefault();
+        e.stopPropagation();
         const levelId = Number(nodeEl.dataset.levelId);
-        const levelObj = LEVELS.find((l) => l.id === levelId);
-        if (levelObj) {
-          nodeEl.classList.add('node-tap-pop');
-          setTimeout(() => nodeEl.classList.remove('node-tap-pop'), 200);
-          this.audio?.playMarkerStep?.();
-          this.onSelectLevel?.(levelObj);
+        if (nodeEl.classList.contains('locked')) {
+          this.handleLockedNodeClick(levelId, nodeEl);
+        } else {
+          this.launchLevel(levelId);
         }
-        return;
-      }
-
-      // Check Locked Node Click
-      const lockedNodeEl = e.target.closest('.map-level-node.locked');
-      if (lockedNodeEl) {
-        const levelId = Number(lockedNodeEl.dataset.levelId);
-        lockedNodeEl.classList.remove('node-lock-shake');
-        void lockedNodeEl.offsetWidth;
-        lockedNodeEl.classList.add('node-lock-shake');
-        this.audio?.playMaterialImpact?.('wood', 0.5);
-        this.spawnMapSpeechBubble(
-          lockedNodeEl,
-          `🔒 Stage ${levelId} is locked! Clear Stage ${levelId - 1} first.`
-        );
         return;
       }
 
@@ -1046,7 +1128,21 @@ export class LevelSelect {
       }
     });
 
-    this.gridEl.addEventListener('keydown', (e) => {
+    // Fail-safe direct click listeners on each node
+    const nodes = this.viewportEl.querySelectorAll('.map-level-node');
+    nodes.forEach((nodeEl) => {
+      nodeEl.addEventListener('click', (e) => {
+        if (this.isInputLocked || this.isDragSuppressingClick) return;
+        const levelId = Number(nodeEl.dataset.levelId);
+        if (nodeEl.classList.contains('locked')) {
+          this.handleLockedNodeClick(levelId, nodeEl);
+        } else {
+          this.launchLevel(levelId);
+        }
+      });
+    });
+
+    this.viewportEl.addEventListener('keydown', (e) => {
       if (this.isInputLocked) return;
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const nodeEl = e.target.closest('.map-level-node.unlocked');
@@ -1054,13 +1150,10 @@ export class LevelSelect {
 
       e.preventDefault();
       const levelId = Number(nodeEl.dataset.levelId);
-      const levelObj = LEVELS.find((l) => l.id === levelId);
-      if (levelObj) {
-        this.onSelectLevel?.(levelObj);
-      }
+      this.launchLevel(levelId);
     });
 
-    this.gridEl.addEventListener('pointerover', (e) => {
+    this.viewportEl.addEventListener('pointerover', (e) => {
       if (this.isInputLocked || this.hasDragged) return;
       const nodeEl = e.target.closest('.map-level-node.unlocked');
       if (!nodeEl) return;
@@ -1074,6 +1167,46 @@ export class LevelSelect {
         this.onPreviewLevel?.(levelObj);
       }
     });
+  }
+
+  handleLockedNodeClick(levelId, nodeEl = null) {
+    const el = nodeEl || document.getElementById(`node-level-${levelId}`);
+    if (el) {
+      el.classList.remove('node-lock-shake');
+      void el.offsetWidth;
+      el.classList.add('node-lock-shake');
+    }
+    this.audio?.playMaterialImpact?.('wood', 0.5);
+    this.spawnMapSpeechBubble(
+      el,
+      `🔒 Stage ${levelId} is locked! Clear Stage ${levelId - 1} first.`
+    );
+  }
+
+  launchLevel(levelId) {
+    if (this.isInputLocked) return;
+    const num = Number(levelId);
+    const levelObj = LEVELS.find((l) => l.id === num);
+    if (!levelObj) return;
+
+    const unlocked = this.storage.getUnlockedLevel();
+    if (num > unlocked) {
+      this.handleLockedNodeClick(num);
+      return;
+    }
+
+    // Set active level
+    this.activeLevelId = num;
+    this.focusedLevelId = num;
+
+    const nodeEl = document.getElementById(`node-level-${num}`);
+    if (nodeEl) {
+      nodeEl.classList.add('node-tap-pop');
+      setTimeout(() => nodeEl.classList.remove('node-tap-pop'), 200);
+    }
+
+    this.audio?.playMarkerStep?.();
+    this.onSelectLevel?.(levelObj);
   }
 
   spawnMapSpeechBubble(anchorEl, text) {
@@ -1110,6 +1243,8 @@ export class LevelSelect {
       }
 
       setTimeout(() => {
+        this.activeLevelId = toLevelId;
+        this.focusedLevelId = toLevelId;
         this.render();
         this.audio?.playLevelUnlock?.();
         this.centerOnLevel(toLevelId, true);

@@ -720,14 +720,14 @@ html, body {
 .roadmap-stage-board-card {
   flex: 1 1 auto;
   min-height: 0;
-  padding: 10px 14px 10px 14px;
+  padding: 0;
   border-radius: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(26, 38, 64, 0.92));
-  border: 1px solid rgba(56, 189, 248, 0.28);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.55);
+  gap: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   overflow: hidden;
   position: relative;
 }
@@ -1333,7 +1333,7 @@ html, body {
 }
 
 /* ═════════════════════════════════════════════════════════════
-   CIRCULAR LEVEL NODES (LEVELS 1 TO 20) - ENLARGED (82PX)
+   CIRCULAR LEVEL NODES (LEVELS 1 TO 20) - ENLARGED (96PX)
    ═════════════════════════════════════════════════════════════ */
 .map-nodes-layer {
   position: absolute;
@@ -1344,8 +1344,8 @@ html, body {
 
 .map-level-node {
   position: absolute;
-  width: 82px;
-  height: 82px;
+  width: 96px;
+  height: 96px;
   transform: translate(-50%, -50%);
   pointer-events: auto;
   display: flex;
@@ -1359,7 +1359,7 @@ html, body {
 
 .map-level-node:hover.unlocked {
   transform: translate(-50%, -55%) scale(1.08);
-  z-index: 10;
+  z-index: 12;
 }
 
 .map-level-node.node-tap-pop {
@@ -1382,11 +1382,11 @@ html, body {
   100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-/* Enlarged 3D Circular Body (80px x 80px) */
+/* Enlarged 3D Circular Body (88px x 88px) */
 .node-circle-body {
   position: relative;
-  width: 74px;
-  height: 74px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1397,27 +1397,75 @@ html, body {
 
 /* Completed & Unlocked Golden Styles */
 .map-level-node.completed .node-circle-body {
-  background: radial-gradient(circle at 35% 30%, #fffbeb 0%, #fef08a 25%, #f59e0b 68%, #b45309 100%);
-  border: 4.5px solid #fffbeb;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7), 0 0 20px rgba(251, 191, 36, 0.6), inset 0 3px 6px rgba(255, 255, 255, 0.85);
+  background: radial-gradient(circle at 35% 28%, #fffbeb 0%, #fef08a 25%, #f59e0b 68%, #b45309 100%);
+  border: 5px solid #fffbeb;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7), 0 0 20px rgba(251, 191, 36, 0.6), inset 0 3px 6px rgba(255, 255, 255, 0.85);
 }
 
-.map-level-node.frontier .node-circle-body {
+/* ═════════════════════════════════════════════════════════════
+   ACTIVE LEVEL (SELECTED / CURRENT STAGE) - HIGH-VISIBILITY BEACON
+   ═════════════════════════════════════════════════════════════ */
+.map-level-node.active {
+  z-index: 25 !important;
+}
+
+.map-level-node.active .node-circle-body {
+  width: 96px;
+  height: 96px;
+  background: radial-gradient(circle at 35% 26%, #ffffff 0%, #fef08a 25%, #f59e0b 65%, #c2410c 100%);
+  border: 5.5px solid #ffffff;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.8), 0 0 45px rgba(251, 191, 36, 1), inset 0 4px 10px rgba(255, 255, 255, 0.95);
+  animation: activeNodePulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes activeNodePulse {
+  0% { transform: scale(1); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.75), 0 0 25px rgba(251, 191, 36, 0.8); }
+  100% { transform: scale(1.06); box-shadow: 0 16px 44px rgba(0, 0, 0, 0.85), 0 0 45px rgba(251, 191, 36, 1); }
+}
+
+/* Pulsing Radiant Beacon Ring around Active Node */
+.active-beacon-pulse {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  border: 3.5px solid rgba(251, 191, 36, 0.95);
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.85), inset 0 0 16px rgba(251, 191, 36, 0.5);
+  pointer-events: none;
+  z-index: 2;
+  animation: beaconRingExpand 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+@keyframes beaconRingExpand {
+  0% {
+    transform: scale(0.92);
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.9), inset 0 0 10px rgba(251, 191, 36, 0.6);
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.75;
+    box-shadow: 0 0 32px rgba(245, 158, 11, 0.95), inset 0 0 20px rgba(245, 158, 11, 0.45);
+  }
+  100% {
+    transform: scale(1.34);
+    opacity: 0;
+    box-shadow: 0 0 48px rgba(239, 68, 68, 0), inset 0 0 25px rgba(239, 68, 68, 0);
+  }
+}
+
+/* Frontier Node (when not active) */
+.map-level-node.frontier:not(.active) .node-circle-body {
   background: radial-gradient(circle at 35% 30%, #ffffff 0%, #fde047 30%, #f59e0b 72%, #d97706 100%);
   border: 5px solid #ffffff;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 30px rgba(251, 191, 36, 0.9), inset 0 3px 8px rgba(255, 255, 255, 0.95);
-  animation: frontierNodePulse 2.2s ease-in-out infinite alternate;
-}
-
-@keyframes frontierNodePulse {
-  0% { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65), 0 0 20px rgba(251, 191, 36, 0.6); }
-  100% { box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 1); }
 }
 
 /* Locked Stone Disk */
 .map-level-node.locked .node-circle-body {
+  width: 88px;
+  height: 88px;
   background: radial-gradient(circle at 35% 30%, #64748b 0%, #475569 45%, #1e293b 100%);
-  border: 4px solid #94a3b8;
+  border: 4.5px solid #94a3b8;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
 }
@@ -1428,14 +1476,20 @@ html, body {
   justify-content: center;
 }
 
-/* Enlarged Bold Numbers (1.95rem) */
+/* Enlarged Bold Numbers (2.35rem) */
 .node-number-text {
   font-family: var(--font-display);
-  font-size: 1.95rem;
+  font-size: 2.35rem;
   font-weight: 900;
   color: #451a03;
   text-shadow: 0 1.5px 0 rgba(255, 255, 255, 0.7);
   line-height: 1;
+}
+
+.map-level-node.active .node-number-text {
+  font-size: 2.5rem;
+  color: #3f1502;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.85);
 }
 
 .map-level-node.locked .node-number-text {
@@ -1456,8 +1510,8 @@ html, body {
 }
 
 .node-lock-svg {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   color: #f1f5f9;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
 }
@@ -1477,97 +1531,97 @@ html, body {
 /* Enlarged Stars Crown Arched Over Completed Circle */
 .node-stars-crown {
   position: absolute;
-  top: -20px;
+  top: -24px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: flex-end;
-  gap: 3px;
+  gap: 4px;
   z-index: 5;
   pointer-events: none;
 }
 
 .crown-star {
-  font-size: 1.25rem;
+  font-size: 1.45rem;
   line-height: 1;
   color: rgba(255, 255, 255, 0.25);
   transition: all 0.2s ease;
 }
 
 .crown-star.center {
-  font-size: 1.55rem;
-  margin-bottom: 4px;
+  font-size: 1.8rem;
+  margin-bottom: 5px;
 }
 
 .crown-star.earned {
   color: #fbbf24;
-  text-shadow: 0 0 10px rgba(251, 191, 36, 1), 0 2px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 0 12px rgba(251, 191, 36, 1), 0 2px 4px rgba(0, 0, 0, 0.7);
   filter: drop-shadow(0 2px 3px rgba(180, 83, 9, 0.9));
 }
 
 /* Active Frontier Bird Mascot Pin (Perched on top of Node) */
 .active-commander-mascot {
   position: absolute;
-  top: -54px;
+  top: -64px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 12;
+  z-index: 15;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: mascotBob 1.6s ease-in-out infinite alternate;
+  animation: mascotBob 1.4s ease-in-out infinite alternate;
 }
 
 @keyframes mascotBob {
   0% { transform: translateX(-50%) translateY(0); }
-  100% { transform: translateX(-50%) translateY(-9px); }
+  100% { transform: translateX(-50%) translateY(-10px); }
 }
 
 .mascot-bird-img {
-  width: 52px;
-  height: 52px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.7));
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.75));
 }
 
 .mascot-speech-cloud {
   background: #ffffff;
   color: #0f172a;
   font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 2px 8px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 3px 10px;
   border-radius: 999px;
-  margin-bottom: -5px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  margin-bottom: -6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   white-space: nowrap;
 }
 
 /* Juicy Orange/Gold "PLAY!" Button (Enlarged for Mobile) */
 .roadmap-juicy-play-cta {
   position: absolute;
-  top: 76px;
+  top: 86px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 14;
+  z-index: 18;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
-  border: 2.8px solid #fef08a;
-  padding: 6px 20px 8px 20px;
+  border: 3px solid #fef08a;
+  padding: 7px 24px 9px 24px;
   border-radius: 999px;
-  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.7), 0 4px 0 #7c2d12, inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.75), 0 4px 0 #7c2d12, inset 0 1px 0 rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  animation: juicyPlayBounce 1.5s ease-in-out infinite;
+  animation: juicyPlayBounce 1.4s ease-in-out infinite;
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .roadmap-juicy-play-cta:hover {
-  transform: translateX(-50%) scale(1.1);
-  filter: brightness(1.12);
-  box-shadow: 0 10px 28px rgba(234, 88, 12, 0.85), 0 4px 0 #7c2d12;
+  transform: translateX(-50%) scale(1.12);
+  filter: brightness(1.15);
+  box-shadow: 0 12px 30px rgba(234, 88, 12, 0.9), 0 4px 0 #7c2d12;
 }
 
 .roadmap-juicy-play-cta:active {
@@ -1595,34 +1649,39 @@ html, body {
 
 .play-cta-text {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 0.05em;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
   line-height: 1;
+  white-space: nowrap;
 }
 
 @keyframes juicyPlayBounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-5px); }
+  50% { transform: translateX(-50%) translateY(-6px); }
 }
 
 /* Bottom Coin Pill under Nodes */
 .node-coin-pill {
-  margin-top: 6px;
+  margin-top: 8px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(251, 191, 36, 0.45);
+  background: rgba(15, 23, 42, 0.92);
+  border: 1.2px solid rgba(251, 191, 36, 0.5);
   color: var(--accent-gold);
   font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 700;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  font-size: 0.78rem;
+  font-weight: 800;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+.map-level-node.active .node-coin-pill {
+  display: none;
 }
 
 .node-coin-pill.claimed {
@@ -2013,57 +2072,18 @@ html, body {
   }
 
   .roadmap-stage-board-card {
-    padding: 4px 6px 6px 6px !important;
+    padding: 0 !important;
     border-radius: 14px !important;
-    gap: 4px !important;
-  }
-
-  /* Compact or hide redundant subheaders on mobile landscape to give 100% space to map */
-  .roadmap-controls-bar {
-    padding: 0 4px !important;
-    gap: 6px !important;
-  }
-
-  .roadmap-heading-group h2 {
-    font-size: 0.9rem !important;
-  }
-
-  .roadmap-heading-group .sequential-hint {
-    display: none !important;
-  }
-
-  .roadmap-legend {
-    display: none !important;
-  }
-
-  .roadmap-zone-pill-btn {
-    padding: 3px 8px !important;
-    font-size: 0.68rem !important;
+    gap: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .roadmap-3d-viewport {
     border-radius: 12px !important;
     min-height: 0 !important;
     height: 100% !important;
-  }
-
-  .map-floating-nav-btn {
-    width: 36px !important;
-    height: 36px !important;
-  }
-
-  .map-floating-nav-btn svg {
-    width: 18px !important;
-    height: 18px !important;
-  }
-
-  .roadmap-bottom-scrubber-bar {
-    padding: 0 2px !important;
-    gap: 8px !important;
-  }
-
-  .scrubber-label {
-    font-size: 0.65rem !important;
   }
 }
 

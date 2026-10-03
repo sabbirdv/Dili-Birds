@@ -81,50 +81,60 @@ export class HudController {
   initListeners() {
     // HUD Header Buttons
     this.restartLevelBtn?.addEventListener('click', () => {
+      this.audio?.playRetry?.();
       this.closeGameMenu();
       this.closeResultModal();
       this.onRetryLevel?.();
     });
 
     this.pauseMenuBtn?.addEventListener('click', () => {
+      this.audio?.playMenuOpen?.();
       this.openGameMenu();
     });
 
     // In-Game Menu Modal Buttons
     document.getElementById('btn-close-game-menu')?.addEventListener('click', () => {
+      this.audio?.playMenuClose?.();
       this.closeGameMenu();
     });
 
     document.getElementById('btn-menu-resume')?.addEventListener('click', () => {
+      this.audio?.playMenuClose?.();
       this.closeGameMenu();
     });
 
     document.getElementById('btn-menu-edit-profile')?.addEventListener('click', () => {
+      this.audio?.playMenuOpen?.();
       this.closeGameMenu();
       this.onOpenProfile?.();
     });
 
     document.getElementById('btn-menu-retry')?.addEventListener('click', () => {
+      this.audio?.playRetry?.();
       this.closeGameMenu();
       this.onRetryLevel?.();
     });
 
     document.getElementById('btn-menu-roadmap')?.addEventListener('click', () => {
+      this.audio?.playMenuBack?.();
       this.closeGameMenu();
       this.onReturnToRoadmap?.();
     });
 
     document.getElementById('btn-menu-dashboard')?.addEventListener('click', () => {
+      this.audio?.playMenuBack?.();
       this.closeGameMenu();
       this.onReturnToDashboard?.();
     });
 
     document.getElementById('btn-menu-main-menu')?.addEventListener('click', () => {
+      this.audio?.playMenuBack?.();
       this.closeGameMenu();
       this.onReturnToDashboard?.();
     });
 
     document.getElementById('btn-menu-fullscreen')?.addEventListener('click', async () => {
+      this.audio?.playUiClick?.();
       await toggleFullscreen();
       this.updateFullscreenUI();
     });
@@ -177,22 +187,25 @@ export class HudController {
 
     // Result Modal Buttons
     document.getElementById('btn-result-dashboard')?.addEventListener('click', () => {
+      this.audio?.playMenuBack?.();
       this.closeResultModal();
       this.onReturnToDashboard?.();
     });
 
     this.btnResultMenu?.addEventListener('click', () => {
+      this.audio?.playMenuBack?.();
       this.closeResultModal();
       this.onReturnToRoadmap?.();
     });
 
-
     this.btnResultRetry?.addEventListener('click', () => {
+      this.audio?.playRetry?.();
       this.closeResultModal();
       this.onRetryLevel?.();
     });
 
     this.btnResultNext?.addEventListener('click', () => {
+      this.audio?.playLevelSelect?.();
       this.closeResultModal();
       this.onNextLevel?.();
     });
@@ -329,15 +342,43 @@ export class HudController {
   hideAbilityPrompt() {}
   spawnFloatingToast() {}
 
-  showResultModal({ won, levelId, hasNextLevel, score, coinsEarned, isFirstTimeWin = false, starsEarned }) {
+  showResultModal({
+    won,
+    levelId,
+    hasNextLevel,
+    score,
+    coinsEarned,
+    isFirstTimeWin = false,
+    starsEarned,
+    prevStars = 0,
+    starsAdded = 0,
+    bestStars = 0,
+    totalStars = 0
+  }) {
     if (!this.resultDialog) return;
 
     this.resultBadge.textContent = won ? `STAGE ${levelId} CLEARED` : `STAGE ${levelId} FAILED`;
     this.resultTitle.textContent = won ? 'Victory!' : 'Out of Birds!';
+
+    // Display the highest stars achieved for this stage
+    const displayStars = won ? Math.max(starsEarned || 0, bestStars || 0) : 0;
+    const starSpans = this.resultStars.querySelectorAll('.star');
+    starSpans.forEach((starEl, i) => {
+      if (won && i < displayStars) {
+        starEl.classList.add('earned');
+      } else {
+        starEl.classList.remove('earned');
+      }
+    });
+
     if (won) {
-      this.resultMessage.textContent = coinsEarned > 0
-        ? 'Fortress demolished! Coins added to your treasury and next mission unlocked.'
-        : 'Fortress demolished! (Replay: coins already claimed on first clear)';
+      if (isFirstTimeWin) {
+        this.resultMessage.innerHTML = `Fortress demolished! <span class="first-win-coin-text">+${coinsEarned} Coins added to treasury</span> and next stage unlocked.`;
+      } else if (starsAdded > 0) {
+        this.resultMessage.innerHTML = `<span class="star-upgrade-text">🌟 Star Rating Upgraded! +${starsAdded} Star${starsAdded > 1 ? 's' : ''} added to total stars (${displayStars}/3 ★).</span><br><span class="replay-coin-text">(Replay clear: coins already claimed on first clear — 0 coins added)</span>`;
+      } else {
+        this.resultMessage.innerHTML = `Fortress demolished! Stage Best: <strong>${displayStars}/3 Stars</strong>.<br><span class="replay-coin-text">(Replay clear: coins already claimed on first clear — 0 coins added)</span>`;
+      }
     } else {
       this.resultMessage.textContent =
         'Some targets survived the bombardment. Adjust your trajectory and try again!';
@@ -350,15 +391,6 @@ export class HudController {
     } else if (this.resultCoins) {
       this.resultCoins.innerHTML = `<span id="result-coins-val">${coinsDisplay}</span> <img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" />`;
     }
-
-    const starSpans = this.resultStars.querySelectorAll('.star');
-    starSpans.forEach((starEl, i) => {
-      if (won && i < starsEarned) {
-        starEl.classList.add('earned');
-      } else {
-        starEl.classList.remove('earned');
-      }
-    });
 
     if (this.btnResultNext) {
       if (won && hasNextLevel) {

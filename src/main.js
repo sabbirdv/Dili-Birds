@@ -96,6 +96,9 @@ class DiliBirdsApp {
       onLevelComplete: ({ won, levelId, score, coinsEarned, starsEarned }) => {
         let actualCoinsAwarded = 0;
         let isFirstTimeWin = false;
+        let starsAdded = 0;
+        let prevStars = 0;
+        let bestStars = starsEarned;
         if (won) {
           const result = this.storage.recordLevelWin(
             levelId,
@@ -106,6 +109,9 @@ class DiliBirdsApp {
           );
           actualCoinsAwarded = result?.actualCoinsAwarded || 0;
           isFirstTimeWin = Boolean(result?.isFirstTimeWin);
+          starsAdded = result?.starsAdded ?? 0;
+          prevStars = result?.prevStars ?? 0;
+          bestStars = result?.bestStars ?? this.storage.getStarsForLevel(levelId);
           const unlockedNewZone = Boolean(result?.unlockedNewZone);
           const newUnlockedLevel = result?.newUnlockedLevel || this.storage.getUnlockedLevel();
           this.levelSelect.focusedLevelId = newUnlockedLevel;
@@ -122,7 +128,7 @@ class DiliBirdsApp {
             username: this.storage.getUsername(),
             levelId,
             score,
-            stars: starsEarned,
+            stars: bestStars,
             totalScore: this.storage.getCoins(),
             totalStars: this.storage.getTotalStars()
           }).then((res) => {
@@ -140,7 +146,11 @@ class DiliBirdsApp {
           score,
           coinsEarned: won ? actualCoinsAwarded : 0,
           isFirstTimeWin,
-          starsEarned
+          starsEarned,
+          prevStars,
+          starsAdded,
+          bestStars,
+          totalStars: this.storage.getTotalStars()
         });
       }
     });

@@ -255,11 +255,20 @@ export class StorageManager {
     const id = Number(levelId);
     const isFirstTimeWin = !this.hasClaimedCoins(id);
 
+    if (!this.state.levelStars) {
+      this.state.levelStars = {};
+    }
     const prevStars = this.getStarsForLevel(id);
+    let starsAdded = 0;
     if (starsEarned > prevStars) {
+      starsAdded = starsEarned - prevStars;
       this.state.levelStars[id] = starsEarned;
     }
+    const bestStars = this.state.levelStars[id] || 0;
 
+    if (!this.state.levelHighScores) {
+      this.state.levelHighScores = {};
+    }
     const prevHigh = Number(this.state.levelHighScores[id]) || 0;
     if (score > prevHigh) {
       this.state.levelHighScores[id] = score;
@@ -289,7 +298,17 @@ export class StorageManager {
     }
 
     this.saveState();
-    return { actualCoinsAwarded, isFirstTimeWin, unlockedNewZone, newUnlockedLevel: this.state.unlockedLevel };
+    return {
+      actualCoinsAwarded,
+      isFirstTimeWin,
+      prevStars,
+      starsEarned,
+      starsAdded,
+      bestStars,
+      totalStars: this.getTotalStars(),
+      unlockedNewZone,
+      newUnlockedLevel: this.state.unlockedLevel
+    };
   }
 
   isSoundEnabled() {
@@ -349,17 +368,10 @@ export class StorageManager {
     if (!this.state.claimedMissions) this.state.claimedMissions = {};
     this.state.claimedMissions[missionId] = true;
     if (coinReward > 0) {
-      this.state.coins = (this.state.coins || 0) + coinReward;
+      this.addCoins(coinReward);
     }
     this.saveState();
     return true;
-  }
-
-  addCoins(amount) {
-    if (!amount || amount <= 0) return this.state.coins;
-    this.state.coins = (this.state.coins || 0) + amount;
-    this.saveState();
-    return this.state.coins;
   }
 
   resetProgress() {

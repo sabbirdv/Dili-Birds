@@ -199,6 +199,11 @@ export class LevelSelect {
         cancelAnimationFrame(this.momentumRafId);
         this.momentumRafId = null;
       }
+      if (this.dragRafId) {
+        cancelAnimationFrame(this.dragRafId);
+        this.dragRafId = null;
+      }
+      this.pendingScrollLeft = null;
 
       this.isPointerDown = true;
       this.hasDragged = false;
@@ -226,7 +231,15 @@ export class LevelSelect {
       }
 
       if (this.hasDragged) {
-        vp.scrollLeft = this.scrollLeftStart - dx;
+        this.pendingScrollLeft = this.scrollLeftStart - dx;
+        if (!this.dragRafId) {
+          this.dragRafId = requestAnimationFrame(() => {
+            if (this.viewportEl && this.pendingScrollLeft !== null) {
+              this.viewportEl.scrollLeft = this.pendingScrollLeft;
+            }
+            this.dragRafId = null;
+          });
+        }
 
         const now = performance.now();
         const dt = now - this.lastTime;
@@ -242,6 +255,15 @@ export class LevelSelect {
       if (!this.isPointerDown) return;
       this.isPointerDown = false;
       vp.classList.remove('is-panning');
+
+      if (this.dragRafId) {
+        cancelAnimationFrame(this.dragRafId);
+        this.dragRafId = null;
+      }
+      if (this.pendingScrollLeft !== null) {
+        vp.scrollLeft = this.pendingScrollLeft;
+        this.pendingScrollLeft = null;
+      }
 
       try {
         if (vp.hasPointerCapture(e.pointerId)) {
@@ -494,9 +516,10 @@ export class LevelSelect {
             <circle cx="8" cy="22" r="11" fill="#6b21a8" />
             <circle cx="20" cy="22" r="11" fill="#7e22ce" />
             <circle cx="14" cy="14" r="13" fill="#a855f7" />
-            <path d="M 6 12 Q 14 6 22 12" fill="none" stroke="#e9d5ff" stroke-width="3" stroke-linecap="round" />
-            <circle cx="10" cy="12" r="1.5" fill="#fef08a" filter="url(#roadGlowFilter)" />
-            <circle cx="18" cy="15" r="1.2" fill="#fef08a" filter="url(#roadGlowFilter)" />
+            <circle cx="10" cy="12" r="3.5" fill="#fef08a" opacity="0.35" />
+            <circle cx="10" cy="12" r="1.5" fill="#fef08a" />
+            <circle cx="18" cy="15" r="3" fill="#fef08a" opacity="0.35" />
+            <circle cx="18" cy="15" r="1.2" fill="#fef08a" />
           </g>
 
           <!-- 6. Soft Background Cloud Puff -->
@@ -1079,55 +1102,85 @@ export class LevelSelect {
   bindNodeEvents() {
     if (!this.viewportEl) return;
 
-    // Viewport-level delegated click listener
-    this.viewportEl.addEventListener('click', (e) => {
-      if (this.isInputLocked || this.isDragSuppressingClick) {
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
+    if (!this.viewportEventsBound) {
+      this.viewportEventsBound = true;
 
-      // Check PLAY! Button click
-      const playBtn = e.target.closest('.roadmap-juicy-play-cta');
-      if (playBtn) {
-        e.preventDefault();
-        e.stopPropagation();
-        const levelId = Number(playBtn.dataset.levelId);
-        this.launchLevel(levelId);
-        return;
-      }
+      // Viewport-level delegated click listener
+      this.viewportEl.addEventListener('click', (e) => {
+        if (this.isInputLocked || this.isDragSuppressingClick) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
 
-      // Check Level Node Click
-      const nodeEl = e.target.closest('.map-level-node');
-      if (nodeEl) {
-        e.preventDefault();
-        e.stopPropagation();
-        const levelId = Number(nodeEl.dataset.levelId);
-        if (nodeEl.classList.contains('locked')) {
-          this.handleLockedNodeClick(levelId, nodeEl);
-        } else {
+        // Check PLAY! Button click
+        const playBtn = e.target.closest('.roadmap-juicy-play-cta');
+        if (playBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const levelId = Number(playBtn.dataset.levelId);
           this.launchLevel(levelId);
+          return;
         }
-        return;
-      }
 
-      // Check Cloud Sanctuary Seal Click / Cloud Tap
-      const cloudSeal = e.target.closest('#cloud-sanctuary-seal, .cloud-fog-of-war');
-      if (cloudSeal) {
-        const seal = document.getElementById('cloud-sanctuary-seal');
-        if (seal) {
-          seal.classList.remove('seal-shake');
-          void seal.offsetWidth;
-          seal.classList.add('seal-shake');
+        // Check Level Node Click
+        const nodeEl = e.target.closest('.map-level-node');
+        if (nodeEl) {
+          e.preventDefault();
+          e.stopPropagation();
+          const levelId = Number(nodeEl.dataset.levelId);
+          if (nodeEl.classList.contains('locked')) {
+            this.handleLockedNodeClick(levelId, nodeEl);
+          } else {
+            this.launchLevel(levelId);
+          }
+          return;
         }
-        const unlocked = this.storage.getUnlockedLevel();
-        this.audio?.playCloudWhoosh?.();
-        this.spawnMapSpeechBubble(
-          seal || e.target,
-          `☁️ Obscured by Cloud Fog! Complete Stage ${Math.min(unlocked, 10)} to clear the mist!`
-        );
-      }
-    });
+
+        // Check Cloud Sanctuary Seal Click / Cloud Tap
+        const cloudSeal = e.target.closest('#cloud-sanctuary-seal, .cloud-fog-of-war');
+        if (cloudSeal) {
+          const seal = document.getElementById('cloud-sanctuary-seal');
+          if (seal) {
+            seal.classList.remove('seal-shake');
+            void seal.offsetWidth;
+            seal.classList.add('seal-shake');
+          }
+          const unlocked = this.storage.getUnlockedLevel();
+          this.audio?.playCloudWhoosh?.();
+          this.spawnMapSpeechBubble(
+            seal || e.target,
+            `☁️ Obscured by Cloud Fog! Complete Stage ${Math.min(unlocked, 10)} to clear the mist!`
+          );
+        }
+      });
+
+      this.viewportEl.addEventListener('keydown', (e) => {
+        if (this.isInputLocked) return;
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const nodeEl = e.target.closest('.map-level-node.unlocked');
+        if (!nodeEl) return;
+
+        e.preventDefault();
+        const levelId = Number(nodeEl.dataset.levelId);
+        this.launchLevel(levelId);
+      });
+
+      this.viewportEl.addEventListener('pointerover', (e) => {
+        if (this.isInputLocked || this.hasDragged) return;
+        const nodeEl = e.target.closest('.map-level-node.unlocked');
+        if (!nodeEl) return;
+
+        const levelId = Number(nodeEl.dataset.levelId);
+        if (this.lastPreviewedLevelId === levelId) return;
+        this.lastPreviewedLevelId = levelId;
+
+        const levelObj = LEVELS.find((l) => l.id === levelId);
+        if (levelObj) {
+          this.onPreviewLevel?.(levelObj);
+        }
+      });
+    }
 
     // Fail-safe direct click listeners on each node
     const nodes = this.viewportEl.querySelectorAll('.map-level-node');
@@ -1141,32 +1194,6 @@ export class LevelSelect {
           this.launchLevel(levelId);
         }
       });
-    });
-
-    this.viewportEl.addEventListener('keydown', (e) => {
-      if (this.isInputLocked) return;
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      const nodeEl = e.target.closest('.map-level-node.unlocked');
-      if (!nodeEl) return;
-
-      e.preventDefault();
-      const levelId = Number(nodeEl.dataset.levelId);
-      this.launchLevel(levelId);
-    });
-
-    this.viewportEl.addEventListener('pointerover', (e) => {
-      if (this.isInputLocked || this.hasDragged) return;
-      const nodeEl = e.target.closest('.map-level-node.unlocked');
-      if (!nodeEl) return;
-
-      const levelId = Number(nodeEl.dataset.levelId);
-      if (this.lastPreviewedLevelId === levelId) return;
-      this.lastPreviewedLevelId = levelId;
-
-      const levelObj = LEVELS.find((l) => l.id === levelId);
-      if (levelObj) {
-        this.onPreviewLevel?.(levelObj);
-      }
     });
   }
 

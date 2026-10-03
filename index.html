@@ -90,10 +90,6 @@
 
     <!-- Structure Birds To Free / Rescue Tracker Panel (Right Side of Screen - Not in Nav) -->
     <aside id="structure-birds-tracker" class="structure-birds-tracker hidden" aria-label="Birds to Free in Structure">
-      <div class="tracker-header">
-        <span class="tracker-header-icon">🕊️</span>
-        <span class="tracker-header-text">FREE BIRDS</span>
-      </div>
       <div id="tracker-birds-list" class="tracker-birds-list">
         <!-- Populated dynamically by HudController -->
       </div>
@@ -450,13 +446,13 @@
         </div>
       </section>
 
-      <!-- Primary Action Buttons (Resume, Restart, Level Roadmap, Dashboard Home) - Only visible when inside gameplay -->
+      <!-- Primary Action Buttons (Dashboard Home, Restart, Level Roadmap) - Only visible when inside gameplay -->
       <section class="menu-action-list" id="menu-gameplay-actions">
-        <button type="button" id="btn-menu-resume" class="action-btn primary-btn resume-cta-btn">
+        <button type="button" id="btn-menu-dashboard" class="action-btn primary-btn resume-cta-btn dashboard-cta-btn" title="Return to Dashboard Home">
           <span class="btn-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           </span>
-          <span class="btn-text">Resume Game</span>
+          <span class="btn-text">Dashboard Home</span>
         </button>
 
         <button type="button" id="btn-menu-retry" class="menu-list-btn">
@@ -475,16 +471,6 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
             </span>
             <span class="list-text">Level Roadmap</span>
-          </div>
-          <span class="list-arrow">➔</span>
-        </button>
-
-        <button type="button" id="btn-menu-dashboard" class="menu-list-btn dashboard-menu-list-btn" title="Return to Dashboard Home">
-          <div class="list-left">
-            <span class="list-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </span>
-            <span class="list-text">Dashboard Home</span>
           </div>
           <span class="list-arrow">➔</span>
         </button>

@@ -530,7 +530,6 @@ export class HudController {
             ${remaining > 0 ? `${remaining}x` : '✓'}
           </span>
         </div>
-        <span class="tracker-bird-name">${meta.name}</span>
       `;
 
       this.trackerListEl.appendChild(itemEl);

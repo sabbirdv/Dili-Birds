@@ -1115,6 +1115,9 @@ html, body {
   touch-action: pan-x;
   overscroll-behavior-x: contain;
   overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  contain: paint;
   user-select: none;
   -webkit-user-select: none;
   cursor: grab;
@@ -1214,7 +1217,9 @@ html, body {
   width: 3800px;
   height: 460px;
   transform-origin: top left;
-  transform: scale(var(--mobile-map-scale, 1));
+  transform: scale(var(--mobile-map-scale, 1)) translateZ(0);
+  will-change: transform;
+  contain: layout;
   background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
   overflow: hidden;
 }
@@ -1228,6 +1233,8 @@ html, body {
   height: 460px;
   pointer-events: none;
   z-index: 1;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* Background Animated Actors & Official Characters */
@@ -1288,11 +1295,12 @@ html, body {
 /* Active Road Progress Glow Pulse */
 .roadmap-active-progress-pulse {
   animation: roadProgressPulse 3s ease-in-out infinite alternate;
+  will-change: opacity;
 }
 
 @keyframes roadProgressPulse {
-  0% { stroke-width: 7.5px; opacity: 0.85; }
-  100% { stroke-width: 9.5px; opacity: 1; }
+  0% { opacity: 0.82; }
+  100% { opacity: 1; }
 }
 
 /* Floating Airship above Level 10 */
@@ -1753,6 +1761,8 @@ html, body {
   overflow: visible;
   display: flex;
   align-items: center;
+  transform: translateZ(0);
+  will-change: left, opacity;
   transition: left 0.85s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.85s ease;
 }
 
@@ -1765,6 +1775,7 @@ html, body {
   width: 140px;
   pointer-events: none;
   overflow: hidden;
+  transform: translateZ(0);
 }
 
 .cloud-sunray {
@@ -1772,6 +1783,8 @@ html, body {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(254, 240, 138, 0.25) 45%, transparent 80%);
   filter: blur(8px);
   transform-origin: top left;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .ray-1 { width: 140px; height: 180px; top: 0; left: 0; transform: rotate(25deg); }
@@ -1786,12 +1799,15 @@ html, body {
   left: -100px;
   width: 200px;
   pointer-events: none;
+  transform: translateZ(0);
 }
 
 .cloud-billow {
   position: absolute;
   border-radius: 50%;
   animation: realisticCloudDrift 6.5s ease-in-out infinite alternate;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* 1. Background Atmospheric Haze */
@@ -1842,10 +1858,9 @@ html, body {
 .cloud-fog-body {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.92) 110px, #ffffff 240px, #ffffff 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.94) 100px, #ffffff 220px, #ffffff 100%);
   box-shadow: -20px 0 40px rgba(255, 255, 255, 0.7);
+  transform: translateZ(0);
 }
 
 .cloud-celestial-stars {
@@ -3137,7 +3152,7 @@ html, body {
 /* Result Modal */
 #result-dialog {
   max-height: 94vh;
-  width: min(92vw, 450px);
+  width: min(94vw, 540px);
   overflow: hidden;
 }
 
@@ -3246,30 +3261,46 @@ html, body {
 .result-actions {
   width: 100%;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-top: 8px;
+  box-sizing: border-box;
 }
 
 .result-actions .action-btn {
+  flex: 1 1 0;
+  min-width: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-size: 0.84rem;
+  gap: 5px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
   font-weight: 700;
   border-radius: 12px;
+  white-space: nowrap;
+}
+
+.result-actions .action-btn span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .result-actions .action-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   stroke-width: 2.2;
   flex-shrink: 0;
   display: block;
+}
+
+.result-actions .action-btn .cta-arrow {
+  font-size: 0.85rem;
+  flex-shrink: 0;
 }
 
 .hidden {
@@ -3793,13 +3824,13 @@ html, body {
 
   #result-dialog {
     max-height: 98vh;
-    width: min(96vw, 440px);
+    width: min(96vw, 520px);
     border-radius: 18px;
   }
 
   .result-content {
     max-height: 98vh;
-    overflow-y: visible;
+    overflow-y: hidden;
     padding: 6px 14px;
     gap: 4px;
   }
@@ -3856,13 +3887,38 @@ html, body {
 
   .result-actions {
     margin-top: 4px;
-    gap: 6px;
+    gap: 5px;
+    flex-wrap: nowrap;
   }
 
   .result-actions .action-btn {
-    padding: 5px 12px;
-    font-size: 0.76rem;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 5px 6px;
+    font-size: 0.72rem;
     min-height: 34px;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .result-actions .action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-actions {
+    gap: 4px;
+  }
+  .result-actions .action-btn {
+    padding: 5px 3px;
+    font-size: 0.68rem;
+    gap: 3px;
+  }
+  .result-actions .action-btn svg {
+    width: 12px;
+    height: 12px;
   }
 }
 
@@ -5893,17 +5949,14 @@ html, body {
 .structure-birds-tracker {
   position: absolute;
   top: 76px;
-  right: 16px;
+  right: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 12px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(56, 189, 248, 0.32);
-  border-radius: 16px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(56, 189, 248, 0.15);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   z-index: 45;
   pointer-events: auto;
   align-items: center;
@@ -6359,10 +6412,12 @@ html, body {
 @media (max-width: 768px), (max-height: 500px) {
   .structure-birds-tracker {
     top: 54px;
-    right: 10px;
-    padding: 6px 8px;
+    right: 8px;
+    padding: 0;
     gap: 5px;
-    border-radius: 12px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
   .tracker-header-text {
     font-size: 0.58rem;

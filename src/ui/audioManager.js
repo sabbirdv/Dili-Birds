@@ -58,16 +58,17 @@ export class AudioManager {
     this.isBgmPlaying = false;
     this.isPlayingGameplay = false;
 
-    // Dynamic Slingshot Pull Continuous Tension Synth
-    this.pullOsc = null;
-    this.pullGain = null;
-    this.pullFilter = null;
+    // Cartoon Slingshot Dynamic Rubber Stretch Synth State
     this.lastPullRatio = 0;
     this.lastPullTickTime = 0;
 
-    // In-Flight Aerodynamic Wind Loop
-    this.flightNoiseSrc = null;
-    this.flightFilter = null;
+    // Cartoon Comical Slide Whistle Flight Synth
+    this.flightOsc = null;
+    this.flightOsc2 = null;
+    this.flightLfo = null;
+    this.flightLfoGain = null;
+    this.flightTremolo = null;
+    this.flightTremoloGain = null;
     this.flightGain = null;
     this.isFlightSoundActive = false;
 
@@ -80,11 +81,12 @@ export class AudioManager {
     // Pre-computed Pink Noise Buffer
     this.pinkNoiseBuffer = null;
 
-    // Volume & Mute State (Calibrated 2x louder default)
+    // Volume & Mute State (90% Default for both SFX and BGM, with 3x Sound Boost)
     this.isMuted = !this.storage.isSoundEnabled();
-    this.sfxVol = this.storage.getSfxVolume();
+    const storedSfx = this.storage.getSfxVolume();
+    this.sfxVol = typeof storedSfx === 'number' ? Math.max(0, Math.min(1.0, storedSfx)) : 0.90;
     const storedBgm = this.storage.getBgmVolume();
-    this.bgmVol = typeof storedBgm === 'number' ? Math.max(0.2, Math.min(1.0, storedBgm)) : 0.85;
+    this.bgmVol = typeof storedBgm === 'number' ? Math.max(0, Math.min(1.0, storedBgm)) : 0.90;
 
     // Autoplay Unlock on any user interaction
     this.setupAutoplayUnlock();
@@ -131,21 +133,21 @@ export class AudioManager {
 
     // 1. Master Dynamics Compressor: Prevents clipping and provides punchy broadcast loudness
     this.masterCompressor = this.ctx.createDynamicsCompressor();
-    this.masterCompressor.threshold.setValueAtTime(-4.0, this.ctx.currentTime);
-    this.masterCompressor.knee.setValueAtTime(8.0, this.ctx.currentTime);
-    this.masterCompressor.ratio.setValueAtTime(3.5, this.ctx.currentTime);
-    this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
-    this.masterCompressor.release.setValueAtTime(0.18, this.ctx.currentTime);
+    this.masterCompressor.threshold.setValueAtTime(-5.0, this.ctx.currentTime);
+    this.masterCompressor.knee.setValueAtTime(10.0, this.ctx.currentTime);
+    this.masterCompressor.ratio.setValueAtTime(4.0, this.ctx.currentTime);
+    this.masterCompressor.attack.setValueAtTime(0.002, this.ctx.currentTime);
+    this.masterCompressor.release.setValueAtTime(0.14, this.ctx.currentTime);
     this.masterCompressor.connect(this.ctx.destination);
 
     // 2. Master Gain Bus
     this.masterGain = this.ctx.createGain();
-    this.masterGain.gain.setValueAtTime(this.isMuted ? 0.0 : 1.0, this.ctx.currentTime);
+    this.masterGain.gain.setValueAtTime(this.isMuted ? 0.0 : 1.25, this.ctx.currentTime);
     this.masterGain.connect(this.masterCompressor);
 
-    // 3. SFX Bus
+    // 3. SFX Bus (Elevated bus multiplier for true 3x punchy presence)
     this.sfxGain = this.ctx.createGain();
-    this.sfxGain.gain.setValueAtTime(this.sfxVol, this.ctx.currentTime);
+    this.sfxGain.gain.setValueAtTime(this.sfxVol * 1.5, this.ctx.currentTime);
     this.sfxGain.connect(this.masterGain);
 
     this.sfxDuckingGain = this.ctx.createGain();
@@ -154,10 +156,10 @@ export class AudioManager {
 
     // 4. Ambience Bus
     this.ambienceGain = this.ctx.createGain();
-    this.ambienceGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+    this.ambienceGain.gain.setValueAtTime(0.95, this.ctx.currentTime);
     this.ambienceGain.connect(this.sfxGain);
 
-    // 5. BGM Bus with 2x Increased Loudness
+    // 5. BGM Bus at 90% default
     this.bgmGain = this.ctx.createGain();
     this.bgmGain.gain.setValueAtTime(this.bgmVol, this.ctx.currentTime);
     this.bgmGain.connect(this.masterGain);
@@ -286,7 +288,8 @@ export class AudioManager {
     if (this.ctx && this.sfxGain) {
       const now = this.ctx.currentTime;
       this.sfxGain.gain.cancelScheduledValues(now);
-      this.sfxGain.gain.linearRampToValueAtTime(this.sfxVol, now + 0.05);
+      this.sfxGain.gain.setValueAtTime(this.sfxGain.gain.value, now);
+      this.sfxGain.gain.linearRampToValueAtTime(this.sfxVol * 1.5, now + 0.05);
     }
   }
 
@@ -296,6 +299,7 @@ export class AudioManager {
     if (this.ctx && this.bgmGain) {
       const now = this.ctx.currentTime;
       this.bgmGain.gain.cancelScheduledValues(now);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, now);
       this.bgmGain.gain.linearRampToValueAtTime(this.bgmVol, now + 0.05);
     }
   }
@@ -948,98 +952,124 @@ export class AudioManager {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * 2. SLINGSHOT MECHANICS & GAMEPLAY AUDIO
+   * 2. CARTOON SLINGSHOT MECHANICS & GAMEPLAY AUDIO
+   * Playful, joyful cartoon audio replacing realistic tension/drone.
    * ═════════════════════════════════════════════════════════════ */
 
+  /**
+   * Cartoon Bird Grab / Pick-up:
+   * Playful, bouncy cartoon bird chirp/peep ("peep-peep!")
+   */
   playBirdGrab() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(540, now);
-    osc.frequency.exponentialRampToValueAtTime(840, now + 0.035);
+    // First cute cartoon peep
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(680, now);
+    osc1.frequency.exponentialRampToValueAtTime(1150, now + 0.032);
 
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.14, now + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+    gain1.gain.setValueAtTime(0.0001, now);
+    gain1.gain.linearRampToValueAtTime(0.40, now + 0.008);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
 
-    osc.connect(gain);
-    gain.connect(this.sfxDuckingGain);
-    osc.start(now);
-    osc.stop(now + 0.055);
+    osc1.connect(gain1);
+    gain1.connect(this.sfxDuckingGain);
+    osc1.start(now);
+    osc1.stop(now + 0.052);
+
+    // Second bounce peep
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(1020, now + 0.038);
+    osc2.frequency.exponentialRampToValueAtTime(1450, now + 0.075);
+
+    gain2.gain.setValueAtTime(0.0001, now + 0.038);
+    gain2.gain.linearRampToValueAtTime(0.44, now + 0.046);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.095);
+
+    osc2.connect(gain2);
+    gain2.connect(this.sfxDuckingGain);
+    osc2.start(now + 0.038);
+    osc2.stop(now + 0.10);
   }
 
+  /**
+   * Cartoon Slingshot Rubber Band Pull & Stretch:
+   * Playful cartoon rubber stretch twang ("twip... bwo-o-ing!")
+   * CRITICAL FIX: When holding still (aiming), ZERO continuous sound/drone is played.
+   * Only triggers cute, bouncy cartoon rubber stretch steps while actively dragging.
+   */
   updateSlingshotPull(ratio = 0) {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
     const clampedRatio = Math.max(0, Math.min(1.0, ratio));
 
-    if (!this.pullOsc) {
-      this.pullOsc = ctx.createOscillator();
-      this.pullFilter = ctx.createBiquadFilter();
-      this.pullGain = ctx.createGain();
-
-      this.pullOsc.type = 'triangle';
-      this.pullFilter.type = 'bandpass';
-      this.pullFilter.Q.setValueAtTime(3.2, now);
-
-      this.pullGain.gain.setValueAtTime(0.0001, now);
-
-      this.pullOsc.connect(this.pullFilter);
-      this.pullFilter.connect(this.pullGain);
-      this.pullGain.connect(this.sfxDuckingGain);
-      this.pullOsc.start(now);
-    }
-
-    const targetFreq = 160 + clampedRatio * 250;
-    this.pullOsc.frequency.linearRampToValueAtTime(targetFreq, now + 0.04);
-    this.pullFilter.frequency.linearRampToValueAtTime(targetFreq * 1.5, now + 0.04);
-
-    const targetGain = clampedRatio > 0.08 ? (0.018 + clampedRatio * 0.048) : 0.0001;
-    this.pullGain.gain.linearRampToValueAtTime(targetGain, now + 0.04);
-
     const pullDelta = Math.abs(clampedRatio - this.lastPullRatio);
-    if (pullDelta > 0.06 && (now - this.lastPullTickTime > 0.075)) {
+    // Only play sound when actively pulling or changing stretch significantly
+    if (pullDelta > 0.032 && (now - this.lastPullTickTime > 0.060)) {
       this.lastPullTickTime = now;
       this.lastPullRatio = clampedRatio;
 
-      const click = ctx.createOscillator();
-      const cGain = ctx.createGain();
-      click.type = 'triangle';
-      click.frequency.setValueAtTime(920 + Math.random() * 400, now);
-      click.frequency.exponentialRampToValueAtTime(350, now + 0.012);
+      // Cartoon rubber band pitch scales with stretch
+      const baseFreq = 220 + clampedRatio * 460; // 220Hz to 680Hz
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
 
-      cGain.gain.setValueAtTime(0.03 * clampedRatio, now);
-      cGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
+      // Triangle for rubbery harmonic body
+      osc.type = 'triangle';
+      // Pitch bends up with cartoon rubber elasticity
+      osc.frequency.setValueAtTime(baseFreq * 0.88, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.18, now + 0.022);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.07);
 
-      click.connect(cGain);
-      cGain.connect(this.sfxDuckingGain);
-      click.start(now);
-      click.stop(now + 0.02);
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(baseFreq * 3.4, now);
+
+      const stepVol = 0.32 + clampedRatio * 0.28;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(stepVol, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.sfxDuckingGain);
+      osc.start(now);
+      osc.stop(now + 0.08);
+
+      // Cute cartoon rubber strain squeak when near full stretch
+      if (clampedRatio > 0.82 && Math.random() > 0.35) {
+        const squeak = ctx.createOscillator();
+        const sqGain = ctx.createGain();
+        squeak.type = 'sine';
+        squeak.frequency.setValueAtTime(1180, now + 0.01);
+        squeak.frequency.exponentialRampToValueAtTime(780, now + 0.05);
+
+        sqGain.gain.setValueAtTime(0.24, now + 0.01);
+        sqGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+
+        squeak.connect(sqGain);
+        sqGain.connect(this.sfxDuckingGain);
+        squeak.start(now + 0.01);
+        squeak.stop(now + 0.06);
+      }
     }
   }
 
   stopSlingshotPull() {
-    if (this.pullGain && this.ctx) {
-      const now = this.ctx.currentTime;
-      this.pullGain.gain.cancelScheduledValues(now);
-      this.pullGain.gain.linearRampToValueAtTime(0.0001, now + 0.03);
-    }
-    if (this.pullOsc) {
-      try {
-        this.pullOsc.stop(this.ctx.currentTime + 0.035);
-      } catch {}
-      this.pullOsc = null;
-      this.pullGain = null;
-      this.pullFilter = null;
-    }
     this.lastPullRatio = 0;
   }
 
+  /**
+   * Cartoon Slingshot Cancel:
+   * Playful cartoon rubber spring unwind ("bwo-o-ing... down")
+   */
   playSlingshotCancel() {
     this.stopSlingshotPull();
     const ctx = this.ensureContext();
@@ -1049,18 +1079,22 @@ export class AudioManager {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(260, now);
-    osc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
+    osc.frequency.setValueAtTime(500, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.09);
 
-    gain.gain.setValueAtTime(0.07, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+    gain.gain.setValueAtTime(0.38, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.10);
 
     osc.connect(gain);
     gain.connect(this.sfxDuckingGain);
     osc.start(now);
-    osc.stop(now + 0.05);
+    osc.stop(now + 0.11);
   }
 
+  /**
+   * Cartoon Slingshot Launch:
+   * Punchy cartoon rubber snap + comical cork pop + bright cartoon slide whistle launch chirp
+   */
   playLaunch(power = 1.0) {
     this.stopSlingshotPull();
     const ctx = this.ensureContext();
@@ -1068,58 +1102,51 @@ export class AudioManager {
     const now = ctx.currentTime;
     const clampedPower = Math.min(1.4, Math.max(0.6, power));
 
-    // Rubber band whip-crack snap
+    // 1. Sharp cartoon rubber whip-snap
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'sawtooth';
-    snapOsc.frequency.setValueAtTime(1450 * clampedPower, now);
-    snapOsc.frequency.exponentialRampToValueAtTime(210, now + 0.034);
+    snapOsc.frequency.setValueAtTime(1750 * clampedPower, now);
+    snapOsc.frequency.exponentialRampToValueAtTime(240, now + 0.038);
 
-    snapGain.gain.setValueAtTime(0.28 * clampedPower, now);
-    snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
+    snapGain.gain.setValueAtTime(0.78 * clampedPower, now);
+    snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
     snapOsc.connect(snapGain);
     snapGain.connect(this.sfxDuckingGain);
     snapOsc.start(now);
-    snapOsc.stop(now + 0.042);
+    snapOsc.stop(now + 0.048);
 
-    // Leather pouch release pop
-    const thumpOsc = ctx.createOscillator();
-    const thumpGain = ctx.createGain();
-    thumpOsc.type = 'sine';
-    thumpOsc.frequency.setValueAtTime(160 * clampedPower, now);
-    thumpOsc.frequency.exponentialRampToValueAtTime(42, now + 0.07);
+    // 2. Comical cartoon launch pop
+    const popOsc = ctx.createOscillator();
+    const popGain = ctx.createGain();
+    popOsc.type = 'sine';
+    popOsc.frequency.setValueAtTime(180 * clampedPower, now);
+    popOsc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
 
-    thumpGain.gain.setValueAtTime(0.30 * clampedPower, now);
-    thumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+    popGain.gain.setValueAtTime(0.72 * clampedPower, now);
+    popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
 
-    thumpOsc.connect(thumpGain);
-    thumpGain.connect(this.sfxDuckingGain);
-    thumpOsc.start(now);
-    thumpOsc.stop(now + 0.085);
+    popOsc.connect(popGain);
+    popGain.connect(this.sfxDuckingGain);
+    popOsc.start(now);
+    popOsc.stop(now + 0.095);
 
-    // Resonant aerodynamic launch whoosh
-    if (this.pinkNoiseBuffer) {
-      const noise = ctx.createBufferSource();
-      noise.buffer = this.pinkNoiseBuffer;
+    // 3. Bright cartoon slide whistle launch whoop
+    const whistleOsc = ctx.createOscillator();
+    const whistleGain = ctx.createGain();
+    whistleOsc.type = 'sine';
+    whistleOsc.frequency.setValueAtTime(440, now);
+    whistleOsc.frequency.exponentialRampToValueAtTime(1200 * clampedPower, now + 0.085);
 
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1150 * clampedPower, now);
-      filter.frequency.exponentialRampToValueAtTime(320, now + 0.11);
-      filter.Q.setValueAtTime(2.4, now);
+    whistleGain.gain.setValueAtTime(0.0001, now);
+    whistleGain.gain.linearRampToValueAtTime(0.55 * clampedPower, now + 0.02);
+    whistleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
 
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.24 * clampedPower, now);
-      noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.115);
-
-      noise.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(this.sfxDuckingGain);
-
-      noise.start(now);
-      noise.stop(now + 0.12);
-    }
+    whistleOsc.connect(whistleGain);
+    whistleGain.connect(this.sfxDuckingGain);
+    whistleOsc.start(now);
+    whistleOsc.stop(now + 0.095);
   }
 
   updateSlingshotCharge(power) { this.updateSlingshotPull(power); }
@@ -1127,43 +1154,101 @@ export class AudioManager {
   playStretch(ratio) { this.updateSlingshotPull(ratio); }
 
   /* ═════════════════════════════════════════════════════════════
-   * IN-FLIGHT AERODYNAMICS
+   * CARTOON BIRD FLIGHT SOUND (Comical Slide-Whistle & Flutter)
+   * Replaces realistic noise rush with a cheerful, melodic cartoon
+   * slide-whistle glide ("wheeeee-e-e!") with subtle comic vibrato.
    * ═════════════════════════════════════════════════════════════ */
 
   startFlightSound() {
     const ctx = this.ensureContext();
-    if (!ctx || this.isMuted || this.isFlightSoundActive || !this.pinkNoiseBuffer) return;
+    if (!ctx || this.isMuted || this.isFlightSoundActive) return;
     this.isFlightSoundActive = true;
     const now = ctx.currentTime;
 
-    this.flightNoiseSrc = ctx.createBufferSource();
-    this.flightNoiseSrc.buffer = this.pinkNoiseBuffer;
-    this.flightNoiseSrc.loop = true;
+    // 1. Primary Whistle Oscillator (Warm Sine)
+    this.flightOsc = ctx.createOscillator();
+    this.flightOsc.type = 'sine';
+    this.flightOsc.frequency.setValueAtTime(640, now);
 
-    this.flightFilter = ctx.createBiquadFilter();
-    this.flightFilter.type = 'bandpass';
-    this.flightFilter.frequency.setValueAtTime(800, now);
-    this.flightFilter.Q.setValueAtTime(1.8, now);
+    // 2. Harmonic Whistle Layer (Soft Triangle 1 octave up for airy cartoon whistle timbre)
+    this.flightOsc2 = ctx.createOscillator();
+    this.flightOsc2.type = 'triangle';
+    this.flightOsc2.frequency.setValueAtTime(1280, now);
+
+    // 3. Comical Vibrato LFO (9.5 Hz warble for iconic cartoon slide-whistle feel)
+    this.flightLfo = ctx.createOscillator();
+    this.flightLfo.type = 'sine';
+    this.flightLfo.frequency.setValueAtTime(9.5, now);
+
+    this.flightLfoGain = ctx.createGain();
+    this.flightLfoGain.gain.setValueAtTime(26, now); // ±26 Hz vibrato depth
+
+    this.flightLfo.connect(this.flightLfoGain);
+    this.flightLfoGain.connect(this.flightOsc.frequency);
+    this.flightLfoGain.connect(this.flightOsc2.frequency);
+
+    // 4. Tremolo Flutter (Wing flapping flutter at 8 Hz)
+    this.flightTremolo = ctx.createOscillator();
+    this.flightTremolo.type = 'sine';
+    this.flightTremolo.frequency.setValueAtTime(8.0, now);
+
+    this.flightTremoloGain = ctx.createGain();
+    this.flightTremoloGain.gain.setValueAtTime(0.08, now); // subtle 8% AM flutter
+    this.flightTremolo.connect(this.flightTremoloGain);
+
+    // 5. Output Gain and Filter
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(2800, now);
 
     this.flightGain = ctx.createGain();
     this.flightGain.gain.setValueAtTime(0.0001, now);
-    this.flightGain.gain.linearRampToValueAtTime(0.040, now + 0.08);
+    this.flightGain.gain.linearRampToValueAtTime(0.24, now + 0.08);
 
-    this.flightNoiseSrc.connect(this.flightFilter);
-    this.flightFilter.connect(this.flightGain);
-    this.flightGain.connect(this.ambienceGain);
+    const osc2Gain = ctx.createGain();
+    osc2Gain.gain.setValueAtTime(0.18, now);
 
-    this.flightNoiseSrc.start(now);
+    this.flightOsc.connect(filter);
+    this.flightOsc2.connect(osc2Gain);
+    osc2Gain.connect(filter);
+
+    filter.connect(this.flightGain);
+    this.flightGain.connect(this.sfxDuckingGain);
+
+    this.flightOsc.start(now);
+    this.flightOsc2.start(now);
+    this.flightLfo.start(now);
+    this.flightTremolo.start(now);
   }
 
   updateFlightSound(speed = 10) {
-    if (!this.isFlightSoundActive || !this.flightFilter || !this.flightGain || !this.ctx) return;
+    if (!this.isFlightSoundActive || !this.flightOsc || !this.flightGain || !this.ctx) return;
     const now = this.ctx.currentTime;
     const normalizedSpeed = Math.min(2.5, Math.max(0.2, speed / 12));
 
-    this.flightFilter.frequency.linearRampToValueAtTime(700 + normalizedSpeed * 450, now + 0.05);
-    const targetGain = Math.min(0.075, 0.02 + normalizedSpeed * 0.028);
-    this.flightGain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
+    // Dynamic comical cartoon pitch glide: rises with speed, dips at apex
+    const targetFreq = 540 + normalizedSpeed * 380;
+    this.flightOsc.frequency.cancelScheduledValues(now);
+    this.flightOsc.frequency.setValueAtTime(this.flightOsc.frequency.value, now);
+    this.flightOsc.frequency.linearRampToValueAtTime(targetFreq, now + 0.06);
+
+    if (this.flightOsc2) {
+      this.flightOsc2.frequency.cancelScheduledValues(now);
+      this.flightOsc2.frequency.setValueAtTime(this.flightOsc2.frequency.value, now);
+      this.flightOsc2.frequency.linearRampToValueAtTime(targetFreq * 2, now + 0.06);
+    }
+
+    if (this.flightLfo) {
+      // Flutter speed increases when flying faster
+      const targetLfoRate = 8.5 + normalizedSpeed * 3.5;
+      this.flightLfo.frequency.linearRampToValueAtTime(targetLfoRate, now + 0.06);
+    }
+
+    // Dynamic volume tracking
+    const targetGain = Math.min(0.35, 0.16 + normalizedSpeed * 0.10);
+    this.flightGain.gain.cancelScheduledValues(now);
+    this.flightGain.gain.setValueAtTime(this.flightGain.gain.value, now);
+    this.flightGain.gain.linearRampToValueAtTime(targetGain, now + 0.06);
   }
 
   stopFlightSound() {
@@ -1173,16 +1258,29 @@ export class AudioManager {
     if (this.flightGain && this.ctx) {
       const now = this.ctx.currentTime;
       this.flightGain.gain.cancelScheduledValues(now);
-      this.flightGain.gain.linearRampToValueAtTime(0.0001, now + 0.06);
+      this.flightGain.gain.setValueAtTime(this.flightGain.gain.value, now);
+      this.flightGain.gain.linearRampToValueAtTime(0.0001, now + 0.04);
     }
-    if (this.flightNoiseSrc) {
-      try {
-        this.flightNoiseSrc.stop(this.ctx.currentTime + 0.07);
-      } catch {}
-      this.flightNoiseSrc = null;
-      this.flightFilter = null;
-      this.flightGain = null;
-    }
+
+    const oscsToStop = [this.flightOsc, this.flightOsc2, this.flightLfo, this.flightTremolo];
+    setTimeout(() => {
+      oscsToStop.forEach((osc) => {
+        if (osc) {
+          try {
+            osc.stop();
+            osc.disconnect();
+          } catch {}
+        }
+      });
+    }, 50);
+
+    this.flightOsc = null;
+    this.flightOsc2 = null;
+    this.flightLfo = null;
+    this.flightLfoGain = null;
+    this.flightTremolo = null;
+    this.flightTremoloGain = null;
+    this.flightGain = null;
   }
 
   /* ═════════════════════════════════════════════════════════════
@@ -1193,7 +1291,7 @@ export class AudioManager {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
-    const vol = Math.min(0.35, Math.max(0.07, intensity * 0.24));
+    const vol = Math.min(0.85, Math.max(0.24, intensity * 0.60));
     const pitchJitter = 0.92 + Math.random() * 0.16;
 
     if (material === 'stone') {

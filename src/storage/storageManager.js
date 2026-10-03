@@ -18,8 +18,8 @@ const DEFAULT_STATE = {
   zoneRevealed: { 1: true, 2: false }, // Tracks revealed zones on roadmap
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
-  sfxVolume: 0.85,
-  bgmVolume: 0.80,
+  sfxVolume: 0.90,
+  bgmVolume: 0.90,
   bgmMode: 'dashboard', // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
   playerId: '',
   serverRowId: null, // Unique ID in Supabase Dili-Birds-Data table
@@ -72,10 +72,12 @@ export class StorageManager {
         avatarUrl: resolvedAvatarUrl,
         avatarPresetId: resolvedPresetId,
         soundEnabled: parsed.soundEnabled !== undefined ? Boolean(parsed.soundEnabled) : true,
-        sfxVolume: typeof parsed.sfxVolume === 'number' ? Math.max(0, Math.min(1, parsed.sfxVolume)) : 0.85,
+        sfxVolume: typeof parsed.sfxVolume === 'number'
+          ? (parsed.sfxVolume < 0.90 ? 0.90 : Math.max(0, Math.min(1, parsed.sfxVolume)))
+          : 0.90,
         bgmVolume: typeof parsed.bgmVolume === 'number'
-          ? (parsed.bgmVolume === 0.45 ? 0.80 : Math.max(0, Math.min(1, parsed.bgmVolume)))
-          : 0.80,
+          ? (parsed.bgmVolume < 0.90 ? 0.90 : Math.max(0, Math.min(1, parsed.bgmVolume)))
+          : 0.90,
         bgmMode: ['dashboard', 'always', 'off'].includes(parsed.bgmMode) ? parsed.bgmMode : 'dashboard',
         coins: Math.max(0, Number(parsed.coins) || 0),
         levelStars: { ...(parsed.levelStars || {}) },
@@ -330,7 +332,7 @@ export class StorageManager {
   }
 
   getSfxVolume() {
-    return typeof this.state.sfxVolume === 'number' ? this.state.sfxVolume : 0.85;
+    return typeof this.state.sfxVolume === 'number' ? this.state.sfxVolume : 0.90;
   }
 
   setSfxVolume(val) {
@@ -340,7 +342,7 @@ export class StorageManager {
   }
 
   getBgmVolume() {
-    return typeof this.state.bgmVolume === 'number' ? this.state.bgmVolume : 0.45;
+    return typeof this.state.bgmVolume === 'number' ? this.state.bgmVolume : 0.90;
   }
 
   setBgmVolume(val) {

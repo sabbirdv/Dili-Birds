@@ -1,42 +1,51 @@
 import { LEVELS } from './levelData.js';
 import coinLogoUrl from '../assets/coin-with-logo.png';
+import coinTextUrl from '../assets/coin-with-text.png';
 import mascotCharUrl from '../assets/character.png';
+import char2Url from '../assets/character-2.png';
+import char3Url from '../assets/character-3.png';
+import subChar1Url from '../assets/sub-character.png';
+import subChar2Url from '../assets/sub-character-2.png';
+import subChar3Url from '../assets/sub-character-3.png';
+import subChar4Url from '../assets/sub-character-4.png';
 import logoWhiteUrl from '../assets/logo-white.png';
-import celestialMascotUrl from '../assets/sub-character.png';
+import logoBlueUrl from '../assets/logo-blue.png';
+import logoBlackUrl from '../assets/logo-black.png';
 
 /**
  * 20 Sequentially Placed Circular Level Nodes along a continuous, wavy undulating path.
- * Map total dimensions: width = 3720px, height = 580px.
- * Nodes oscillate organically in a wave pattern (y: 200–380) across the vibrant terrain.
+ * Calibrated dimensions: width = 3800px, height = 460px.
+ * Nodes oscillate organically between upper hills (y: 140–160) and lower meadows (y: 290–310),
+ * perfectly fitting any mobile landscape screen without vertical scrolling.
  */
 export const LEVEL_NODES = [
   // Zone 1: Sky Haven & Emerald Bastions (Levels 1–10)
-  { id: 1,  x: 180,  y: 360, zoneId: 1, zone: 'Emerald Valley', name: 'Timber Watchtower' },
-  { id: 2,  x: 360,  y: 210, zoneId: 1, zone: 'Crystal Ridge',  name: 'Twin Crystal Spires' },
-  { id: 3,  x: 540,  y: 380, zoneId: 1, zone: 'Emerald Valley', name: 'Stone Bastion Fortress' },
-  { id: 4,  x: 720,  y: 210, zoneId: 1, zone: 'Emerald Valley', name: 'Triple Bunker Redoubt' },
-  { id: 5,  x: 910,  y: 360, zoneId: 1, zone: 'Emerald Valley', name: 'Grand Citadel', milestone: 'sunburst' },
-  { id: 6,  x: 1100, y: 190, zoneId: 1, zone: 'Amber Canyon',   name: 'Canyon Gate Outpost' },
-  { id: 7,  x: 1280, y: 380, zoneId: 1, zone: 'Amber Canyon',   name: 'High Scaffold Quarry' },
-  { id: 8,  x: 1460, y: 230, zoneId: 1, zone: 'Amber Canyon',   name: 'Twin Citadels' },
-  { id: 9,  x: 1640, y: 380, zoneId: 1, zone: 'Amber Canyon',   name: 'Obsidian Arch Stronghold' },
-  { id: 10, x: 1830, y: 210, zoneId: 1, zone: 'Amber Canyon',   name: 'Colossus Gateway', milestone: 'airship' },
+  { id: 1,  x: 180,  y: 290, zoneId: 1, zone: 'Emerald Valley', name: 'Timber Watchtower' },
+  { id: 2,  x: 360,  y: 150, zoneId: 1, zone: 'Crystal Ridge',  name: 'Twin Crystal Spires' },
+  { id: 3,  x: 540,  y: 310, zoneId: 1, zone: 'Emerald Valley', name: 'Stone Bastion Fortress' },
+  { id: 4,  x: 720,  y: 150, zoneId: 1, zone: 'Emerald Valley', name: 'Triple Bunker Redoubt' },
+  { id: 5,  x: 910,  y: 290, zoneId: 1, zone: 'Emerald Valley', name: 'Grand Citadel', milestone: 'sunburst' },
+  { id: 6,  x: 1100, y: 140, zoneId: 1, zone: 'Amber Canyon',   name: 'Canyon Gate Outpost' },
+  { id: 7,  x: 1280, y: 310, zoneId: 1, zone: 'Amber Canyon',   name: 'High Scaffold Quarry' },
+  { id: 8,  x: 1460, y: 160, zoneId: 1, zone: 'Amber Canyon',   name: 'Twin Citadels' },
+  { id: 9,  x: 1640, y: 310, zoneId: 1, zone: 'Amber Canyon',   name: 'Obsidian Arch Stronghold' },
+  { id: 10, x: 1830, y: 160, zoneId: 1, zone: 'Amber Canyon',   name: 'Colossus Gateway', milestone: 'airship' },
 
   // Zone 2: Celestial Citadel & Crown Summit (Levels 11–20)
-  { id: 11, x: 2030, y: 370, zoneId: 2, zone: 'Celestial Twilight', name: 'Celestial Gateway' },
-  { id: 12, x: 2210, y: 210, zoneId: 2, zone: 'Celestial Twilight', name: 'Crystal Monoliths' },
-  { id: 13, x: 2390, y: 380, zoneId: 2, zone: 'Celestial Twilight', name: 'Starlight Sanctuary' },
-  { id: 14, x: 2570, y: 210, zoneId: 2, zone: 'Celestial Twilight', name: 'Aurora Spires' },
-  { id: 15, x: 2750, y: 360, zoneId: 2, zone: 'Celestial Twilight', name: 'Nebula Fortress', milestone: 'crystal' },
-  { id: 16, x: 2930, y: 210, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Bastion' },
-  { id: 17, x: 3110, y: 380, zoneId: 2, zone: 'Crown Summit',   name: 'Stormkeep Citadel' },
-  { id: 18, x: 3280, y: 220, zoneId: 2, zone: 'Crown Summit',   name: 'Dragon Spine Rampart' },
-  { id: 19, x: 3440, y: 370, zoneId: 2, zone: 'Crown Summit',   name: 'Infernal Vaults' },
-  { id: 20, x: 3580, y: 210, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Summit Apex', milestone: 'crown' }
+  { id: 11, x: 2030, y: 300, zoneId: 2, zone: 'Celestial Twilight', name: 'Celestial Gateway' },
+  { id: 12, x: 2210, y: 150, zoneId: 2, zone: 'Celestial Twilight', name: 'Crystal Monoliths' },
+  { id: 13, x: 2390, y: 310, zoneId: 2, zone: 'Celestial Twilight', name: 'Starlight Sanctuary' },
+  { id: 14, x: 2570, y: 150, zoneId: 2, zone: 'Celestial Twilight', name: 'Aurora Spires' },
+  { id: 15, x: 2750, y: 290, zoneId: 2, zone: 'Celestial Twilight', name: 'Nebula Fortress', milestone: 'crystal' },
+  { id: 16, x: 2930, y: 150, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Bastion' },
+  { id: 17, x: 3110, y: 310, zoneId: 2, zone: 'Crown Summit',   name: 'Stormkeep Citadel' },
+  { id: 18, x: 3280, y: 160, zoneId: 2, zone: 'Crown Summit',   name: 'Dragon Spine Rampart' },
+  { id: 19, x: 3440, y: 300, zoneId: 2, zone: 'Crown Summit',   name: 'Infernal Vaults' },
+  { id: 20, x: 3580, y: 150, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Summit Apex', milestone: 'crown' }
 ];
 
-export const MAP_TOTAL_WIDTH = 3760;
-export const MAP_TOTAL_HEIGHT = 580;
+export const MAP_TOTAL_WIDTH = 3800;
+export const MAP_TOTAL_HEIGHT = 460;
 
 /**
  * Builds a natural, ultra-smooth cubic Bézier spline connecting nodes sequentially.
@@ -48,11 +57,10 @@ function buildWavySplinePath(nodes, endIndex = nodes.length) {
     return `M ${nodes[0].x} ${nodes[0].y}`;
   }
 
-  // Lead-in from before Level 1
-  let d = `M ${Math.max(40, nodes[0].x - 100)} ${nodes[0].y + 10}`;
-  // Smooth curve into node 0
-  const dx0 = 100;
-  d += ` C ${nodes[0].x - dx0 * 0.5} ${nodes[0].y + 10}, ${nodes[0].x - dx0 * 0.3} ${nodes[0].y}, ${nodes[0].x} ${nodes[0].y}`;
+  // Smooth lead-in from before Level 1
+  let d = `M ${Math.max(30, nodes[0].x - 110)} ${nodes[0].y + 12}`;
+  const dx0 = 110;
+  d += ` C ${nodes[0].x - dx0 * 0.5} ${nodes[0].y + 12}, ${nodes[0].x - dx0 * 0.3} ${nodes[0].y}, ${nodes[0].x} ${nodes[0].y}`;
 
   // Connect node i to node i+1 with S-curve cubic Béziers
   for (let i = 0; i < count - 1; i++) {
@@ -69,7 +77,7 @@ function buildWavySplinePath(nodes, endIndex = nodes.length) {
   // Lead-out if at the end of all 20 nodes
   if (count === nodes.length) {
     const last = nodes[nodes.length - 1];
-    d += ` C ${last.x + 80} ${last.y}, ${last.x + 120} ${last.y - 10}, ${last.x + 160} ${last.y - 10}`;
+    d += ` C ${last.x + 80} ${last.y}, ${last.x + 120} ${last.y - 12}, ${last.x + 170} ${last.y - 12}`;
   }
 
   return d;
@@ -77,12 +85,12 @@ function buildWavySplinePath(nodes, endIndex = nodes.length) {
 
 /**
  * Comprehensive, High-Fidelity Horizontal Level Selection Map.
- * - Continuous, winding wavy path across lush ground terrain.
- * - Circular nodes for levels 1 to 20 sequentially positioned on the path.
- * - 0–3 stars crowning completed nodes, red bird avatar on active frontier node, and juicy PLAY! button.
- * - Smooth horizontal touch and mouse dragging with velocity inertia; vertical scrolling disabled.
- * - Dynamic white Cloud Fog of War covering levels 11 onward, clearing progressively as stages are completed.
- * - Interactive navigation: tapping any unlocked node launches that level immediately.
+ * - Calibrated for mobile landscape orientation (strictly zero vertical scroll).
+ * - Continuous, winding wavy path across vibrant ground terrain.
+ * - Large, tactile circular nodes for levels 1 to 20 with prominent numbers and stars.
+ * - Background populated with official characters, coins, and logos (tinted & animated).
+ * - Realistic volumetric cumulus Cloud Fog of War obscuring levels 11 onward, clearing progressively.
+ * - Smooth horizontal drag/panning with velocity inertia.
  */
 export class LevelSelect {
   constructor(storage, onSelectLevel, onPreviewLevel, audio = null) {
@@ -113,10 +121,12 @@ export class LevelSelect {
     this.lastTime = 0;
     this.velocityX = 0;
     this.momentumRafId = null;
+    this.currentScale = 1.0;
 
     this.bindViewportInteractions();
     this.bindQuickZoneJumps();
     this.bindFloatingNavButtons();
+    this.bindResizeListener();
   }
 
   setAudio(audio) {
@@ -137,6 +147,44 @@ export class LevelSelect {
     }
   }
 
+  bindResizeListener() {
+    const handleResize = () => {
+      this.updateMobileScaling();
+      this.updateScrubberAndNavControls();
+    };
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(handleResize, 100);
+    });
+  }
+
+  /**
+   * Automatically adapts the map world scale to fit the mobile landscape screen height.
+   * Completely eliminates vertical scrolling while ensuring all nodes, mascot pins, and CTA buttons are visible.
+   */
+  updateMobileScaling() {
+    if (!this.viewportEl) return;
+    const vpHeight = this.viewportEl.clientHeight || 360;
+    const baseHeight = MAP_TOTAL_HEIGHT;
+
+    // In mobile landscape or short viewports, scale down to fit comfortably
+    let scale = 1.0;
+    if (vpHeight < baseHeight) {
+      scale = Math.max(0.58, Math.min(1.0, (vpHeight - 4) / baseHeight));
+    } else {
+      scale = Math.min(1.25, vpHeight / baseHeight);
+    }
+    this.currentScale = scale;
+
+    this.viewportEl.style.setProperty('--mobile-map-scale', scale.toFixed(3));
+
+    const wrapper = this.gridEl;
+    if (wrapper) {
+      wrapper.style.width = `${Math.round(MAP_TOTAL_WIDTH * scale)}px`;
+      wrapper.style.height = `${Math.round(MAP_TOTAL_HEIGHT * scale)}px`;
+    }
+  }
+
   /* ═════════════════════════════════════════════════════════════
    * HORIZONTAL SCROLLING & DRAGGING MECHANICS
    * ═════════════════════════════════════════════════════════════ */
@@ -148,7 +196,6 @@ export class LevelSelect {
     // Pointer Drag (Mouse + Touch)
     vp.addEventListener('pointerdown', (e) => {
       if (this.isInputLocked) return;
-      // Cancel any ongoing momentum coasting
       if (this.momentumRafId) {
         cancelAnimationFrame(this.momentumRafId);
         this.momentumRafId = null;
@@ -174,7 +221,7 @@ export class LevelSelect {
       const dx = e.clientX - this.startX;
       const dy = e.clientY - this.startY;
 
-      // Check drag threshold (6px) to distinguish drag from tap
+      // 6px drag threshold
       if (!this.hasDragged && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
         this.hasDragged = true;
       }
@@ -203,8 +250,7 @@ export class LevelSelect {
         }
       } catch {}
 
-      // Apply smooth momentum coasting
-      if (this.hasDragged && Math.abs(this.velocityX) > 0.2) {
+      if (this.hasDragged && Math.abs(this.velocityX) > 0.18) {
         this.startMomentumGlide(this.velocityX);
       }
 
@@ -214,21 +260,16 @@ export class LevelSelect {
     vp.addEventListener('pointerup', handlePointerEnd);
     vp.addEventListener('pointercancel', handlePointerEnd);
 
-    // Mouse wheel horizontal translation (vertical wheel delta scrolls horizontally)
+    // Mouse wheel horizontal translation
     vp.addEventListener('wheel', (e) => {
       if (this.isInputLocked) return;
       const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       if (Math.abs(delta) > 0.5) {
         e.preventDefault();
-        vp.scrollLeft += delta * 1.1;
+        vp.scrollLeft += delta * 1.15;
         this.updateScrubberAndNavControls();
       }
     }, { passive: false });
-
-    // Ensure strictly no vertical movement on touch
-    vp.addEventListener('touchmove', (e) => {
-      // Touch-action: pan-x already helps, but prevent any vertical overscroll
-    }, { passive: true });
 
     // Sync scrubber on scroll
     vp.addEventListener('scroll', () => {
@@ -240,11 +281,11 @@ export class LevelSelect {
     const vp = this.viewportEl;
     if (!vp) return;
 
-    let v = initialVelocity * 15; // Scale velocity to pixels per frame
-    const friction = 0.93;
+    let v = initialVelocity * 16;
+    const friction = 0.92;
 
     const step = () => {
-      if (Math.abs(v) < 0.3) {
+      if (Math.abs(v) < 0.25) {
         this.momentumRafId = null;
         return;
       }
@@ -263,12 +304,14 @@ export class LevelSelect {
 
     btnLeft?.addEventListener('click', () => {
       if (this.isInputLocked || !this.viewportEl) return;
-      this.viewportEl.scrollBy({ left: -420, behavior: 'smooth' });
+      const panAmount = Math.max(300, (this.viewportEl.clientWidth || 600) * 0.7);
+      this.viewportEl.scrollBy({ left: -panAmount, behavior: 'smooth' });
     });
 
     btnRight?.addEventListener('click', () => {
       if (this.isInputLocked || !this.viewportEl) return;
-      this.viewportEl.scrollBy({ left: 420, behavior: 'smooth' });
+      const panAmount = Math.max(300, (this.viewportEl.clientWidth || 600) * 0.7);
+      this.viewportEl.scrollBy({ left: panAmount, behavior: 'smooth' });
     });
   }
 
@@ -292,7 +335,7 @@ export class LevelSelect {
     if (zoneId === 1) {
       targetX = 0;
     } else {
-      targetX = 1860 - 80;
+      targetX = (1860 - 80) * this.currentScale;
     }
     this.viewportEl.scrollTo({ left: Math.max(0, targetX), behavior: smooth ? 'smooth' : 'auto' });
     this.updateZoneButtons();
@@ -302,7 +345,7 @@ export class LevelSelect {
     if (!this.viewportEl) return;
     const node = LEVEL_NODES.find((n) => n.id === Number(levelId)) || LEVEL_NODES[0];
     const vpWidth = this.viewportEl.clientWidth || 800;
-    const targetScroll = node.x - vpWidth / 2;
+    const targetScroll = (node.x * this.currentScale) - vpWidth / 2;
     this.viewportEl.scrollTo({
       left: Math.max(0, targetScroll),
       behavior: smooth ? 'smooth' : 'auto'
@@ -326,7 +369,7 @@ export class LevelSelect {
     if (!this.viewportEl) return;
 
     const scrollLeft = this.viewportEl.scrollLeft;
-    const isZone2 = scrollLeft >= 1400;
+    const isZone2 = scrollLeft >= 1350 * this.currentScale;
     this.currentZoneId = isZone2 ? 2 : 1;
 
     jumpBtn1?.classList.toggle('active', !isZone2);
@@ -339,7 +382,6 @@ export class LevelSelect {
     const maxScroll = Math.max(1, vp.scrollWidth - vp.clientWidth);
     const currentScroll = vp.scrollLeft;
 
-    // Update floating nav arrows opacity / visibility
     const btnLeft = document.getElementById('btn-map-pan-left');
     const btnRight = document.getElementById('btn-map-pan-right');
     if (btnLeft) {
@@ -349,7 +391,6 @@ export class LevelSelect {
       btnRight.classList.toggle('disabled', currentScroll >= maxScroll - 10);
     }
 
-    // Update Scrubber marker
     const scrubberMarker = document.getElementById('scrubber-marker');
     if (scrubberMarker) {
       const pct = Math.max(0, Math.min(100, (currentScroll / maxScroll) * 100));
@@ -365,11 +406,10 @@ export class LevelSelect {
 
   /**
    * Generates the multi-layer SVG world canvas:
-   * 1. Sky gradients & celestial transition
-   * 2. Distant mountain silhouettes
-   * 3. Green hill plateaus, lagoon, cliffs, and floating rocks
-   * 4. Multi-layer winding wavy road (shadow, curb, road, stones, center dashes, active progress)
-   * 5. Thematic scenery props (Watchtowers, bridges, Colossus Altar, Level 10 Airship, Level 20 Citadel)
+   * 1. Dynamic sky & mountain backdrops.
+   * 2. Lush green rolling hills, cliffs, lagoon, and celestial crags.
+   * 3. Winding wavy road layers.
+   * 4. Official characters & icons embedded into scenery.
    */
   buildWorldSvgTerrain(unlockedLevel) {
     const fullPathD = buildWavySplinePath(LEVEL_NODES, LEVEL_NODES.length);
@@ -385,11 +425,11 @@ export class LevelSelect {
         aria-hidden="true"
       >
         <defs>
-          <!-- Atmosphere & Sky Gradient across 3760px -->
+          <!-- Atmosphere & Sky Gradient across 3800px -->
           <linearGradient id="skyAtmosphereGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#38bdf8" />
-            <stop offset="30%" stop-color="#60a5fa" />
-            <stop offset="48%" stop-color="#f59e0b" stop-opacity="0.3" />
+            <stop offset="28%" stop-color="#60a5fa" />
+            <stop offset="46%" stop-color="#f59e0b" stop-opacity="0.35" />
             <stop offset="54%" stop-color="#4f46e5" />
             <stop offset="78%" stop-color="#3b0764" />
             <stop offset="100%" stop-color="#1e1b4b" />
@@ -398,7 +438,7 @@ export class LevelSelect {
           <!-- Golden Winding Road Gradient -->
           <linearGradient id="roadSurfaceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#fef08a" />
-            <stop offset="40%" stop-color="#f59e0b" />
+            <stop offset="35%" stop-color="#f59e0b" />
             <stop offset="100%" stop-color="#d97706" />
           </linearGradient>
 
@@ -444,6 +484,20 @@ export class LevelSelect {
             <stop offset="100%" stop-color="#0284c7" />
           </linearGradient>
 
+          <!-- Volumetric Cloud Gradients (Sunlit Top, Soft Blue/Slate Shadow Underside) -->
+          <radialGradient id="cloudVolumeGrad1" cx="45%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="45%" stop-color="#f8fafc" />
+            <stop offset="75%" stop-color="#e2e8f0" />
+            <stop offset="100%" stop-color="#94a3b8" />
+          </radialGradient>
+          <radialGradient id="cloudVolumeGrad2" cx="40%" cy="25%" r="75%">
+            <stop offset="0%" stop-color="#ffffff" />
+            <stop offset="50%" stop-color="#f1f5f9" />
+            <stop offset="80%" stop-color="#cbd5e1" />
+            <stop offset="100%" stop-color="#64748b" />
+          </radialGradient>
+
           <!-- Soft Glow Filters -->
           <filter id="roadGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -453,164 +507,187 @@ export class LevelSelect {
             <feGaussianBlur stdDeviation="8" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
+          <filter id="cloudSoftShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="6" />
+            <feOffset dx="-4" dy="8" />
+            <feComponentTransfer><feFuncA type="linear" slope="0.32" /></feComponentTransfer>
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
         <!-- 1. SKY BACKDROP & AMBIENCE -->
-        <rect x="0" y="0" width="${MAP_TOTAL_WIDTH}" height="${MAP_TOTAL_HEIGHT}" fill="url(#skyAtmosphereGrad)" opacity="0.32" />
+        <rect x="0" y="0" width="${MAP_TOTAL_WIDTH}" height="${MAP_TOTAL_HEIGHT}" fill="url(#skyAtmosphereGrad)" opacity="0.35" />
 
         <!-- Distant Mountain Silhouettes -->
-        <path d="M 0 320 Q 300 180 600 300 T 1200 290 T 1800 280 T 2400 270 T 3000 280 T 3760 300 L 3760 580 L 0 580 Z" fill="#0f291e" opacity="0.45" />
-        <path d="M 0 350 Q 250 240 500 330 T 1000 320 T 1500 300 T 2000 310 T 2600 290 T 3200 310 T 3760 330 L 3760 580 L 0 580 Z" fill="#133d26" opacity="0.55" />
+        <path d="M 0 250 Q 300 130 600 230 T 1200 220 T 1800 210 T 2400 200 T 3000 210 T 3800 230 L 3800 460 L 0 460 Z" fill="#0f291e" opacity="0.45" />
+        <path d="M 0 270 Q 250 180 500 260 T 1000 250 T 1500 230 T 2000 240 T 2600 220 T 3200 240 T 3800 260 L 3800 460 L 0 460 Z" fill="#133d26" opacity="0.55" />
 
         <!-- 2. MIDGROUND TERRAIN ISLANDS & PLATEAUS -->
 
         <!-- Zone 1: Emerald Valley Rolling Hills (x: 0 to 1100) -->
-        <path d="M -40 380 Q 180 260 400 370 T 800 330 T 1150 380 L 1150 580 L -40 580 Z" fill="url(#greenHillGrad1)" />
-        <path d="M 120 440 Q 360 140 600 420 T 980 430 L 980 580 L 120 580 Z" fill="url(#greenHillGrad2)" opacity="0.85" />
+        <path d="M -40 310 Q 180 190 400 300 T 800 260 T 1150 310 L 1150 460 L -40 460 Z" fill="url(#greenHillGrad1)" />
+        <path d="M 120 350 Q 360 80 600 340 T 980 340 L 980 460 L 120 460 Z" fill="url(#greenHillGrad2)" opacity="0.85" />
 
         <!-- Coastal Water Cove at start (Levels 1–3) -->
-        <path d="M 0 460 Q 140 430 260 480 T 480 510 L 480 580 L 0 580 Z" fill="url(#lagoonWaterGrad)" opacity="0.75" />
-        <!-- Sandy Beach Shoreline -->
-        <path d="M 0 455 Q 140 425 260 475 T 490 505" fill="none" stroke="#fef08a" stroke-width="8" stroke-linecap="round" opacity="0.8" />
+        <path d="M 0 370 Q 140 340 260 390 T 480 410 L 480 460 L 0 460 Z" fill="url(#lagoonWaterGrad)" opacity="0.75" />
+        <path d="M 0 365 Q 140 335 260 385 T 490 405" fill="none" stroke="#fef08a" stroke-width="7" stroke-linecap="round" opacity="0.8" />
 
         <!-- Amber Canyon Rocky Cliffs (x: 1050 to 1950) -->
-        <path d="M 1050 420 Q 1250 160 1450 390 T 1750 340 T 1980 420 L 1980 580 L 1050 580 Z" fill="url(#amberCanyonGrad)" />
-        <!-- Canyon Outcroppings & Spires -->
-        <polygon points="1080,430 1100,165 1135,430" fill="#b45309" opacity="0.9" />
-        <polygon points="1440,430 1460,205 1490,430" fill="#92400e" opacity="0.9" />
+        <path d="M 1050 330 Q 1250 100 1450 300 T 1750 260 T 1980 330 L 1980 460 L 1050 460 Z" fill="url(#amberCanyonGrad)" />
+        <polygon points="1080,340 1100,105 1135,340" fill="#b45309" opacity="0.9" />
+        <polygon points="1440,340 1460,135 1490,340" fill="#92400e" opacity="0.9" />
 
-        <!-- Zone 2: Celestial Citadel & Frost Peaks (x: 1950 to 3760) -->
-        <path d="M 1950 420 Q 2200 170 2450 380 T 2950 340 T 3450 320 T 3760 380 L 3760 580 L 1950 580 Z" fill="url(#celestialPeakGrad)" />
-        <polygon points="2180,420 2210,185 2245,420" fill="#6b21a8" opacity="0.85" />
-        <polygon points="2540,420 2570,185 2605,420" fill="#581c87" opacity="0.85" />
-        <polygon points="3250,420 3280,195 3315,420" fill="#4c1d95" opacity="0.85" />
+        <!-- Zone 2: Celestial Citadel & Frost Peaks (x: 1950 to 3800) -->
+        <path d="M 1950 330 Q 2200 110 2450 300 T 2950 260 T 3450 240 T 3800 300 L 3800 460 L 1950 460 Z" fill="url(#celestialPeakGrad)" />
+        <polygon points="2180,340 2210,125 2245,340" fill="#6b21a8" opacity="0.85" />
+        <polygon points="2540,340 2570,125 2605,340" fill="#581c87" opacity="0.85" />
+        <polygon points="3250,340 3280,135 3315,340" fill="#4c1d95" opacity="0.85" />
 
-        <!-- 3. SCENERY PROPS & STRUCTURES (Inspired by Angry Birds 2 Map) -->
+        <!-- 3. SCENERY PROPS & STRUCTURES WITH OFFICIAL CHARACTERS & ICONS -->
 
-        <!-- Watchtower at Level 4 (x = 720) -->
-        <g transform="translate(680, 110)" opacity="0.92">
+        <!-- Stage 2: Official Character-2 (Yellow Bird) Cheering atop the Hill -->
+        <g class="map-bg-actor actor-bob-slow" transform="translate(390, 85)">
+          <ellipse cx="24" cy="46" rx="16" ry="5" fill="#000000" opacity="0.25" />
+          <image href="${char2Url}" x="0" y="0" width="48" height="48" preserveAspectRatio="xMidYMid meet" />
+        </g>
+
+        <!-- Stage 3 Shoreline: Treasure Crate with Official Coin Logo -->
+        <g transform="translate(460, 360)">
+          <rect x="0" y="8" width="32" height="24" rx="4" fill="#78350f" stroke="#b45309" stroke-width="2" />
+          <rect x="-2" y="4" width="36" height="8" rx="2" fill="#92400e" />
+          <image href="${coinLogoUrl}" x="6" y="-6" width="20" height="20" class="coin-glint-bob" />
+        </g>
+
+        <!-- Stage 4: Wooden Watchtower with Official Sub-Character-2 on Lookout -->
+        <g transform="translate(680, 50)" opacity="0.95">
           <!-- Timber posts -->
-          <line x1="15" y1="110" x2="25" y2="40" stroke="#78350f" stroke-width="4.5" stroke-linecap="round" />
-          <line x1="55" y1="110" x2="45" y2="40" stroke="#78350f" stroke-width="4.5" stroke-linecap="round" />
-          <!-- Cross bracing -->
-          <line x1="18" y1="95" x2="52" y2="55" stroke="#92400e" stroke-width="2.5" />
-          <line x1="18" y1="55" x2="52" y2="95" stroke="#92400e" stroke-width="2.5" />
+          <line x1="15" y1="105" x2="25" y2="40" stroke="#78350f" stroke-width="4.5" stroke-linecap="round" />
+          <line x1="55" y1="105" x2="45" y2="40" stroke="#78350f" stroke-width="4.5" stroke-linecap="round" />
+          <line x1="18" y1="90" x2="52" y2="55" stroke="#92400e" stroke-width="2.5" />
+          <line x1="18" y1="55" x2="52" y2="90" stroke="#92400e" stroke-width="2.5" />
           <!-- Platform deck -->
           <rect x="10" y="36" width="50" height="7" rx="2" fill="#b45309" stroke="#78350f" stroke-width="1.5" />
+          <!-- Sub-Character-2 on Deck -->
+          <image href="${subChar2Url}" x="22" y="8" width="30" height="30" class="actor-lookout" />
           <!-- Thatched canopy roof -->
           <polygon points="5,36 35,12 65,36" fill="#ca8a04" stroke="#854d0e" stroke-width="2" />
-          <line x1="35" y1="12" x2="35" y2="2" stroke="#451a03" stroke-width="2" />
-          <polygon points="35,2 48,6 35,10" fill="#ef4444" />
         </g>
 
-        <!-- Sentry Outpost with Cute Peeking Green Pig at Level 6 (x = 1100) -->
-        <g transform="translate(1140, 120)">
-          <!-- Wooden Tower Frame -->
-          <rect x="0" y="40" width="36" height="50" fill="none" stroke="#78350f" stroke-width="3" />
-          <line x1="0" y1="40" x2="36" y2="90" stroke="#92400e" stroke-width="2" />
-          <rect x="-4" y="34" width="44" height="6" rx="2" fill="#b45309" />
-          <!-- Cute Green Pig Peeking -->
-          <circle cx="28" cy="24" r="14" fill="#22c55e" stroke="#15803d" stroke-width="2" />
-          <!-- Pig Ears -->
-          <circle cx="20" cy="12" r="4" fill="#22c55e" stroke="#15803d" stroke-width="1.5" />
-          <circle cx="36" cy="12" r="4" fill="#22c55e" stroke="#15803d" stroke-width="1.5" />
-          <!-- Pig Snout -->
-          <ellipse cx="28" cy="26" rx="6.5" ry="4.5" fill="#4ade80" stroke="#16a34a" stroke-width="1" />
-          <circle cx="26" cy="26" r="1.2" fill="#14532d" />
-          <circle cx="30" cy="26" r="1.2" fill="#14532d" />
-          <!-- Pig Eyes -->
-          <circle cx="23" cy="20" r="2.5" fill="#ffffff" /><circle cx="23" cy="20" r="1.2" fill="#000000" />
-          <circle cx="33" cy="20" r="2.5" fill="#ffffff" /><circle cx="33" cy="20" r="1.2" fill="#000000" />
+        <!-- Stage 6: Barricade with Official Sub-Character-3 Peeking -->
+        <g transform="translate(1145, 75)">
+          <rect x="12" y="24" width="32" height="36" rx="3" fill="#78350f" stroke="#451a03" stroke-width="2" />
+          <image href="${subChar3Url}" x="2" y="4" width="36" height="36" class="actor-peek" />
         </g>
 
-        <!-- Wooden Plank Suspension Bridge over Ravine at Level 7 (x = 1280) -->
-        <path d="M 1210 395 Q 1280 415 1350 395" fill="none" stroke="#78350f" stroke-width="5" stroke-linecap="round" />
-        <path d="M 1210 395 Q 1280 415 1350 395" fill="none" stroke="#ca8a04" stroke-width="3" stroke-dasharray="4 8" stroke-linecap="round" />
+        <!-- Stage 7: Wooden Suspension Bridge over Ravine -->
+        <path d="M 1210 325 Q 1280 345 1350 325" fill="none" stroke="#78350f" stroke-width="5" stroke-linecap="round" />
+        <path d="M 1210 325 Q 1280 345 1350 325" fill="none" stroke="#ca8a04" stroke-width="3" stroke-dasharray="4 8" stroke-linecap="round" />
 
-        <!-- Golden Key on the road between Lv 7 & Lv 8 (x = 1370) -->
-        <g transform="translate(1370, 310) rotate(-25)">
-          <circle cx="8" cy="8" r="7" fill="none" stroke="#fbbf24" stroke-width="2.5" />
-          <line x1="15" y1="8" x2="30" y2="8" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" />
-          <line x1="24" y1="8" x2="24" y2="14" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" />
-          <line x1="28" y1="8" x2="28" y2="13" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" />
+        <!-- Stage 8: Official Character-3 (Heavy Black Bird) Standing Valiantly near TNT -->
+        <g class="map-bg-actor actor-stand" transform="translate(1495, 95)">
+          <ellipse cx="24" cy="46" rx="18" ry="6" fill="#000000" opacity="0.3" />
+          <!-- TNT Barrel -->
+          <rect x="36" y="22" width="18" height="24" rx="3" fill="#ef4444" stroke="#991b1b" stroke-width="1.5" />
+          <text x="39" y="38" font-size="8" font-weight="900" fill="#ffffff" font-family="sans-serif">TNT</text>
+          <image href="${char3Url}" x="0" y="2" width="46" height="46" />
+        </g>
+
+        <!-- Stage 9: Natural Stone Arch with Floating Official Coin with Text -->
+        <g transform="translate(1600, 245)">
+          <path d="M -15 65 Q 10 -25 35 65" fill="none" stroke="#78350f" stroke-width="12" stroke-linecap="round" />
+          <image href="${coinTextUrl}" x="-4" y="0" width="28" height="28" class="coin-glint-bob" />
         </g>
 
         <!-- ═════════════════════════════════════════════════════════════
-             LEVEL 10: GRAND COLOSSUS ALTAR & FLOATING AIRSHIP
+             STAGE 10: COLOSSUS ALTAR & OFFICIAL AIRSHIP (WITH SUB-CHAR-4)
              ═════════════════════════════════════════════════════════════ -->
-        <!-- Stone Altar Platform Base under Level 10 Node (x = 1830, y = 210) -->
-        <g transform="translate(1780, 220)">
-          <!-- Circular Carved Stone Dais -->
-          <ellipse cx="50" cy="30" rx="60" ry="24" fill="#334155" stroke="#64748b" stroke-width="3" />
-          <ellipse cx="50" cy="25" rx="52" ry="18" fill="#1e293b" stroke="#94a3b8" stroke-width="2" />
-          <!-- Rune glow ring -->
-          <ellipse cx="50" cy="23" rx="42" ry="14" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 6" opacity="0.8" />
-          <!-- Radiant upward light columns shooting to the airship -->
-          <polygon points="15,22 40,-130 60,-130 85,22" fill="url(#skyAtmosphereGrad)" opacity="0.45" filter="url(#lightBeaconGlow)" />
+        <!-- Stone Altar Dais under Level 10 Node (x = 1830, y = 160) -->
+        <g transform="translate(1775, 170)">
+          <ellipse cx="55" cy="30" rx="65" ry="24" fill="#1e293b" stroke="#475569" stroke-width="3" />
+          <ellipse cx="55" cy="24" rx="55" ry="18" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+          <!-- Engraved Official Dlicom Blue Logo in Center of Stone Dais -->
+          <image href="${logoBlueUrl}" x="35" y="12" width="40" height="22" opacity="0.85" filter="url(#lightBeaconGlow)" />
+          <!-- Radiant upward light columns -->
+          <polygon points="18,22 42,-120 68,-120 92,22" fill="url(#skyAtmosphereGrad)" opacity="0.45" filter="url(#lightBeaconGlow)" />
         </g>
 
-        <!-- Floating Airship / Hot Air Balloon above Level 10 (Animated via CSS) -->
-        <g id="map-level-10-airship" class="map-floating-airship" transform="translate(1765, 30)">
-          <!-- Shadow beneath airship -->
-          <ellipse cx="65" cy="140" rx="35" ry="8" fill="#000000" opacity="0.25" filter="url(#roadGlowFilter)" />
-
-          <!-- Airship Balloon Envelope (Yellow & Green Stripes like reference image) -->
-          <ellipse cx="65" cy="55" rx="55" ry="38" fill="#facc15" stroke="#ca8a04" stroke-width="2.5" />
-          <path d="M 35 25 Q 65 55 35 85" fill="none" stroke="#16a34a" stroke-width="6" opacity="0.8" />
-          <path d="M 65 17 Q 65 55 65 93" fill="none" stroke="#16a34a" stroke-width="6" opacity="0.8" />
-          <path d="M 95 25 Q 65 55 95 85" fill="none" stroke="#16a34a" stroke-width="6" opacity="0.8" />
+        <!-- Floating Airship above Level 10 piloted by Official Sub-Character-4 -->
+        <g id="map-level-10-airship" class="map-floating-airship" transform="translate(1760, 10)">
+          <ellipse cx="70" cy="125" rx="36" ry="8" fill="#000000" opacity="0.25" filter="url(#roadGlowFilter)" />
+          <!-- Striped Airship Envelope -->
+          <ellipse cx="70" cy="45" rx="58" ry="38" fill="#facc15" stroke="#ca8a04" stroke-width="2.5" />
+          <path d="M 40 18 Q 70 45 40 72" fill="none" stroke="#16a34a" stroke-width="6" opacity="0.85" />
+          <path d="M 70 8 Q 70 45 70 82" fill="none" stroke="#16a34a" stroke-width="6" opacity="0.85" />
+          <path d="M 100 18 Q 70 45 100 72" fill="none" stroke="#16a34a" stroke-width="6" opacity="0.85" />
 
           <!-- Rigging Cords -->
-          <line x1="30" y1="75" x2="45" y2="105" stroke="#78350f" stroke-width="1.8" />
-          <line x1="100" y1="75" x2="85" y2="105" stroke="#78350f" stroke-width="1.8" />
-          <line x1="65" y1="92" x2="65" y2="105" stroke="#78350f" stroke-width="1.8" />
+          <line x1="35" y1="65" x2="50" y2="92" stroke="#78350f" stroke-width="1.8" />
+          <line x1="105" y1="65" x2="90" y2="92" stroke="#78350f" stroke-width="1.8" />
 
           <!-- Wooden Basket Gondola -->
-          <rect x="42" y="103" width="46" height="22" rx="6" fill="#b45309" stroke="#78350f" stroke-width="2" />
-          <line x1="42" y1="114" x2="88" y2="114" stroke="#78350f" stroke-width="1.5" />
+          <rect x="46" y="90" width="48" height="20" rx="5" fill="#b45309" stroke="#78350f" stroke-width="2" />
+          <!-- Official Sub-Character-4 as Pilot at the Helm -->
+          <image href="${subChar4Url}" x="55" y="72" width="30" height="30" />
 
-          <!-- Green Pig Pilot in Airship Gondola -->
-          <circle cx="65" cy="100" r="10" fill="#22c55e" stroke="#15803d" stroke-width="1.5" />
-          <ellipse cx="65" cy="102" rx="4.5" ry="3" fill="#4ade80" />
-          <circle cx="62" cy="98" r="1.5" fill="#fff" /><circle cx="62" cy="98" r="0.8" fill="#000" />
-          <circle cx="68" cy="98" r="1.5" fill="#fff" /><circle cx="68" cy="98" r="0.8" fill="#000" />
-
-          <!-- Rear Wooden Propeller (Spinning) -->
-          <g class="airship-spinning-propeller" transform="translate(18, 70)">
+          <!-- Rear Wooden Propeller -->
+          <g class="airship-spinning-propeller" transform="translate(18, 55)">
             <ellipse cx="0" cy="0" rx="3.5" ry="14" fill="#a16207" stroke="#713f12" stroke-width="1.5" />
             <circle cx="0" cy="0" r="2.5" fill="#451a03" />
           </g>
 
-          <!-- Trailing Red Streamer Ribbon -->
-          <path class="airship-fluttering-ribbon" d="M 120 55 Q 135 50 150 56 Q 160 62 170 54" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" />
+          <!-- Trailing Ribbon with Official Logo-White Banner -->
+          <g transform="translate(126, 35)">
+            <path class="airship-fluttering-ribbon" d="M 0 10 Q 18 5 36 12 Q 54 18 72 8" fill="none" stroke="#ef4444" stroke-width="16" stroke-linecap="round" />
+            <image href="${logoWhiteUrl}" x="12" y="2" width="34" height="18" />
+          </g>
         </g>
 
         <!-- ═════════════════════════════════════════════════════════════
-             ZONE 2: CELESTIAL CRYSTALS & LEVEL 20 GRAND CITADEL
+             ZONE 2: CELESTIAL REALM WITH OFFICIAL CHARACTERS & CREST
              ═════════════════════════════════════════════════════════════ -->
-        <!-- Glowing Crystal Clusters at Level 15 (x = 2750) -->
-        <g transform="translate(2700, 310)">
-          <polygon points="10,40 18,10 26,40" fill="#c084fc" stroke="#e9d5ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
-          <polygon points="26,40 36,0 46,40" fill="#a855f7" stroke="#f3e8ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
-          <polygon points="46,40 52,15 58,40" fill="#c084fc" stroke="#e9d5ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
+
+        <!-- Stage 12: Official Sub-Character (Celestial Mascot) Floating on Cloud -->
+        <g class="map-bg-actor actor-float-celestial" transform="translate(2250, 75)">
+          <ellipse cx="24" cy="48" rx="22" ry="6" fill="#c084fc" opacity="0.3" filter="url(#roadGlowFilter)" />
+          <image href="${subChar1Url}" x="0" y="0" width="50" height="50" style="filter: drop-shadow(0 0 14px #c084fc);" />
         </g>
 
-        <!-- Level 20: Royal Grand Crown Citadel Fortress (x = 3580, y = 210) -->
-        <g transform="translate(3520, 95)" opacity="0.95">
+        <!-- Stage 15: Glowing Nebula Monolith with Official Golden Logo Crest -->
+        <g transform="translate(2700, 240)">
+          <polygon points="12,35 22,5 32,35" fill="#c084fc" stroke="#e9d5ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
+          <polygon points="32,35 44,-10 56,35" fill="#a855f7" stroke="#f3e8ff" stroke-width="1.5" filter="url(#roadGlowFilter)" />
+          <image href="${logoWhiteUrl}" x="28" y="2" width="30" height="16" style="filter: drop-shadow(0 0 10px #fbbf24);" />
+        </g>
+
+        <!-- Stage 17: Official Character-2 (Frost Knight) Cheering on Mountain Peak -->
+        <g class="map-bg-actor actor-bob-slow" transform="translate(3150, 240)">
+          <ellipse cx="20" cy="42" rx="15" ry="5" fill="#000000" opacity="0.25" />
+          <image href="${char2Url}" x="0" y="0" width="42" height="42" style="filter: drop-shadow(0 0 10px #38bdf8);" />
+        </g>
+
+        <!-- Stage 20: Royal Grand Crown Citadel Fortress with Official Red Bird Monument -->
+        <g transform="translate(3510, 35)" opacity="0.98">
           <!-- Citadel Walls & Towers -->
-          <rect x="10" y="45" width="100" height="65" rx="4" fill="#1e1b4b" stroke="#c084fc" stroke-width="2.5" />
-          <!-- Left & Right Battlements -->
-          <rect x="0" y="25" width="28" height="85" rx="3" fill="#312e81" stroke="#a855f7" stroke-width="2" />
-          <rect x="92" y="25" width="28" height="85" rx="3" fill="#312e81" stroke="#a855f7" stroke-width="2" />
+          <rect x="15" y="45" width="110" height="70" rx="5" fill="#1e1b4b" stroke="#c084fc" stroke-width="2.5" />
+          <rect x="0" y="20" width="32" height="95" rx="4" fill="#312e81" stroke="#a855f7" stroke-width="2" />
+          <rect x="108" y="20" width="32" height="95" rx="4" fill="#312e81" stroke="#a855f7" stroke-width="2" />
           <!-- Central Spire -->
-          <polygon points="45,45 60,8 75,45" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
-          <!-- Crown on top of Central Spire -->
-          <polygon points="50,12 55,2 60,8 65,2 70,12" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" />
-          <!-- Royal Banners -->
-          <line x1="14" y1="25" x2="14" y2="10" stroke="#fbbf24" stroke-width="2" />
-          <polygon points="14,10 28,15 14,20" fill="#a855f7" />
-          <line x1="106" y1="25" x2="106" y2="10" stroke="#fbbf24" stroke-width="2" />
-          <polygon points="106,10 120,15 106,20" fill="#a855f7" />
+          <polygon points="50,45 70,2 90,45" fill="#f59e0b" stroke="#d97706" stroke-width="2" />
+          <!-- Official Logo-White Crest on Castle Wall -->
+          <image href="${logoWhiteUrl}" x="48" y="60" width="44" height="24" style="filter: drop-shadow(0 0 8px #fbbf24);" />
+
+          <!-- Monumental Golden Champion Throne: Official Character-1 with Royal Crown -->
+          <g transform="translate(48, -25)">
+            <!-- Golden Royal Crown -->
+            <polygon points="12,12 18,2 24,8 30,2 36,12" fill="#fbbf24" stroke="#b45309" stroke-width="1.8" filter="url(#roadGlowFilter)" />
+            <image href="${mascotCharUrl}" x="0" y="8" width="46" height="46" style="filter: drop-shadow(0 4px 14px rgba(251, 191, 36, 0.9));" />
+          </g>
+          <!-- Floating Medallions -->
+          <image href="${coinLogoUrl}" x="-8" y="5" width="22" height="22" class="coin-glint-bob" />
+          <image href="${coinLogoUrl}" x="126" y="5" width="22" height="22" class="coin-glint-bob" />
         </g>
 
         <!-- ═════════════════════════════════════════════════════════════
@@ -618,29 +695,29 @@ export class LevelSelect {
              ═════════════════════════════════════════════════════════════ -->
 
         <!-- Layer 1: Soil Bed Drop Shadow -->
-        <path d="${fullPathD}" fill="none" stroke="#14290d" stroke-width="46" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />
+        <path d="${fullPathD}" fill="none" stroke="#14290d" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" opacity="0.65" />
 
         <!-- Layer 2: Green Grass Berm / Shoulder -->
-        <path d="${fullPathD}" fill="none" stroke="#2d5312" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${fullPathD}" fill="none" stroke="#2d5312" stroke-width="44" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Layer 3: Cobblestone Earth Curb -->
-        <path d="${fullPathD}" fill="none" stroke="#78350f" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${fullPathD}" fill="none" stroke="#78350f" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Layer 4: Golden Sandy Paved Wavy Roadway -->
-        <path d="${fullPathD}" fill="none" stroke="url(#roadSurfaceGrad)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${fullPathD}" fill="none" stroke="url(#roadSurfaceGrad)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" />
 
         <!-- Layer 5: Cobblestone Edge Texture -->
-        <path d="${fullPathD}" fill="none" stroke="#d97706" stroke-width="14" stroke-dasharray="2 16" stroke-linecap="round" opacity="0.65" />
+        <path d="${fullPathD}" fill="none" stroke="#d97706" stroke-width="16" stroke-dasharray="2 16" stroke-linecap="round" opacity="0.65" />
 
         <!-- Layer 6: Center Glowing Trail Dashes -->
-        <path d="${fullPathD}" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-dasharray="8 14" stroke-linecap="round" opacity="0.82" />
+        <path d="${fullPathD}" fill="none" stroke="#ffffff" stroke-width="4" stroke-dasharray="8 14" stroke-linecap="round" opacity="0.85" />
 
-        <!-- Layer 7: Active Journey Progress Line (Illuminates from Lv 1 up to unlocked level) -->
+        <!-- Layer 7: Active Journey Progress Line -->
         <path
           d="${activePathD}"
           fill="none"
           stroke="url(#activeRoadProgressGrad)"
-          stroke-width="6.5"
+          stroke-width="7.5"
           stroke-linecap="round"
           stroke-linejoin="round"
           filter="url(#roadGlowFilter)"
@@ -652,6 +729,7 @@ export class LevelSelect {
 
   /**
    * Builds the 20 Circular Level Nodes positioned along the wavy path.
+   * Prominently sized (82px) for effortless tapping on mobile touchscreen.
    */
   buildLevelNodesHtml(unlockedLevel, avatarUrl) {
     let html = '';
@@ -740,7 +818,7 @@ export class LevelSelect {
           ${milestoneBadgeHtml}
           ${starsHtml}
 
-          <!-- 3D Circular Disk -->
+          <!-- 3D Circular Disk (Enlarged for Mobile Touch) -->
           <div class="node-circle-body">
             <div class="node-circle-bevel"></div>
             <div class="node-circle-core">
@@ -750,7 +828,7 @@ export class LevelSelect {
             ${
               !isUnlocked
                 ? `<div class="node-lock-overlay" aria-hidden="true">
-                    <svg class="node-lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="node-lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                       <rect x="4" y="11" width="16" height="10" rx="3" />
                       <path d="M8 11V7a4 4 0 0 1 8 0v4" />
                     </svg>
@@ -774,19 +852,17 @@ export class LevelSelect {
   }
 
   /**
-   * Dynamic Cloud Covering System (Fog of War):
+   * Realistic Volumetric Cumulus Cloud Fog of War:
    * Levels 1 through 10 visible initially.
-   * Levels 11 onward obscured by stylized white cloud overlay.
-   * Progressively clears as levels are completed.
+   * Levels 11 onward obscured by stylized, realistic white cloud layers with volumetric shading,
+   * ambient depth, and rolling mist, clearing progressively as stages are completed.
    */
   buildCloudFogOfWar(unlockedLevel) {
-    // If all 20 levels cleared, fog is completely dispelled
     if (unlockedLevel >= 20) {
       return '';
     }
 
-    // Determine the dynamic X boundary where the cloud fog begins:
-    let fogStartX = 1910; // Default: immediately after Level 10
+    let fogStartX = 1910;
     if (unlockedLevel > 10) {
       const currentLevelNode = LEVEL_NODES[unlockedLevel - 1];
       if (currentLevelNode) {
@@ -803,21 +879,36 @@ export class LevelSelect {
         style="left: ${fogStartX}px; width: ${fogWidth}px;"
         aria-label="Cloud Fog of War: Celestial Citadel"
       >
-        <!-- Stylized Billowing White Cumulus Cloud Puffs on the leading edge -->
-        <div class="cloud-puff-bank" aria-hidden="true">
-          <div class="cloud-billow billow-1"></div>
-          <div class="cloud-billow billow-2"></div>
-          <div class="cloud-billow billow-3"></div>
-          <div class="cloud-billow billow-4"></div>
-          <div class="cloud-billow billow-5"></div>
-          <div class="cloud-billow billow-6"></div>
-          <div class="cloud-billow billow-7"></div>
-          <div class="cloud-billow billow-8"></div>
+        <!-- Realistic Sunbeam Crepuscular Rays Streaming through Cloud Edges -->
+        <div class="cloud-sunray-bank" aria-hidden="true">
+          <div class="cloud-sunray ray-1"></div>
+          <div class="cloud-sunray ray-2"></div>
+          <div class="cloud-sunray ray-3"></div>
         </div>
 
-        <!-- Dense misty white/ethereal cloud mass -->
+        <!-- Realistic Volumetric Layered Cumulus Cloud Puffs on Leading Edge -->
+        <div class="cloud-puff-bank" aria-hidden="true">
+          <!-- Background Atmospheric Haze -->
+          <div class="cloud-billow haze-layer billow-bg-1"></div>
+          <div class="cloud-billow haze-layer billow-bg-2"></div>
+
+          <!-- Midground Volumetric Cumulus Bodies -->
+          <div class="cloud-billow billow-volumetric billow-1"></div>
+          <div class="cloud-billow billow-volumetric billow-2"></div>
+          <div class="cloud-billow billow-volumetric billow-3"></div>
+          <div class="cloud-billow billow-volumetric billow-4"></div>
+          <div class="cloud-billow billow-volumetric billow-5"></div>
+          <div class="cloud-billow billow-volumetric billow-6"></div>
+
+          <!-- Foreground Crisp Sunlit Cloud Puffs -->
+          <div class="cloud-billow billow-sunlit billow-7"></div>
+          <div class="cloud-billow billow-sunlit billow-8"></div>
+          <div class="cloud-billow billow-sunlit billow-9"></div>
+        </div>
+
+        <!-- Dense Misty Volumetric Fog Mass with Celestial Starlight -->
         <div class="cloud-fog-body" aria-hidden="true">
-          <div class="cloud-fog-gradient-shim"></div>
+          <div class="cloud-fog-volumetric-gradient"></div>
           <div class="cloud-celestial-stars"></div>
         </div>
 
@@ -855,7 +946,7 @@ export class LevelSelect {
           ${this.buildLevelNodesHtml(unlockedLevel, avatarUrl)}
         </div>
 
-        <!-- 3. Dynamic Stylized White Cloud Fog of War -->
+        <!-- 3. Dynamic Realistic White Cloud Fog of War -->
         ${this.buildCloudFogOfWar(unlockedLevel)}
       </div>
     `;
@@ -863,8 +954,9 @@ export class LevelSelect {
     this.gridEl.innerHTML = html;
     this.bindNodeEvents();
 
-    // Auto-center viewport on current frontier node and sync UI indicators
+    // Auto-scale to landscape screen height and center on active node
     requestAnimationFrame(() => {
+      this.updateMobileScaling();
       this.centerOnLevel(unlockedLevel, false);
       this.updateScrubberAndNavControls();
 
@@ -890,7 +982,6 @@ export class LevelSelect {
   bindNodeEvents() {
     if (!this.gridEl) return;
 
-    // Node Click & PLAY Button Click
     this.gridEl.addEventListener('click', (e) => {
       if (this.isInputLocked || this.hasDragged) {
         e.preventDefault();
@@ -914,7 +1005,6 @@ export class LevelSelect {
         const levelId = Number(nodeEl.dataset.levelId);
         const levelObj = LEVELS.find((l) => l.id === levelId);
         if (levelObj) {
-          // Playful tap pop effect
           nodeEl.classList.add('node-tap-pop');
           setTimeout(() => nodeEl.classList.remove('node-tap-pop'), 200);
           this.audio?.playMarkerStep?.();
@@ -923,7 +1013,7 @@ export class LevelSelect {
         return;
       }
 
-      // Check Locked Node Click (Give cheerful feedback)
+      // Check Locked Node Click
       const lockedNodeEl = e.target.closest('.map-level-node.locked');
       if (lockedNodeEl) {
         const levelId = Number(lockedNodeEl.dataset.levelId);
@@ -956,7 +1046,6 @@ export class LevelSelect {
       }
     });
 
-    // Keyboard support on nodes
     this.gridEl.addEventListener('keydown', (e) => {
       if (this.isInputLocked) return;
       if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -971,7 +1060,6 @@ export class LevelSelect {
       }
     });
 
-    // Hover preview
     this.gridEl.addEventListener('pointerover', (e) => {
       if (this.isInputLocked || this.hasDragged) return;
       const nodeEl = e.target.closest('.map-level-node.unlocked');
@@ -1004,9 +1092,6 @@ export class LevelSelect {
     }, 2200);
   }
 
-  /**
-   * Smoothly animates player marker between levels.
-   */
   animatePlayerMarker(fromLevelId, toLevelId) {
     return new Promise((resolve) => {
       const fromNode = document.getElementById(`node-level-${fromLevelId}`);
@@ -1039,10 +1124,6 @@ export class LevelSelect {
     });
   }
 
-  /**
-   * Cinematic animated cloud removal sequence when Level 10 is defeated.
-   * Sweeping winds disperse the white cloud overlay to reveal Level 11 and Zone 2!
-   */
   async animateCloudRemoval() {
     this.lockInput();
     this.centerOnLevel(10, true);
@@ -1054,36 +1135,24 @@ export class LevelSelect {
       return;
     }
 
-    // Play rushing wind audio
     this.audio?.playCloudWhoosh?.();
-
-    // Trigger cloud dissipation animation
     cloudFogEl.classList.add('cloud-dissipating');
 
     await new Promise((r) => setTimeout(r, 1200));
 
-    // Save zone reveal in storage
     this.storage.setZoneRevealed(2, true);
-
-    // Audio chime for level unlock
     this.audio?.playLevelUnlock?.();
-
-    // Re-render roadmap with Zone 2 revealed
     this.render();
 
-    // Pan camera to Level 11
     this.centerOnLevel(11, true);
 
-    // Highlight Level 11 with unlocked flare pulse
     const level11Node = document.getElementById('node-level-11');
     if (level11Node) {
       level11Node.classList.add('node-unlocked-flare');
       setTimeout(() => level11Node.classList.remove('node-unlocked-flare'), 1000);
     }
 
-    // Animate marker from 10 to 11
     await this.animatePlayerMarker(10, 11);
-
     this.unlockInput();
   }
 }

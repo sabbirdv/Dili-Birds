@@ -1099,12 +1099,17 @@ html, body {
    HORIZONTAL SCROLLABLE VIEWPORT (TOUCH / MOUSE PANNING)
    STRICTLY DISABLING ALL VERTICAL SCROLLING
    ═════════════════════════════════════════════════════════════ */
+/* ═════════════════════════════════════════════════════════════
+   HORIZONTAL SCROLLABLE VIEWPORT (TOUCH / MOUSE PANNING)
+   CALIBRATED FOR MOBILE LANDSCAPE (STRICTLY ZERO VERTICAL SCROLL)
+   ═════════════════════════════════════════════════════════════ */
 .roadmap-3d-viewport {
   position: relative;
   width: 100%;
   flex: 1 1 auto;
-  min-height: 480px;
-  max-height: 620px;
+  min-height: 280px;
+  height: 100%;
+  max-height: 100%;
   overflow-x: auto;
   overflow-y: hidden !important;
   touch-action: pan-x;
@@ -1115,14 +1120,14 @@ html, body {
   cursor: grab;
   border-radius: 18px;
   background: #08111e;
-  border: 1.5px solid rgba(56, 189, 248, 0.2);
-  box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.75);
+  border: 1.5px solid rgba(56, 189, 248, 0.22);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85);
   scrollbar-width: thin;
   scrollbar-color: rgba(251, 191, 36, 0.45) rgba(15, 23, 42, 0.75);
 }
 
 .roadmap-3d-viewport::-webkit-scrollbar {
-  height: 6px;
+  height: 5px;
 }
 
 .roadmap-3d-viewport::-webkit-scrollbar-track {
@@ -1152,14 +1157,14 @@ html, body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.88);
-  border: 1.5px solid rgba(251, 191, 36, 0.5);
+  background: rgba(15, 23, 42, 0.9);
+  border: 1.8px solid rgba(251, 191, 36, 0.55);
   color: var(--accent-gold);
   display: grid;
   place-items: center;
   cursor: pointer;
   z-index: 15;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 12px rgba(251, 191, 36, 0.25);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 14px rgba(251, 191, 36, 0.3);
   transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -1171,19 +1176,19 @@ html, body {
 }
 
 .map-floating-nav-btn.pan-left {
-  left: 12px;
+  left: 10px;
 }
 
 .map-floating-nav-btn.pan-right {
-  right: 12px;
+  right: 10px;
 }
 
 .map-floating-nav-btn:hover:not(.disabled) {
-  background: rgba(30, 41, 59, 0.95);
+  background: rgba(30, 41, 59, 0.98);
   color: #ffffff;
   border-color: #fbbf24;
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 10px 28px rgba(251, 191, 36, 0.45);
+  box-shadow: 0 10px 28px rgba(251, 191, 36, 0.5);
 }
 
 .map-floating-nav-btn:active:not(.disabled) {
@@ -1191,22 +1196,25 @@ html, body {
 }
 
 .map-floating-nav-btn.disabled {
-  opacity: 0.2;
+  opacity: 0.15;
   pointer-events: none;
 }
 
-/* World Container & Layering */
+/* World Container & Layering (with Dynamic Mobile Landscape Scaling) */
 .roadmap-grid-wrapper {
   position: relative;
   display: block;
-  width: max-content;
-  height: 100%;
+  width: calc(3800px * var(--mobile-map-scale, 1));
+  height: calc(460px * var(--mobile-map-scale, 1));
+  overflow: visible;
 }
 
 .map-world-container {
   position: relative;
-  width: 3760px;
-  height: 580px;
+  width: 3800px;
+  height: 460px;
+  transform-origin: top left;
+  transform: scale(var(--mobile-map-scale, 1));
   background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
   overflow: hidden;
 }
@@ -1216,10 +1224,65 @@ html, body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 3760px;
-  height: 580px;
+  width: 3800px;
+  height: 460px;
   pointer-events: none;
   z-index: 1;
+}
+
+/* Background Animated Actors & Official Characters */
+.map-bg-actor {
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.actor-bob-slow {
+  animation: bgActorBob 2.6s ease-in-out infinite alternate;
+}
+
+.actor-lookout {
+  animation: bgActorLookout 3.2s ease-in-out infinite alternate;
+}
+
+.actor-peek {
+  animation: bgActorPeek 2.8s ease-in-out infinite alternate;
+}
+
+.actor-float-celestial {
+  animation: bgActorCelestial 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes bgActorBob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+
+@keyframes bgActorLookout {
+  0% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-3px) rotate(2deg); }
+  100% { transform: translateY(0) rotate(-2deg); }
+}
+
+@keyframes bgActorPeek {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(5px) translateY(-2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes bgActorCelestial {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.04); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.coin-glint-bob {
+  animation: coinGlintBob 2.2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 4px 10px rgba(251, 191, 36, 0.7));
+}
+
+@keyframes coinGlintBob {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-5px) rotate(5deg); }
 }
 
 /* Active Road Progress Glow Pulse */
@@ -1228,25 +1291,25 @@ html, body {
 }
 
 @keyframes roadProgressPulse {
-  0% { stroke-width: 6px; opacity: 0.85; }
-  100% { stroke-width: 8px; opacity: 1; }
+  0% { stroke-width: 7.5px; opacity: 0.85; }
+  100% { stroke-width: 9.5px; opacity: 1; }
 }
 
 /* Floating Airship above Level 10 */
 .map-floating-airship {
   animation: airshipFloat 3.8s ease-in-out infinite alternate;
-  transform-origin: 65px 55px;
+  transform-origin: 70px 45px;
 }
 
 @keyframes airshipFloat {
   0% {
-    transform: translate(1765px, 24px) rotate(-1deg);
+    transform: translate(1760px, 8px) rotate(-1deg);
   }
   50% {
-    transform: translate(1765px, 34px) rotate(1.2deg);
+    transform: translate(1760px, 18px) rotate(1.2deg);
   }
   100% {
-    transform: translate(1765px, 20px) rotate(-0.5deg);
+    transform: translate(1760px, 6px) rotate(-0.5deg);
   }
 }
 
@@ -1256,8 +1319,8 @@ html, body {
 }
 
 @keyframes spinPropeller {
-  from { transform: translate(18px, 70px) rotate(0deg); }
-  to { transform: translate(18px, 70px) rotate(360deg); }
+  from { transform: translate(18px, 55px) rotate(0deg); }
+  to { transform: translate(18px, 55px) rotate(360deg); }
 }
 
 .airship-fluttering-ribbon {
@@ -1270,7 +1333,7 @@ html, body {
 }
 
 /* ═════════════════════════════════════════════════════════════
-   CIRCULAR LEVEL NODES (LEVELS 1 TO 20)
+   CIRCULAR LEVEL NODES (LEVELS 1 TO 20) - ENLARGED (82PX)
    ═════════════════════════════════════════════════════════════ */
 .map-nodes-layer {
   position: absolute;
@@ -1281,8 +1344,8 @@ html, body {
 
 .map-level-node {
   position: absolute;
-  width: 66px;
-  height: 66px;
+  width: 82px;
+  height: 82px;
   transform: translate(-50%, -50%);
   pointer-events: auto;
   display: flex;
@@ -1295,7 +1358,7 @@ html, body {
 }
 
 .map-level-node:hover.unlocked {
-  transform: translate(-50%, -54%) scale(1.08);
+  transform: translate(-50%, -55%) scale(1.08);
   z-index: 10;
 }
 
@@ -1319,43 +1382,43 @@ html, body {
   100% { transform: translate(-50%, -50%) scale(1); }
 }
 
-/* 3D Circular Body */
+/* Enlarged 3D Circular Body (80px x 80px) */
 .node-circle-body {
   position: relative;
-  width: 58px;
-  height: 58px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6), 0 3px 0 rgba(0, 0, 0, 0.7);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65), 0 4px 0 rgba(0, 0, 0, 0.75);
   transition: all 0.2s ease;
 }
 
-/* Completed & Unlocked Golden Styles (Matching reference screenshot) */
+/* Completed & Unlocked Golden Styles */
 .map-level-node.completed .node-circle-body {
-  background: radial-gradient(circle at 35% 30%, #fffbeb 0%, #fef08a 25%, #f59e0b 70%, #b45309 100%);
-  border: 3.5px solid #fffbeb;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.65), 0 0 16px rgba(251, 191, 36, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  background: radial-gradient(circle at 35% 30%, #fffbeb 0%, #fef08a 25%, #f59e0b 68%, #b45309 100%);
+  border: 4.5px solid #fffbeb;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.7), 0 0 20px rgba(251, 191, 36, 0.6), inset 0 3px 6px rgba(255, 255, 255, 0.85);
 }
 
 .map-level-node.frontier .node-circle-body {
-  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #fde047 30%, #f59e0b 75%, #d97706 100%);
-  border: 4px solid #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 24px rgba(251, 191, 36, 0.8), inset 0 2px 6px rgba(255, 255, 255, 0.9);
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #fde047 30%, #f59e0b 72%, #d97706 100%);
+  border: 5px solid #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 30px rgba(251, 191, 36, 0.9), inset 0 3px 8px rgba(255, 255, 255, 0.95);
   animation: frontierNodePulse 2.2s ease-in-out infinite alternate;
 }
 
 @keyframes frontierNodePulse {
-  0% { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 16px rgba(251, 191, 36, 0.5); }
-  100% { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 32px rgba(251, 191, 36, 0.95); }
+  0% { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.65), 0 0 20px rgba(251, 191, 36, 0.6); }
+  100% { box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8), 0 0 40px rgba(251, 191, 36, 1); }
 }
 
 /* Locked Stone Disk */
 .map-level-node.locked .node-circle-body {
   background: radial-gradient(circle at 35% 30%, #64748b 0%, #475569 45%, #1e293b 100%);
-  border: 3.5px solid #94a3b8;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.65), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+  border: 4px solid #94a3b8;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.3);
   cursor: not-allowed;
 }
 
@@ -1365,12 +1428,13 @@ html, body {
   justify-content: center;
 }
 
+/* Enlarged Bold Numbers (1.95rem) */
 .node-number-text {
   font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-weight: 800;
+  font-size: 1.95rem;
+  font-weight: 900;
   color: #451a03;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  text-shadow: 0 1.5px 0 rgba(255, 255, 255, 0.7);
   line-height: 1;
 }
 
@@ -1392,10 +1456,10 @@ html, body {
 }
 
 .node-lock-svg {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   color: #f1f5f9;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.85));
 }
 
 .node-lock-shake {
@@ -1410,41 +1474,41 @@ html, body {
   80% { transform: translate(-47%, -50%) rotate(3deg); }
 }
 
-/* Stars Crown Arched Over Completed Circle (Reference Image 1) */
+/* Enlarged Stars Crown Arched Over Completed Circle */
 .node-stars-crown {
   position: absolute;
-  top: -16px;
+  top: -20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: flex-end;
-  gap: 2px;
+  gap: 3px;
   z-index: 5;
   pointer-events: none;
 }
 
 .crown-star {
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   line-height: 1;
   color: rgba(255, 255, 255, 0.25);
   transition: all 0.2s ease;
 }
 
 .crown-star.center {
-  font-size: 1.15rem;
-  margin-bottom: 3px;
+  font-size: 1.55rem;
+  margin-bottom: 4px;
 }
 
 .crown-star.earned {
   color: #fbbf24;
-  text-shadow: 0 0 8px rgba(251, 191, 36, 0.9), 0 2px 4px rgba(0, 0, 0, 0.6);
-  filter: drop-shadow(0 2px 2px rgba(180, 83, 9, 0.8));
+  text-shadow: 0 0 10px rgba(251, 191, 36, 1), 0 2px 4px rgba(0, 0, 0, 0.7);
+  filter: drop-shadow(0 2px 3px rgba(180, 83, 9, 0.9));
 }
 
 /* Active Frontier Bird Mascot Pin (Perched on top of Node) */
 .active-commander-mascot {
   position: absolute;
-  top: -46px;
+  top: -54px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 12;
@@ -1457,33 +1521,33 @@ html, body {
 
 @keyframes mascotBob {
   0% { transform: translateX(-50%) translateY(0); }
-  100% { transform: translateX(-50%) translateY(-8px); }
+  100% { transform: translateX(-50%) translateY(-9px); }
 }
 
 .mascot-bird-img {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.7));
 }
 
 .mascot-speech-cloud {
   background: #ffffff;
   color: #0f172a;
   font-family: var(--font-display);
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 1px 7px;
+  padding: 2px 8px;
   border-radius: 999px;
-  margin-bottom: -4px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  margin-bottom: -5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
   white-space: nowrap;
 }
 
-/* Juicy Orange/Gold "PLAY!" Button (Matching Reference Image 1) */
+/* Juicy Orange/Gold "PLAY!" Button (Enlarged for Mobile) */
 .roadmap-juicy-play-cta {
   position: absolute;
-  top: 60px;
+  top: 76px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 14;
@@ -1491,10 +1555,10 @@ html, body {
   flex-direction: column;
   align-items: center;
   background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
-  border: 2.5px solid #fef08a;
-  padding: 6px 18px 7px 18px;
+  border: 2.8px solid #fef08a;
+  padding: 6px 20px 8px 20px;
   border-radius: 999px;
-  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.65), 0 3px 0 #7c2d12, inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.7), 0 4px 0 #7c2d12, inset 0 1px 0 rgba(255, 255, 255, 0.65);
   cursor: pointer;
   animation: juicyPlayBounce 1.5s ease-in-out infinite;
   transition: transform 0.15s ease, filter 0.15s ease;
@@ -1503,7 +1567,7 @@ html, body {
 .roadmap-juicy-play-cta:hover {
   transform: translateX(-50%) scale(1.1);
   filter: brightness(1.12);
-  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.85), 0 4px 0 #7c2d12;
+  box-shadow: 0 10px 28px rgba(234, 88, 12, 0.85), 0 4px 0 #7c2d12;
 }
 
 .roadmap-juicy-play-cta:active {
@@ -1513,29 +1577,29 @@ html, body {
 
 .play-cta-pointer-hand {
   position: absolute;
-  top: -12px;
+  top: -14px;
   color: #fef08a;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
   animation: pointerBob 0.8s ease-in-out infinite alternate;
 }
 
 .play-cta-pointer-hand svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 @keyframes pointerBob {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-4px); }
+  100% { transform: translateY(-5px); }
 }
 
 .play-cta-text {
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 0.05em;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
   line-height: 1;
 }
 
@@ -1546,41 +1610,41 @@ html, body {
 
 /* Bottom Coin Pill under Nodes */
 .node-coin-pill {
-  margin-top: 4px;
+  margin-top: 6px;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 1.5px 7px;
+  gap: 4px;
+  padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.88);
-  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(251, 191, 36, 0.45);
   color: var(--accent-gold);
   font-family: var(--font-display);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
 }
 
 .node-coin-pill.claimed {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.65);
   border-color: rgba(148, 163, 184, 0.3);
   color: #94a3b8;
 }
 
 .coin-pill-img {
-  width: 11px;
-  height: 11px;
+  width: 13px;
+  height: 13px;
   object-fit: contain;
 }
 
 /* Milestone Decorations */
 .milestone-sunburst-rays {
   position: absolute;
-  width: 88px;
-  height: 88px;
+  width: 104px;
+  height: 104px;
   border-radius: 50%;
-  border: 3px dashed #fbbf24;
-  opacity: 0.6;
+  border: 3.5px dashed #fbbf24;
+  opacity: 0.65;
   pointer-events: none;
   animation: spinSlow 16s linear infinite;
 }
@@ -1592,34 +1656,34 @@ html, body {
 
 .milestone-boss-beacon {
   position: absolute;
-  top: -24px;
+  top: -26px;
   background: linear-gradient(135deg, #0284c7, #38bdf8);
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   font-weight: 800;
-  padding: 1px 7px;
+  padding: 1.5px 8px;
   border-radius: 999px;
   letter-spacing: 0.05em;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.85);
   white-space: nowrap;
 }
 
 .milestone-crown-apex {
   position: absolute;
-  top: -22px;
-  font-size: 1.2rem;
-  filter: drop-shadow(0 2px 6px rgba(251, 191, 36, 0.8));
+  top: -26px;
+  font-size: 1.45rem;
+  filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.9));
   animation: crownBob 1.8s ease-in-out infinite alternate;
 }
 
 @keyframes crownBob {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-4px); }
+  100% { transform: translateY(-5px); }
 }
 
 /* ═════════════════════════════════════════════════════════════
-   CLOUD FOG OF WAR (DYNAMIC CLOUD COVERING SYSTEM)
+   REALISTIC VOLUMETRIC CLOUD FOG OF WAR
    ═════════════════════════════════════════════════════════════ */
 .cloud-fog-of-war {
   position: absolute;
@@ -1633,47 +1697,96 @@ html, body {
   transition: left 0.85s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.85s ease;
 }
 
-/* Billowing White Cumulus Cloud Puffs on the Leading Edge */
+/* Crepuscular Sunbeam Rays */
+.cloud-sunray-bank {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -80px;
+  width: 140px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cloud-sunray {
+  position: absolute;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(254, 240, 138, 0.25) 45%, transparent 80%);
+  filter: blur(8px);
+  transform-origin: top left;
+}
+
+.ray-1 { width: 140px; height: 180px; top: 0; left: 0; transform: rotate(25deg); }
+.ray-2 { width: 160px; height: 220px; top: 120px; left: -20px; transform: rotate(32deg); }
+.ray-3 { width: 140px; height: 180px; top: 260px; left: 10px; transform: rotate(28deg); }
+
+/* Realistic Volumetric Cumulus Billows along Leading Edge */
 .cloud-puff-bank {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: -90px;
-  width: 180px;
+  left: -100px;
+  width: 200px;
   pointer-events: none;
 }
 
 .cloud-billow {
   position: absolute;
-  background: radial-gradient(circle at 40% 35%, #ffffff 0%, #f8fafc 50%, #e2e8f0 85%, #cbd5e1 100%);
   border-radius: 50%;
-  filter: drop-shadow(-8px 12px 18px rgba(15, 23, 42, 0.45));
-  animation: cloudDrift 6.5s ease-in-out infinite alternate;
+  animation: realisticCloudDrift 6.5s ease-in-out infinite alternate;
 }
 
-.billow-1 { width: 170px; height: 140px; top: -20px; left: -20px; animation-duration: 7s; }
-.billow-2 { width: 190px; height: 160px; top: 70px; left: 10px; animation-duration: 8s; }
-.billow-3 { width: 180px; height: 150px; top: 180px; left: -30px; animation-duration: 6.2s; }
-.billow-4 { width: 210px; height: 170px; top: 290px; left: 15px; animation-duration: 8.5s; }
-.billow-5 { width: 190px; height: 160px; top: 400px; left: -25px; animation-duration: 7.2s; }
-.billow-6 { width: 160px; height: 130px; top: 490px; left: 20px; animation-duration: 6.8s; }
-.billow-7 { width: 140px; height: 120px; top: 120px; left: -50px; animation-duration: 7.5s; opacity: 0.9; }
-.billow-8 { width: 150px; height: 130px; top: 340px; left: -45px; animation-duration: 8.2s; opacity: 0.9; }
+/* 1. Background Atmospheric Haze */
+.billow-bg-1 {
+  width: 220px; height: 180px; top: 40px; left: -40px;
+  background: radial-gradient(circle at 45% 35%, #ffffff 0%, rgba(226, 232, 240, 0.85) 60%, rgba(148, 163, 184, 0.45) 100%);
+  filter: blur(14px);
+  opacity: 0.7;
+}
+.billow-bg-2 {
+  width: 240px; height: 200px; top: 220px; left: -50px;
+  background: radial-gradient(circle at 45% 35%, #ffffff 0%, rgba(226, 232, 240, 0.85) 60%, rgba(148, 163, 184, 0.45) 100%);
+  filter: blur(16px);
+  opacity: 0.7;
+}
 
-@keyframes cloudDrift {
+/* 2. Midground Volumetric Cumulus Bodies */
+.billow-volumetric {
+  background: radial-gradient(circle at 42% 28%, #ffffff 0%, #f8fafc 45%, #e2e8f0 75%, #94a3b8 100%);
+  filter: drop-shadow(-10px 14px 22px rgba(15, 23, 42, 0.5));
+}
+
+.billow-1 { width: 180px; height: 150px; top: -30px; left: -20px; animation-duration: 7s; }
+.billow-2 { width: 210px; height: 170px; top: 50px; left: 15px; animation-duration: 8.2s; }
+.billow-3 { width: 195px; height: 160px; top: 150px; left: -25px; animation-duration: 6.4s; }
+.billow-4 { width: 220px; height: 175px; top: 230px; left: 20px; animation-duration: 8.6s; }
+.billow-5 { width: 200px; height: 165px; top: 310px; left: -15px; animation-duration: 7.4s; }
+.billow-6 { width: 175px; height: 140px; top: 375px; left: 25px; animation-duration: 7s; }
+
+/* 3. Foreground Sunlit Puffs */
+.billow-sunlit {
+  background: radial-gradient(circle at 38% 22%, #ffffff 0%, #fffdfa 40%, #f1f5f9 70%, #cbd5e1 100%);
+  filter: drop-shadow(-6px 10px 16px rgba(15, 23, 42, 0.4));
+  box-shadow: inset 0 -8px 18px rgba(100, 116, 139, 0.35);
+}
+
+.billow-7 { width: 140px; height: 120px; top: 30px; left: -35px; animation-duration: 6.8s; }
+.billow-8 { width: 155px; height: 130px; top: 190px; left: -40px; animation-duration: 7.8s; }
+.billow-9 { width: 145px; height: 125px; top: 320px; left: -30px; animation-duration: 7.2s; }
+
+@keyframes realisticCloudDrift {
   0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(6px, -6px) scale(1.03); }
-  100% { transform: translate(-5px, 5px) scale(0.98); }
+  50% { transform: translate(7px, -6px) scale(1.025); }
+  100% { transform: translate(-6px, 5px) scale(0.98); }
 }
 
-/* Dense Misty White Cloud Mass Covering Levels 11+ */
+/* Dense Misty Volumetric Fog Mass */
 .cloud-fog-body {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.88) 120px, #ffffff 260px, #ffffff 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: -15px 0 35px rgba(255, 255, 255, 0.6);
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.92) 110px, #ffffff 240px, #ffffff 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: -20px 0 40px rgba(255, 255, 255, 0.7);
 }
 
 .cloud-celestial-stars {
@@ -1697,16 +1810,16 @@ html, body {
   gap: 14px;
   padding: 16px 24px;
   border-radius: 20px;
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.88);
   border: 1.5px solid rgba(251, 191, 36, 0.45);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(251, 191, 36, 0.25);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(251, 191, 36, 0.25);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cloud-sanctuary-seal:hover {
   transform: scale(1.04);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 32px rgba(251, 191, 36, 0.4);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 32px rgba(251, 191, 36, 0.4);
 }
 
 .seal-icon-circle {
@@ -1775,18 +1888,18 @@ html, body {
 /* Floating Speech Bubble on Tap */
 .map-floating-bubble {
   position: absolute;
-  top: -38px;
+  top: -44px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.95);
-  border: 1.5px solid var(--accent-gold);
+  background: rgba(15, 23, 42, 0.96);
+  border: 1.8px solid var(--accent-gold);
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
   white-space: nowrap;
   pointer-events: none;
   z-index: 30;
@@ -1810,8 +1923,8 @@ html, body {
 .roadmap-bottom-scrubber-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 6px;
+  gap: 10px;
+  padding: 0 4px;
   flex-shrink: 0;
 }
 
@@ -1853,6 +1966,105 @@ html, body {
   box-shadow: 0 0 10px rgba(251, 191, 36, 0.9);
   pointer-events: none;
   transition: left 0.1s linear;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   MOBILE LANDSCAPE STRICT ZERO-VERTICAL-SCROLL RESPONSIVE SYSTEM
+   ═════════════════════════════════════════════════════════════ */
+@media (max-height: 520px), (max-width: 900px) and (orientation: landscape) {
+  .roadmap-page {
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  .roadmap-scroll-shell {
+    padding: 4px 8px 6px 8px !important;
+    gap: 4px !important;
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+
+  .roadmap-nav-bar {
+    padding: 3px 10px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+  }
+
+  .btn-back-to-dashboard {
+    padding: 4px 12px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .roadmap-page-title {
+    font-size: 1.15rem !important;
+  }
+
+  .progress-summary.compact-summary {
+    gap: 8px !important;
+  }
+
+  .summary-item .summary-title {
+    display: none;
+  }
+
+  .summary-item .summary-val {
+    font-size: 0.8rem !important;
+  }
+
+  .roadmap-stage-board-card {
+    padding: 4px 6px 6px 6px !important;
+    border-radius: 14px !important;
+    gap: 4px !important;
+  }
+
+  /* Compact or hide redundant subheaders on mobile landscape to give 100% space to map */
+  .roadmap-controls-bar {
+    padding: 0 4px !important;
+    gap: 6px !important;
+  }
+
+  .roadmap-heading-group h2 {
+    font-size: 0.9rem !important;
+  }
+
+  .roadmap-heading-group .sequential-hint {
+    display: none !important;
+  }
+
+  .roadmap-legend {
+    display: none !important;
+  }
+
+  .roadmap-zone-pill-btn {
+    padding: 3px 8px !important;
+    font-size: 0.68rem !important;
+  }
+
+  .roadmap-3d-viewport {
+    border-radius: 12px !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+  .map-floating-nav-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .map-floating-nav-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .roadmap-bottom-scrubber-bar {
+    padding: 0 2px !important;
+    gap: 8px !important;
+  }
+
+  .scrubber-label {
+    font-size: 0.65rem !important;
+  }
 }
 
 /* Aim Telemetry */

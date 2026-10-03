@@ -33,6 +33,12 @@ export class BrandingElements {
     this.clouds = [];   // { group, speed, baseY, phase }
     this.petals = [];   // { mesh, vy, vx, phase, rotSpeed }
     this.driftingPieces = []; // 3D drifting structural blocks & game assets
+    this.hillMeshes = [];
+    this.treeCanopyMeshes = [];
+    this.treeTrunkMeshes = [];
+    this.flowerMeshes = [];
+    this.backdropTextures = new Map();
+    this.currentTheme = 'emerald';
     this.targetTilt = { x: 0, y: 0 };
     this.currentTilt = { x: 0, y: 0 };
     this.initPointerParallax();
@@ -133,115 +139,396 @@ export class BrandingElements {
    * ═════════════════════════════════════════════════════════════ */
 
   /**
-   * 2048×1024 canvas-painted anime sky with gradient, sun glow, clouds, layered mountain
-   * silhouettes, and cherry blossom tree silhouettes.
+   * Generates high-resolution canvas backdrop for the given theme (cached in Map).
    */
-  buildAnimeSkyBackdrop() {
+  getThemeBackdropTexture(theme = 'emerald') {
+    if (this.backdropTextures.has(theme)) {
+      return this.backdropTextures.get(theme);
+    }
+
     const c = document.createElement('canvas');
     c.width = 2048;
     c.height = 1024;
     const ctx = c.getContext('2d');
 
-    // ── 1. Anime sky gradient ──
-    const sky = ctx.createLinearGradient(0, 0, 0, 1024);
-    sky.addColorStop(0.0, '#1a5fb4');    // deep azure zenith
-    sky.addColorStop(0.20, '#3d98d8');   // bright blue
-    sky.addColorStop(0.40, '#6cb8e8');   // mid sky
-    sky.addColorStop(0.55, '#a8daf4');   // pale blue
-    sky.addColorStop(0.66, '#e8f0d8');   // horizon cream-green
-    sky.addColorStop(0.76, '#b8d888');   // distant hillside
-    sky.addColorStop(0.86, '#78b050');   // closer green
-    sky.addColorStop(1.0, '#4a8830');    // foreground green
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, 2048, 1024);
+    if (theme === 'amber') {
+      // ══════════════════════════════════════════════════════════
+      // THEME 2: AMBER CANYON & GOLDEN PEAKS (Levels 6–10)
+      // Rich golden-hour sunset, layered sandstone bluffs, autumn foliage
+      // ══════════════════════════════════════════════════════════
+      const sky = ctx.createLinearGradient(0, 0, 0, 1024);
+      sky.addColorStop(0.0, '#7c2d12');    // deep russet sunset zenith
+      sky.addColorStop(0.22, '#c2410c');   // rich amber-orange
+      sky.addColorStop(0.42, '#ea580c');   // fiery apricot
+      sky.addColorStop(0.58, '#f59e0b');   // warm golden horizon
+      sky.addColorStop(0.68, '#fef3c7');   // luminous sunburst band
+      sky.addColorStop(0.78, '#b45309');   // canyon rim
+      sky.addColorStop(0.88, '#92400e');   // deep canyon rock
+      sky.addColorStop(1.0, '#78350f');    // foreground canyon earth
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 2048, 1024);
 
-    // ── 2. Warm sun glow (upper-right) ──
-    const sg = ctx.createRadialGradient(1180, 420, 18, 1180, 420, 480);
-    sg.addColorStop(0, 'rgba(255,250,220,0.55)');
-    sg.addColorStop(0.25, 'rgba(255,245,200,0.3)');
-    sg.addColorStop(0.6, 'rgba(200,230,248,0.1)');
-    sg.addColorStop(1, 'rgba(200,230,248,0)');
-    ctx.fillStyle = sg;
-    ctx.fillRect(0, 0, 2048, 1024);
+      // Radiant golden sunset disc & crepuscular rays
+      const sg = ctx.createRadialGradient(1280, 480, 24, 1280, 480, 520);
+      sg.addColorStop(0, 'rgba(255, 255, 230, 0.85)');
+      sg.addColorStop(0.2, 'rgba(254, 240, 138, 0.55)');
+      sg.addColorStop(0.5, 'rgba(249, 115, 22, 0.22)');
+      sg.addColorStop(1, 'rgba(249, 115, 22, 0)');
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, 0, 2048, 1024);
 
-    // ── 3. Far mountain silhouettes (misty blue-grey) ──
-    ctx.fillStyle = 'rgba(110,140,180,0.45)';
-    ctx.beginPath();
-    ctx.moveTo(0, 1024);
-    [
-      [0, 700], [140, 580], [320, 650], [520, 510], [740, 620],
-      [980, 500], [1200, 580], [1420, 470], [1650, 560], [1850, 500],
-      [2048, 555], [2048, 1024]
-    ].forEach(([x, y]) => ctx.lineTo(x, y));
-    ctx.closePath();
-    ctx.fill();
+      // Distant towering red-rock mesa & plateau silhouettes
+      ctx.fillStyle = 'rgba(124, 45, 18, 0.52)';
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 680], [160, 680], [190, 520], [380, 520], [420, 670],
+        [680, 670], [720, 480], [980, 480], [1020, 660],
+        [1280, 660], [1320, 460], [1560, 460], [1600, 650],
+        [1820, 650], [1860, 510], [2000, 510], [2048, 640], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
 
-    // ── 4. Mid mountain layer (blue-green) ──
-    const mGrad = ctx.createLinearGradient(0, 580, 0, 820);
-    mGrad.addColorStop(0, 'rgba(65,115,85,0.65)');
-    mGrad.addColorStop(1, 'rgba(55,100,65,0.45)');
-    ctx.fillStyle = mGrad;
-    ctx.beginPath();
-    ctx.moveTo(0, 1024);
-    [
-      [0, 740], [200, 660], [420, 720], [680, 630], [960, 700],
-      [1250, 620], [1500, 710], [1780, 650], [2048, 710], [2048, 1024]
-    ].forEach(([x, y]) => ctx.lineTo(x, y));
-    ctx.closePath();
-    ctx.fill();
+      // Mid-distance layered sandstone canyon ridges
+      const mGrad = ctx.createLinearGradient(0, 580, 0, 840);
+      mGrad.addColorStop(0, 'rgba(180, 83, 9, 0.72)');
+      mGrad.addColorStop(1, 'rgba(146, 64, 14, 0.55)');
+      ctx.fillStyle = mGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 720], [240, 640], [480, 710], [760, 620], [1040, 680],
+        [1320, 610], [1600, 690], [1880, 630], [2048, 700], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
 
-    // ── 5. Near foothill layer (warm green) ──
-    const fGrad = ctx.createLinearGradient(0, 690, 0, 1024);
-    fGrad.addColorStop(0, '#5a9a3a');
-    fGrad.addColorStop(0.5, '#4a8830');
-    fGrad.addColorStop(1, '#3a7428');
-    ctx.fillStyle = fGrad;
-    ctx.beginPath();
-    ctx.moveTo(0, 1024);
-    [
-      [0, 785], [280, 720], [560, 770], [840, 710], [1100, 750],
-      [1380, 700], [1680, 760], [1920, 730], [2048, 770], [2048, 1024]
-    ].forEach(([x, y]) => ctx.lineTo(x, y));
-    ctx.closePath();
-    ctx.fill();
+      // Golden autumn tree silhouettes on ridges
+      this.paintAutumnTreeSilhouette(ctx, 320, 720, 1.8);
+      this.paintAutumnTreeSilhouette(ctx, 780, 710, 1.6);
+      this.paintAutumnTreeSilhouette(ctx, 1260, 690, 1.9);
+      this.paintAutumnTreeSilhouette(ctx, 1680, 710, 1.5);
 
-    // ── 6. Cherry blossom tree silhouettes on foothills ──
-    this.paintTreeSilhouette(ctx, 240, 758, 1.8);
-    this.paintTreeSilhouette(ctx, 580, 748, 1.5);
-    this.paintTreeSilhouette(ctx, 1050, 738, 1.3);
-    this.paintTreeSilhouette(ctx, 1420, 728, 2.0);
-    this.paintTreeSilhouette(ctx, 1780, 748, 1.6);
+      // Warm golden anime sunset clouds
+      this.paintAnimeCloud(ctx, 280, 210, 280, 100, 0.88);
+      this.paintAnimeCloud(ctx, 880, 170, 340, 120, 0.90);
+      this.paintAnimeCloud(ctx, 1580, 230, 290, 110, 0.85);
+      this.paintAnimeCloud(ctx, 1220, 350, 240, 85, 0.75);
 
-    // ── 7. Painted anime clouds (on top of everything) ──
-    this.paintAnimeCloud(ctx, 300, 190, 260, 95, 0.90);
-    this.paintAnimeCloud(ctx, 850, 155, 330, 115, 0.92);
-    this.paintAnimeCloud(ctx, 1520, 215, 270, 100, 0.86);
-    this.paintAnimeCloud(ctx, 160, 310, 185, 68, 0.68);
-    this.paintAnimeCloud(ctx, 1160, 340, 225, 82, 0.72);
-    this.paintAnimeCloud(ctx, 1820, 290, 200, 72, 0.75);
+    } else if (theme === 'celestial') {
+      // ══════════════════════════════════════════════════════════
+      // THEME 3: CELESTIAL TWILIGHT & FLOATING CRYSTALS (Levels 11–15)
+      // Mystical deep indigo-to-cyan sky, luminous waving aurora borealis, stars
+      // ══════════════════════════════════════════════════════════
+      const sky = ctx.createLinearGradient(0, 0, 0, 1024);
+      sky.addColorStop(0.0, '#0f172a');    // cosmic deep midnight navy
+      sky.addColorStop(0.25, '#1e1b4b');   // mystical indigo
+      sky.addColorStop(0.48, '#312e81');   // royal twilight purple
+      sky.addColorStop(0.68, '#0284c7');   // glowing electric cyan
+      sky.addColorStop(0.82, '#0d9488');   // emerald-turquoise horizon glow
+      sky.addColorStop(1.0, '#134e4a');    // deep alpine crystal base
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 2048, 1024);
 
-    // ── Create textured backdrop plane (expanded for dynamic camera zooming) ──
+      // Twinkling celestial constellations and star field
+      ctx.fillStyle = '#ffffff';
+      for (let s = 0; s < 180; s++) {
+        const sx = (s * 97) % 2040 + 4;
+        const sy = (s * 43) % 480 + 10;
+        const sRadius = (s % 3 === 0) ? 2.2 : (s % 2 === 0 ? 1.5 : 0.9);
+        const sAlpha = 0.4 + (s % 5) * 0.14;
+        ctx.fillStyle = `rgba(255, 255, 255, ${sAlpha})`;
+        ctx.beginPath();
+        ctx.arc(sx, sy, sRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Luminous waving Aurora Borealis ribbons across the sky
+      for (let a = 0; a < 3; a++) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0, 320 + a * 50);
+        for (let x = 0; x <= 2048; x += 64) {
+          const wave = Math.sin((x * 0.0035) + a * 1.8) * 75 + Math.cos((x * 0.008) - a) * 45;
+          ctx.lineTo(x, 260 + a * 65 + wave);
+        }
+        ctx.lineTo(2048, 1024);
+        ctx.lineTo(0, 1024);
+        ctx.closePath();
+
+        const aurGrad = ctx.createLinearGradient(0, 180 + a * 50, 0, 500 + a * 60);
+        aurGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+        aurGrad.addColorStop(0.3, a === 1 ? 'rgba(52, 211, 153, 0.42)' : 'rgba(56, 189, 248, 0.38)');
+        aurGrad.addColorStop(0.7, 'rgba(167, 139, 250, 0.25)');
+        aurGrad.addColorStop(1, 'rgba(30, 27, 75, 0)');
+        ctx.fillStyle = aurGrad;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Floating crystal archipelago silhouettes in the distance
+      ctx.fillStyle = 'rgba(49, 46, 129, 0.65)';
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 680], [180, 560], [280, 620], [480, 480], [620, 600],
+        [840, 470], [1060, 590], [1280, 490], [1520, 610], [1760, 510],
+        [1940, 580], [2048, 540], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Near crystal ridge with bioluminescent accents
+      const cGrad = ctx.createLinearGradient(0, 680, 0, 1024);
+      cGrad.addColorStop(0, '#1e1b4b');
+      cGrad.addColorStop(0.5, '#134e4a');
+      cGrad.addColorStop(1, '#064e3b');
+      ctx.fillStyle = cGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 760], [280, 690], [560, 750], [840, 680], [1120, 740],
+        [1400, 670], [1680, 730], [1960, 690], [2048, 740], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Luminous crystal trees on ridges
+      this.paintCrystalTreeSilhouette(ctx, 360, 730, 1.7);
+      this.paintCrystalTreeSilhouette(ctx, 840, 710, 1.8);
+      this.paintCrystalTreeSilhouette(ctx, 1380, 700, 1.9);
+      this.paintCrystalTreeSilhouette(ctx, 1820, 720, 1.6);
+
+      // Glowing twilight clouds
+      this.paintAnimeCloud(ctx, 320, 200, 260, 95, 0.78);
+      this.paintAnimeCloud(ctx, 920, 160, 320, 115, 0.82);
+      this.paintAnimeCloud(ctx, 1620, 220, 270, 100, 0.75);
+
+    } else if (theme === 'summit') {
+      // ══════════════════════════════════════════════════════════
+      // THEME 4: CROWN SUMMIT & VOLCANIC STORM FORTRESS (Levels 16–20)
+      // Dramatic storm sky, fiery horizon, jagged gothic peaks, thunderclouds
+      // ══════════════════════════════════════════════════════════
+      const sky = ctx.createLinearGradient(0, 0, 0, 1024);
+      sky.addColorStop(0.0, '#090d16');    // obsidian shadow zenith
+      sky.addColorStop(0.24, '#1e1b4b');   // tempest purple
+      sky.addColorStop(0.44, '#4c1d95');   // electric twilight
+      sky.addColorStop(0.62, '#991b1b');   // blazing crimson dusk
+      sky.addColorStop(0.76, '#dc2626');   // volcanic furnace red
+      sky.addColorStop(0.88, '#f59e0b');   // molten gold horizon
+      sky.addColorStop(1.0, '#1c1917');    // volcanic basalt earth
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Distant lightning flash radiance along horizon
+      const lg = ctx.createRadialGradient(920, 620, 30, 920, 620, 600);
+      lg.addColorStop(0, 'rgba(254, 240, 138, 0.75)');
+      lg.addColorStop(0.25, 'rgba(239, 68, 68, 0.45)');
+      lg.addColorStop(0.65, 'rgba(147, 51, 234, 0.18)');
+      lg.addColorStop(1, 'rgba(76, 29, 149, 0)');
+      ctx.fillStyle = lg;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Towering jagged obsidian peaks & dramatic gothic spires
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 700], [140, 480], [240, 650], [380, 430], [520, 620],
+        [720, 390], [860, 580], [1080, 360], [1240, 550], [1460, 410],
+        [1620, 600], [1820, 440], [1960, 630], [2048, 510], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Near volcanic basalt ramparts
+      const bGrad = ctx.createLinearGradient(0, 660, 0, 1024);
+      bGrad.addColorStop(0, '#1e293b');
+      bGrad.addColorStop(0.5, '#0f172a');
+      bGrad.addColorStop(1, '#090d16');
+      ctx.fillStyle = bGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 740], [220, 660], [480, 730], [740, 650], [1020, 710],
+        [1300, 640], [1580, 720], [1840, 660], [2048, 730], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Ancient stone obelisks & fortress pinnacles on ridges
+      this.paintObeliskSilhouette(ctx, 380, 710, 2.0);
+      this.paintObeliskSilhouette(ctx, 860, 680, 2.2);
+      this.paintObeliskSilhouette(ctx, 1340, 670, 2.1);
+      this.paintObeliskSilhouette(ctx, 1780, 690, 1.9);
+
+      // Dramatic thundercloud anvil clouds with incandescent rim light
+      this.paintAnimeCloud(ctx, 360, 180, 320, 110, 0.85);
+      this.paintAnimeCloud(ctx, 1020, 140, 380, 135, 0.88);
+      this.paintAnimeCloud(ctx, 1680, 190, 330, 120, 0.82);
+
+    } else {
+      // ══════════════════════════════════════════════════════════
+      // THEME 1: EMERALD VALLEY & SUNNY SKIES (Levels 1–5, Bright & Clean)
+      // Classic anime blue sky, warm sun glow, lush rolling green hills, cherry trees
+      // ══════════════════════════════════════════════════════════
+      const sky = ctx.createLinearGradient(0, 0, 0, 1024);
+      sky.addColorStop(0.0, '#1a5fb4');    // deep azure zenith
+      sky.addColorStop(0.20, '#3d98d8');   // bright blue
+      sky.addColorStop(0.40, '#6cb8e8');   // mid sky
+      sky.addColorStop(0.55, '#a8daf4');   // pale blue
+      sky.addColorStop(0.66, '#e8f0d8');   // horizon cream-green
+      sky.addColorStop(0.76, '#b8d888');   // distant hillside
+      sky.addColorStop(0.86, '#78b050');   // closer green
+      sky.addColorStop(1.0, '#4a8830');    // foreground green
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Warm sun glow (upper-right)
+      const sg = ctx.createRadialGradient(1180, 420, 18, 1180, 420, 480);
+      sg.addColorStop(0, 'rgba(255,250,220,0.55)');
+      sg.addColorStop(0.25, 'rgba(255,245,200,0.3)');
+      sg.addColorStop(0.6, 'rgba(200,230,248,0.1)');
+      sg.addColorStop(1, 'rgba(200,230,248,0)');
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Far mountain silhouettes (misty blue-grey)
+      ctx.fillStyle = 'rgba(110,140,180,0.45)';
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 700], [140, 580], [320, 650], [520, 510], [740, 620],
+        [980, 500], [1200, 580], [1420, 470], [1650, 560], [1850, 500],
+        [2048, 555], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Mid mountain layer (blue-green)
+      const mGrad = ctx.createLinearGradient(0, 580, 0, 820);
+      mGrad.addColorStop(0, 'rgba(65,115,85,0.65)');
+      mGrad.addColorStop(1, 'rgba(55,100,65,0.45)');
+      ctx.fillStyle = mGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 740], [200, 660], [420, 720], [680, 630], [960, 700],
+        [1250, 620], [1500, 710], [1780, 650], [2048, 710], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Near foothill layer (warm green)
+      const fGrad = ctx.createLinearGradient(0, 690, 0, 1024);
+      fGrad.addColorStop(0, '#5a9a3a');
+      fGrad.addColorStop(0.5, '#4a8830');
+      fGrad.addColorStop(1, '#3a7428');
+      ctx.fillStyle = fGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 785], [280, 720], [560, 770], [840, 710], [1100, 750],
+        [1380, 700], [1680, 760], [1920, 730], [2048, 770], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Cherry blossom tree silhouettes on foothills
+      this.paintTreeSilhouette(ctx, 240, 758, 1.8);
+      this.paintTreeSilhouette(ctx, 580, 748, 1.5);
+      this.paintTreeSilhouette(ctx, 1050, 738, 1.3);
+      this.paintTreeSilhouette(ctx, 1420, 728, 2.0);
+      this.paintTreeSilhouette(ctx, 1780, 748, 1.6);
+
+      // Painted anime clouds
+      this.paintAnimeCloud(ctx, 300, 190, 260, 95, 0.90);
+      this.paintAnimeCloud(ctx, 850, 155, 330, 115, 0.92);
+      this.paintAnimeCloud(ctx, 1520, 215, 270, 100, 0.86);
+      this.paintAnimeCloud(ctx, 160, 310, 185, 68, 0.68);
+      this.paintAnimeCloud(ctx, 1160, 340, 225, 82, 0.72);
+      this.paintAnimeCloud(ctx, 1820, 290, 200, 72, 0.75);
+    }
+
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
+    this.backdropTextures.set(theme, tex);
+    return tex;
+  }
 
-    const backdrop = new THREE.Mesh(
+  paintAutumnTreeSilhouette(ctx, tx, ty, s = 1.0) {
+    ctx.fillStyle = 'rgba(74, 30, 12, 0.75)';
+    ctx.fillRect(tx - 3 * s, ty, 6 * s, 36 * s);
+
+    ctx.fillStyle = 'rgba(217, 119, 6, 0.85)';
+    [ [0, -32], [20, -22], [-20, -24], [12, -44], [-12, -40], [24, -36], [-22, -34] ].forEach(([ox, oy]) => {
+      ctx.beginPath();
+      ctx.arc(tx + ox * s, ty + oy * s, 19 * s, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.75)';
+    [ [6, -38], [-14, -30], [16, -28] ].forEach(([ox, oy]) => {
+      ctx.beginPath();
+      ctx.arc(tx + ox * s, ty + oy * s, 11 * s, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  paintCrystalTreeSilhouette(ctx, tx, ty, s = 1.0) {
+    ctx.fillStyle = 'rgba(30, 27, 75, 0.85)';
+    ctx.fillRect(tx - 2.5 * s, ty, 5 * s, 36 * s);
+
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.75)';
+    [ [0, -34], [16, -24], [-16, -26], [8, -46], [-8, -42], [20, -38], [-18, -36] ].forEach(([ox, oy]) => {
+      ctx.beginPath();
+      ctx.arc(tx + ox * s, ty + oy * s, 17 * s, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.fillStyle = 'rgba(167, 139, 250, 0.85)';
+    [ [4, -40], [-10, -32], [12, -30] ].forEach(([ox, oy]) => {
+      ctx.beginPath();
+      ctx.arc(tx + ox * s, ty + oy * s, 10 * s, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  paintObeliskSilhouette(ctx, tx, ty, s = 1.0) {
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    ctx.beginPath();
+    ctx.moveTo(tx - 6 * s, ty + 40 * s);
+    ctx.lineTo(tx - 3 * s, ty - 35 * s);
+    ctx.lineTo(tx, ty - 50 * s);
+    ctx.lineTo(tx + 3 * s, ty - 35 * s);
+    ctx.lineTo(tx + 6 * s, ty + 40 * s);
+    ctx.closePath();
+    ctx.fill();
+
+    // Glowing rune line
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.75)';
+    ctx.lineWidth = 2 * s;
+    ctx.beginPath();
+    ctx.moveTo(tx, ty + 30 * s);
+    ctx.lineTo(tx, ty - 30 * s);
+    ctx.stroke();
+  }
+
+  buildAnimeSkyBackdrop() {
+    const tex = this.getThemeBackdropTexture(this.currentTheme);
+    this.backdropMesh = new THREE.Mesh(
       new THREE.PlaneGeometry(240, 115),
       new THREE.MeshBasicMaterial({ map: tex, depthWrite: false, fog: false })
     );
-    backdrop.position.set(1, 24, -48);
-    this.root.add(backdrop);
+    this.backdropMesh.position.set(1, 24, -48);
+    this.root.add(this.backdropMesh);
   }
 
   /**
-   * Smooth rolling 3D green hills at multiple Z-depths for natural parallax.
+   * Smooth rolling 3D hills at multiple Z-depths for natural parallax.
    */
   buildParallaxHills() {
-    const greens = [
-      new THREE.MeshStandardMaterial({ color: 0x4a9c32, roughness: 0.78 }),
-      new THREE.MeshStandardMaterial({ color: 0x3a8a28, roughness: 0.82 }),
-      new THREE.MeshStandardMaterial({ color: 0x58a840, roughness: 0.75 }),
-    ];
-
     const hills = [
       { pos: [-38, -6, -25], sx: 20, sy: 9.0, sz: 10, mi: 0 },
       { pos: [-22, -5, -22], sx: 18, sy: 8.5, sz: 9, mi: 1 },
@@ -257,33 +544,30 @@ export class BrandingElements {
     hills.forEach(({ pos, sx, sy, sz, mi }) => {
       const geo = new THREE.SphereGeometry(1, 24, 16);
       geo.scale(sx, sy, sz);
-      const mesh = new THREE.Mesh(geo, greens[mi]);
+      const mat = new THREE.MeshStandardMaterial({ color: 0x4a9c32, roughness: 0.78 });
+      const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(...pos);
       mesh.receiveShadow = true;
+      mesh.userData = { hillIndex: mi };
+      this.hillMeshes.push(mesh);
       this.root.add(mesh);
     });
   }
 
   /**
-   * Creates a single 3D cherry blossom tree: brown trunk + branches + pink canopy clusters.
+   * Creates a single 3D tree with theme-responsive foliage clusters.
    */
   createCherryTree(trunkH = 2.8, canopyR = 2.2, scale = 1.0) {
     const tree = new THREE.Group();
 
     const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c3a20, roughness: 0.85 });
-    const pinks = [
-      new THREE.MeshStandardMaterial({ color: 0xffc0d0, roughness: 0.62, flatShading: true }),
-      new THREE.MeshStandardMaterial({ color: 0xf5a0be, roughness: 0.65, flatShading: true }),
-      new THREE.MeshStandardMaterial({ color: 0xe88098, roughness: 0.68, flatShading: true }),
-    ];
-
-    // Main trunk
     const trunk = new THREE.Mesh(
       new THREE.CylinderGeometry(0.12 * scale, 0.24 * scale, trunkH * scale, 8),
       trunkMat
     );
     trunk.position.y = trunkH * scale * 0.5;
     trunk.castShadow = true;
+    this.treeTrunkMeshes.push(trunk);
     tree.add(trunk);
 
     // Major branches
@@ -295,10 +579,11 @@ export class BrandingElements {
       );
       br.position.set(xDir * 0.35 * scale, trunkH * scale * hR, zDir * 0.1 * scale);
       br.rotation.z = xDir * 0.65;
+      this.treeTrunkMeshes.push(br);
       tree.add(br);
     });
 
-    // Blossom canopy clusters (overlapping dodecahedrons)
+    // Foliage canopy clusters
     const blossoms = [
       [0, 1.05, 0, 1.0],
       [-0.38, 0.88, 0.22, 0.85],
@@ -314,7 +599,10 @@ export class BrandingElements {
     blossoms.forEach(([xr, yr, zr, sizeR], i) => {
       const r = canopyR * scale * sizeR * 0.42;
       const geo = new THREE.DodecahedronGeometry(r, 1);
-      const blob = new THREE.Mesh(geo, pinks[i % 3]);
+      const blob = new THREE.Mesh(
+        geo,
+        new THREE.MeshStandardMaterial({ color: 0xffc0d0, roughness: 0.65, flatShading: true })
+      );
       blob.position.set(
         xr * canopyR * scale,
         trunkH * scale * yr,
@@ -322,15 +610,14 @@ export class BrandingElements {
       );
       blob.rotation.set(i * 0.8, i * 1.2, i * 0.5);
       blob.castShadow = true;
+      blob.userData = { blobIndex: i };
+      this.treeCanopyMeshes.push(blob);
       tree.add(blob);
     });
 
     return tree;
   }
 
-  /**
-   * Places 6 3D cherry blossom trees around the background, framing the gameplay area.
-   */
   buildCherryBlossomTrees() {
     const trees = [
       { pos: [-20, 0, -9], h: 3.2, r: 2.6, s: 1.1 },
@@ -348,9 +635,6 @@ export class BrandingElements {
     });
   }
 
-  /**
-   * Scatters small wildflower meshes along the ground edges for anime grassland charm.
-   */
   buildWildflowers() {
     const colors = [0xffffff, 0xffd700, 0xff8c00, 0xffb6c1, 0xe8e048, 0xf08080, 0xdda0dd];
     const geo = new THREE.SphereGeometry(0.08, 6, 4);
@@ -366,10 +650,10 @@ export class BrandingElements {
         ? -5.5 - Math.random() * 3
         : 5.5 + Math.random() * 3;
       flower.position.set(x, 0.08 + Math.random() * 0.06, z);
+      this.flowerMeshes.push(flower);
       this.root.add(flower);
     }
 
-    // Taller grass-like wildflower clusters near foreground trees
     const tallGeo = new THREE.ConeGeometry(0.06, 0.28, 4);
     const greenMat = new THREE.MeshStandardMaterial({ color: 0x5cb848, roughness: 0.7 });
 
@@ -381,7 +665,96 @@ export class BrandingElements {
         : 6 + Math.random() * 2;
       blade.position.set(x, 0.14, z);
       blade.rotation.z = (Math.random() - 0.5) * 0.3;
+      this.flowerMeshes.push(blade);
       this.root.add(blade);
+    }
+  }
+
+  /**
+   * Applies the environment visual theme across backdrop, hills, trees, and particles.
+   */
+  setTheme(theme = 'emerald') {
+    if (this.currentTheme === theme && this.hasAppliedThemeOnce) return;
+    this.currentTheme = theme;
+    this.hasAppliedThemeOnce = true;
+
+    // 1. Update backdrop canvas map
+    if (this.backdropMesh && this.backdropMesh.material) {
+      this.backdropMesh.material.map = this.getThemeBackdropTexture(theme);
+      this.backdropMesh.material.needsUpdate = true;
+    }
+
+    // 2. Update 3D parallax hill colors
+    const hillPaletteMap = {
+      emerald: [0x4a9c32, 0x3a8a28, 0x58a840],
+      amber: [0xc2410c, 0xb45309, 0xd97706],
+      celestial: [0x3730a3, 0x1e1b4b, 0x0284c7],
+      summit: [0x1e293b, 0x0f172a, 0x334155]
+    };
+    const hillPalette = hillPaletteMap[theme] || hillPaletteMap.emerald;
+    this.hillMeshes.forEach((mesh) => {
+      if (mesh?.material) {
+        const mi = mesh.userData?.hillIndex || 0;
+        mesh.material.color.setHex(hillPalette[mi % hillPalette.length]);
+      }
+    });
+
+    // 3. Update 3D tree canopies & trunks
+    const canopyPaletteMap = {
+      emerald: [0xffc0d0, 0xf5a0be, 0xe88098],
+      amber: [0xf59e0b, 0xd97706, 0xb45309],
+      celestial: [0x38bdf8, 0x818cf8, 0x34d399],
+      summit: [0x475569, 0x64748b, 0x991b1b]
+    };
+    const canopyPalette = canopyPaletteMap[theme] || canopyPaletteMap.emerald;
+    this.treeCanopyMeshes.forEach((mesh) => {
+      if (mesh?.material) {
+        const bi = mesh.userData?.blobIndex || 0;
+        mesh.material.color.setHex(canopyPalette[bi % canopyPalette.length]);
+      }
+    });
+
+    const trunkColorMap = {
+      emerald: 0x5c3a20,
+      amber: 0x78350f,
+      celestial: 0x1e1b4b,
+      summit: 0x0f172a
+    };
+    const trunkColor = trunkColorMap[theme] || 0x5c3a20;
+    this.treeTrunkMeshes.forEach((mesh) => {
+      if (mesh?.material) {
+        mesh.material.color.setHex(trunkColor);
+      }
+    });
+
+    // 4. Update falling ambient particles (petals / autumn leaves / stardust / embers)
+    const particleColorsMap = {
+      emerald: [0xffc0d0, 0xf8a0c0, 0xf07898, 0xfff0f5],
+      amber: [0xfbbf24, 0xf59e0b, 0xd97706, 0xfde047],
+      celestial: [0x38bdf8, 0xa5f3fc, 0xc084fc, 0x67e8f9],
+      summit: [0xf97316, 0xef4444, 0xfbbf24, 0xdc2626]
+    };
+    const pPalette = particleColorsMap[theme] || particleColorsMap.emerald;
+    this.petals.forEach((p, idx) => {
+      if (p.mesh?.material) {
+        p.mesh.material.color.setHex(pPalette[idx % pPalette.length]);
+      }
+    });
+  }
+
+  /**
+   * Sets the theme based on the level ID (1-5 emerald, 6-10 amber, 11-15 celestial, 16-20 summit)
+   */
+  setThemeForLevel(levelId = 1) {
+    const id = Number(levelId) || 1;
+    if (id <= 5) {
+      this.setTheme('emerald');
+    } else if (id <= 10) {
+      this.setTheme('amber');
+    } else if (id <= 15) {
+      this.setTheme('celestial');
+    } else {
+      this.setTheme('summit');
     }
   }
 

@@ -91,10 +91,23 @@ export class GameScene {
     const aspect = width / height;
 
     // Low-FOV (28°) telephoto framing eliminates wide-angle 3D perspective distortion
-    // while keeping the entire 2D/3D hybrid arena stationary in view.
+    // while keeping the entire 2D/3D hybrid arena cleanly in view.
     this.camera = new THREE.PerspectiveCamera(28, aspect, 1.0, 160);
     this.stationaryLookAt = new THREE.Vector3(1.0, 4.2, 0.0);
     this.stationaryCameraPos = new THREE.Vector3(1.0, 4.2, 42.0);
+
+    // Dynamic Action Cinematic Camera Controller
+    // States: 'OVERVIEW' (static wide starting view) | 'TRACKING' (smooth projectile follow & subtle zoom) | 'FOCUS' (impact area close-up) | 'RETURN' (smooth glide back to overview)
+    this.cameraState = 'OVERVIEW';
+    this.overviewLookAt = new THREE.Vector3(1.0, 4.2, 0.0);
+    this.overviewCameraPos = new THREE.Vector3(1.0, 4.2, 42.0);
+    this.currentCameraPos = new THREE.Vector3(1.0, 4.2, 42.0);
+    this.currentLookAt = new THREE.Vector3(1.0, 4.2, 0.0);
+    this.targetCameraPos = new THREE.Vector3(1.0, 4.2, 42.0);
+    this.targetLookAt = new THREE.Vector3(1.0, 4.2, 0.0);
+    this.focusPoint = new THREE.Vector3(1.0, 4.2, 0.0);
+    this.focusTimer = 0;
+
     this.updateStationaryCameraPosition(aspect);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -108,28 +121,28 @@ export class GameScene {
     this.container.appendChild(this.renderer.domElement);
 
     // Balanced studio + outdoor lighting to highlight 3D sculpted character geometry & glass orbs
-    const hemiLight = new THREE.HemisphereLight(0xf0f9ff, 0x1e293b, 0.95);
-    this.scene.add(hemiLight);
+    this.hemiLight = new THREE.HemisphereLight(0xf0f9ff, 0x1e293b, 0.95);
+    this.scene.add(this.hemiLight);
 
-    const dirLight = new THREE.DirectionalLight(0xfff5e0, 1.55);
-    dirLight.position.set(-8, 32, 28);
-    dirLight.castShadow = true;
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
-    dirLight.shadow.camera.near = 2;
-    dirLight.shadow.camera.far = 130;
+    this.dirLight = new THREE.DirectionalLight(0xfff5e0, 1.55);
+    this.dirLight.position.set(-8, 32, 28);
+    this.dirLight.castShadow = true;
+    this.dirLight.shadow.mapSize.width = 2048;
+    this.dirLight.shadow.mapSize.height = 2048;
+    this.dirLight.shadow.camera.near = 2;
+    this.dirLight.shadow.camera.far = 130;
     const d = 38;
-    dirLight.shadow.camera.left = -d;
-    dirLight.shadow.camera.right = d;
-    dirLight.shadow.camera.top = d;
-    dirLight.shadow.camera.bottom = -d;
-    dirLight.shadow.bias = -0.0005;
-    this.scene.add(dirLight);
+    this.dirLight.shadow.camera.left = -d;
+    this.dirLight.shadow.camera.right = d;
+    this.dirLight.shadow.camera.top = d;
+    this.dirLight.shadow.camera.bottom = -d;
+    this.dirLight.shadow.bias = -0.0005;
+    this.scene.add(this.dirLight);
 
     // Subtle front-right fill light so sculpted faces and eyes pop with 3D depth
-    const fillLight = new THREE.DirectionalLight(0xe0f2fe, 0.55);
-    fillLight.position.set(14, 10, 20);
-    this.scene.add(fillLight);
+    this.fillLight = new THREE.DirectionalLight(0xe0f2fe, 0.55);
+    this.fillLight.position.set(14, 10, 20);
+    this.scene.add(this.fillLight);
 
     // Dedicated reusable explosion flash light
     // Pre-added to the scene so Three.js compiles all PBR shaders with point light support on load.
@@ -187,9 +200,9 @@ export class GameScene {
 
     return {
       minX,
-      maxX: Math.max(13.0, maxX),
+      maxX: Math.max(14.0, maxX),
       minY: Math.min(0, minY),
-      maxY: Math.max(7.5, maxY)
+      maxY: Math.max(8.0, maxY)
     };
   }
 
@@ -197,17 +210,17 @@ export class GameScene {
    * Dynamic Camera System:
    * Automatically calculates the total bounding box of the current level's structure.
    * Adjusts camera distance (moves further back on Z-axis) and FOV so that the entire
-   * structure, slingshot, and ground are always fully visible regardless of size.
+   * structure, slingshot, and ground are always fully visible in a wide-angle overview.
    */
   updateDynamicCamera(aspect) {
     const safeAspect = Math.max(0.65, aspect || 1.77);
     const bbox = this.computeLevelBoundingBox(this.currentLevel);
 
     // Padding around the bounding box (safe room for HUD, trajectory arc, and collapsing debris)
-    const padLeft = 2.8;
-    const padRight = 3.8;
-    const padBottom = 2.0;
-    const padTop = 3.8;
+    const padLeft = 2.4;
+    const padRight = 3.4;
+    const padBottom = 1.8;
+    const padTop = 3.6;
 
     const totalWidth = (bbox.maxX - bbox.minX) + padLeft + padRight;
     const totalHeight = (bbox.maxY - bbox.minY) + padBottom + padTop;
@@ -224,11 +237,18 @@ export class GameScene {
     const zForHeight = totalHeight / (2 * halfAngleTan);
     const targetZ = Math.max(38.0, Math.max(zForWidth, zForHeight));
 
-    this.stationaryLookAt.set(centerX, Math.max(3.6, centerY), 0.0);
-    this.stationaryCameraPos.set(centerX, Math.max(4.2, centerY + 0.4), targetZ);
+    this.overviewLookAt.set(centerX, Math.max(3.6, centerY), 0.0);
+    this.overviewCameraPos.set(centerX, Math.max(4.0, centerY + 0.3), targetZ);
 
-    this.camera.position.copy(this.stationaryCameraPos);
-    this.camera.lookAt(this.stationaryLookAt);
+    this.stationaryLookAt.copy(this.overviewLookAt);
+    this.stationaryCameraPos.copy(this.overviewCameraPos);
+
+    if (this.cameraState === 'OVERVIEW' || !this.hasBirdLaunched) {
+      this.currentCameraPos.copy(this.overviewCameraPos);
+      this.currentLookAt.copy(this.overviewLookAt);
+      this.camera.position.copy(this.overviewCameraPos);
+      this.camera.lookAt(this.overviewLookAt);
+    }
     this.camera.updateProjectionMatrix();
   }
 
@@ -288,50 +308,236 @@ export class GameScene {
     }
   }
 
+  createProceduralGrassTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 512);
+    grad.addColorStop(0, '#84cc16'); // Vibrant lime-green crest matching reference image
+    grad.addColorStop(0.35, '#65a30d');
+    grad.addColorStop(1, '#4d7c0f'); // Darker organic turf base
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Fine organic grass blade streaks
+    ctx.strokeStyle = 'rgba(163, 230, 53, 0.45)';
+    ctx.lineWidth = 3;
+    for (let x = 8; x < 512; x += 16) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + (Math.sin(x * 0.2) * 5), 45 + (Math.cos(x * 0.3) * 15));
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = 'rgba(63, 98, 18, 0.35)';
+    ctx.lineWidth = 2.5;
+    for (let x = 16; x < 512; x += 22) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x - (Math.cos(x * 0.25) * 4), 30 + (Math.sin(x * 0.4) * 10));
+      ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.repeat.set(16, 1);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
+  createProceduralCliffTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 512);
+    grad.addColorStop(0, '#475569');
+    grad.addColorStop(0.5, '#334155');
+    grad.addColorStop(1, '#1e293b');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Sedimentary strata horizontal layers matching reference image
+    const strata = [40, 90, 145, 210, 265, 330, 395, 455];
+    strata.forEach((sy, i) => {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
+      ctx.fillRect(0, sy, 512, 6);
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.25)';
+      ctx.fillRect(0, sy + 6, 512, 3);
+
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.4)';
+      ctx.lineWidth = 2;
+      for (let x = 15 + (i % 3) * 20; x < 512; x += 70) {
+        ctx.beginPath();
+        ctx.moveTo(x, sy);
+        ctx.lineTo(x + (Math.sin(x) * 10), sy + 40);
+        ctx.stroke();
+      }
+    });
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.repeat.set(12, 1);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }
+
   buildEnvironment() {
     this.stageGroup = new THREE.Group();
 
-    // Main grassy game stage (expanded to 88 units width for grand structures)
+    // Main grassy game stage with stylized procedural grass texture
     const grassGeo = new THREE.BoxGeometry(88, 2.0, 16);
+    this.grassTex = this.createProceduralGrassTexture();
     const grassMat = new THREE.MeshStandardMaterial({
-      color: 0x22c55e,
+      map: this.grassTex,
+      color: 0xffffff,
       roughness: 0.82
     });
-    const grassMesh = new THREE.Mesh(grassGeo, grassMat);
-    grassMesh.position.set(1.5, -1.0, 0);
-    grassMesh.receiveShadow = true;
-    this.stageGroup.add(grassMesh);
+    this.grassMesh = new THREE.Mesh(grassGeo, grassMat);
+    this.grassMesh.position.set(1.5, -1.0, 0);
+    this.grassMesh.receiveShadow = true;
+    this.stageGroup.add(this.grassMesh);
 
     // Clean front trim bevel along the grass edge for a crisp 2D/3D hybrid stage look
     const trimGeo = new THREE.BoxGeometry(88.4, 0.35, 16.2);
     const trimMat = new THREE.MeshStandardMaterial({
-      color: 0x16a34a,
+      color: 0x3f6212,
       roughness: 0.78
     });
-    const trimMesh = new THREE.Mesh(trimGeo, trimMat);
-    trimMesh.position.set(1.5, -0.18, 0);
-    this.stageGroup.add(trimMesh);
+    this.trimMesh = new THREE.Mesh(trimGeo, trimMat);
+    this.trimMesh.position.set(1.5, -0.18, 0);
+    this.stageGroup.add(this.trimMesh);
 
-    // Sub-surface rocky foundation under the stage
+    // Sub-surface rocky foundation with horizontal stratified sedimentary layers
     const cliffGeo = new THREE.BoxGeometry(84, 10.0, 15);
+    this.cliffTex = this.createProceduralCliffTexture();
     const cliffMat = new THREE.MeshStandardMaterial({
-      color: 0x334155,
+      map: this.cliffTex,
+      color: 0xffffff,
       roughness: 0.9
     });
-    const cliffMesh = new THREE.Mesh(cliffGeo, cliffMat);
-    cliffMesh.position.set(1.5, -6.8, 0);
-    this.stageGroup.add(cliffMesh);
+    this.cliffMesh = new THREE.Mesh(cliffGeo, cliffMat);
+    this.cliffMesh.position.set(1.5, -6.8, 0);
+    this.stageGroup.add(this.cliffMesh);
 
     // Fortress stone foundation pad on the right side
-    const padMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(24.0, 0.12, 6.0),
+    this.padMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(26.0, 0.12, 6.0),
       new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.78 })
     );
-    padMesh.position.set(13.5, 0.04, 0);
-    padMesh.receiveShadow = true;
-    this.stageGroup.add(padMesh);
+    this.padMesh.position.set(13.5, 0.04, 0);
+    this.padMesh.receiveShadow = true;
+    this.stageGroup.add(this.padMesh);
 
     this.scene.add(this.stageGroup);
+  }
+
+  /**
+   * Dynamically applies environment visual theme across sky, fog, lighting, terrain, and scenery.
+   * Themes evolve across level groups:
+   *  - Levels 1–5: Bright & clean (Emerald Valley)
+   *  - Levels 6–10: Richer terrain (Amber Canyon & sunset)
+   *  - Levels 11–15: New visual theme (Celestial Twilight & glowing aurora)
+   *  - Levels 16–20: Dramatic & advanced (Crown Summit & volcanic storm)
+   * Always maintains complete gameplay visibility on the z = 0 action plane.
+   */
+  applyEnvironmentTheme(levelId = 1) {
+    const id = Number(levelId) || 1;
+    let themeId = 'emerald';
+    if (id <= 5) {
+      themeId = 'emerald';
+    } else if (id <= 10) {
+      themeId = 'amber';
+    } else if (id <= 15) {
+      themeId = 'celestial';
+    } else {
+      themeId = 'summit';
+    }
+
+    if (this.currentThemeId === themeId && this.hasAppliedSceneTheme) return;
+    this.currentThemeId = themeId;
+    this.hasAppliedSceneTheme = true;
+
+    if (themeId === 'amber') {
+      this.scene.background = new THREE.Color(0xb45309);
+      if (this.scene.fog) {
+        this.scene.fog.color.setHex(0xfce7c8);
+        this.scene.fog.density = 0.0035;
+      }
+      this.hemiLight?.color.setHex(0xffedd5);
+      this.hemiLight?.groundColor.setHex(0x78350f);
+      if (this.hemiLight) this.hemiLight.intensity = 1.05;
+      this.dirLight?.color.setHex(0xffedd5);
+      if (this.dirLight) this.dirLight.intensity = 1.65;
+      this.fillLight?.color.setHex(0xfde047);
+
+      this.grassMesh?.material.color.setHex(0xd97706);
+      this.trimMesh?.material.color.setHex(0xb45309);
+      this.cliffMesh?.material.color.setHex(0x78350f);
+      this.padMesh?.material.color.setHex(0x92400e);
+
+    } else if (themeId === 'celestial') {
+      this.scene.background = new THREE.Color(0x1e1b4b);
+      if (this.scene.fog) {
+        this.scene.fog.color.setHex(0x312e81);
+        this.scene.fog.density = 0.0038;
+      }
+      this.hemiLight?.color.setHex(0x818cf8);
+      this.hemiLight?.groundColor.setHex(0x0f172a);
+      if (this.hemiLight) this.hemiLight.intensity = 0.95;
+      this.dirLight?.color.setHex(0xc7d2fe);
+      if (this.dirLight) this.dirLight.intensity = 1.45;
+      this.fillLight?.color.setHex(0x38bdf8);
+
+      this.grassMesh?.material.color.setHex(0x0284c7);
+      this.trimMesh?.material.color.setHex(0x38bdf8);
+      this.cliffMesh?.material.color.setHex(0x1e1b4b);
+      this.padMesh?.material.color.setHex(0x312e81);
+
+    } else if (themeId === 'summit') {
+      this.scene.background = new THREE.Color(0x090d16);
+      if (this.scene.fog) {
+        this.scene.fog.color.setHex(0x2e1065);
+        this.scene.fog.density = 0.004;
+      }
+      this.hemiLight?.color.setHex(0xfca5a5);
+      this.hemiLight?.groundColor.setHex(0x18181b);
+      if (this.hemiLight) this.hemiLight.intensity = 1.1;
+      this.dirLight?.color.setHex(0xfecdd3);
+      if (this.dirLight) this.dirLight.intensity = 1.6;
+      this.fillLight?.color.setHex(0xf97316);
+
+      this.grassMesh?.material.color.setHex(0x334155);
+      this.trimMesh?.material.color.setHex(0xf59e0b);
+      this.cliffMesh?.material.color.setHex(0x0f172a);
+      this.padMesh?.material.color.setHex(0x1e293b);
+
+    } else {
+      // Emerald
+      this.scene.background = new THREE.Color(0x4da8e0);
+      if (this.scene.fog) {
+        this.scene.fog.color.setHex(0xb8daf0);
+        this.scene.fog.density = 0.003;
+      }
+      this.hemiLight?.color.setHex(0xf0f9ff);
+      this.hemiLight?.groundColor.setHex(0x1e293b);
+      if (this.hemiLight) this.hemiLight.intensity = 0.95;
+      this.dirLight?.color.setHex(0xfff5e0);
+      if (this.dirLight) this.dirLight.intensity = 1.55;
+      this.fillLight?.color.setHex(0xe0f2fe);
+
+      this.grassMesh?.material.color.setHex(0xffffff);
+      this.trimMesh?.material.color.setHex(0x3f6212);
+      this.cliffMesh?.material.color.setHex(0xffffff);
+      this.padMesh?.material.color.setHex(0x64748b);
+    }
+
+    this.branding?.setThemeForLevel(id);
   }
 
   updateBrandName(brandName) {
@@ -359,6 +565,9 @@ export class GameScene {
     this.levelCoinsEarned = 0;
     this.isLevelAlreadyCompleted = levelConfig ? Boolean(this.storage?.hasClaimedCoins(levelConfig.id)) : false;
     this.birdsQueue = [...levelConfig.birds];
+
+    // Apply evolving environment theme for this level group (1-5 emerald, 6-10 amber, 11-15 celestial, 16-20 summit)
+    this.applyEnvironmentTheme(levelConfig?.id || 1);
 
     // 1. Spawn Blocks (strictly on z = 0 plane)
     levelConfig.blocks.forEach((bCfg) => {
@@ -465,7 +674,7 @@ export class GameScene {
   }
 
   spawnBlock(cfg) {
-    const { type, pos, size } = cfg;
+    const { type, pos, size, isStatic = false } = cfg;
     const alignedPos = [pos[0], pos[1], 0];
     const mesh = createBlockMesh(type, size);
     mesh.position.set(...alignedPos);
@@ -477,18 +686,22 @@ export class GameScene {
       wood: 3.2,
       coin: 2.2,
       tnt: 2.0,
-      stone: 5.6
+      stone: 5.6,
+      metal: 6.8
     };
     const hpMap = {
       glass: 20,
       coin: 26,
       tnt: 16,
       wood: 50,
-      stone: 95
+      stone: 95,
+      metal: 120
     };
 
+    const mass = isStatic ? 0 : (massMap[type] || 3.2);
+
     const body = new CANNON.Body({
-      mass: massMap[type] || 3.2,
+      mass,
       shape: new CANNON.Box(halfExtents),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
@@ -498,6 +711,9 @@ export class GameScene {
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
+    if (isStatic) {
+      body.type = CANNON.Body.STATIC;
+    }
 
     // Start settled on initial load; wakes up dynamically during gameplay
     body.sleepSpeedLimit = 0.1;
@@ -510,6 +726,7 @@ export class GameScene {
       size,
       mesh,
       body,
+      isStatic,
       maxHp,
       hp: maxHp,
       destroyed: false,
@@ -537,6 +754,8 @@ export class GameScene {
           this.wakeAllStructures();
         }
 
+        this.triggerCameraImpactFocus(blockObj.body.position);
+
         // Light graze or glancing collision (< 1.8 normal impact) deals zero damage
         if (normalImpact < 1.8) {
           this.audio?.playMaterialImpact(blockObj.type, 0.15);
@@ -548,9 +767,9 @@ export class GameScene {
         const birdType = this.activeBird?.type || 'red';
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.4 : 1.0;
+          birdMultiplier = blockObj.type === 'glass' ? 2.5 : 1.0;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.3 : 1.8;
+          birdMultiplier = blockObj.type === 'stone' ? 2.3 : blockObj.type === 'metal' ? 2.4 : 1.8;
         }
 
         // Damage derived from normal impact collision force
@@ -592,7 +811,8 @@ export class GameScene {
   }
 
   spawnTarget(cfg) {
-    const { pos, radius = 0.75, isBoss = false } = cfg;
+    const { pos, isBoss = false } = cfg;
+    const radius = cfg.radius || (isBoss ? 0.58 : 0.44);
     const alignedPos = [pos[0], pos[1], 0];
     const mesh = createTargetMesh(radius, isBoss);
     mesh.position.set(...alignedPos);
@@ -601,7 +821,7 @@ export class GameScene {
     this.scene.add(mesh);
 
     const body = new CANNON.Body({
-      mass: isBoss ? 3.0 : 1.8,
+      mass: isBoss ? 2.8 : 1.6,
       shape: new CANNON.Sphere(radius),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
@@ -620,7 +840,7 @@ export class GameScene {
       body,
       radius,
       isBoss,
-      hp: isBoss ? 24 : 14,
+      hp: isBoss ? 26 : 14,
       destroyed: false,
       lastHitTime: 0
     };
@@ -637,6 +857,7 @@ export class GameScene {
       }
 
       if (isBirdHit) {
+        this.triggerCameraImpactFocus(targetObj.body.position);
         if (normalImpact < 2.0) return;
         targetObj.lastHitTime = now;
         const dmg = (normalImpact - 1.2) * 2.8;
@@ -664,6 +885,9 @@ export class GameScene {
     this.waitingBirdMeshes.forEach((m) => this.scene.remove(m));
     this.waitingBirdMeshes = [];
 
+    // Smoothly return camera to overview when new bird is prepared
+    this.cameraState = 'RETURN';
+
     if (this.birdsQueue.length === 0) {
       this.activeBird = null;
       return;
@@ -689,11 +913,19 @@ export class GameScene {
     // Render remaining birds lined up behind the slingshot strictly on z = 0
     for (let i = 1; i < this.birdsQueue.length; i++) {
       const wMesh = createBirdMesh(this.birdsQueue[i]);
-      const r = wMesh.userData.radius || 0.68;
-      wMesh.position.set(-14.6 - (i - 1) * 1.65, r, 0.0);
+      const r = wMesh.userData.radius || 0.46;
+      wMesh.position.set(-14.4 - (i - 1) * 1.35, r, 0.0);
       wMesh.rotation.set(0, 0, 0);
       this.scene.add(wMesh);
       this.waitingBirdMeshes.push(wMesh);
+    }
+  }
+
+  triggerCameraImpactFocus(pos) {
+    if (this.cameraState === 'TRACKING' || this.cameraState === 'FOCUS') {
+      this.cameraState = 'FOCUS';
+      this.focusPoint.set(pos.x, pos.y, 0);
+      this.focusTimer = 1.35;
     }
   }
 
@@ -701,8 +933,12 @@ export class GameScene {
     if (!this.activeBird) return;
     this.hasBirdLaunched = true;
 
-    const radius = this.activeBird.mesh.userData.radius || 0.68;
-    const mass = this.activeBird.type === 'heavy' ? 5.6 : 2.8;
+    // Transition camera into smooth projectile tracking & subtle zoom
+    this.cameraState = 'TRACKING';
+    this.focusTimer = 0;
+
+    const radius = this.activeBird.mesh.userData.radius || 0.46;
+    const mass = this.activeBird.type === 'heavy' ? 4.8 : 2.5;
 
     const body = new CANNON.Body({
       mass,
@@ -845,10 +1081,11 @@ export class GameScene {
       wood: [0xc27838, 0x8f4f1a, 0xd97706],
       stone: [0x64748b, 0x475569, 0x94a3b8],
       glass: [0x7dd3fc, 0x38bdf8, 0xe0f2fe],
+      metal: [0x94a3b8, 0x64748b, 0x334155, 0x38bdf8],
       coin: [0xfbbf24, 0xf59e0b, 0x38bdf8]
     };
     const colors = paletteMap[type] || [0xc27838, 0x8f4f1a];
-    const chunkCount = type === 'stone' ? 6 : type === 'glass' ? 7 : 5;
+    const chunkCount = type === 'stone' || type === 'metal' ? 6 : type === 'glass' ? 7 : 5;
 
     for (let i = 0; i < chunkCount; i++) {
       const color = colors[i % colors.length];
@@ -857,6 +1094,7 @@ export class GameScene {
       const chunkD = Math.max(0.12, (size[2] / 2) * (0.6 + Math.random() * 0.7));
 
       const isGlass = type === 'glass';
+      const isMetal = type === 'metal';
       const mat = isGlass
         ? new THREE.MeshPhysicalMaterial({
             color,
@@ -868,8 +1106,8 @@ export class GameScene {
           })
         : new THREE.MeshStandardMaterial({
             color,
-            roughness: type === 'stone' ? 0.8 : 0.55,
-            metalness: type === 'coin' ? 0.4 : 0.05
+            roughness: isMetal ? 0.28 : type === 'stone' ? 0.8 : 0.55,
+            metalness: isMetal ? 0.85 : type === 'coin' ? 0.6 : 0.05
           });
 
       // Scale unit box via matrix rather than allocating new geometries every hit
@@ -904,9 +1142,29 @@ export class GameScene {
       });
     }
 
+    // Additional shear sparks for metal breaks
+    if (type === 'metal') {
+      for (let s = 0; s < 8; s++) {
+        const sMesh = new THREE.Mesh(this.sharedSparkGeo, s % 2 === 0 ? this.sharedSparkMat1 : this.sharedSparkMat2);
+        sMesh.position.copy(origin);
+        this.scene.add(sMesh);
+        const sVel = new THREE.Vector3((Math.random() - 0.5) * 10, Math.random() * 7 + 2, (Math.random() - 0.5) * 2);
+        this.particles.push({
+          type: 'debris',
+          mesh: sMesh,
+          vel: sVel,
+          rotVel: new THREE.Vector3(8, 8, 8),
+          baseScale: 0.8,
+          life: 0.8,
+          decay: 2.2,
+          sharedMaterial: true
+        });
+      }
+    }
+
     // 2. Soft stylized dust / smoke puff
     const dustCount = 3;
-    const dustColor = type === 'stone' ? 0x94a3b8 : type === 'glass' ? 0xe0f2fe : 0xd1a06d;
+    const dustColor = type === 'stone' || type === 'metal' ? 0x94a3b8 : type === 'glass' ? 0xe0f2fe : 0xd1a06d;
     for (let i = 0; i < dustCount; i++) {
       const dustMat = new THREE.MeshBasicMaterial({
         color: dustColor,
@@ -1049,15 +1307,15 @@ export class GameScene {
   }
 
   /**
-   * Modern stylized 3D explosion with expanding shockwave, fireball core,
-   * rising volumetric smoke plumes, glowing sparks, and pre-allocated light flash.
+   * Modern stylized 3D explosion with expanding dual shockwaves, blazing fireball core,
+   * rising volumetric smoke plumes, high-speed incandescent sparks, and dynamic light flash.
    */
   createModernExplosion(origin) {
-    // 1. Expanding Shockwave Ring (Torus on XY plane)
+    // 1. Primary High-Velocity Expanding Shockwave Ring (Torus on XY plane)
     const shockwaveMat = new THREE.MeshBasicMaterial({
-      color: 0xfde047,
+      color: 0xfef08a,
       transparent: true,
-      opacity: 0.95,
+      opacity: 0.98,
       depthWrite: false
     });
     const shockwaveMesh = new THREE.Mesh(this.sharedShockwaveGeo, shockwaveMat);
@@ -1066,14 +1324,34 @@ export class GameScene {
     this.particles.push({
       type: 'shockwave',
       mesh: shockwaveMesh,
-      baseScale: 0.3,
-      maxExpansion: 6.5,
-      baseOpacity: 0.95,
+      baseScale: 0.35,
+      maxExpansion: 7.8,
+      baseOpacity: 0.98,
       life: 1.0,
-      decay: 2.8
+      decay: 2.6
     });
 
-    // 2. Blazing Fireball Plasma Core
+    // Secondary Thermal Shockwave (amber warm halo)
+    const shockwaveMat2 = new THREE.MeshBasicMaterial({
+      color: 0xf97316,
+      transparent: true,
+      opacity: 0.75,
+      depthWrite: false
+    });
+    const shockwaveMesh2 = new THREE.Mesh(this.sharedShockwaveGeo, shockwaveMat2);
+    shockwaveMesh2.position.set(origin.x, origin.y, 0.04);
+    this.scene.add(shockwaveMesh2);
+    this.particles.push({
+      type: 'shockwave',
+      mesh: shockwaveMesh2,
+      baseScale: 0.25,
+      maxExpansion: 5.2,
+      baseOpacity: 0.75,
+      life: 1.0,
+      decay: 2.1
+    });
+
+    // 2. Blazing Fireball Plasma Core with color morphing
     const fireMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -1086,22 +1364,22 @@ export class GameScene {
     this.particles.push({
       type: 'fireball',
       mesh: fireMesh,
-      baseScale: 0.5,
+      baseScale: 0.65,
       baseOpacity: 1.0,
       life: 1.0,
-      decay: 3.2
+      decay: 3.0
     });
 
     // 3. Volumetric Billowing Smoke Plumes
-    const smokeColors = [0x1e293b, 0x334155, 0x475569, 0x0f172a];
-    const smokeCount = 10;
+    const smokeColors = [0x1e293b, 0x334155, 0x475569, 0x0f172a, 0x64748b];
+    const smokeCount = 12;
     for (let i = 0; i < smokeCount; i++) {
       const color = smokeColors[i % smokeColors.length];
-      const radius = 0.38 + Math.random() * 0.3;
+      const radius = 0.42 + Math.random() * 0.35;
       const smokeMat = new THREE.MeshBasicMaterial({
         color,
         transparent: true,
-        opacity: 0.75,
+        opacity: 0.8,
         depthWrite: false
       });
       const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, smokeMat);
@@ -1113,12 +1391,12 @@ export class GameScene {
       );
       this.scene.add(mesh);
 
-      const angle = (i / smokeCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
-      const speed = 2.4 + Math.random() * 3.0;
+      const angle = (i / smokeCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+      const speed = 2.6 + Math.random() * 3.4;
       const vel = new THREE.Vector3(
         Math.cos(angle) * speed,
-        Math.sin(angle) * speed * 0.8 + 1.8,
-        (Math.random() - 0.5) * 1.2
+        Math.sin(angle) * speed * 0.8 + 2.0,
+        (Math.random() - 0.5) * 1.4
       );
 
       this.particles.push({
@@ -1126,14 +1404,14 @@ export class GameScene {
         mesh,
         vel,
         baseScale: radius,
-        baseOpacity: 0.75,
+        baseOpacity: 0.8,
         life: 1.0,
-        decay: 1.4
+        decay: 1.3
       });
     }
 
     // 4. Incandescent High-Speed Sparks & Shrapnel Embers
-    const sparkCount = 20;
+    const sparkCount = 26;
     for (let i = 0; i < sparkCount; i++) {
       const mesh = new THREE.Mesh(
         this.sharedSparkGeo,
@@ -1143,16 +1421,16 @@ export class GameScene {
       this.scene.add(mesh);
 
       const angle = Math.random() * Math.PI * 2;
-      const speed = 6.5 + Math.random() * 9.5;
+      const speed = 7.5 + Math.random() * 11.0;
       const vel = new THREE.Vector3(
         Math.cos(angle) * speed,
-        Math.sin(angle) * speed * 0.85 + 2.8,
-        (Math.random() - 0.5) * 2.5
+        Math.sin(angle) * speed * 0.9 + 3.2,
+        (Math.random() - 0.5) * 2.8
       );
       const rotVel = new THREE.Vector3(
-        (Math.random() - 0.5) * 16,
-        (Math.random() - 0.5) * 16,
-        (Math.random() - 0.5) * 16
+        (Math.random() - 0.5) * 18,
+        (Math.random() - 0.5) * 18,
+        (Math.random() - 0.5) * 18
       );
 
       this.particles.push({
@@ -1160,9 +1438,9 @@ export class GameScene {
         mesh,
         vel,
         rotVel,
-        baseScale: 1.0,
+        baseScale: 1.1,
         life: 1.0,
-        decay: 1.7,
+        decay: 1.6,
         sharedMaterial: true
       });
     }
@@ -1170,8 +1448,8 @@ export class GameScene {
     // 5. Dynamic Flash Light using pre-allocated point light (ZERO runtime shader recompilation!)
     if (this.explosionLight) {
       this.explosionLight.position.set(origin.x, origin.y, 2.0);
-      this.explosionLight.intensity = 5.5;
-      this.explosionLightTimer = 0.28;
+      this.explosionLight.intensity = 6.5;
+      this.explosionLightTimer = 0.32;
     }
   }
 
@@ -1252,6 +1530,7 @@ export class GameScene {
     // Check immediate Victory if all targets are eliminated
     if (this.targets.length === 0) {
       this.levelResolved = true;
+      this.cameraState = 'RETURN';
       this.onHideAbilityPrompt?.();
 
       const unusedBirds = Math.max(
@@ -1290,6 +1569,7 @@ export class GameScene {
         bBody.position.y < -1.8 || bBody.position.x > 28 || bBody.position.x < -24;
 
       if (outOfBounds || (flightDuration > 1.1 && speed < 0.45) || flightDuration > 5.0) {
+        this.cameraState = 'RETURN';
         this.onHideAbilityPrompt?.();
         this.scene.remove(this.activeBird.mesh);
         this.world.removeBody(this.activeBird.body);
@@ -1562,26 +1842,81 @@ export class GameScene {
     const elapsedTime = this.clock.elapsedTime;
     this.branding?.update(elapsedTime, deltaTime);
 
-    // Dynamic Camera Shake (Screen Trauma)
+    // ── DYNAMIC ACTION CINEMATIC CAMERA CONTROLLER ──
+    // States: 'OVERVIEW', 'TRACKING', 'FOCUS', 'RETURN'
+    if (this.cameraState === 'TRACKING') {
+      if (this.activeBird && this.activeBird.body) {
+        const bPos = this.activeBird.body.position;
+        const bVel = this.activeBird.body.velocity;
+        // Lead the projectile smoothly in the direction of flight
+        const leadX = Math.min(2.5, Math.max(0.4, bVel.x * 0.08));
+        const targetX = Math.max(this.slingshot.anchor.x + 2.0, bPos.x + leadX);
+        const targetY = Math.max(2.2, Math.min(bPos.y * 0.6 + 1.8, 14.0));
+        // Subtle ~30% zoom in to focus on projectile and upcoming impact area
+        const zoomZ = Math.max(24.0, this.overviewCameraPos.z * 0.68);
+
+        this.targetLookAt.set(targetX, targetY, 0);
+        this.targetCameraPos.set(targetX, targetY + 0.35, zoomZ);
+      } else {
+        this.cameraState = 'RETURN';
+      }
+    } else if (this.cameraState === 'FOCUS') {
+      this.focusTimer -= deltaTime;
+      const zoomZ = Math.max(24.0, this.overviewCameraPos.z * 0.70);
+      this.targetLookAt.set(this.focusPoint.x, Math.max(2.0, this.focusPoint.y), 0);
+      this.targetCameraPos.set(this.focusPoint.x, Math.max(2.4, this.focusPoint.y + 0.4), zoomZ);
+
+      if (this.focusTimer <= 0) {
+        this.cameraState = 'RETURN';
+      }
+    } else if (this.cameraState === 'RETURN') {
+      this.targetCameraPos.copy(this.overviewCameraPos);
+      this.targetLookAt.copy(this.overviewLookAt);
+
+      if (
+        this.currentCameraPos.distanceTo(this.overviewCameraPos) < 0.25 &&
+        this.currentLookAt.distanceTo(this.overviewLookAt) < 0.25
+      ) {
+        this.cameraState = 'OVERVIEW';
+      }
+    } else {
+      // 'OVERVIEW'
+      this.targetCameraPos.copy(this.overviewCameraPos);
+      this.targetLookAt.copy(this.overviewLookAt);
+    }
+
+    // Smooth exponential damping / lerp
+    const lerpSpeed =
+      this.cameraState === 'TRACKING'
+        ? 6.8
+        : this.cameraState === 'FOCUS'
+        ? 4.8
+        : 3.6;
+    const lerpFactor = 1.0 - Math.exp(-lerpSpeed * deltaTime);
+    this.currentCameraPos.lerp(this.targetCameraPos, lerpFactor);
+    this.currentLookAt.lerp(this.targetLookAt, lerpFactor);
+
+    // Dynamic Camera Shake (Screen Trauma) applied to current camera position & lookAt
+    let camX = this.currentCameraPos.x;
+    let camY = this.currentCameraPos.y;
+    let camZ = this.currentCameraPos.z;
+    let lookX = this.currentLookAt.x;
+    let lookY = this.currentLookAt.y;
+    let lookZ = this.currentLookAt.z;
+
     if (this.cameraShakeTrauma > 0.001) {
       const traumaSq = this.cameraShakeTrauma * this.cameraShakeTrauma;
       const offsetX = (Math.random() - 0.5) * 0.72 * traumaSq;
       const offsetY = (Math.random() - 0.5) * 0.72 * traumaSq;
-      this.camera.position.set(
-        this.stationaryCameraPos.x + offsetX,
-        this.stationaryCameraPos.y + offsetY,
-        this.stationaryCameraPos.z
-      );
-      this.camera.lookAt(
-        this.stationaryLookAt.x + offsetX * 0.4,
-        this.stationaryLookAt.y + offsetY * 0.4,
-        this.stationaryLookAt.z
-      );
+      camX += offsetX;
+      camY += offsetY;
+      lookX += offsetX * 0.4;
+      lookY += offsetY * 0.4;
       this.cameraShakeTrauma = Math.max(0, this.cameraShakeTrauma - deltaTime * 3.2);
-    } else {
-      this.camera.position.copy(this.stationaryCameraPos);
-      this.camera.lookAt(this.stationaryLookAt);
     }
+
+    this.camera.position.set(camX, camY, camZ);
+    this.camera.lookAt(lookX, lookY, lookZ);
 
     // Render stationary camera frame
     this.renderer.render(this.scene, this.camera);

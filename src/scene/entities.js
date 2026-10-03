@@ -312,7 +312,7 @@ function createSculptedWings(scale = 1.0, color = 0x2952ff) {
  */
 export function createBirdMesh(type = 'red') {
   const group = new THREE.Group();
-  const radius = type === 'heavy' ? 0.84 : 0.74;
+  const radius = type === 'heavy' ? 0.54 : type === 'speed' ? 0.44 : 0.46;
   const scale = radius / 0.74;
 
   const isMagenta = type === 'heavy';
@@ -386,9 +386,10 @@ export function createBirdMesh(type = 'red') {
  * - 3D white diamond eye bases with 3D extruded pink heart pupils
  * - 3D black round O-mouth
  */
-export function createTargetMesh(radius = 0.76, isBoss = false) {
+export function createTargetMesh(radius = 0.44, isBoss = false) {
   const group = new THREE.Group();
-  const scale = (radius / 0.72) * (isBoss ? 1.08 : 1.0);
+  const effectiveRadius = radius || (isBoss ? 0.58 : 0.44);
+  const scale = (effectiveRadius / 0.72) * (isBoss ? 1.08 : 1.0);
 
   const core = createSculptedSpeechBubbleCore({
     scale,
@@ -400,7 +401,7 @@ export function createTargetMesh(radius = 0.76, isBoss = false) {
   });
 
   group.add(core);
-  group.userData = { radius, isBoss };
+  group.userData = { radius: effectiveRadius, isBoss };
   return group;
 }
 
@@ -410,74 +411,261 @@ function getProceduralBlockTexture(type) {
   }
 
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = 512;
+  canvas.height = 512;
   const ctx = canvas.getContext('2d');
 
   if (type === 'wood') {
-    ctx.fillStyle = '#c27838';
-    ctx.fillRect(0, 0, 256, 256);
-    ctx.strokeStyle = '#8f4f1a';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(6, 6, 244, 244);
+    // Rich, warm varnished timber with distinct planks, wood grain, knots, and bevels
+    const grad = ctx.createLinearGradient(0, 0, 512, 512);
+    grad.addColorStop(0, '#c67838');
+    grad.addColorStop(0.5, '#ad6227');
+    grad.addColorStop(1, '#8f4f1a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 512);
 
-    ctx.strokeStyle = 'rgba(92, 45, 12, 0.35)';
+    // Plank seam lines (3 vertical planks)
+    ctx.fillStyle = 'rgba(60, 25, 6, 0.45)';
+    ctx.fillRect(168, 0, 6, 512);
+    ctx.fillRect(338, 0, 6, 512);
+
+    // Fine organic wood grain curves
+    ctx.strokeStyle = 'rgba(92, 45, 12, 0.28)';
     ctx.lineWidth = 3;
-    for (let y = 28; y < 240; y += 32) {
+    for (let y = 16; y < 500; y += 22) {
       ctx.beginPath();
-      ctx.moveTo(10, y);
-      ctx.bezierCurveTo(90, y - 8, 160, y + 8, 246, y);
+      ctx.moveTo(12, y);
+      ctx.bezierCurveTo(140, y + (Math.sin(y * 0.08) * 16), 340, y - (Math.cos(y * 0.06) * 18), 500, y);
       ctx.stroke();
     }
-  } else if (type === 'stone') {
-    ctx.fillStyle = '#64748b';
-    ctx.fillRect(0, 0, 256, 256);
-    ctx.strokeStyle = '#334155';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(6, 6, 244, 244);
 
-    for (let i = 0; i < 40; i++) {
-      ctx.fillStyle = i % 2 === 0 ? 'rgba(255,255,255,0.08)' : 'rgba(15,23,42,0.18)';
-      const rx = ((i * 53) % 220) + 16;
-      const ry = ((i * 97) % 220) + 16;
-      ctx.fillRect(rx, ry, 14, 10);
+    // Wood knots
+    [ [100, 140, 22, 14], [250, 360, 28, 16], [420, 210, 20, 12] ].forEach(([kx, ky, krx, kry]) => {
+      ctx.strokeStyle = 'rgba(70, 28, 6, 0.4)';
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.ellipse(kx, ky, krx, kry, 0.2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(kx, ky, krx * 0.5, kry * 0.5, 0.2, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Outer beveled frame & iron corner bolts
+    ctx.strokeStyle = '#5c2d0c';
+    ctx.lineWidth = 14;
+    ctx.strokeRect(7, 7, 498, 498);
+
+    ctx.strokeStyle = 'rgba(255, 215, 165, 0.35)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(16, 16, 480, 480);
+
+    // Corner fixing bolts
+    ctx.fillStyle = '#29170a';
+    [ [30, 30], [482, 30], [30, 482], [482, 482], [171, 30], [341, 30], [171, 482], [341, 482] ].forEach(([bx, by]) => {
+      ctx.beginPath();
+      ctx.arc(bx, by, 7, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+  } else if (type === 'stone') {
+    // Chiseled granite masonry blocks with mortar grooves and rich stone stippling
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Masonry courses (3 rows of staggered ashlar stone)
+    const stoneGrad = ctx.createLinearGradient(0, 0, 0, 512);
+    stoneGrad.addColorStop(0, '#78889e');
+    stoneGrad.addColorStop(0.5, '#64748b');
+    stoneGrad.addColorStop(1, '#475569');
+    ctx.fillStyle = stoneGrad;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Mortar lines
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(0, 168, 512, 10);
+    ctx.fillRect(0, 338, 512, 10);
+    // Vertical joints
+    ctx.fillRect(256, 0, 10, 168);
+    ctx.fillRect(128, 178, 10, 160);
+    ctx.fillRect(384, 178, 10, 160);
+    ctx.fillRect(256, 348, 10, 164);
+
+    // Granular mineral flecks & chisel texture
+    for (let i = 0; i < 380; i++) {
+      const rx = (i * 73) % 500 + 6;
+      const ry = (i * 127) % 500 + 6;
+      const size = (i % 3) + 2;
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.22)';
+      ctx.fillRect(rx, ry, size, size);
     }
+
+    // Outer stone edge bevel
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 14;
+    ctx.strokeRect(7, 7, 498, 498);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(16, 16, 480, 480);
+
+  } else if (type === 'metal') {
+    // Industrial reinforced steel girder / riveted iron plate
+    const metalGrad = ctx.createLinearGradient(0, 0, 512, 512);
+    metalGrad.addColorStop(0, '#475569');
+    metalGrad.addColorStop(0.3, '#334155');
+    metalGrad.addColorStop(0.7, '#1e293b');
+    metalGrad.addColorStop(1, '#0f172a');
+    ctx.fillStyle = metalGrad;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Diagonal hazard/industrial cross-brace embossing
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+    ctx.lineWidth = 28;
+    ctx.beginPath();
+    ctx.moveTo(30, 30);
+    ctx.lineTo(482, 482);
+    ctx.moveTo(482, 30);
+    ctx.lineTo(30, 482);
+    ctx.stroke();
+
+    // Inner plate bevel
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(40, 40, 432, 432);
+
+    // Outer reinforced steel flange
+    ctx.strokeStyle = '#0f172a';
+    ctx.lineWidth = 20;
+    ctx.strokeRect(10, 10, 492, 492);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(22, 22, 468, 468);
+
+    // Riveted industrial perimeter studs
+    ctx.fillStyle = '#94a3b8';
+    for (let x = 32; x <= 480; x += 64) {
+      [32, 480].forEach((y) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+    for (let y = 96; y <= 416; y += 64) {
+      [32, 480].forEach((x) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
   } else if (type === 'coin') {
-    const grad = ctx.createLinearGradient(0, 0, 256, 256);
-    grad.addColorStop(0, '#38bdf8');
-    grad.addColorStop(0.5, '#2563eb');
+    // Gilded royal treasure chest with sapphire glow and Dilicom emblem
+    const grad = ctx.createLinearGradient(0, 0, 512, 512);
+    grad.addColorStop(0, '#f59e0b');
+    grad.addColorStop(0.3, '#d97706');
+    grad.addColorStop(0.7, '#2563eb');
     grad.addColorStop(1, '#1d4ed8');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillRect(0, 0, 512, 512);
 
-    ctx.strokeStyle = '#bae6fd';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(10, 10, 236, 236);
+    // Gold metallic border with corner ornaments
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 18;
+    ctx.strokeRect(14, 14, 484, 484);
 
-    // Draw the Dili-Birds diamond emblem in the center of the coin crate
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(32, 32, 448, 448);
+
+    // Center Dilicom diamond crest
     ctx.save();
-    ctx.translate(128, 128);
+    ctx.translate(256, 256);
     ctx.rotate(Math.PI / 4);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 14;
-    ctx.strokeRect(-38, -38, 76, 76);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(-85, -85, 170, 170);
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(-62, -62, 124, 124);
+    ctx.fillStyle = '#fef08a';
+    ctx.fillRect(-35, -35, 70, 70);
     ctx.restore();
+
   } else if (type === 'tnt') {
+    // Upgraded high-visibility military/industrial TNT crate with hazard chevrons & brass clasps
+    const tntGrad = ctx.createLinearGradient(0, 0, 0, 512);
+    tntGrad.addColorStop(0, '#ef4444');
+    tntGrad.addColorStop(0.5, '#dc2626');
+    tntGrad.addColorStop(1, '#991b1b');
+    ctx.fillStyle = tntGrad;
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Warning hazard stripes (top and bottom)
+    const drawHazardStripe = (startY, h) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, startY, 512, h);
+      ctx.clip();
+      ctx.fillStyle = '#facc15';
+      ctx.fillRect(0, startY, 512, h);
+      ctx.fillStyle = '#18181b';
+      for (let x = -80; x < 600; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, startY);
+        ctx.lineTo(x + 25, startY);
+        ctx.lineTo(x - 10, startY + h);
+        ctx.lineTo(x - 35, startY + h);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    };
+    drawHazardStripe(16, 44);
+    drawHazardStripe(452, 44);
+
+    // High-contrast central explosive label plate
+    ctx.fillStyle = '#fffbeb';
+    ctx.fillRect(36, 160, 440, 192);
+
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(36, 160, 440, 192);
+
+    // "DANGER" sub-banner
     ctx.fillStyle = '#dc2626';
-    ctx.fillRect(0, 0, 256, 256);
-
-    ctx.strokeStyle = '#7f1d1d';
-    ctx.lineWidth = 12;
-    ctx.strokeRect(8, 8, 240, 240);
-
-    ctx.fillStyle = '#fef2f2';
-    ctx.fillRect(16, 86, 224, 84);
-
-    ctx.fillStyle = '#991b1b';
-    ctx.font = 'bold 64px "Inter", sans-serif';
+    ctx.fillRect(36, 160, 440, 36);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 24px "Inter", "Arial Black", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('TNT', 128, 130);
+    ctx.fillText('★ DANGER : HIGH EXPLOSIVE ★', 256, 178);
+
+    // Bold stencil "TNT" text
+    ctx.fillStyle = '#7f1d1d';
+    ctx.font = '900 130px "Inter", "Arial Black", sans-serif';
+    ctx.fillText('TNT', 256, 268);
+
+    // Heavy reinforced metal corner brackets
+    ctx.fillStyle = '#1f2937';
+    const bracketSize = 64;
+    // Top-left
+    ctx.fillRect(0, 0, bracketSize, 18);
+    ctx.fillRect(0, 0, 18, bracketSize);
+    // Top-right
+    ctx.fillRect(512 - bracketSize, 0, bracketSize, 18);
+    ctx.fillRect(512 - 18, 0, 18, bracketSize);
+    // Bottom-left
+    ctx.fillRect(0, 512 - 18, bracketSize, 18);
+    ctx.fillRect(0, 512 - bracketSize, 18, bracketSize);
+    // Bottom-right
+    ctx.fillRect(512 - bracketSize, 512 - 18, bracketSize, 18);
+    ctx.fillRect(512 - 18, 512 - bracketSize, 18, bracketSize);
+
+    // Brass corner studs
+    ctx.fillStyle = '#f59e0b';
+    [ [14, 14], [498, 14], [14, 498], [498, 498] ].forEach(([x, y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fill();
+    });
   }
 
   const tex = new THREE.CanvasTexture(canvas);
@@ -487,7 +675,7 @@ function getProceduralBlockTexture(type) {
 }
 
 /**
- * Creates a 3D Destructible Block mesh ('wood' | 'stone' | 'glass' | 'coin' | 'tnt').
+ * Creates a 3D Destructible Block mesh ('wood' | 'stone' | 'metal' | 'glass' | 'coin' | 'tnt').
  */
 export function createBlockMesh(type, size) {
   const [w, h, d] = size;
@@ -496,24 +684,64 @@ export function createBlockMesh(type, size) {
   let mat;
   if (type === 'glass') {
     mat = new THREE.MeshPhysicalMaterial({
-      color: 0x7dd3fc,
+      color: 0xa5f3fc,
       transparent: true,
-      opacity: 0.68,
-      roughness: 0.12,
-      metalness: 0.1,
-      transmission: 0.25
+      opacity: 0.65,
+      roughness: 0.06,
+      metalness: 0.08,
+      transmission: 0.65,
+      ior: 1.52,
+      reflectivity: 0.9,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05
+    });
+  } else if (type === 'metal') {
+    const tex = getProceduralBlockTexture(type);
+    mat = new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 0.28,
+      metalness: 0.82
     });
   } else {
     const tex = getProceduralBlockTexture(type);
     mat = new THREE.MeshStandardMaterial({
       map: tex,
-      roughness: type === 'coin' ? 0.25 : type === 'stone' ? 0.8 : 0.65,
-      metalness: type === 'coin' ? 0.45 : 0.08
+      roughness: type === 'coin' ? 0.22 : type === 'stone' ? 0.82 : type === 'tnt' ? 0.45 : 0.65,
+      metalness: type === 'coin' ? 0.65 : type === 'stone' ? 0.08 : type === 'tnt' ? 0.15 : 0.06
     });
   }
 
   const mesh = new THREE.Mesh(geo, mat);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
+
+  // For TNT blocks, add upgraded 3D metallic fuse collar & glowing pulse indicator on top
+  if (type === 'tnt') {
+    const fuseGroup = new THREE.Group();
+    const tntScale = Math.min(1.0, Math.min(w, h) / 0.8);
+    // Brass fuse collar
+    const collar = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12 * tntScale, 0.15 * tntScale, 0.08 * tntScale, 16),
+      new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.85, roughness: 0.25 })
+    );
+    collar.position.set(0, h / 2 + 0.04 * tntScale, 0);
+    fuseGroup.add(collar);
+
+    // Glowing warning beacon LED
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.08 * tntScale, 12, 12),
+      new THREE.MeshStandardMaterial({
+        color: 0xfef08a,
+        emissive: 0xef4444,
+        emissiveIntensity: 0.85,
+        roughness: 0.1
+      })
+    );
+    beacon.position.set(0, h / 2 + 0.11 * tntScale, 0);
+    fuseGroup.add(beacon);
+
+    mesh.add(fuseGroup);
+  }
+
   return mesh;
 }

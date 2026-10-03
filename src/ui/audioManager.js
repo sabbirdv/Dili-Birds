@@ -847,6 +847,21 @@ export class AudioManager {
       body.start(now);
       body.stop(now + 0.1);
 
+    } else if (material === 'metal') {
+      // Heavy industrial metal clang / metallic resonance
+      [1450, 2200, 3100].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.004);
+        gain.gain.setValueAtTime(vol * 0.85, now + idx * 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.004 + 0.065);
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+        osc.start(now + idx * 0.004);
+        osc.stop(now + idx * 0.004 + 0.07);
+      });
+
     } else if (material === 'glass') {
       // Brittle crystal chip
       [2300, 3400].forEach((freq, idx) => {
@@ -976,6 +991,35 @@ export class AudioManager {
         noiseSrc.start(now);
         noiseSrc.stop(now + 0.3);
       }
+
+    } else if (type === 'metal') {
+      // Heavy metal structure buckle and shear
+      const buckleOsc = ctx.createOscillator();
+      const buckleGain = ctx.createGain();
+      buckleOsc.type = 'sawtooth';
+      buckleOsc.frequency.setValueAtTime(420, now);
+      buckleOsc.frequency.exponentialRampToValueAtTime(75, now + 0.18);
+
+      buckleGain.gain.setValueAtTime(0.24 * countMult, now);
+      buckleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+      buckleOsc.connect(buckleGain);
+      buckleGain.connect(this.sfxGain);
+      buckleOsc.start(now);
+      buckleOsc.stop(now + 0.21);
+
+      [1800, 2600].forEach((freq, idx) => {
+        const ring = ctx.createOscillator();
+        const rGain = ctx.createGain();
+        ring.type = 'sine';
+        ring.frequency.setValueAtTime(freq, now + idx * 0.012);
+        rGain.gain.setValueAtTime(0.12 * countMult, now + idx * 0.012);
+        rGain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.012 + 0.15);
+        ring.connect(rGain);
+        rGain.connect(this.sfxGain);
+        ring.start(now + idx * 0.012);
+        ring.stop(now + idx * 0.012 + 0.16);
+      });
 
     } else if (type === 'glass') {
       // Tempered crystal fracture

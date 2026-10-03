@@ -201,7 +201,7 @@
 
           <div class="roadmap-title-lockup">
             <div class="brand-tag" id="hero-brand-tag">Dili Birds</div>
-            <h1 class="roadmap-page-title">Campaign <span class="accent-3d">Roadmap</span></h1>
+            <h1 class="roadmap-page-title">World <span class="accent-3d">Map</span></h1>
           </div>
 
           <!-- Player Progress Summary Bar -->
@@ -216,7 +216,7 @@
             <div class="summary-divider"></div>
             <div class="summary-item">
               <span class="summary-title">Stage Progress</span>
-              <strong class="summary-val" id="summary-level">1 / 8</strong>
+              <strong class="summary-val" id="summary-level">1 / 20</strong>
             </div>
             <div class="summary-divider"></div>
             <div class="summary-item">
@@ -231,34 +231,63 @@
               <span class="summary-title">Stars</span>
               <strong class="summary-val star-accent" id="summary-stars">
                 <svg class="pill-star-svg gold-star" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span id="summary-stars-val">0 / 24</span>
+                <span id="summary-stars-val">0 / 60</span>
               </strong>
             </div>
           </section>
         </header>
 
-        <!-- Square-Shaped 8-Stage Roadmap Section -->
+        <!-- Full-Width Horizontal World Map Section -->
         <section class="roadmap-stage-board-card glass-card" aria-labelledby="level-select-heading">
           <div class="section-header roadmap-controls-bar">
             <div class="roadmap-heading-group">
-              <h2 id="level-select-heading">3D Campaign Roadmap</h2>
-              <span class="sequential-hint">Conquer Zone 1 (Levels 1–10) to dispel the clouds and reveal Zone 2 (Levels 11–20)! Click any unlocked stage to launch!</span>
+              <h2 id="level-select-heading">Wavy Campaign Path</h2>
+              <span class="sequential-hint">Drag horizontally across the terrain to explore • Tap any unlocked stage to launch!</span>
+            </div>
+
+            <!-- Quick Zone Jump Shortcuts -->
+            <div class="roadmap-zone-quick-jumps" role="group" aria-label="Zone Quick Jump">
+              <button type="button" class="roadmap-zone-pill-btn active" id="btn-jump-zone-1" data-jump-zone="1" title="Jump to Zone 1">
+                <span class="zone-pill-indicator z1"></span>
+                <span>Zone 1: Sky Haven (1–10)</span>
+              </button>
+              <button type="button" class="roadmap-zone-pill-btn" id="btn-jump-zone-2" data-jump-zone="2" title="Jump to Zone 2">
+                <span class="zone-pill-indicator z2"></span>
+                <span id="label-jump-zone-2">Zone 2: Celestial Citadel (11–20) ☁️</span>
+              </button>
             </div>
 
             <div class="roadmap-legend-actions">
               <div class="roadmap-legend" aria-hidden="true">
                 <span class="legend-item"><i class="dot completed"></i> Cleared</span>
-                <span class="legend-item"><i class="dot frontier"></i> Active Stage</span>
-                <span class="legend-item"><i class="dot locked"></i> Locked</span>
+                <span class="legend-item"><i class="dot frontier"></i> Active</span>
+                <span class="legend-item"><i class="dot locked"></i> Cloud Fog</span>
               </div>
             </div>
           </div>
 
-          <!-- Square Roadmap Viewport -->
-          <div id="roadmap-viewport" class="roadmap-3d-viewport">
+          <!-- Horizontal Scrollable Map Viewport with Left/Right Drag Pan & Floating Controls -->
+          <div id="roadmap-viewport" class="roadmap-3d-viewport" tabindex="0" role="region" aria-label="Horizontal Level Select World Map">
+            <button type="button" id="btn-map-pan-left" class="map-floating-nav-btn pan-left" title="Pan Left" aria-label="Pan Left">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button type="button" id="btn-map-pan-right" class="map-floating-nav-btn pan-right" title="Pan Right" aria-label="Pan Right">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
             <div id="level-grid" class="roadmap-grid-wrapper">
               <!-- Dynamically populated by src/levels/levelSelect.js -->
             </div>
+          </div>
+
+          <!-- Bottom Mini-Progress Scrubber Track -->
+          <div class="roadmap-bottom-scrubber-bar" aria-hidden="true">
+            <span class="scrubber-label start">Stage 1</span>
+            <div class="scrubber-track-wrap">
+              <div class="scrubber-track-fill" id="scrubber-progress-fill" style="width: 5%;"></div>
+              <div class="scrubber-player-marker" id="scrubber-marker" style="left: 0%;"></div>
+            </div>
+            <span class="scrubber-label end">Stage 20</span>
           </div>
         </section>
       </div>

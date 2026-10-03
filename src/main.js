@@ -66,6 +66,9 @@ class DiliBirdsApp {
       },
       onSetDashboard3DMode: (isDash) => {
         this.gameScene?.setDashboardMode(isDash);
+      },
+      onActivateAbility: () => {
+        this.gameScene?.triggerBirdAbility();
       }
     });
 
@@ -75,6 +78,7 @@ class DiliBirdsApp {
       audio: this.audio,
       onStatsChange: (stats) => {
         this.ui.hud.updateStats(stats);
+        this.ui.hud.updateRescueTracker(stats.targetsByType, stats.initialTargetsByType);
         this.ui.refreshHeaderStats();
       },
       onAimUpdate: (power, angle) => {
@@ -82,6 +86,18 @@ class DiliBirdsApp {
       },
       onAimEnd: () => {
         this.ui.hud.hideAimTelemetry();
+      },
+      onBirdReady: (data) => {
+        this.ui.hud.setBirdAbilityReady(data);
+      },
+      onBirdLaunch: (data) => {
+        this.ui.hud.setBirdAbilityInFlight(data);
+      },
+      onAbilityUsed: (data) => {
+        this.ui.hud.setBirdAbilityUsed(data);
+      },
+      onBirdReset: () => {
+        this.ui.hud.hideBirdAbility();
       },
       onShowAbilityPrompt: (msg) => {
         this.ui.hud.showAbilityPrompt(msg);

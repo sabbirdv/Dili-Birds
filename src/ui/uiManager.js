@@ -24,7 +24,8 @@ export class UIManager {
     onToggleCameraView,
     onPauseGame,
     onResumeGame,
-    onSetDashboard3DMode
+    onSetDashboard3DMode,
+    onActivateAbility
   }) {
     this.storage = storage;
     this.audio = audio;
@@ -114,7 +115,8 @@ export class UIManager {
       onReturnToMenu: () => this.showDashboardView(),
       onOpenProfile: () => this.profileModal.open('username'),
       onPauseGame: () => this.onPauseGame?.(),
-      onResumeGame: () => this.onResumeGame?.()
+      onResumeGame: () => this.onResumeGame?.(),
+      onActivateAbility: () => onActivateAbility?.()
     });
 
     this.bindTopBarEvents();

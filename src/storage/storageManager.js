@@ -15,6 +15,7 @@ const DEFAULT_STATE = {
   levelHighScores: {},
   claimedCoinLevels: {}, // Tracks level IDs where coins have already been awarded
   claimedMissions: {}, // Tracks mission IDs where quest rewards have been claimed
+  claimedCharacters: {}, // Tracks unlocked heroes claimed by player
   zoneRevealed: { 1: true, 2: false }, // Tracks revealed zones on roadmap
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
@@ -84,6 +85,7 @@ export class StorageManager {
         levelHighScores: { ...(parsed.levelHighScores || {}) },
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
         claimedMissions: { ...(parsed.claimedMissions || {}) },
+        claimedCharacters: { ...(parsed.claimedCharacters || {}) },
         zoneRevealed: { 1: true, 2: Boolean(parsed.zoneRevealed?.[2] || Number(parsed.unlockedLevel) > 10) },
         playerId: typeof parsed.playerId === 'string' && parsed.playerId ? parsed.playerId : '',
         serverRowId: parsed.serverRowId !== undefined ? parsed.serverRowId : null
@@ -188,6 +190,25 @@ export class StorageManager {
 
   getTotalStars() {
     return Object.values(this.state.levelStars).reduce((acc, s) => acc + (Number(s) || 0), 0);
+  }
+
+  getPlayedLevelsCount() {
+    const unlocked = this.getUnlockedLevel();
+    const playedSet = new Set();
+    if (this.state.levelStars) {
+      for (const [lvl, s] of Object.entries(this.state.levelStars)) {
+        if (Number(s) > 0) playedSet.add(Number(lvl));
+      }
+    }
+    if (this.state.levelHighScores) {
+      for (const [lvl, sc] of Object.entries(this.state.levelHighScores)) {
+        if (Number(sc) > 0) playedSet.add(Number(lvl));
+      }
+    }
+    for (let i = 1; i < unlocked; i++) {
+      playedSet.add(i);
+    }
+    return playedSet.size;
   }
 
   getServerRowId() {
@@ -378,6 +399,21 @@ export class StorageManager {
     return true;
   }
 
+  hasClaimedCharacter(heroId) {
+    return Boolean(this.state.claimedCharacters?.[heroId]);
+  }
+
+  claimCharacter(heroId, coinReward = 0) {
+    if (this.hasClaimedCharacter(heroId)) return false;
+    if (!this.state.claimedCharacters) this.state.claimedCharacters = {};
+    this.state.claimedCharacters[heroId] = true;
+    if (coinReward > 0) {
+      this.addCoins(coinReward);
+    }
+    this.saveState();
+    return true;
+  }
+
   resetProgress() {
     const currentUsername = this.state.username;
     const currentAvatarUrl = this.state.avatarUrl;
@@ -401,6 +437,7 @@ export class StorageManager {
       levelHighScores: {},
       claimedCoinLevels: {},
       claimedMissions: {},
+      claimedCharacters: {},
       zoneRevealed: { 1: true, 2: false },
       serverRowId: this.state.serverRowId
     };

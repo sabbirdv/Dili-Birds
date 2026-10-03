@@ -332,38 +332,40 @@ export class AudioManager {
 
   enterGameplay() {
     this.isPlayingGameplay = true;
-    const mode = this.storage?.getBgmMode?.() || 'dashboard';
-    if (mode === 'always') {
-      if (this.ctx && this.bgmFadeGain) {
-        const now = this.ctx.currentTime;
-        const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
-        this.bgmFadeGain.gain.cancelScheduledValues(now);
-        this.bgmFadeGain.gain.setValueAtTime(cur, now);
-        this.bgmFadeGain.gain.linearRampToValueAtTime(0.25, now + 0.35);
-      }
-      if (!this.isBgmPlaying && !this.isMuted) {
-        this.startBGM(0.35);
-      }
-    } else {
-      this.stopBGM(0.3);
+    if (this.ctx && this.bgmFadeGain) {
+      const now = this.ctx.currentTime;
+      const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
+      this.bgmFadeGain.gain.cancelScheduledValues(now);
+      this.bgmFadeGain.gain.setValueAtTime(cur, now);
+      this.bgmFadeGain.gain.linearRampToValueAtTime(0.22, now + 0.40);
+    }
+    if (!this.isBgmPlaying && !this.isMuted) {
+      this.startBGM(0.40);
     }
   }
 
   enterMenu() {
     this.isPlayingGameplay = false;
-    const mode = this.storage?.getBgmMode?.() || 'dashboard';
-    if (mode === 'off' || this.isMuted) {
-      this.stopBGM(0.15);
-    } else {
-      if (this.isBgmPlaying && this.bgmFadeGain && this.ctx) {
-        const now = this.ctx.currentTime;
+    if (this.isMuted) return;
+
+    if (this.ctx) {
+      const now = this.ctx.currentTime;
+      if (this.bgmFadeGain) {
         const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
         this.bgmFadeGain.gain.cancelScheduledValues(now);
         this.bgmFadeGain.gain.setValueAtTime(cur, now);
-        this.bgmFadeGain.gain.linearRampToValueAtTime(1.0, now + 0.35);
-      } else {
-        this.startBGM(0.35);
+        this.bgmFadeGain.gain.linearRampToValueAtTime(1.0, now + 0.30);
       }
+      if (this.bgmDuckingGain) {
+        const curDuck = Math.max(0.0001, this.bgmDuckingGain.gain.value);
+        this.bgmDuckingGain.gain.cancelScheduledValues(now);
+        this.bgmDuckingGain.gain.setValueAtTime(curDuck, now);
+        this.bgmDuckingGain.gain.linearRampToValueAtTime(1.0, now + 0.20);
+      }
+    }
+
+    if (!this.isBgmPlaying && !this.isMuted) {
+      this.startBGM(0.35);
     }
   }
 
@@ -373,30 +375,29 @@ export class AudioManager {
     }
     if (mode === 'off') {
       this.stopBGM(0.2);
-    } else if (mode === 'dashboard') {
+    } else {
       if (this.isPlayingGameplay) {
-        this.stopBGM(0.2);
+        if (this.bgmFadeGain && this.ctx) {
+          const now = this.ctx.currentTime;
+          this.bgmFadeGain.gain.linearRampToValueAtTime(0.22, now + 0.3);
+        }
       } else {
-        this.startBGM(0.35);
-      }
-    } else if (mode === 'always') {
-      if (this.isPlayingGameplay && this.bgmFadeGain && this.ctx) {
-        const now = this.ctx.currentTime;
-        this.bgmFadeGain.gain.linearRampToValueAtTime(0.25, now + 0.3);
+        if (this.bgmFadeGain && this.ctx) {
+          const now = this.ctx.currentTime;
+          this.bgmFadeGain.gain.linearRampToValueAtTime(1.0, now + 0.3);
+        }
       }
       this.startBGM(0.35);
     }
   }
 
   startBGM(fadeDuration = 0.35) {
-    const mode = this.storage?.getBgmMode?.() || 'dashboard';
-    if (mode === 'off' || this.isMuted) return;
-    if (mode === 'dashboard' && this.isPlayingGameplay) return;
+    if (this.isMuted) return;
 
     const ctx = this.ensureContext();
     if (!ctx) return;
 
-    const targetGain = (this.isPlayingGameplay && mode === 'always') ? 0.25 : 1.0;
+    const targetGain = this.isPlayingGameplay ? 0.22 : 1.0;
 
     if (this.isBgmPlaying) {
       if (this.bgmFadeGain) {
@@ -424,16 +425,7 @@ export class AudioManager {
     this.bgmNextStepTime = ctx.currentTime + 0.04;
 
     const runScheduler = () => {
-      const currentMode = this.storage?.getBgmMode?.() || 'dashboard';
       if (!this.isBgmPlaying || !this.ctx || this.isMuted) return;
-      if (currentMode === 'off') {
-        this.stopBGM(0.2);
-        return;
-      }
-      if (currentMode === 'dashboard' && this.isPlayingGameplay) {
-        this.stopBGM(0.2);
-        return;
-      }
 
       // If context is suspended by browser, wait cleanly
       if (this.ctx.state !== 'running') {
@@ -456,14 +448,24 @@ export class AudioManager {
     if (this.bgmLookaheadTimer) clearInterval(this.bgmLookaheadTimer);
     this.bgmLookaheadTimer = setInterval(runScheduler, 30);
 
-    // Watchdog check: guarantees BGM never stays silent accidentally
+    // Watchdog check: continuously verifies BGM is playing and gains are at correct levels
     if (!this.bgmWatchdogTimer) {
       this.bgmWatchdogTimer = setInterval(() => {
-        const currentMode = this.storage?.getBgmMode?.() || 'dashboard';
-        if (!this.isMuted && currentMode !== 'off') {
-          if (!this.isPlayingGameplay || currentMode === 'always') {
-            if (this.ctx && this.ctx.state === 'running' && (!this.isBgmPlaying || (this.bgmFadeGain && this.bgmFadeGain.gain.value < 0.05))) {
-              this.startBGM(0.3);
+        if (!this.isMuted && this.ctx && this.ctx.state === 'running') {
+          const target = this.isPlayingGameplay ? 0.22 : 1.0;
+          if (!this.isBgmPlaying) {
+            this.startBGM(0.3);
+          } else {
+            const now = this.ctx.currentTime;
+            if (this.bgmFadeGain && Math.abs(this.bgmFadeGain.gain.value - target) > 0.08) {
+              this.bgmFadeGain.gain.cancelScheduledValues(now);
+              this.bgmFadeGain.gain.setValueAtTime(this.bgmFadeGain.gain.value, now);
+              this.bgmFadeGain.gain.linearRampToValueAtTime(target, now + 0.25);
+            }
+            if (!this.isPlayingGameplay && this.bgmDuckingGain && this.bgmDuckingGain.gain.value < 0.92) {
+              this.bgmDuckingGain.gain.cancelScheduledValues(now);
+              this.bgmDuckingGain.gain.setValueAtTime(this.bgmDuckingGain.gain.value, now);
+              this.bgmDuckingGain.gain.linearRampToValueAtTime(1.0, now + 0.20);
             }
           }
         }
@@ -1132,21 +1134,21 @@ export class AudioManager {
     popOsc.start(now);
     popOsc.stop(now + 0.095);
 
-    // 3. Bright cartoon slide whistle launch whoop
+    // 3. Gentle cartoon launch whoop (soft warm sine 320Hz -> 620Hz, non-piercing)
     const whistleOsc = ctx.createOscillator();
     const whistleGain = ctx.createGain();
     whistleOsc.type = 'sine';
-    whistleOsc.frequency.setValueAtTime(440, now);
-    whistleOsc.frequency.exponentialRampToValueAtTime(1200 * clampedPower, now + 0.085);
+    whistleOsc.frequency.setValueAtTime(320, now);
+    whistleOsc.frequency.exponentialRampToValueAtTime(620 * clampedPower, now + 0.08);
 
     whistleGain.gain.setValueAtTime(0.0001, now);
-    whistleGain.gain.linearRampToValueAtTime(0.55 * clampedPower, now + 0.02);
-    whistleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    whistleGain.gain.linearRampToValueAtTime(0.24 * clampedPower, now + 0.02);
+    whistleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.085);
 
     whistleOsc.connect(whistleGain);
     whistleGain.connect(this.sfxDuckingGain);
     whistleOsc.start(now);
-    whistleOsc.stop(now + 0.095);
+    whistleOsc.stop(now + 0.09);
   }
 
   updateSlingshotCharge(power) { this.updateSlingshotPull(power); }
@@ -1154,9 +1156,10 @@ export class AudioManager {
   playStretch(ratio) { this.updateSlingshotPull(ratio); }
 
   /* ═════════════════════════════════════════════════════════════
-   * CARTOON BIRD FLIGHT SOUND (Comical Slide-Whistle & Flutter)
-   * Replaces realistic noise rush with a cheerful, melodic cartoon
-   * slide-whistle glide ("wheeeee-e-e!") with subtle comic vibrato.
+   * CARTOON BIRD FLIGHT SOUND (Soft, Warm Cartoon Glide)
+   * Ultra-gentle, non-intrusive mellow tone ("soft soft sonay, kane lage na").
+   * Soft sine at 290Hz-380Hz, deep 480Hz lowpass filter, gentle vibrato,
+   * whisper-level volume (gain 0.032 - 0.055 max).
    * ═════════════════════════════════════════════════════════════ */
 
   startFlightSound() {
@@ -1165,90 +1168,57 @@ export class AudioManager {
     this.isFlightSoundActive = true;
     const now = ctx.currentTime;
 
-    // 1. Primary Whistle Oscillator (Warm Sine)
+    // 1. Warm, Pure Mellow Sine Oscillator (Low-mid register: ~320 Hz, gentle and round)
     this.flightOsc = ctx.createOscillator();
     this.flightOsc.type = 'sine';
-    this.flightOsc.frequency.setValueAtTime(640, now);
+    this.flightOsc.frequency.setValueAtTime(320, now);
 
-    // 2. Harmonic Whistle Layer (Soft Triangle 1 octave up for airy cartoon whistle timbre)
-    this.flightOsc2 = ctx.createOscillator();
-    this.flightOsc2.type = 'triangle';
-    this.flightOsc2.frequency.setValueAtTime(1280, now);
-
-    // 3. Comical Vibrato LFO (9.5 Hz warble for iconic cartoon slide-whistle feel)
+    // 2. Slow, Soothing Vibrato LFO (5.5 Hz, tiny ±6 Hz depth for gentle breath wobble)
     this.flightLfo = ctx.createOscillator();
     this.flightLfo.type = 'sine';
-    this.flightLfo.frequency.setValueAtTime(9.5, now);
+    this.flightLfo.frequency.setValueAtTime(5.5, now);
 
     this.flightLfoGain = ctx.createGain();
-    this.flightLfoGain.gain.setValueAtTime(26, now); // ±26 Hz vibrato depth
+    this.flightLfoGain.gain.setValueAtTime(6.0, now); // Gentle ±6 Hz depth (never harsh)
 
     this.flightLfo.connect(this.flightLfoGain);
     this.flightLfoGain.connect(this.flightOsc.frequency);
-    this.flightLfoGain.connect(this.flightOsc2.frequency);
 
-    // 4. Tremolo Flutter (Wing flapping flutter at 8 Hz)
-    this.flightTremolo = ctx.createOscillator();
-    this.flightTremolo.type = 'sine';
-    this.flightTremolo.frequency.setValueAtTime(8.0, now);
-
-    this.flightTremoloGain = ctx.createGain();
-    this.flightTremoloGain.gain.setValueAtTime(0.08, now); // subtle 8% AM flutter
-    this.flightTremolo.connect(this.flightTremoloGain);
-
-    // 5. Output Gain and Filter
+    // 3. Deep Warm Lowpass Filter (Cuts all high-frequency harshness at 480 Hz)
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(2800, now);
+    filter.frequency.setValueAtTime(480, now);
+    filter.Q.setValueAtTime(0.7, now); // Soft Butterworth damping
 
+    // 4. Ultra-Soft Output Gain (Whisper-gentle: starts at 0.035, never exceeds 0.055)
     this.flightGain = ctx.createGain();
     this.flightGain.gain.setValueAtTime(0.0001, now);
-    this.flightGain.gain.linearRampToValueAtTime(0.24, now + 0.08);
-
-    const osc2Gain = ctx.createGain();
-    osc2Gain.gain.setValueAtTime(0.18, now);
+    this.flightGain.gain.linearRampToValueAtTime(0.036, now + 0.12);
 
     this.flightOsc.connect(filter);
-    this.flightOsc2.connect(osc2Gain);
-    osc2Gain.connect(filter);
-
     filter.connect(this.flightGain);
     this.flightGain.connect(this.sfxDuckingGain);
 
     this.flightOsc.start(now);
-    this.flightOsc2.start(now);
     this.flightLfo.start(now);
-    this.flightTremolo.start(now);
   }
 
   updateFlightSound(speed = 10) {
     if (!this.isFlightSoundActive || !this.flightOsc || !this.flightGain || !this.ctx) return;
     const now = this.ctx.currentTime;
-    const normalizedSpeed = Math.min(2.5, Math.max(0.2, speed / 12));
+    const normalizedSpeed = Math.min(2.0, Math.max(0.2, speed / 14));
 
-    // Dynamic comical cartoon pitch glide: rises with speed, dips at apex
-    const targetFreq = 540 + normalizedSpeed * 380;
+    // Gentle, soft cartoon glide: smooth pitch range (290Hz to 380Hz)
+    const targetFreq = 290 + normalizedSpeed * 65;
     this.flightOsc.frequency.cancelScheduledValues(now);
     this.flightOsc.frequency.setValueAtTime(this.flightOsc.frequency.value, now);
-    this.flightOsc.frequency.linearRampToValueAtTime(targetFreq, now + 0.06);
+    this.flightOsc.frequency.linearRampToValueAtTime(targetFreq, now + 0.08);
 
-    if (this.flightOsc2) {
-      this.flightOsc2.frequency.cancelScheduledValues(now);
-      this.flightOsc2.frequency.setValueAtTime(this.flightOsc2.frequency.value, now);
-      this.flightOsc2.frequency.linearRampToValueAtTime(targetFreq * 2, now + 0.06);
-    }
-
-    if (this.flightLfo) {
-      // Flutter speed increases when flying faster
-      const targetLfoRate = 8.5 + normalizedSpeed * 3.5;
-      this.flightLfo.frequency.linearRampToValueAtTime(targetLfoRate, now + 0.06);
-    }
-
-    // Dynamic volume tracking
-    const targetGain = Math.min(0.35, 0.16 + normalizedSpeed * 0.10);
+    // Gentle volume scaling: capped at ultra-soft 0.052 so it never hurts ears
+    const targetGain = Math.min(0.052, 0.030 + normalizedSpeed * 0.014);
     this.flightGain.gain.cancelScheduledValues(now);
     this.flightGain.gain.setValueAtTime(this.flightGain.gain.value, now);
-    this.flightGain.gain.linearRampToValueAtTime(targetGain, now + 0.06);
+    this.flightGain.gain.linearRampToValueAtTime(targetGain, now + 0.08);
   }
 
   stopFlightSound() {
@@ -1259,10 +1229,10 @@ export class AudioManager {
       const now = this.ctx.currentTime;
       this.flightGain.gain.cancelScheduledValues(now);
       this.flightGain.gain.setValueAtTime(this.flightGain.gain.value, now);
-      this.flightGain.gain.linearRampToValueAtTime(0.0001, now + 0.04);
+      this.flightGain.gain.linearRampToValueAtTime(0.0001, now + 0.06);
     }
 
-    const oscsToStop = [this.flightOsc, this.flightOsc2, this.flightLfo, this.flightTremolo];
+    const oscsToStop = [this.flightOsc, this.flightLfo];
     setTimeout(() => {
       oscsToStop.forEach((osc) => {
         if (osc) {
@@ -1272,7 +1242,7 @@ export class AudioManager {
           } catch {}
         }
       });
-    }, 50);
+    }, 70);
 
     this.flightOsc = null;
     this.flightOsc2 = null;
@@ -1458,7 +1428,7 @@ export class AudioManager {
     snapOsc.frequency.setValueAtTime(1050 * pitchJitter, now);
     snapOsc.frequency.exponentialRampToValueAtTime(140, now + 0.035);
 
-    snapGain.gain.setValueAtTime(0.26 * countMult, now);
+    snapGain.gain.setValueAtTime(0.72 * countMult, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
     snapOsc.connect(snapGain);
@@ -1472,7 +1442,7 @@ export class AudioManager {
     woodOsc.frequency.setValueAtTime(210 * pitchJitter, now);
     woodOsc.frequency.exponentialRampToValueAtTime(55, now + 0.12);
 
-    woodGain.gain.setValueAtTime(0.18 * countMult, now);
+    woodGain.gain.setValueAtTime(0.52 * countMult, now);
     woodGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
     woodOsc.connect(woodGain);
@@ -1491,7 +1461,7 @@ export class AudioManager {
         sFilter.Q.setValueAtTime(2.8, now + offset);
 
         const sGain = ctx.createGain();
-        sGain.gain.setValueAtTime(0.14 * countMult, now + offset);
+        sGain.gain.setValueAtTime(0.38 * countMult, now + offset);
         sGain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.055);
 
         sSrc.connect(sFilter);
@@ -1519,7 +1489,7 @@ export class AudioManager {
     filter.frequency.setValueAtTime(280, now);
     filter.frequency.exponentialRampToValueAtTime(70, now + 0.2);
 
-    crackGain.gain.setValueAtTime(0.26 * countMult, now);
+    crackGain.gain.setValueAtTime(0.75 * countMult, now);
     crackGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.23);
 
     crackOsc.connect(filter);
@@ -1538,7 +1508,7 @@ export class AudioManager {
       nFilter.Q.setValueAtTime(1.4, now);
 
       const nGain = ctx.createGain();
-      nGain.gain.setValueAtTime(0.24 * countMult, now);
+      nGain.gain.setValueAtTime(0.68 * countMult, now);
       nGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 
       noiseSrc.connect(nFilter);
@@ -1559,7 +1529,7 @@ export class AudioManager {
     snapOsc.frequency.setValueAtTime(3400 * pitchJitter, now);
     snapOsc.frequency.exponentialRampToValueAtTime(1200, now + 0.02);
 
-    snapGain.gain.setValueAtTime(0.20 * countMult, now);
+    snapGain.gain.setValueAtTime(0.62 * countMult, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
 
     snapOsc.connect(snapGain);
@@ -1575,7 +1545,7 @@ export class AudioManager {
       const start = now + idx * 0.012 + Math.random() * 0.006;
       osc.frequency.setValueAtTime(freq * pitchJitter + (Math.random() - 0.5) * 80, start);
 
-      gain.gain.setValueAtTime(0.10 * countMult, start);
+      gain.gain.setValueAtTime(0.32 * countMult, start);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.11);
 
       osc.connect(gain);
@@ -1595,7 +1565,7 @@ export class AudioManager {
     buckleOsc.frequency.setValueAtTime(440 * pitchJitter, now);
     buckleOsc.frequency.exponentialRampToValueAtTime(75, now + 0.16);
 
-    buckleGain.gain.setValueAtTime(0.26 * countMult, now);
+    buckleGain.gain.setValueAtTime(0.78 * countMult, now);
     buckleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
 
     buckleOsc.connect(buckleGain);
@@ -1609,7 +1579,7 @@ export class AudioManager {
       ring.type = 'triangle';
       ring.frequency.setValueAtTime(baseFreq * pitchJitter, now + idx * 0.008);
 
-      rGain.gain.setValueAtTime(0.13 * countMult, now + idx * 0.008);
+      rGain.gain.setValueAtTime(0.38 * countMult, now + idx * 0.008);
       rGain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.008 + 0.18);
 
       ring.connect(rGain);
@@ -1627,7 +1597,7 @@ export class AudioManager {
     rumbleOsc.frequency.setValueAtTime(52, now);
     rumbleOsc.frequency.exponentialRampToValueAtTime(24, now + 0.42);
 
-    const rumbleVol = Math.min(0.24, 0.10 + breakCount * 0.028);
+    const rumbleVol = Math.min(0.68, 0.28 + breakCount * 0.08);
     rumbleGain.gain.setValueAtTime(rumbleVol, now);
     rumbleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.44);
 
@@ -1659,7 +1629,7 @@ export class AudioManager {
       fuseFilter.Q.setValueAtTime(3.5, now);
 
       const fuseGain = ctx.createGain();
-      fuseGain.gain.setValueAtTime(0.20, now);
+      fuseGain.gain.setValueAtTime(0.45, now);
       fuseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
 
       fuseSrc.connect(fuseFilter);
@@ -1678,7 +1648,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(88, blastTime);
     osc.frequency.exponentialRampToValueAtTime(32, blastTime + 0.45);
 
-    gain.gain.setValueAtTime(0.40, blastTime);
+    gain.gain.setValueAtTime(0.92, blastTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.48);
 
     osc.connect(gain);
@@ -1697,7 +1667,7 @@ export class AudioManager {
       roarFilter.frequency.exponentialRampToValueAtTime(85, blastTime + 0.42);
 
       const roarGain = ctx.createGain();
-      roarGain.gain.setValueAtTime(0.34, blastTime);
+      roarGain.gain.setValueAtTime(0.80, blastTime);
       roarGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.45);
 
       roarSrc.connect(roarFilter);
@@ -1714,7 +1684,7 @@ export class AudioManager {
     shrapnelOsc.frequency.setValueAtTime(780, blastTime);
     shrapnelOsc.frequency.exponentialRampToValueAtTime(120, blastTime + 0.05);
 
-    shrapnelGain.gain.setValueAtTime(0.25, blastTime);
+    shrapnelGain.gain.setValueAtTime(0.65, blastTime);
     shrapnelGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.055);
 
     shrapnelOsc.connect(shrapnelGain);
@@ -1734,7 +1704,7 @@ export class AudioManager {
         dFilter.Q.setValueAtTime(2.2, blastTime + offset);
 
         const dGain = ctx.createGain();
-        dGain.gain.setValueAtTime(0.15 - idx * 0.03, blastTime + offset);
+        dGain.gain.setValueAtTime(0.38 - idx * 0.08, blastTime + offset);
         dGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + offset + 0.12);
 
         dSrc.connect(dFilter);
@@ -1753,7 +1723,7 @@ export class AudioManager {
     tailOsc.frequency.setValueAtTime(48, blastTime + 0.1);
     tailOsc.frequency.exponentialRampToValueAtTime(22, blastTime + 0.65);
 
-    tailGain.gain.setValueAtTime(0.14, blastTime + 0.1);
+    tailGain.gain.setValueAtTime(0.35, blastTime + 0.1);
     tailGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.7);
 
     tailOsc.connect(tailGain);
@@ -1781,7 +1751,7 @@ export class AudioManager {
     snap.frequency.setValueAtTime(780, now);
     snap.frequency.exponentialRampToValueAtTime(140, now + 0.03);
 
-    snapGain.gain.setValueAtTime(0.28, now);
+    snapGain.gain.setValueAtTime(0.78, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
 
     snap.connect(snapGain);
@@ -1795,7 +1765,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(260, now);
     osc.frequency.exponentialRampToValueAtTime(55, now + 0.13);
 
-    gain.gain.setValueAtTime(0.26, now);
+    gain.gain.setValueAtTime(0.72, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
 
     osc.connect(gain);
@@ -1808,7 +1778,7 @@ export class AudioManager {
     bell.type = 'sine';
     bell.frequency.setValueAtTime(1174.66, now + 0.02);
 
-    bGain.gain.setValueAtTime(0.14, now + 0.02);
+    bGain.gain.setValueAtTime(0.45, now + 0.02);
     bGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
 
     bell.connect(bGain);
@@ -1832,7 +1802,7 @@ export class AudioManager {
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(1400, now);
 
-    gain.gain.setValueAtTime(0.20, now);
+    gain.gain.setValueAtTime(0.65, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
 
     osc.connect(filter);
@@ -1854,7 +1824,7 @@ export class AudioManager {
       const noteTime = now + idx * 0.045;
       osc.frequency.setValueAtTime(freq, noteTime);
 
-      gain.gain.setValueAtTime(0.16, noteTime);
+      gain.gain.setValueAtTime(0.48, noteTime);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.19);
 
       osc.connect(gain);
@@ -1878,7 +1848,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(freq, noteTime);
 
       gain.gain.setValueAtTime(0.0001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.18, noteTime + 0.035);
+      gain.gain.linearRampToValueAtTime(0.55, noteTime + 0.035);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.65);
 
       osc.connect(gain);
@@ -1895,7 +1865,7 @@ export class AudioManager {
         const bGain = this.ctx.createGain();
         bell.type = 'sine';
         bell.frequency.setValueAtTime(freq, cNow);
-        bGain.gain.setValueAtTime(0.11, cNow);
+        bGain.gain.setValueAtTime(0.35, cNow);
         bGain.gain.exponentialRampToValueAtTime(0.0001, cNow + 0.95);
         bell.connect(bGain);
         bGain.connect(this.sfxDuckingGain);
@@ -1922,7 +1892,7 @@ export class AudioManager {
       filter.frequency.setValueAtTime(320, noteTime);
 
       gain.gain.setValueAtTime(0.0001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.04);
+      gain.gain.linearRampToValueAtTime(0.38, noteTime + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.32);
 
       osc.connect(filter);
@@ -1945,7 +1915,7 @@ export class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(840, now + 0.06);
     osc.frequency.exponentialRampToValueAtTime(180, now + 0.12);
 
-    gain.gain.setValueAtTime(0.14, now);
+    gain.gain.setValueAtTime(0.42, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
     osc.connect(gain);
@@ -1968,7 +1938,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(freq, noteTime);
 
       gain.gain.setValueAtTime(0.001, noteTime);
-      gain.gain.exponentialRampToValueAtTime(0.20, noteTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.60, noteTime + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.35);
 
       osc.connect(gain);
@@ -1994,7 +1964,7 @@ export class AudioManager {
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.24, now + 0.35);
+    gain.gain.linearRampToValueAtTime(0.65, now + 0.35);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
 
     src.connect(filter);
@@ -2015,7 +1985,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(440, now);
     osc.frequency.exponentialRampToValueAtTime(880, now + 0.07);
 
-    gain.gain.setValueAtTime(0.10, now);
+    gain.gain.setValueAtTime(0.30, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
     osc.connect(gain);
@@ -2039,7 +2009,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(950, now);
     osc.frequency.exponentialRampToValueAtTime(420, now + 0.018);
 
-    gain.gain.setValueAtTime(0.09, now);
+    gain.gain.setValueAtTime(0.28, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
 
     osc.connect(gain);
@@ -2061,7 +2031,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(freq, noteTime);
 
       gain.gain.setValueAtTime(0.0001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.09, noteTime + 0.015);
+      gain.gain.linearRampToValueAtTime(0.26, noteTime + 0.015);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.14);
 
       osc.connect(gain);
@@ -2082,7 +2052,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(540, now);
     osc.frequency.exponentialRampToValueAtTime(260, now + 0.05);
 
-    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.setValueAtTime(0.24, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
 
     osc.connect(gain);
@@ -2107,7 +2077,7 @@ export class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(784, now + 0.06);
 
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.01);
+    gain.gain.linearRampToValueAtTime(0.35, now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
 
     osc.connect(gain);
@@ -2139,7 +2109,7 @@ export class AudioManager {
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(220, now);
 
-    gain.gain.setValueAtTime(0.09, now);
+    gain.gain.setValueAtTime(0.28, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
 
     osc.connect(filter);

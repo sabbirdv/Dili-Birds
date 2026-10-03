@@ -6,6 +6,66 @@ import char4Url from '../assets/sub-character-4.png';
 import { AVATAR_PRESETS } from './avatarPresets.js';
 import { leaderboardService } from '../services/leaderboardService.js';
 
+export const INFERNO_FLARE_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="fireBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f97316" />
+      <stop offset="60%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#180404" />
+    </radialGradient>
+    <linearGradient id="fireCorona" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="48" fill="url(#fireBg)" stroke="#f97316" stroke-width="2.5" />
+  <circle cx="50" cy="50" r="38" fill="none" stroke="url(#fireCorona)" stroke-width="2.5" stroke-dasharray="12 6" opacity="0.85" />
+  <path d="M44 26 C40 14, 50 8, 50 8 C50 8, 60 14, 56 26 Z" fill="#fbbf24" stroke="#ea580c" stroke-width="1.5" />
+  <rect x="22" y="34" width="56" height="32" rx="16" fill="#dc2626" stroke="#991b1b" stroke-width="2" />
+  <polygon points="50,66 52,73 53,66" fill="#dc2626" />
+  <g transform="translate(34, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <g transform="translate(66, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <path d="M44 58 Q50 64 56 58" fill="none" stroke="#090d16" stroke-width="2.4" stroke-linecap="round" />
+</svg>
+`)}`;
+
+export const VORTEX_TITAN_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="vortexBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#818cf8" />
+      <stop offset="60%" stop-color="#312e81" />
+      <stop offset="100%" stop-color="#090d16" />
+    </radialGradient>
+    <linearGradient id="vortexRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c7d2fe" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="48" fill="url(#vortexBg)" stroke="#818cf8" stroke-width="2.5" />
+  <ellipse cx="50" cy="50" rx="40" ry="18" fill="none" stroke="url(#vortexRing)" stroke-width="2.4" transform="rotate(-25 50 50)" opacity="0.85" />
+  <ellipse cx="50" cy="50" rx="40" ry="18" fill="none" stroke="url(#vortexRing)" stroke-width="2.0" transform="rotate(35 50 50)" opacity="0.7" />
+  <rect x="22" y="34" width="56" height="32" rx="16" fill="#4f46e5" stroke="#3730a3" stroke-width="2" />
+  <polygon points="50,66 52,73 53,66" fill="#4f46e5" />
+  <g transform="translate(34, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <g transform="translate(66, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <path d="M44 58 Q50 64 56 58" fill="none" stroke="#090d16" stroke-width="2.4" stroke-linecap="round" />
+</svg>
+`)}`;
+
 export const HEROES_DATA = [
   {
     id: 'commander_falcon',
@@ -14,11 +74,14 @@ export const HEROES_DATA = [
     type: 'red',
     avatarUrl: char1Url,
     milestoneLevel: 1,
-    abilityName: 'Aero-Wing Glide',
-    abilityDesc: 'Signature aero-stabilized flight with high kinetic impact upon structural collision.',
+    specialPower: 'Aero Kinetic Stability & Timber Demolition',
+    abilityName: 'Aero-Wing Strike',
+    abilityDesc: 'Signature aerodynamic balance and high kinetic impact. Delivers +60% bonus demolition damage against wooden guard posts and timber scaffolds.',
+    recommendedLevels: 'Levels 1–6, 20',
     speed: 88,
     power: 82,
     pierce: 76,
+    claimReward: 100,
     themeColor: '#38bdf8'
   },
   {
@@ -28,11 +91,14 @@ export const HEROES_DATA = [
     type: 'speed',
     avatarUrl: char2Url,
     milestoneLevel: 3,
+    specialPower: 'Supersonic Dash & Glass Penetration',
     abilityName: 'Supersonic Boost',
-    abilityDesc: 'Tap screen mid-flight to ignite plasma thrust, accelerating into a high-penetration drill projectile.',
-    speed: 98,
-    power: 74,
-    pierce: 94,
+    abilityDesc: 'Tap screen mid-flight to ignite high-velocity plasma thrust. Shatters through multi-layer glass structures with 3.2x demolition force.',
+    recommendedLevels: 'Levels 3–15, 20',
+    speed: 99,
+    power: 75,
+    pierce: 96,
+    claimReward: 150,
     themeColor: '#0ea5e9'
   },
   {
@@ -42,11 +108,14 @@ export const HEROES_DATA = [
     type: 'heavy',
     avatarUrl: char3Url,
     milestoneLevel: 5,
-    abilityName: 'Seismic Shockwave',
-    abilityDesc: 'Heavy metallic core. Tap in mid-air or upon impact to trigger a massive 360-degree seismic ground quake.',
+    specialPower: 'Meteor Slam & Foundation Shatter',
+    abilityName: 'Meteor Slam',
+    abilityDesc: 'Heavy 4.8kg density core. Tap mid-flight to plummet vertically at high terminal velocity, triggering seismic shockwaves that crush granite and stone pillars.',
+    recommendedLevels: 'Levels 5–20',
     speed: 64,
     power: 99,
-    pierce: 86,
+    pierce: 88,
+    claimReward: 200,
     themeColor: '#d946ef'
   },
   {
@@ -56,12 +125,49 @@ export const HEROES_DATA = [
     type: 'split',
     avatarUrl: char4Url,
     milestoneLevel: 7,
+    specialPower: 'Tri-Cluster Spread & Multi-Target Swarm',
     abilityName: 'Tri-Cluster Spread',
-    abilityDesc: 'Tap mid-flight to release three synchronized strike birds covering a wide multi-tier blast zone.',
+    abilityDesc: 'Tap mid-flight to multiply into 3 synchronized strike birds in a vertical fanned volley, blanketing multi-tier platforms and wide target arrays.',
+    recommendedLevels: 'Levels 7–15, 17–20',
     speed: 86,
     power: 88,
     pierce: 90,
-    themeColor: '#fbbf24'
+    claimReward: 250,
+    themeColor: '#f59e0b'
+  },
+  {
+    id: 'inferno_flare',
+    name: 'Inferno Flare',
+    archetype: 'Solar Pyre Orb',
+    type: 'fire',
+    avatarUrl: INFERNO_FLARE_AVATAR,
+    milestoneLevel: 11,
+    specialPower: 'Incendiary Detonation & Chain Reactions',
+    abilityName: 'Inferno Burst',
+    abilityDesc: 'Tap mid-flight or on impact to detonate a 3.8-unit thermal fireball blast. Instantly explodes distant TNT vaults, incinerates wood, and melts metal joint connections.',
+    recommendedLevels: 'Levels 11–20',
+    speed: 84,
+    power: 96,
+    pierce: 82,
+    claimReward: 300,
+    themeColor: '#f97316'
+  },
+  {
+    id: 'vortex_titan',
+    name: 'Vortex Titan',
+    archetype: 'Gravitational Singularity',
+    type: 'vortex',
+    avatarUrl: VORTEX_TITAN_AVATAR,
+    milestoneLevel: 16,
+    specialPower: 'Kinetic Implosion & Fortress Repulsion',
+    abilityName: 'Vortex Shockwave',
+    abilityDesc: 'Tap mid-flight or on impact to release a high-frequency gravitational shockwave. Repels reinforced iron girders and stone blocks outward with massive impulse force.',
+    recommendedLevels: 'Levels 16–20',
+    speed: 78,
+    power: 100,
+    pierce: 95,
+    claimReward: 400,
+    themeColor: '#818cf8'
   }
 ];
 
@@ -105,6 +211,38 @@ export const MISSIONS_DATA = [
     target: 5,
     rewardCoins: 250,
     getProgress: (storage) => Math.min(5, storage.getUnlockedLevel())
+  },
+  {
+    id: 'mission_splitter_unlocked',
+    title: 'Cluster Swarm',
+    desc: 'Reach Stage 7 to unlock Splitter Trio tactical character.',
+    target: 7,
+    rewardCoins: 250,
+    getProgress: (storage) => Math.min(7, storage.getUnlockedLevel())
+  },
+  {
+    id: 'mission_inferno_unlocked',
+    title: 'Solar Foundry',
+    desc: 'Reach Stage 11 to unlock Inferno Flare incendiary character.',
+    target: 11,
+    rewardCoins: 300,
+    getProgress: (storage) => Math.min(11, storage.getUnlockedLevel())
+  },
+  {
+    id: 'mission_vortex_unlocked',
+    title: 'Cosmic Singularity',
+    desc: 'Reach Stage 16 to unlock Vortex Titan gravitational character.',
+    target: 16,
+    rewardCoins: 400,
+    getProgress: (storage) => Math.min(16, storage.getUnlockedLevel())
+  },
+  {
+    id: 'mission_grand_champion',
+    title: 'Crown Conqueror',
+    desc: 'Clear Stage 20 and demolish the Emperor\'s Final Fortress.',
+    target: 20,
+    rewardCoins: 600,
+    getProgress: (storage) => (storage.getStarsForLevel(20) > 0 ? 20 : Math.min(19, storage.getUnlockedLevel()))
   }
 ];
 
@@ -582,6 +720,14 @@ export class DashboardModals {
     this.charactersDialog.showModal();
   }
 
+  claimHero(heroId, rewardCoins) {
+    if (this.storage.claimCharacter(heroId, rewardCoins)) {
+      this.audio?.playCoin?.();
+      this.onRefreshHeader?.();
+      this.renderCharactersList();
+    }
+  }
+
   renderCharactersList() {
     const gridEl = document.getElementById('characters-roster-grid');
     const milestoneBannerEl = document.getElementById('modal-milestone-banner');
@@ -594,10 +740,10 @@ export class DashboardModals {
       let nextLockedHero = HEROES_DATA.find((h) => h.milestoneLevel > unlockedLevel);
       let bannerHint = nextLockedHero
         ? `Next Unlock: <strong>${nextLockedHero.name}</strong> at <strong>Level ${nextLockedHero.milestoneLevel}</strong>!`
-        : `All 4 Heroes Unlocked!`;
+        : `All 6 Legendary Birds Unlocked & Ready!`;
 
-      const maxMilestone = 7;
-      const pct = Math.min(100, Math.max(16, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
+      const maxMilestone = 16;
+      const pct = Math.min(100, Math.max(8, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
 
       let nodesHtml = '';
       HEROES_DATA.forEach((hero) => {
@@ -622,7 +768,7 @@ export class DashboardModals {
       milestoneBannerEl.innerHTML = `
         <div class="modal-milestone-info">
           <div class="milestone-banner-top">
-            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES</span>
+            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES (LEVELS 1–20)</span>
             <span class="milestones-next-teaser">${bannerHint}</span>
           </div>
           <div class="milestones-track-container modal-track">
@@ -637,13 +783,39 @@ export class DashboardModals {
       `;
     }
 
-
     let html = '';
     HEROES_DATA.forEach((hero) => {
       const isUnlocked = unlockedLevel >= hero.milestoneLevel;
-      const statusPill = isUnlocked
-        ? `<span class="hero-status-pill unlocked"><svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> UNLOCKED</span>`
-        : `<span class="hero-status-pill locked"><svg class="lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg> UNLOCKS AT LEVEL ${hero.milestoneLevel}</span>`;
+      const isClaimed = this.storage.hasClaimedCharacter(hero.id);
+
+      let statusPill = '';
+      let actionFooterHtml = '';
+
+      if (!isUnlocked) {
+        statusPill = `<span class="hero-status-pill locked"><svg class="lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg> UNLOCKS AT LEVEL ${hero.milestoneLevel}</span>`;
+        actionFooterHtml = `
+          <div class="hero-locked-tag">
+            <svg class="lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+            <span>Complete Stage ${hero.milestoneLevel} to Recruit</span>
+          </div>
+        `;
+      } else if (!isClaimed) {
+        statusPill = `<span class="hero-status-pill ready-claim"><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> UNLOCKED • CLAIM BONUS</span>`;
+        actionFooterHtml = `
+          <button type="button" class="btn-hero-claim ready" data-hero-id="${hero.id}" data-reward="${hero.claimReward}">
+            <span class="btn-claim-text">CLAIM HERO BONUS</span>
+            <span class="btn-claim-reward">+${hero.claimReward} <img class="coin-icon-mini" src="${coinLogoUrl}" alt="Coin" /></span>
+          </button>
+        `;
+      } else {
+        statusPill = `<span class="hero-status-pill unlocked"><svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> ACTIVE IN SQUAD</span>`;
+        actionFooterHtml = `
+          <div class="hero-claimed-tag">
+            <svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>UNLOCKED &amp; READY IN BATTLE</span>
+          </div>
+        `;
+      }
 
       html += `
         <article class="hero-collection-card ${isUnlocked ? 'unlocked-card' : 'locked-card'}" style="--hero-color: ${hero.themeColor};">
@@ -660,7 +832,15 @@ export class DashboardModals {
               ${statusPill}
             </div>
 
-            <h3 class="hero-display-name">${hero.name}</h3>
+            <div class="hero-title-group">
+              <h3 class="hero-display-name">${hero.name}</h3>
+              <span class="hero-rec-tag">🎯 ${hero.recommendedLevels}</span>
+            </div>
+
+            <div class="hero-power-row">
+              <span class="power-label">POWER</span>
+              <span class="power-val">${hero.specialPower}</span>
+            </div>
 
             <div class="hero-ability-box">
               <span class="ability-title">
@@ -684,11 +864,25 @@ export class DashboardModals {
                 <div class="stat-track"><div class="stat-fill" style="width: ${hero.pierce}%;"></div></div>
               </div>
             </div>
+
+            <div class="hero-card-footer">
+              ${actionFooterHtml}
+            </div>
           </div>
         </article>
       `;
     });
 
     gridEl.innerHTML = html;
+
+    // Attach click events to claim buttons
+    gridEl.querySelectorAll('.btn-hero-claim.ready').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const targetBtn = e.currentTarget;
+        const heroId = targetBtn.dataset.heroId;
+        const reward = Number(targetBtn.dataset.reward) || 0;
+        this.claimHero(heroId, reward);
+      });
+    });
   }
 }

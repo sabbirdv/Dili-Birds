@@ -305,40 +305,283 @@ function createSculptedWings(scale = 1.0, color = 0x2952ff) {
 }
 
 /**
- * Creates a full 3D Bird model accurately sculpted to match the custom character images:
- * - 'red' (matches character.png & sub-character-4.png): Winged Blue Dili-Bird with 3D swept wings & aura orb
- * - 'speed' (matches character-2.png): Electric Blue 3D Glass Energy Orb with internal energy filaments & 3D pill character
- * - 'heavy' (matches character-3.png & sub-character-3.png): Metallic Magenta 3D Glass Energy Orb with plasma rings & 3D pill character
+ * Creates aerodynamic speed fins for 'speed' (Speedster Swift).
+ */
+function createSpeedFins(scale = 1.0, color = 0x0ea5e9) {
+  const group = new THREE.Group();
+  const finMat = new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.22,
+    metalness: 0.25
+  });
+
+  [-1, 1].forEach((side) => {
+    const shape = new THREE.Shape();
+    shape.moveTo(0, -0.06 * scale);
+    shape.lineTo(side * 0.38 * scale, -0.02 * scale);
+    shape.lineTo(side * 0.46 * scale, 0.16 * scale);
+    shape.lineTo(0, 0.08 * scale);
+    shape.closePath();
+
+    const geo = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.08 * scale,
+      bevelEnabled: true,
+      bevelThickness: 0.02 * scale,
+      bevelSize: 0.015 * scale,
+      bevelSegments: 4
+    });
+    geo.center();
+
+    const mesh = new THREE.Mesh(geo, finMat);
+    mesh.position.set(side * 0.65 * scale, 0.05 * scale, 0);
+    mesh.rotation.z = side * -0.25;
+    mesh.castShadow = true;
+    group.add(mesh);
+  });
+
+  return group;
+}
+
+/**
+ * Creates 3 orbiting satellite energy clusters for 'split' (Splitter Trio).
+ */
+function createSplitSatellites(radius, scale) {
+  const group = new THREE.Group();
+  const satMat = new THREE.MeshStandardMaterial({
+    color: 0xfbbf24,
+    emissive: 0xd97706,
+    emissiveIntensity: 0.35,
+    roughness: 0.2,
+    metalness: 0.1
+  });
+  const satGeo = new THREE.SphereGeometry(0.09 * scale, 12, 12);
+
+  // 3 satellite orbs positioned symmetrically at 120-degree intervals around outer rim
+  for (let i = 0; i < 3; i++) {
+    const angle = (i * Math.PI * 2) / 3 + 0.5;
+    const orb = new THREE.Mesh(satGeo, satMat);
+    orb.position.set(
+      Math.cos(angle) * radius * 0.95,
+      Math.sin(angle) * radius * 0.95,
+      (i % 2 === 0 ? 0.06 : -0.06) * scale
+    );
+    group.add(orb);
+  }
+
+  // Small golden crown crest feather
+  const crestMat = new THREE.MeshStandardMaterial({
+    color: 0xf59e0b,
+    roughness: 0.25,
+    metalness: 0.15
+  });
+  const crestShape = new THREE.Shape();
+  crestShape.moveTo(-0.06 * scale, 0);
+  crestShape.lineTo(0, 0.22 * scale);
+  crestShape.lineTo(0.06 * scale, 0);
+  crestShape.closePath();
+  const crestGeo = new THREE.ExtrudeGeometry(crestShape, {
+    depth: 0.06 * scale,
+    bevelEnabled: true,
+    bevelThickness: 0.015 * scale,
+    bevelSize: 0.01 * scale,
+    bevelSegments: 3
+  });
+  crestGeo.center();
+  const crestMesh = new THREE.Mesh(crestGeo, crestMat);
+  crestMesh.position.set(0, radius * 0.88, 0);
+  group.add(crestMesh);
+
+  return group;
+}
+
+/**
+ * Creates stylized flame crest plume and solar corona ring for 'fire' (Inferno Flare).
+ */
+function createFlameAccents(radius, scale) {
+  const group = new THREE.Group();
+  const flameMat = new THREE.MeshStandardMaterial({
+    color: 0xf97316,
+    emissive: 0xe11d48,
+    emissiveIntensity: 0.4,
+    roughness: 0.25,
+    metalness: 0.1
+  });
+
+  // Sculpted flame crest plume on top of the head
+  const fShape = new THREE.Shape();
+  fShape.moveTo(-0.08 * scale, 0);
+  fShape.quadraticCurveTo(-0.12 * scale, 0.18 * scale, 0, 0.32 * scale);
+  fShape.quadraticCurveTo(0.12 * scale, 0.18 * scale, 0.08 * scale, 0);
+  fShape.closePath();
+
+  const fGeo = new THREE.ExtrudeGeometry(fShape, {
+    depth: 0.08 * scale,
+    bevelEnabled: true,
+    bevelThickness: 0.02 * scale,
+    bevelSize: 0.015 * scale,
+    bevelSegments: 4
+  });
+  fGeo.center();
+
+  const fMesh = new THREE.Mesh(fGeo, flameMat);
+  fMesh.position.set(0, radius * 0.92, 0);
+  group.add(fMesh);
+
+  // Solar Corona Plasma Torus
+  const coronaMat = new THREE.MeshBasicMaterial({
+    color: 0xfde047,
+    transparent: true,
+    opacity: 0.55
+  });
+  const coronaTorus = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.9, 0.022 * scale, 8, 32),
+    coronaMat
+  );
+  coronaTorus.rotation.set(0.4, 0.2, 0);
+  group.add(coronaTorus);
+
+  return group;
+}
+
+/**
+ * Creates dual-axis anti-gravity gyroscopic rings for 'vortex' (Vortex Titan).
+ */
+function createVortexAccents(radius, scale) {
+  const group = new THREE.Group();
+  const vortexMat = new THREE.MeshStandardMaterial({
+    color: 0x818cf8,
+    emissive: 0x4338ca,
+    emissiveIntensity: 0.45,
+    roughness: 0.18,
+    metalness: 0.5
+  });
+
+  // Concentric dual-axis gyroscopic anti-gravity rings
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.92, 0.022 * scale, 8, 36),
+    vortexMat
+  );
+  ring1.rotation.set(0.85, 0.3, 0.2);
+  group.add(ring1);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.88, 0.018 * scale, 8, 36),
+    vortexMat
+  );
+  ring2.rotation.set(-0.7, 0.4, -0.6);
+  group.add(ring2);
+
+  // Subtle geometric energy node pips along the equator
+  const pipGeo = new THREE.SphereGeometry(0.06 * scale, 8, 8);
+  [-1, 1].forEach((dir) => {
+    const pip = new THREE.Mesh(pipGeo, vortexMat);
+    pip.position.set(dir * radius * 0.96, 0, 0);
+    group.add(pip);
+  });
+
+  return group;
+}
+
+/**
+ * Creates a full 3D Bird model accurately sculpted to match the custom character system:
+ * - 'red' (Commander Falcon): Winged Blue Dili-Bird with 3D swept wings & aero stability orb
+ * - 'speed' (Speedster Swift): Electric Blue 3D Glass Energy Orb with aerodynamic twin fins & sonic filaments
+ * - 'heavy' (Bomber Titan): Metallic Magenta 3D Glass Energy Orb with dense plasma rings & seismic core
+ * - 'split' (Splitter Trio): Radiant Golden Amber Orb with orbiting tri-satellite cluster orbs & crest
+ * - 'fire' (Inferno Flare): Blazing Crimson Solar Pyre Orb with sculpted flame plume & solar corona
+ * - 'vortex' (Vortex Titan): Deep Cosmic Indigo Orb with dual-axis gyroscopic anti-gravity rings
+ *
+ * NOTE: The fundamental character identity (speech-bubble pill shape, chevron-diamond eyes, and U-smile)
+ * is 100% FIXED and preserved across all bird variants.
  */
 export function createBirdMesh(type = 'red') {
   const group = new THREE.Group();
-  const radius = type === 'heavy' ? 0.54 : type === 'speed' ? 0.44 : 0.46;
+
+  const BIRD_CONFIGS = {
+    red: {
+      radius: 0.46,
+      bodyColor: 0x2546f0,
+      metalness: 0.18,
+      roughness: 0.24,
+      orbColor: 0x38bdf8,
+      orbEmissive: 0x0284c7,
+      orbOpacity: 0.36,
+      ringColor: 0xbae6fd
+    },
+    speed: {
+      radius: 0.44,
+      bodyColor: 0x0284c7,
+      metalness: 0.22,
+      roughness: 0.18,
+      orbColor: 0x38bdf8,
+      orbEmissive: 0x0ea5e9,
+      orbOpacity: 0.42,
+      ringColor: 0xe0f2fe
+    },
+    heavy: {
+      radius: 0.54,
+      bodyColor: 0x9d176d,
+      metalness: 0.55,
+      roughness: 0.18,
+      orbColor: 0xd946ef,
+      orbEmissive: 0x86198f,
+      orbOpacity: 0.44,
+      ringColor: 0xf5d0fe
+    },
+    split: {
+      radius: 0.44,
+      bodyColor: 0xd97706,
+      metalness: 0.22,
+      roughness: 0.20,
+      orbColor: 0xfbbf24,
+      orbEmissive: 0xb45309,
+      orbOpacity: 0.40,
+      ringColor: 0xfef08a
+    },
+    fire: {
+      radius: 0.48,
+      bodyColor: 0xdc2626,
+      metalness: 0.24,
+      roughness: 0.20,
+      orbColor: 0xf97316,
+      orbEmissive: 0xc2410c,
+      orbOpacity: 0.46,
+      ringColor: 0xfed7aa
+    },
+    vortex: {
+      radius: 0.50,
+      bodyColor: 0x4f46e5,
+      metalness: 0.45,
+      roughness: 0.18,
+      orbColor: 0x818cf8,
+      orbEmissive: 0x3730a3,
+      orbOpacity: 0.44,
+      ringColor: 0xc7d2fe
+    }
+  };
+
+  const cfg = BIRD_CONFIGS[type] || BIRD_CONFIGS.red;
+  const radius = cfg.radius;
   const scale = radius / 0.74;
 
-  const isMagenta = type === 'heavy';
-  const isWinged = type === 'red';
-
-  // 1. Inner 3D Sculpted Speech-Bubble Pill Character (with 3D chevron-diamond eyes & U-smile)
+  // 1. Inner 3D Sculpted Speech-Bubble Pill Character (Fixed: chevron-diamond eyes & U-smile)
   const coreBody = createSculptedSpeechBubbleCore({
     scale: scale * 0.88,
-    bodyColor: isMagenta ? 0x9d176d : 0x2546f0,
-    metalness: isMagenta ? 0.55 : 0.18,
-    roughness: isMagenta ? 0.18 : 0.24,
+    bodyColor: cfg.bodyColor,
+    metalness: cfg.metalness,
+    roughness: cfg.roughness,
     eyeStyle: 'chevron',
     isFluffy: false
   });
   group.add(coreBody);
 
-  // 2. Outer 3D Translucent Glassy Energy Sphere (matches character-2.png, character-3.png, character.png)
-  const orbColor = isMagenta ? 0xd946ef : 0x38bdf8;
-  const orbEmissive = isMagenta ? 0x86198f : 0x0284c7;
-
+  // 2. Outer 3D Translucent Glassy Energy Sphere
   const glassOrbMat = new THREE.MeshPhysicalMaterial({
-    color: orbColor,
-    emissive: orbEmissive,
-    emissiveIntensity: 0.18,
+    color: cfg.orbColor,
+    emissive: cfg.orbEmissive,
+    emissiveIntensity: 0.20,
     transparent: true,
-    opacity: isWinged ? 0.36 : 0.42,
+    opacity: cfg.orbOpacity,
     roughness: 0.08,
     metalness: 0.05,
     transmission: 0.45,
@@ -349,9 +592,9 @@ export function createBirdMesh(type = 'red') {
   const outerOrb = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 24), glassOrbMat);
   group.add(outerOrb);
 
-  // 3. Internal 3D Energy Filaments / Swirl Rings inside the orb (matching character-2.png & character-3.png)
+  // 3. Internal 3D Energy Filaments / Swirl Rings inside the orb
   const ringMat = new THREE.MeshBasicMaterial({
-    color: isMagenta ? 0xf5d0fe : 0xbae6fd,
+    color: cfg.ringColor,
     transparent: true,
     opacity: 0.42
   });
@@ -369,10 +612,27 @@ export function createBirdMesh(type = 'red') {
   ring2.rotation.set(-0.6, 0.3, -0.4);
   group.add(ring2);
 
-  // 4. For 'red' (character.png), add the 3D sculpted swept side wings
-  if (isWinged) {
+  // 4. Character-Specific Accents & Distinct Ability Visual Language
+  if (type === 'red') {
+    // 3D sculpted swept aerodynamic side wings
     const wings = createSculptedWings(scale, 0x2546f0);
     group.add(wings);
+  } else if (type === 'speed') {
+    // Aerodynamic twin winglets / fins
+    const speedFins = createSpeedFins(scale, 0x0ea5e9);
+    group.add(speedFins);
+  } else if (type === 'split') {
+    // 3 orbiting satellite cluster orbs + golden feather crest
+    const splitAccents = createSplitSatellites(radius, scale);
+    group.add(splitAccents);
+  } else if (type === 'fire') {
+    // Flame crest plume + solar corona torus
+    const flameAccents = createFlameAccents(radius, scale);
+    group.add(flameAccents);
+  } else if (type === 'vortex') {
+    // Dual-axis gyroscopic anti-gravity rings
+    const vortexAccents = createVortexAccents(radius, scale);
+    group.add(vortexAccents);
   }
 
   group.userData = { radius, type };
@@ -386,22 +646,36 @@ export function createBirdMesh(type = 'red') {
  * - 3D white diamond eye bases with 3D extruded pink heart pupils
  * - 3D black round O-mouth
  */
-export function createTargetMesh(radius = 0.44, isBoss = false) {
+export function createTargetMesh(radius = 0.44, isBoss = false, targetType = 'blue') {
   const group = new THREE.Group();
   const effectiveRadius = radius || (isBoss ? 0.58 : 0.44);
   const scale = (effectiveRadius / 0.72) * (isBoss ? 1.08 : 1.0);
 
+  let bodyColor = 0x2563eb;
+  let isFluffy = Boolean(isBoss);
+
+  if (targetType === 'pink') {
+    bodyColor = 0xec4899;
+  } else if (targetType === 'gold' || targetType === 'yellow') {
+    bodyColor = 0xf59e0b;
+  } else if (targetType === 'boss' || isBoss) {
+    bodyColor = 0x4f46e5;
+    isFluffy = true;
+  } else {
+    bodyColor = 0x2563eb;
+  }
+
   const core = createSculptedSpeechBubbleCore({
     scale,
-    bodyColor: isBoss ? 0x3b66f5 : 0x2546f0,
+    bodyColor,
     metalness: 0.08,
     roughness: isBoss ? 0.82 : 0.58, // Velvet / plush finish matching sub-character.png & sub-character-2.png
     eyeStyle: 'heart',
-    isFluffy: isBoss // Boss targets get the 3D fluffy plush tuft silhouette from sub-character.png
+    isFluffy
   });
 
   group.add(core);
-  group.userData = { radius: effectiveRadius, isBoss };
+  group.userData = { radius: effectiveRadius, isBoss, targetType };
   return group;
 }
 

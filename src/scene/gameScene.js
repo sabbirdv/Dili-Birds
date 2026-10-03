@@ -15,7 +15,11 @@ export class GameScene {
     onShowAbilityPrompt,
     onHideAbilityPrompt,
     onToast,
-    onLevelComplete
+    onLevelComplete,
+    onBirdReady,
+    onBirdLaunch,
+    onAbilityUsed,
+    onBirdReset
   }) {
     this.container = container;
     this.storage = storage;
@@ -27,6 +31,10 @@ export class GameScene {
     this.onHideAbilityPrompt = onHideAbilityPrompt;
     this.onToast = onToast;
     this.onLevelComplete = onLevelComplete;
+    this.onBirdReady = onBirdReady;
+    this.onBirdLaunch = onBirdLaunch;
+    this.onAbilityUsed = onAbilityUsed;
+    this.onBirdReset = onBirdReset;
 
     // Collections of active physics/visual objects
     this.blocks = [];
@@ -34,6 +42,7 @@ export class GameScene {
     this.particles = [];
     this.waitingBirdMeshes = [];
     this.birdsQueue = [];
+    this.secondaryBirds = [];
 
     this.activeBird = null; // { mesh, body, type, abilityUsed, launchTime }
     this.currentLevel = null;
@@ -284,7 +293,7 @@ export class GameScene {
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     groundBody.addEventListener('collide', (event) => {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
-      if (event.body === this.activeBird?.body) {
+      if (this.isBirdBody(event.body)) {
         this.audio?.stopFlightSound?.();
       }
       if (normalImpact > 1.2) {
@@ -580,8 +589,11 @@ export class GameScene {
     });
 
     // 2. Spawn Enemy Targets (strictly on z = 0 plane)
-    levelConfig.targets.forEach((tCfg) => {
-      this.spawnTarget(tCfg);
+    this.initialTargetsByType = {};
+    levelConfig.targets.forEach((tCfg, idx) => {
+      const type = tCfg.birdType || tCfg.type || (tCfg.isBoss ? 'boss' : ['blue', 'pink', 'gold'][idx % 3]);
+      this.initialTargetsByType[type] = (this.initialTargetsByType[type] || 0) + 1;
+      this.spawnTarget(tCfg, idx);
     });
 
     // 3. Prepare Bird Queue & Active Slingshot Bird
@@ -619,8 +631,25 @@ export class GameScene {
     if (this.activeBird?.mesh) {
       this.activeBird.mesh.visible = !isDashboard;
     }
+    if (isDashboard) {
+      this.onBirdReset?.();
+    }
   }
 
+
+  isBirdBody(body) {
+    if (!body) return false;
+    if (this.activeBird && this.activeBird.body === body) return true;
+    if (this.secondaryBirds && this.secondaryBirds.some((sb) => sb.body === body)) return true;
+    return false;
+  }
+
+  getBirdTypeForBody(body) {
+    if (this.activeBird && this.activeBird.body === body) return this.activeBird.type;
+    const found = this.secondaryBirds?.find((sb) => sb.body === body);
+    if (found) return found.type;
+    return this.activeBird?.type || 'red';
+  }
 
   clearLevelEntities() {
     if (this.activeBird) {
@@ -629,6 +658,14 @@ export class GameScene {
         this.world.removeBody(this.activeBird.body);
       }
       this.activeBird = null;
+    }
+
+    if (this.secondaryBirds) {
+      this.secondaryBirds.forEach((sb) => {
+        this.scene.remove(sb.mesh);
+        if (sb.body) this.world.removeBody(sb.body);
+      });
+      this.secondaryBirds = [];
     }
 
     this.waitingBirdMeshes.forEach((m) => this.scene.remove(m));
@@ -741,7 +778,7 @@ export class GameScene {
     body.addEventListener('collide', (event) => {
       if (!this.isPlayingLevel || blockObj.destroyed || !this.hasBirdLaunched) return;
 
-      const isBirdHit = event.body === this.activeBird?.body;
+      const isBirdHit = this.isBirdBody(event.body);
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       const now = performance.now();
 
@@ -760,6 +797,15 @@ export class GameScene {
           this.wakeAllStructures();
         }
 
+        const birdType = this.getBirdTypeForBody(event.body);
+
+        // Fire bird direct impact on TNT causes instant detonation
+        if (birdType === 'fire' && blockObj.type === 'tnt') {
+          blockObj.lastHitTime = now;
+          this.destroyBlock(blockObj);
+          return;
+        }
+
         // Light graze or glancing collision (< 1.8 normal impact) deals zero damage
         if (normalImpact < 1.8) {
           this.audio?.playMaterialImpact(blockObj.type, 0.15);
@@ -768,12 +814,20 @@ export class GameScene {
 
         blockObj.lastHitTime = now;
 
-        const birdType = this.activeBird?.type || 'red';
+        // Strategic material effectiveness matrix
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.5 : 1.0;
+          birdMultiplier = blockObj.type === 'glass' ? 3.2 : blockObj.type === 'wood' ? 1.4 : 0.8;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.3 : blockObj.type === 'metal' ? 2.4 : 1.8;
+          birdMultiplier = blockObj.type === 'stone' ? 2.6 : blockObj.type === 'metal' ? 2.5 : 1.8;
+        } else if (birdType === 'red') {
+          birdMultiplier = blockObj.type === 'wood' ? 1.6 : 1.0;
+        } else if (birdType === 'split') {
+          birdMultiplier = blockObj.type === 'glass' ? 1.8 : blockObj.type === 'wood' ? 1.4 : 1.0;
+        } else if (birdType === 'fire') {
+          birdMultiplier = blockObj.type === 'wood' ? 2.8 : blockObj.type === 'glass' ? 2.2 : blockObj.type === 'tnt' ? 4.0 : 1.5;
+        } else if (birdType === 'vortex') {
+          birdMultiplier = blockObj.type === 'metal' ? 2.4 : blockObj.type === 'stone' ? 2.2 : 1.6;
         }
 
         // Damage derived from normal impact collision force
@@ -814,11 +868,15 @@ export class GameScene {
     this.blocks.push(blockObj);
   }
 
-  spawnTarget(cfg) {
+  spawnTarget(cfg, targetIndex = 0) {
     const { pos, isBoss = false } = cfg;
+    let birdType = cfg.birdType || cfg.type;
+    if (!birdType) {
+      birdType = isBoss ? 'boss' : ['blue', 'pink', 'gold'][targetIndex % 3];
+    }
     const radius = cfg.radius || (isBoss ? 0.58 : 0.44);
     const alignedPos = [pos[0], pos[1], 0];
-    const mesh = createTargetMesh(radius, isBoss);
+    const mesh = createTargetMesh(radius, isBoss, birdType);
     mesh.position.set(...alignedPos);
     // Face directly toward the 2D camera
     mesh.rotation.set(0, 0, 0);
@@ -844,6 +902,7 @@ export class GameScene {
       body,
       radius,
       isBoss,
+      birdType,
       hp: isBoss ? 26 : 14,
       destroyed: false,
       lastHitTime: 0
@@ -852,7 +911,7 @@ export class GameScene {
     body.addEventListener('collide', (event) => {
       if (!this.isPlayingLevel || targetObj.destroyed || !this.hasBirdLaunched) return;
 
-      const isBirdHit = event.body === this.activeBird?.body;
+      const isBirdHit = this.isBirdBody(event.body);
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       const now = performance.now();
 
@@ -893,6 +952,7 @@ export class GameScene {
 
     if (this.birdsQueue.length === 0) {
       this.activeBird = null;
+      this.onBirdReset?.();
       return;
     }
 
@@ -911,6 +971,11 @@ export class GameScene {
     this.slingshot.mountBird(birdMesh);
     if (!this.isPlayingLevel) {
       this.slingshot.canInteract = false;
+    } else if (!this.isDashboardMode) {
+      this.onBirdReady?.({
+        birdType: nextType,
+        hasActiveAbility: nextType !== 'red'
+      });
     }
 
     // Render remaining birds lined up behind the slingshot strictly on z = 0
@@ -941,7 +1006,15 @@ export class GameScene {
     this.focusTimer = 0;
 
     const radius = this.activeBird.mesh.userData.radius || 0.46;
-    const mass = this.activeBird.type === 'heavy' ? 4.8 : 2.5;
+    const massMap = {
+      red: 2.5,
+      speed: 2.2,
+      heavy: 4.8,
+      split: 2.4,
+      fire: 2.8,
+      vortex: 3.8
+    };
+    const mass = massMap[this.activeBird.type] || 2.5;
 
     const body = new CANNON.Body({
       mass,
@@ -962,31 +1035,219 @@ export class GameScene {
     this.activeBird.launchTime = performance.now();
     this.audio?.startFlightSound?.();
 
-    if (this.activeBird.type === 'speed') {
-      this.onShowAbilityPrompt?.('⚡ Tap or Click in mid-flight for Turbo Speed Boost!');
-    } else if (this.activeBird.type === 'heavy') {
-      this.onShowAbilityPrompt?.('💣 Tap or Click in mid-flight for Meteor Slam!');
+    this.onBirdLaunch?.({
+      birdType: this.activeBird.type,
+      hasActiveAbility: this.activeBird.type !== 'red'
+    });
+
+    const prompts = {
+      speed: '⚡ Tap or Click mid-flight for Supersonic Boost!',
+      heavy: '💣 Tap or Click mid-flight for Meteor Slam!',
+      split: '✨ Tap or Click mid-flight for Tri-Cluster Split!',
+      fire: '🔥 Tap or Click mid-flight for Inferno Burst!',
+      vortex: '🌀 Tap or Click mid-flight for Vortex Shockwave!'
+    };
+    if (prompts[this.activeBird.type]) {
+      this.onShowAbilityPrompt?.(prompts[this.activeBird.type]);
     }
   }
 
   triggerBirdAbility() {
     if (!this.activeBird || !this.activeBird.body || this.activeBird.abilityUsed) return;
 
-    if (this.activeBird.type === 'speed') {
+    this.onAbilityUsed?.({
+      birdType: this.activeBird.type
+    });
+
+    const bType = this.activeBird.type;
+    const pos = this.activeBird.mesh.position.clone();
+
+    if (bType === 'speed') {
       this.activeBird.abilityUsed = true;
-      this.audio?.playBoost();
-      this.activeBird.body.velocity.x *= 1.75;
+      this.audio?.playBoost?.();
+      this.activeBird.body.velocity.x *= 1.85;
       this.activeBird.body.velocity.y *= 1.1;
-      this.spawnBurstParticles(this.activeBird.mesh.position, 0x38bdf8, 16);
+      this.spawnBurstParticles(pos, 0x38bdf8, 18);
       this.onHideAbilityPrompt?.();
-    } else if (this.activeBird.type === 'heavy') {
+    } else if (bType === 'heavy') {
       this.activeBird.abilityUsed = true;
-      this.audio?.playBoost();
-      this.activeBird.body.velocity.x *= 1.2;
+      this.audio?.playBoost?.();
+      this.activeBird.body.velocity.x *= 1.15;
       this.activeBird.body.velocity.y = -22.0;
-      this.spawnBurstParticles(this.activeBird.mesh.position, 0xd946ef, 18);
+      this.spawnBurstParticles(pos, 0xd946ef, 20);
       this.onHideAbilityPrompt?.();
+    } else if (bType === 'split') {
+      this.onHideAbilityPrompt?.();
+      this.triggerSplitAbility();
+    } else if (bType === 'fire') {
+      this.activeBird.abilityUsed = true;
+      this.onHideAbilityPrompt?.();
+      this.detonateThermalBlast(pos);
+    } else if (bType === 'vortex') {
+      this.activeBird.abilityUsed = true;
+      this.onHideAbilityPrompt?.();
+      this.triggerVortexShockwave(pos);
     }
+  }
+
+  triggerSplitAbility() {
+    if (!this.activeBird || !this.activeBird.body) return;
+    this.activeBird.abilityUsed = true;
+    this.audio?.playBoost?.();
+
+    const pos = this.activeBird.mesh.position.clone();
+    const currentVel = this.activeBird.body.velocity;
+    this.spawnBurstParticles(pos, 0xfbbf24, 20);
+
+    // Center bird surges forward
+    currentVel.x *= 1.12;
+
+    if (!this.secondaryBirds) this.secondaryBirds = [];
+
+    const offsets = [
+      { vy: currentVel.y + 5.5, dy: 0.28 },
+      { vy: currentVel.y - 5.5, dy: -0.28 }
+    ];
+
+    offsets.forEach((off) => {
+      const subMesh = createBirdMesh('split');
+      subMesh.scale.setScalar(0.85);
+      subMesh.position.set(pos.x, pos.y + off.dy, 0);
+      this.scene.add(subMesh);
+
+      const subBody = new CANNON.Body({
+        mass: 1.8,
+        shape: new CANNON.Sphere(0.38),
+        position: new CANNON.Vec3(pos.x, pos.y + off.dy, 0),
+        velocity: new CANNON.Vec3(currentVel.x * 1.02, off.vy, 0),
+        material: this.defaultMaterial,
+        linearDamping: 0.01,
+        angularDamping: 0.08,
+        linearFactor: new CANNON.Vec3(1, 1, 0),
+        angularFactor: new CANNON.Vec3(0, 0, 1)
+      });
+      this.world.addBody(subBody);
+
+      this.secondaryBirds.push({
+        mesh: subMesh,
+        body: subBody,
+        type: 'split',
+        launchTime: performance.now()
+      });
+    });
+  }
+
+  detonateThermalBlast(origin) {
+    this.audio?.playExplosion?.();
+    this.createModernExplosion(origin);
+    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.6);
+    this.wakeAllStructures();
+
+    const blastRadius = 3.8;
+    [...this.blocks].forEach((b) => {
+      if (b.destroyed || !b.body) return;
+      const bPos = b.body.position;
+      const dist = Math.hypot(bPos.x - origin.x, bPos.y - origin.y);
+      if (dist < blastRadius) {
+        b.body.wakeUp();
+        if (b.type === 'tnt') {
+          this.destroyBlock(b);
+        } else {
+          const falloff = 1 - dist / blastRadius;
+          const dmg = falloff * (b.type === 'wood' ? 65 : b.type === 'glass' ? 50 : 35);
+          b.hp -= dmg;
+          const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
+          if (impulseDir.length() > 0.01) {
+            impulseDir.normalize();
+            b.body.applyImpulse(impulseDir.scale(falloff * 14), bPos);
+          }
+          if (b.hp <= 0) {
+            this.destroyBlock(b);
+          }
+        }
+      }
+    });
+
+    [...this.targets].forEach((t) => {
+      if (t.destroyed || !t.body) return;
+      const tPos = t.body.position;
+      const dist = Math.hypot(tPos.x - origin.x, tPos.y - origin.y);
+      if (dist < blastRadius) {
+        t.body.wakeUp();
+        const falloff = 1 - dist / blastRadius;
+        t.hp -= falloff * 30;
+        const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
+        if (impulseDir.length() > 0.01) {
+          impulseDir.normalize();
+          t.body.applyImpulse(impulseDir.scale(falloff * 12), tPos);
+        }
+        if (t.hp <= 0) {
+          this.defeatTarget(t);
+        }
+      }
+    });
+  }
+
+  triggerVortexShockwave(origin) {
+    this.audio?.playExplosion?.();
+    this.spawnVortexFX(origin);
+    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.75);
+    this.wakeAllStructures();
+
+    const shockwaveRadius = 5.8;
+    [...this.blocks].forEach((b) => {
+      if (b.destroyed || !b.body) return;
+      const bPos = b.body.position;
+      const dist = Math.hypot(bPos.x - origin.x, bPos.y - origin.y);
+      if (dist < shockwaveRadius && dist > 0.08) {
+        b.body.wakeUp();
+        const falloff = 1 - dist / shockwaveRadius;
+        const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0).unit();
+        b.body.applyImpulse(impulseDir.scale(falloff * 24), bPos);
+        b.hp -= falloff * 25;
+        if (b.hp <= 0) {
+          this.destroyBlock(b);
+        }
+      }
+    });
+
+    [...this.targets].forEach((t) => {
+      if (t.destroyed || !t.body) return;
+      const tPos = t.body.position;
+      const dist = Math.hypot(tPos.x - origin.x, tPos.y - origin.y);
+      if (dist < shockwaveRadius && dist > 0.08) {
+        t.body.wakeUp();
+        const falloff = 1 - dist / shockwaveRadius;
+        const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0).unit();
+        t.body.applyImpulse(impulseDir.scale(falloff * 20), tPos);
+        t.hp -= falloff * 20;
+        if (t.hp <= 0) {
+          this.defeatTarget(t);
+        }
+      }
+    });
+  }
+
+  spawnVortexFX(origin) {
+    const shockwaveMat = new THREE.MeshBasicMaterial({
+      color: 0x818cf8,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false
+    });
+    const mesh = new THREE.Mesh(this.sharedShockwaveGeo, shockwaveMat);
+    mesh.position.set(origin.x, origin.y, 0.1);
+    this.scene.add(mesh);
+    this.particles.push({
+      type: 'shockwave',
+      mesh,
+      baseScale: 0.3,
+      maxExpansion: 6.2,
+      baseOpacity: 0.9,
+      life: 1.0,
+      decay: 2.2
+    });
+    this.spawnBurstParticles(origin, 0xa5b4fc, 24);
   }
 
   destroyBlock(blockObj) {
@@ -1477,7 +1738,15 @@ export class GameScene {
       this.levelCoinsEarned += coinBounty;
     }
 
-    this.spawnBurstParticles(pos, 0x38bdf8, 18);
+    const burstColor =
+      targetObj.birdType === 'pink'
+        ? 0xec4899
+        : targetObj.birdType === 'gold' || targetObj.birdType === 'yellow'
+        ? 0xfbbf24
+        : targetObj.birdType === 'boss'
+        ? 0x818cf8
+        : 0x38bdf8;
+    this.spawnBurstParticles(pos, burstColor, 20);
     this.emitHudStats();
   }
 
@@ -1508,8 +1777,22 @@ export class GameScene {
   }
 
   emitHudStats() {
+    if (!this.isPlayingLevel || this.isDashboardMode) {
+      return;
+    }
+
+    const targetsByType = {};
+    this.targets.forEach((t) => {
+      if (!t.destroyed) {
+        const type = t.birdType || 'blue';
+        targetsByType[type] = (targetsByType[type] || 0) + 1;
+      }
+    });
+
     this.onStatsChange?.({
       targetsLeft: this.targets.length,
+      targetsByType,
+      initialTargetsByType: this.initialTargetsByType || {},
       birdsQueue: this.birdsQueue,
       score: this.score
     });
@@ -1564,21 +1847,44 @@ export class GameScene {
       return;
     }
 
-    // Check if the currently launched bird has finished its flight
+    // Check if the currently launched bird and any split projectiles have finished their flight
     if (this.activeBird && this.activeBird.body) {
       const bBody = this.activeBird.body;
       const speed = bBody.velocity.length();
       const flightDuration = (performance.now() - this.activeBird.launchTime) / 1000;
-      const outOfBounds =
+      const mainOutOfBounds =
         bBody.position.y < -1.8 || bBody.position.x > 28 || bBody.position.x < -24;
+      const mainSettled = mainOutOfBounds || (flightDuration > 1.1 && speed < 0.45) || flightDuration > 5.0;
 
-      if (outOfBounds || (flightDuration > 1.1 && speed < 0.45) || flightDuration > 5.0) {
+      let secondariesSettled = true;
+      if (this.secondaryBirds && this.secondaryBirds.length > 0) {
+        for (const sb of this.secondaryBirds) {
+          if (!sb.body) continue;
+          const sSpeed = sb.body.velocity.length();
+          const sDur = (performance.now() - sb.launchTime) / 1000;
+          const sOut = sb.body.position.y < -1.8 || sb.body.position.x > 28 || sb.body.position.x < -24;
+          if (!sOut && (sDur <= 1.1 || sSpeed >= 0.45) && sDur <= 5.0) {
+            secondariesSettled = false;
+            break;
+          }
+        }
+      }
+
+      if (mainSettled && secondariesSettled) {
         this.audio?.stopFlightSound?.();
         this.cameraState = 'RETURN';
         this.onHideAbilityPrompt?.();
         this.scene.remove(this.activeBird.mesh);
         this.world.removeBody(this.activeBird.body);
         this.activeBird = null;
+
+        if (this.secondaryBirds) {
+          this.secondaryBirds.forEach((sb) => {
+            this.scene.remove(sb.mesh);
+            if (sb.body) this.world.removeBody(sb.body);
+          });
+          this.secondaryBirds = [];
+        }
 
         // Consume the launched bird from the queue
         this.birdsQueue.shift();
@@ -1701,6 +2007,17 @@ export class GameScene {
 
       const birdSpeed = Math.hypot(this.activeBird.body.velocity.x, this.activeBird.body.velocity.y);
       this.audio?.updateFlightSound?.(birdSpeed);
+    }
+
+    // Sync secondary split birds strictly on z = 0 plane
+    if (this.secondaryBirds && this.secondaryBirds.length > 0) {
+      this.secondaryBirds.forEach((sb) => {
+        if (!sb.body || !sb.mesh) return;
+        sb.mesh.position.set(sb.body.position.x, sb.body.position.y, 0);
+        sb.body.position.z = 0;
+        sb.body.velocity.z = 0;
+        sb.mesh.quaternion.copy(sb.body.quaternion);
+      });
     }
 
     // Sync blocks strictly on z = 0 plane

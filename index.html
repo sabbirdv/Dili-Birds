@@ -88,11 +88,34 @@
       </div>
     </header>
 
-    <!-- Slingshot Aim Telemetry (Only while actively aiming slingshot) -->
-    <div id="aim-telemetry" class="aim-telemetry hidden">
-      <span id="telemetry-power">Power: 0%</span>
-      <span class="telemetry-sep">•</span>
-      <span id="telemetry-angle">Angle: 0°</span>
+    <!-- Structure Birds To Free / Rescue Tracker Panel (Right Side of Screen - Not in Nav) -->
+    <aside id="structure-birds-tracker" class="structure-birds-tracker hidden" aria-label="Birds to Free in Structure">
+      <div class="tracker-header">
+        <span class="tracker-header-icon">🕊️</span>
+        <span class="tracker-header-text">FREE BIRDS</span>
+      </div>
+      <div id="tracker-birds-list" class="tracker-birds-list">
+        <!-- Populated dynamically by HudController -->
+      </div>
+    </aside>
+
+    <!-- Active Bird Ability Indicator & In-Flight Activation Dock (Screen Bottom Center) -->
+    <div id="bird-ability-dock" class="bird-ability-dock hidden" aria-label="Bird Ability Controller">
+      <!-- First-Time Tutorial Hint Tooltip -->
+      <div id="ability-first-time-tooltip" class="ability-tooltip hidden" role="tooltip">
+        <span class="tooltip-sparkle">💡</span>
+        <span class="tooltip-text">Tap this button mid-flight to activate special ability!</span>
+        <button type="button" id="btn-dismiss-ability-tooltip" class="tooltip-close" aria-label="Dismiss">✕</button>
+      </div>
+
+      <button type="button" id="btn-activate-ability" class="ability-btn" aria-label="Activate Bird Ability">
+        <div class="ability-icon-ring" aria-hidden="true"></div>
+        <span class="ability-icon" id="ability-btn-icon">⚡</span>
+        <div class="ability-meta">
+          <span class="ability-name" id="ability-btn-name">Supersonic Boost</span>
+          <span class="ability-status" id="ability-btn-status">Ready</span>
+        </div>
+      </button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════
@@ -176,7 +199,7 @@
             <div class="card-text-block">
               <span class="card-kicker-tag">HEROES CODEX</span>
               <h3 class="card-heading">Character Roster</h3>
-              <p class="card-desc">Unlock 4 specialized birds with hypersonic, shockwave, and split perks.</p>
+              <p class="card-desc">Unlock 6 specialized birds with supersonic, seismic, split, thermal, and vortex abilities.</p>
             </div>
             <div class="card-action-cue">
               <span>Explore Heroes</span>
@@ -387,13 +410,13 @@
     <div class="game-menu-shell glass-card">
       <div class="game-menu-header">
         <div class="menu-title-group">
-          <span class="menu-kicker">MISSION STATUS</span>
+          <span class="menu-kicker" id="menu-header-kicker">MISSION STATUS</span>
           <h2 id="game-menu-title">
             <svg class="menu-title-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="10" y1="4" x2="10" y2="20"/><line x1="14" y1="4" x2="14" y2="20"/></svg>
-            Game Paused
+            <span id="menu-title-text">Game Paused</span>
           </h2>
         </div>
-        <button type="button" id="btn-close-game-menu" class="dialog-close-btn" aria-label="Resume Game" title="Resume Game (Esc)">
+        <button type="button" id="btn-close-game-menu" class="dialog-close-btn" aria-label="Close Menu" title="Close (Esc)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -422,13 +445,13 @@
           </span>
           <div class="m-content">
             <span class="m-label">STARS</span>
-            <strong class="m-val" id="menu-stars">0 / 24</strong>
+            <strong class="m-val" id="menu-stars">0 / 0</strong>
           </div>
         </div>
       </section>
 
-      <!-- Primary Action Buttons (Resume, Restart, Main Menu) -->
-      <section class="menu-action-list">
+      <!-- Primary Action Buttons (Resume, Restart, Level Roadmap, Dashboard Home) - Only visible when inside gameplay -->
+      <section class="menu-action-list" id="menu-gameplay-actions">
         <button type="button" id="btn-menu-resume" class="action-btn primary-btn resume-cta-btn">
           <span class="btn-icon">
             <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
@@ -446,25 +469,26 @@
           <span class="list-arrow">➔</span>
         </button>
 
-        <button type="button" id="btn-menu-main-menu" class="menu-list-btn main-menu-list-btn" title="Return to Main Menu / Level Select Roadmap">
+        <button type="button" id="btn-menu-roadmap" class="menu-list-btn roadmap-menu-list-btn" title="Open Level Select Roadmap">
           <div class="list-left">
             <span class="list-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
             </span>
-            <span class="list-text">Main Menu (Dashboard / Roadmap)</span>
+            <span class="list-text">Level Roadmap</span>
           </div>
           <span class="list-arrow">➔</span>
         </button>
 
-        <button type="button" id="btn-menu-audio-toggle" class="menu-list-btn" title="Toggle Master Audio">
+        <button type="button" id="btn-menu-dashboard" class="menu-list-btn dashboard-menu-list-btn" title="Return to Dashboard Home">
           <div class="list-left">
-            <span class="list-icon" id="menu-audio-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            <span class="list-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             </span>
-            <span class="list-text">Sound Effects &amp; Music</span>
+            <span class="list-text">Dashboard Home</span>
           </div>
-          <span class="sub-badge" id="menu-audio-status">ON</span>
+          <span class="list-arrow">➔</span>
         </button>
+      </section>
 
         <!-- Audio State & Independent Volume Controls -->
         <div class="menu-volume-panel" aria-label="Audio Volume Settings">
@@ -632,7 +656,18 @@
 
   <!-- Level Result Modal Dialog (Victory / Try Again) -->
   <dialog id="result-dialog" class="game-dialog" closedby="closerequest" aria-labelledby="result-dialog-title">
+    <!-- Celebratory Full-Screen Confetti Shower Canvas -->
+    <div id="victory-celebration-container" class="victory-celebration-container hidden" aria-hidden="true">
+      <canvas id="victory-confetti-canvas" class="victory-confetti-canvas"></canvas>
+    </div>
+
     <div class="dialog-content result-content">
+      <!-- Prominent Status Banner: Red Highlight for Failed / Incomplete, Gold for Victory (Requirement 2) -->
+      <div id="result-status-highlight" class="result-status-highlight hidden">
+        <span class="status-highlight-icon" id="status-highlight-icon">⚠️</span>
+        <span class="status-highlight-text" id="status-highlight-text">LEVEL NOT COMPLETED</span>
+      </div>
+
       <div class="result-badge" id="result-badge">STAGE COMPLETE</div>
       <h2 id="result-dialog-title">Victory!</h2>
       <div class="result-stars" id="result-stars" aria-label="Stars Earned">

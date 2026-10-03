@@ -27,7 +27,7 @@ export const LEVELS = [
     "birds": [
       "red",
       "red",
-      "speed"
+      "red"
     ],
     "blocks": [
       {
@@ -349,9 +349,9 @@ export const LEVELS = [
     "coinReward": 125,
     "birds": [
       "red",
-      "speed",
-      "speed",
-      "heavy"
+      "red",
+      "red",
+      "red"
     ],
     "blocks": [
       {
@@ -726,8 +726,8 @@ export const LEVELS = [
     "birds": [
       "red",
       "speed",
-      "heavy",
-      "heavy"
+      "speed",
+      "red"
     ],
     "blocks": [
       {
@@ -1012,7 +1012,7 @@ export const LEVELS = [
       "red",
       "speed",
       "speed",
-      "heavy"
+      "red"
     ],
     "blocks": [
       {
@@ -2387,8 +2387,8 @@ export const LEVELS = [
     "coinReward": 240,
     "birds": [
       "speed",
-      "red",
-      "heavy",
+      "split",
+      "split",
       "heavy"
     ],
     "blocks": [
@@ -2654,10 +2654,10 @@ export const LEVELS = [
     "description": "Twin cliff bastions connected by a multi-tier counterweighted suspension bridge.",
     "coinReward": 270,
     "birds": [
-      "speed",
       "red",
-      "heavy",
-      "speed"
+      "split",
+      "speed",
+      "heavy"
     ],
     "blocks": [
       {
@@ -3013,7 +3013,7 @@ export const LEVELS = [
     "description": "Two fortified sand-brick bastions with interlocking timber trusses and armored bunkers.",
     "coinReward": 300,
     "birds": [
-      "red",
+      "split",
       "speed",
       "heavy",
       "heavy"
@@ -3435,7 +3435,7 @@ export const LEVELS = [
     "birds": [
       "speed",
       "heavy",
-      "red",
+      "split",
       "heavy",
       "speed"
     ],
@@ -3816,10 +3816,10 @@ export const LEVELS = [
     "description": "Industrial metal girders and glass observation decks engineered to absorb direct hits.",
     "coinReward": 340,
     "birds": [
+      "fire",
       "heavy",
       "speed",
-      "heavy",
-      "red"
+      "fire"
     ],
     "blocks": [
       {
@@ -4141,9 +4141,9 @@ export const LEVELS = [
     "coinReward": 380,
     "birds": [
       "speed",
-      "speed",
+      "fire",
       "heavy",
-      "heavy"
+      "split"
     ],
     "blocks": [
       {
@@ -4486,11 +4486,11 @@ export const LEVELS = [
     "description": "Twin Gothic cathedrals connected by delicate high-altitude buttresses and suspended bell towers.",
     "coinReward": 420,
     "birds": [
-      "red",
+      "split",
+      "fire",
+      "heavy",
       "speed",
-      "heavy",
-      "heavy",
-      "speed"
+      "heavy"
     ],
     "blocks": [
       {
@@ -4956,9 +4956,9 @@ export const LEVELS = [
     "coinReward": 450,
     "birds": [
       "heavy",
+      "fire",
       "speed",
-      "red",
-      "heavy",
+      "split",
       "heavy"
     ],
     "blocks": [
@@ -5268,10 +5268,10 @@ export const LEVELS = [
     "coinReward": 520,
     "birds": [
       "speed",
+      "split",
+      "fire",
       "heavy",
-      "heavy",
-      "red",
-      "speed"
+      "heavy"
     ],
     "blocks": [
       {
@@ -5623,9 +5623,9 @@ export const LEVELS = [
     "description": "An impenetrable volcanic iron fortress with triple-thick steel girders and concealed thermal vents.",
     "coinReward": 480,
     "birds": [
+      "vortex",
       "heavy",
-      "speed",
-      "heavy",
+      "fire",
       "speed"
     ],
     "blocks": [
@@ -5948,10 +5948,10 @@ export const LEVELS = [
     "coinReward": 540,
     "birds": [
       "speed",
+      "split",
+      "vortex",
       "heavy",
-      "speed",
-      "heavy",
-      "red"
+      "fire"
     ],
     "blocks": [
       {
@@ -6221,10 +6221,10 @@ export const LEVELS = [
     "coinReward": 600,
     "birds": [
       "heavy",
-      "heavy",
+      "vortex",
+      "fire",
       "speed",
-      "speed",
-      "red"
+      "split"
     ],
     "blocks": [
       {
@@ -6615,10 +6615,10 @@ export const LEVELS = [
     "description": "Twin towering volcanic spires with magma vaults and high-altitude warheads reaching height 15 units.",
     "coinReward": 700,
     "birds": [
-      "speed",
+      "fire",
+      "vortex",
       "heavy",
-      "heavy",
-      "speed",
+      "split",
       "heavy"
     ],
     "blocks": [
@@ -7214,11 +7214,11 @@ export const LEVELS = [
     "description": "The ultimate monumental citadel spanning 18 units across, 7 stories high, with armored vaults and the Supreme Boss.",
     "coinReward": 1000,
     "birds": [
+      "vortex",
       "heavy",
+      "fire",
+      "split",
       "speed",
-      "heavy",
-      "speed",
-      "heavy",
       "red"
     ],
     "blocks": [

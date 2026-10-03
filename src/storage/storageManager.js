@@ -19,7 +19,7 @@ const DEFAULT_STATE = {
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
   sfxVolume: 0.85,
-  bgmVolume: 0.45,
+  bgmVolume: 0.80,
   bgmMode: 'dashboard', // 'dashboard' (default) | 'always' (dashboard + in-game) | 'off'
   playerId: '',
   serverRowId: null, // Unique ID in Supabase Dili-Birds-Data table
@@ -73,7 +73,9 @@ export class StorageManager {
         avatarPresetId: resolvedPresetId,
         soundEnabled: parsed.soundEnabled !== undefined ? Boolean(parsed.soundEnabled) : true,
         sfxVolume: typeof parsed.sfxVolume === 'number' ? Math.max(0, Math.min(1, parsed.sfxVolume)) : 0.85,
-        bgmVolume: typeof parsed.bgmVolume === 'number' ? Math.max(0, Math.min(1, parsed.bgmVolume)) : 0.45,
+        bgmVolume: typeof parsed.bgmVolume === 'number'
+          ? (parsed.bgmVolume === 0.45 ? 0.80 : Math.max(0, Math.min(1, parsed.bgmVolume)))
+          : 0.80,
         bgmMode: ['dashboard', 'always', 'off'].includes(parsed.bgmMode) ? parsed.bgmMode : 'dashboard',
         coins: Math.max(0, Number(parsed.coins) || 0),
         levelStars: { ...(parsed.levelStars || {}) },

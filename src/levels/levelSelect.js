@@ -330,6 +330,7 @@ export class LevelSelect {
    * 2. Lush green rolling hills, cliffs, lagoon, and celestial crags.
    * 3. Winding wavy road layers.
    * 4. Official characters & icons embedded into scenery.
+   */
   buildWorldSvgTerrain(unlockedLevel) {
     const fullPathD = buildWavySplinePath(LEVEL_NODES, LEVEL_NODES.length);
     const activePathD = buildWavySplinePath(LEVEL_NODES, Math.min(unlockedLevel, LEVEL_NODES.length));

@@ -1,39 +1,33 @@
 /**
  * Centralized, High-Fidelity & Immersive Web Audio System for Dili-Birds 3D.
  *
- * Core Audio Engineering & Architectural Pillars:
- *  1. Continuous Interface Background Music (BGM):
- *     - Beautiful, calm, playful, atmospheric, and immersive soundtrack.
- *     - Features organic acoustic marimba/kalimba plucks, lush warm Rhodes electric piano,
- *       sparkling celesta/bell counterpoints, warm round acoustic upright bass, and gentle
- *       organic shakers and wood taps.
- *     - Runs seamlessly across ALL non-gameplay sections (Main Dashboard, Profile Setup,
- *       Level Select Roadmap, Leaderboard Hall of Fame, Characters Codex, Daily Directives,
- *       Settings/Menu) without restarting or interrupting.
- *     - Sample-accurate Web Audio lookahead scheduling with zero clicks, phase issues, or duplicate instances.
- *  2. Gameplay Audio & Clean Transition:
- *     - Smoothly fades down / transitions to subtle ambient presence upon entering active gameplay.
- *     - Full tactile feedback for slingshot mechanics: bird grabbing/picking, dynamic elastic tension
- *       creaks and rising harmonic tension while pulling, release snap, and fast launch whoosh/swish.
- *     - Aerodynamic in-flight air movement smoothly tracking projectile speed.
- *  3. Material-Specific Physical Destruction & Layering:
- *     - Distinct physical acoustics for WOOD (splintering, snappy timber cracks, hollow resonance),
- *       STONE (concussive mineral cleavage, crumbling masonry, gritty friction), GLASS (sharp fracture,
- *       staggered cascading crystalline shards), and METAL (industrial buckle, resonant plate modes).
- *     - Multiple randomized sound variations per material with subtle pitch/volume/micro-timing jitter.
- *     - Voice-limiting, priority concurrency, and dynamic structural collapse merging so chain reactions
- *       sound like cohesive physical events rather than audio clutter.
- *  4. Complete 5-Phase TNT Audio Sequence:
- *     - Fuse ignition spark -> rapid fuse burning sizzle -> punchy mid-bass concussive blast ->
- *       tumbling debris scatter -> environmental reverb tail.
- *     - Automatic dynamic audio ducking of BGM and SFX to deliver powerful perceived impact without clipping.
- *  5. Subtle, Polished UI Sounds:
- *     - Non-intrusive organic taps, smooth rising menu opens, soft dismissals, bouncy stage clicks,
- *       sparkling unlock fanfares, and metallic bounty chimes.
- *  6. Device & Browser Optimization:
- *     - Built-in DynamicsCompressorNode on master bus prevents digital clipping on mobile speakers.
- *     - Low-frequency management calibrated for mobile phone speakers, laptop speakers, and headphones.
- *     - Unified autoplay unlock and background tab lifecycle management.
+ * Requirements & Sound Engineering:
+ *  1. Advanced, Joyful, & Highly Engaging Interface BGM:
+ *     - Signature casual-physics game soundtrack (Angry Birds / Rayman / Mario / Bad Piggies style).
+ *     - Multi-layered rich instrumental casual orchestration:
+ *       * Bright, bouncy acoustic marimba & xylophone lead with playful double-strikes and trills
+ *       * Joyful cartoon melodica/brass stabs on upbeat syncopations
+ *       * Rhythmic acoustic ukulele/guitar percussive strumming ("chuk-a-chick, cha!")
+ *       * Bouncy acoustic upright slap bass with walking chromatic lines and octave pops
+ *       * Sparkling celesta & glockenspiel counter-melodies
+ *       * Cheerful swinging acoustic percussion (round kick, crisp woodblock rim-clack, shakers, tambourine)
+ *       * Calibrated stereo spatial depth and acoustic body
+ *     - Full 16-bar, 30.48-second composition at 126 BPM with Intro, A-Section, A'-Variation,
+ *       B-Lift, and seamless turnaround looping gaplessly without clicks or seams.
+ *     - 2x Increased volume output with full presence, protected by DynamicsCompressorNode.
+ *  2. Bulletproof Audio Lifecycle & Auto-Awaken:
+ *     - Immediate audio awakening on ANY user interaction (click, touch, key, pointer) anywhere on screen.
+ *     - Continuous playback across all non-gameplay pages (Dashboard, Roadmap, Profile, Leaderboard,
+ *       Characters, Missions, Settings) without stopping or restarting.
+ *     - Watchdog recovery preventing BGM from ever cutting off or becoming silent.
+ *  3. Seamless Gameplay Transition:
+ *     - Smoothly ducks or fades when entering active stage; resumes cleanly when returning or on level complete.
+ *  4. Tactile Slingshot & Physics Audio:
+ *     - Bird grabbing, dynamic elastic tension creaks, whip-crack snap, fast whoosh, aerodynamic in-flight sound.
+ *     - 4 material destruction acoustics (Wood, Stone, Glass, Metal) with concurrency voice limiting.
+ *     - Complete 5-phase TNT explosion sequence with dynamic ducking.
+ *  5. Polished UI Sound Suite:
+ *     - Organic button taps, rising menu opens, dismissals, bouncy stage clicks, reward fanfares.
  */
 
 export class AudioManager {
@@ -51,13 +45,14 @@ export class AudioManager {
     this.bgmFadeGain = null;
     this.ambienceGain = null;
 
-    // Atmospheric Reverb & Delay Bus (synthesized multi-tap spatial delay)
+    // Spatial Delay Line for Warmth & Stereo Width
     this.delayNodeL = null;
     this.delayNodeR = null;
     this.delayFeedbackGain = null;
 
-    // Background Music (BGM) State - 112 BPM, 16 bars (256 sixteenth-note steps, 34.28s loop)
+    // Joyful 126 BPM BGM State (16 bars, 256 steps, 30.48s loop)
     this.bgmLookaheadTimer = null;
+    this.bgmWatchdogTimer = null;
     this.bgmStep = 0;
     this.bgmNextStepTime = 0;
     this.isBgmPlaying = false;
@@ -82,18 +77,19 @@ export class AudioManager {
     this.lastBreakTime = 0;
     this.recentBreakCountInWindow = 0;
 
-    // Reusable Pre-computed Pink Noise Buffer for realistic physical textures
+    // Pre-computed Pink Noise Buffer
     this.pinkNoiseBuffer = null;
 
-    // Volume & Mute State
+    // Volume & Mute State (Calibrated 2x louder default)
     this.isMuted = !this.storage.isSoundEnabled();
     this.sfxVol = this.storage.getSfxVolume();
-    this.bgmVol = this.storage.getBgmVolume();
+    const storedBgm = this.storage.getBgmVolume();
+    this.bgmVol = typeof storedBgm === 'number' ? Math.max(0.2, Math.min(1.0, storedBgm)) : 0.85;
 
-    // Auto-unlock Web Audio on first user interaction
+    // Autoplay Unlock on any user interaction
     this.setupAutoplayUnlock();
 
-    // Background tab throttling & safety
+    // Background tab visibility listener
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         if (this.ctx && this.ctx.state === 'running') {
@@ -101,7 +97,11 @@ export class AudioManager {
         }
       } else {
         if (this.ctx && this.ctx.state === 'suspended' && !this.isMuted) {
-          this.ctx.resume().catch(() => {});
+          this.ctx.resume().then(() => {
+            if (!this.isPlayingGameplay && !this.isBgmPlaying) {
+              this.startBGM(0.3);
+            }
+          }).catch(() => {});
         }
       }
     });
@@ -120,7 +120,7 @@ export class AudioManager {
         this.generatePinkNoiseBuffer();
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended' && !this.isMuted) {
+    if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
     return this.ctx;
@@ -129,22 +129,21 @@ export class AudioManager {
   initNodeGraph() {
     if (!this.ctx || this.masterCompressor) return;
 
-    // 1. Master Dynamics Compressor: Guarantees zero digital distortion or clipping
-    //    across mobile speakers, cheap laptops, and headphones.
+    // 1. Master Dynamics Compressor: Prevents clipping and provides punchy broadcast loudness
     this.masterCompressor = this.ctx.createDynamicsCompressor();
-    this.masterCompressor.threshold.setValueAtTime(-5.0, this.ctx.currentTime);
-    this.masterCompressor.knee.setValueAtTime(10.0, this.ctx.currentTime);
-    this.masterCompressor.ratio.setValueAtTime(4.0, this.ctx.currentTime);
+    this.masterCompressor.threshold.setValueAtTime(-4.0, this.ctx.currentTime);
+    this.masterCompressor.knee.setValueAtTime(8.0, this.ctx.currentTime);
+    this.masterCompressor.ratio.setValueAtTime(3.5, this.ctx.currentTime);
     this.masterCompressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
-    this.masterCompressor.release.setValueAtTime(0.22, this.ctx.currentTime);
+    this.masterCompressor.release.setValueAtTime(0.18, this.ctx.currentTime);
     this.masterCompressor.connect(this.ctx.destination);
 
-    // 2. Master Gain Bus (controlled by global mute toggle)
+    // 2. Master Gain Bus
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.setValueAtTime(this.isMuted ? 0.0 : 1.0, this.ctx.currentTime);
     this.masterGain.connect(this.masterCompressor);
 
-    // 3. SFX Bus with Dedicated Dynamic Ducking Node
+    // 3. SFX Bus
     this.sfxGain = this.ctx.createGain();
     this.sfxGain.gain.setValueAtTime(this.sfxVol, this.ctx.currentTime);
     this.sfxGain.connect(this.masterGain);
@@ -153,12 +152,12 @@ export class AudioManager {
     this.sfxDuckingGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
     this.sfxDuckingGain.connect(this.sfxGain);
 
-    // 4. Ambience Bus (for subtle flight rushes & atmospheric texture)
+    // 4. Ambience Bus
     this.ambienceGain = this.ctx.createGain();
-    this.ambienceGain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+    this.ambienceGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
     this.ambienceGain.connect(this.sfxGain);
 
-    // 5. BGM Bus with Ducking and Smooth Screen Fade Gains
+    // 5. BGM Bus with 2x Increased Loudness
     this.bgmGain = this.ctx.createGain();
     this.bgmGain.gain.setValueAtTime(this.bgmVol, this.ctx.currentTime);
     this.bgmGain.connect(this.masterGain);
@@ -171,20 +170,20 @@ export class AudioManager {
     this.bgmFadeGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
     this.bgmFadeGain.connect(this.bgmDuckingGain);
 
-    // 6. Spatial Atmosphere Delay Line (warm stereo acoustic space for BGM)
+    // 6. Stereo Acoustic Delay Space
     try {
       this.delayNodeL = this.ctx.createDelay(1.0);
-      this.delayNodeL.delayTime.setValueAtTime(0.185, this.ctx.currentTime);
+      this.delayNodeL.delayTime.setValueAtTime(0.160, this.ctx.currentTime);
 
       this.delayNodeR = this.ctx.createDelay(1.0);
-      this.delayNodeR.delayTime.setValueAtTime(0.245, this.ctx.currentTime);
+      this.delayNodeR.delayTime.setValueAtTime(0.238, this.ctx.currentTime);
 
       const delayFilter = this.ctx.createBiquadFilter();
       delayFilter.type = 'lowpass';
-      delayFilter.frequency.setValueAtTime(1800, this.ctx.currentTime);
+      delayFilter.frequency.setValueAtTime(2200, this.ctx.currentTime);
 
       this.delayFeedbackGain = this.ctx.createGain();
-      this.delayFeedbackGain.gain.setValueAtTime(0.22, this.ctx.currentTime);
+      this.delayFeedbackGain.gain.setValueAtTime(0.20, this.ctx.currentTime);
 
       this.delayNodeL.connect(delayFilter);
       this.delayNodeR.connect(delayFilter);
@@ -192,14 +191,11 @@ export class AudioManager {
       this.delayFeedbackGain.connect(this.delayNodeL);
       this.delayFeedbackGain.connect(this.delayNodeR);
 
-      // Mix wet delay subtly into BGM bus
       const delayWetGain = this.ctx.createGain();
-      delayWetGain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+      delayWetGain.gain.setValueAtTime(0.24, this.ctx.currentTime);
       delayFilter.connect(delayWetGain);
       delayWetGain.connect(this.bgmFadeGain);
-    } catch {
-      // Graceful fallback if delay creation fails on legacy browser
-    }
+    } catch {}
   }
 
   generatePinkNoiseBuffer() {
@@ -223,24 +219,35 @@ export class AudioManager {
     this.pinkNoiseBuffer = buffer;
   }
 
+  /**
+   * Universal, bulletproof audio unlocker:
+   * Awaken audio on ANY interaction anywhere on the screen without waiting for menu click.
+   */
+  handleUserInteraction() {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().then(() => {
+        if (!this.isPlayingGameplay && !this.isBgmPlaying && !this.isMuted) {
+          this.startBGM(0.3);
+        }
+      }).catch(() => {});
+    } else if (!this.isPlayingGameplay && !this.isBgmPlaying && !this.isMuted) {
+      this.startBGM(0.3);
+    }
+  }
+
   setupAutoplayUnlock() {
     const unlock = () => {
-      this.ensureContext();
-      if (this.ctx) {
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume().then(() => {
-            if (!this.isPlayingGameplay) {
-              this.startBGM(0.4);
-            }
-          }).catch(() => {});
-        } else if (!this.isPlayingGameplay) {
-          this.startBGM(0.4);
-        }
+      this.handleUserInteraction();
+      // Only remove once AudioContext is genuinely running and BGM is started
+      if (this.ctx && this.ctx.state === 'running' && this.isBgmPlaying) {
+        window.removeEventListener('pointerdown', unlock);
+        window.removeEventListener('touchstart', unlock);
+        window.removeEventListener('click', unlock);
+        window.removeEventListener('keydown', unlock);
       }
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('touchstart', unlock);
-      window.removeEventListener('click', unlock);
-      window.removeEventListener('keydown', unlock);
     };
 
     window.addEventListener('pointerdown', unlock, { passive: true });
@@ -250,7 +257,7 @@ export class AudioManager {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * VOLUME, MUTE & DUCKING CONTROLS
+   * VOLUME & MUTE CONTROLS
    * ═════════════════════════════════════════════════════════════ */
 
   setMuted(muted) {
@@ -264,7 +271,7 @@ export class AudioManager {
     }
 
     if (!this.isMuted && !this.isBgmPlaying && !this.isPlayingGameplay) {
-      this.startBGM(0.4);
+      this.startBGM(0.3);
     }
     return !this.isMuted;
   }
@@ -293,25 +300,21 @@ export class AudioManager {
     }
   }
 
-  /**
-   * Smooth dynamic ducking for major physical events (e.g. TNT explosions, structural collapses).
-   * Briefly attenuates background music and SFX buses, then smoothly restores full volume.
-   */
-  duck(duckLevel = 0.32, holdTime = 0.16, recoverTime = 0.45) {
-    if (!this.ctx) return;
+  duck(duckLevel = 0.35, holdTime = 0.16, recoverTime = 0.45) {
+    if (!this.ctx || !this.bgmDuckingGain) return;
     const now = this.ctx.currentTime;
 
-    if (this.bgmDuckingGain) {
-      this.bgmDuckingGain.gain.cancelScheduledValues(now);
-      this.bgmDuckingGain.gain.setValueAtTime(this.bgmDuckingGain.gain.value, now);
-      this.bgmDuckingGain.gain.linearRampToValueAtTime(duckLevel, now + 0.025);
-      this.bgmDuckingGain.gain.setValueAtTime(duckLevel, now + holdTime);
-      this.bgmDuckingGain.gain.linearRampToValueAtTime(1.0, now + holdTime + recoverTime);
-    }
+    const curBgm = Math.max(0.1, this.bgmDuckingGain.gain.value);
+    this.bgmDuckingGain.gain.cancelScheduledValues(now);
+    this.bgmDuckingGain.gain.setValueAtTime(curBgm, now);
+    this.bgmDuckingGain.gain.linearRampToValueAtTime(duckLevel, now + 0.03);
+    this.bgmDuckingGain.gain.setValueAtTime(duckLevel, now + holdTime);
+    this.bgmDuckingGain.gain.linearRampToValueAtTime(1.0, now + holdTime + recoverTime);
 
     if (this.sfxDuckingGain) {
+      const curSfx = Math.max(0.1, this.sfxDuckingGain.gain.value);
       this.sfxDuckingGain.gain.cancelScheduledValues(now);
-      this.sfxDuckingGain.gain.setValueAtTime(this.sfxDuckingGain.gain.value, now);
+      this.sfxDuckingGain.gain.setValueAtTime(curSfx, now);
       this.sfxDuckingGain.gain.linearRampToValueAtTime(0.75, now + 0.02);
       this.sfxDuckingGain.gain.setValueAtTime(0.75, now + holdTime);
       this.sfxDuckingGain.gain.linearRampToValueAtTime(1.0, now + holdTime + recoverTime * 0.7);
@@ -319,27 +322,26 @@ export class AudioManager {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * 1. CONTINUOUS INTERFACE BACKGROUND MUSIC (BGM)
-   * Beautiful, calm, playful, atmospheric, and immersive soundtrack.
-   * Plays seamlessly across ALL non-gameplay screens without restarting!
+   * 1. ADVANCED, JOYFUL & ENGAGING INSTRUMENTAL BGM
+   * 126 BPM, 16 Bars (256 sixteenth-note steps, 30.48s loop)
    * ═════════════════════════════════════════════════════════════ */
 
   enterGameplay() {
     this.isPlayingGameplay = true;
     const mode = this.storage?.getBgmMode?.() || 'dashboard';
     if (mode === 'always') {
-      // In "always" mode, smoothly duck BGM to 20% so gameplay SFX are crystal clear
       if (this.ctx && this.bgmFadeGain) {
         const now = this.ctx.currentTime;
+        const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
         this.bgmFadeGain.gain.cancelScheduledValues(now);
-        this.bgmFadeGain.gain.linearRampToValueAtTime(0.22, now + 0.4);
+        this.bgmFadeGain.gain.setValueAtTime(cur, now);
+        this.bgmFadeGain.gain.linearRampToValueAtTime(0.25, now + 0.35);
       }
       if (!this.isBgmPlaying && !this.isMuted) {
-        this.startBGM(0.4);
+        this.startBGM(0.35);
       }
     } else {
-      // Default: clean, smooth 0.35s fade down to silence during active stage
-      this.stopBGM(0.35);
+      this.stopBGM(0.3);
     }
   }
 
@@ -347,15 +349,16 @@ export class AudioManager {
     this.isPlayingGameplay = false;
     const mode = this.storage?.getBgmMode?.() || 'dashboard';
     if (mode === 'off' || this.isMuted) {
-      this.stopBGM(0.2);
+      this.stopBGM(0.15);
     } else {
-      // Restore full BGM volume smoothly without restarting track position
       if (this.isBgmPlaying && this.bgmFadeGain && this.ctx) {
         const now = this.ctx.currentTime;
+        const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
         this.bgmFadeGain.gain.cancelScheduledValues(now);
+        this.bgmFadeGain.gain.setValueAtTime(cur, now);
         this.bgmFadeGain.gain.linearRampToValueAtTime(1.0, now + 0.35);
       } else {
-        this.startBGM(0.4);
+        this.startBGM(0.35);
       }
     }
   }
@@ -370,22 +373,18 @@ export class AudioManager {
       if (this.isPlayingGameplay) {
         this.stopBGM(0.2);
       } else {
-        this.startBGM(0.4);
+        this.startBGM(0.35);
       }
     } else if (mode === 'always') {
       if (this.isPlayingGameplay && this.bgmFadeGain && this.ctx) {
         const now = this.ctx.currentTime;
-        this.bgmFadeGain.gain.linearRampToValueAtTime(0.22, now + 0.3);
+        this.bgmFadeGain.gain.linearRampToValueAtTime(0.25, now + 0.3);
       }
-      this.startBGM(0.4);
+      this.startBGM(0.35);
     }
   }
 
-  /**
-   * Starts the continuous, seamless 16-bar interface BGM.
-   * If already playing, maintains playback position across navigation!
-   */
-  startBGM(fadeDuration = 0.4) {
+  startBGM(fadeDuration = 0.35) {
     const mode = this.storage?.getBgmMode?.() || 'dashboard';
     if (mode === 'off' || this.isMuted) return;
     if (mode === 'dashboard' && this.isPlayingGameplay) return;
@@ -393,13 +392,14 @@ export class AudioManager {
     const ctx = this.ensureContext();
     if (!ctx) return;
 
-    const targetGain = (this.isPlayingGameplay && mode === 'always') ? 0.22 : 1.0;
+    const targetGain = (this.isPlayingGameplay && mode === 'always') ? 0.25 : 1.0;
 
     if (this.isBgmPlaying) {
-      // Already running: smoothly ramp fade gain if needed
       if (this.bgmFadeGain) {
         const now = ctx.currentTime;
+        const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
         this.bgmFadeGain.gain.cancelScheduledValues(now);
+        this.bgmFadeGain.gain.setValueAtTime(cur, now);
         this.bgmFadeGain.gain.linearRampToValueAtTime(targetGain, now + fadeDuration);
       }
       return;
@@ -414,10 +414,10 @@ export class AudioManager {
       this.bgmFadeGain.gain.linearRampToValueAtTime(targetGain, now + fadeDuration);
     }
 
-    // 112 BPM: 0.5357s per beat, 0.1339s per 16th-note step
-    const stepDuration = 0.1339;
-    const scheduleAheadTime = 0.220; // 220ms lookahead window
-    this.bgmNextStepTime = ctx.currentTime + 0.05;
+    // 126 BPM: 0.4762s per beat, 0.1190s per 16th-note step
+    const stepDuration = 0.11905;
+    const scheduleAheadTime = 0.220;
+    this.bgmNextStepTime = ctx.currentTime + 0.04;
 
     const runScheduler = () => {
       const currentMode = this.storage?.getBgmMode?.() || 'dashboard';
@@ -431,19 +431,40 @@ export class AudioManager {
         return;
       }
 
-      // Tab throttling / sleep safety: advance clock cleanly if lagged
-      if (this.bgmNextStepTime < this.ctx.currentTime) {
-        this.bgmNextStepTime = this.ctx.currentTime + 0.04;
+      // If context is suspended by browser, wait cleanly
+      if (this.ctx.state !== 'running') {
+        return;
       }
+
+      // Catch-up safety if clock lagged
+      if (this.bgmNextStepTime < this.ctx.currentTime) {
+        this.bgmNextStepTime = this.ctx.currentTime + 0.02;
+      }
+
       while (this.bgmNextStepTime < this.ctx.currentTime + scheduleAheadTime) {
         this._scheduleBgmStep(this.bgmStep, this.bgmNextStepTime, stepDuration);
         this.bgmNextStepTime += stepDuration;
-        this.bgmStep = (this.bgmStep + 1) % 256; // 16 bars * 16 steps = 256 steps (34.28s)
+        this.bgmStep = (this.bgmStep + 1) % 256; // 16 bars * 16 steps = 256 steps (30.48s)
       }
     };
 
     runScheduler();
-    this.bgmLookaheadTimer = setInterval(runScheduler, 35);
+    if (this.bgmLookaheadTimer) clearInterval(this.bgmLookaheadTimer);
+    this.bgmLookaheadTimer = setInterval(runScheduler, 30);
+
+    // Watchdog check: guarantees BGM never stays silent accidentally
+    if (!this.bgmWatchdogTimer) {
+      this.bgmWatchdogTimer = setInterval(() => {
+        const currentMode = this.storage?.getBgmMode?.() || 'dashboard';
+        if (!this.isMuted && currentMode !== 'off') {
+          if (!this.isPlayingGameplay || currentMode === 'always') {
+            if (this.ctx && this.ctx.state === 'running' && (!this.isBgmPlaying || (this.bgmFadeGain && this.bgmFadeGain.gain.value < 0.05))) {
+              this.startBGM(0.3);
+            }
+          }
+        }
+      }, 1000);
+    }
   }
 
   stopBGM(fadeDuration = 0.2) {
@@ -455,19 +476,22 @@ export class AudioManager {
 
     if (this.ctx && this.bgmFadeGain) {
       const now = this.ctx.currentTime;
+      const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
       this.bgmFadeGain.gain.cancelScheduledValues(now);
+      this.bgmFadeGain.gain.setValueAtTime(cur, now);
       this.bgmFadeGain.gain.linearRampToValueAtTime(0.0001, now + fadeDuration);
     }
   }
 
   /**
-   * Internal high-fidelity step synthesizer for the 34.28-Second BGM Loop.
-   * Features 16 bars of charming, calm, playful casual game orchestration:
-   *  - Warm marimba/kalimba wooden mallets
-   *  - Soft Rhodes chord swells
-   *  - Sparkly celesta/bell counterpoints
-   *  - Bouncy acoustic upright bass
-   *  - Gentle organic shaker & woodblock groove
+   * Advanced Instrumental Step Synthesizer (126 BPM, 16 Bars)
+   * Joyful, catchy casual game anthem featuring:
+   *  - Bouncy wooden marimba & crisp xylophone riffs
+   *  - Upbeat brass / melodica stabs
+   *  - Rhythm ukulele / acoustic guitar strumming
+   *  - Walking upright slap bass
+   *  - Glockenspiel sparkles
+   *  - Dynamic acoustic swing percussion
    */
   _scheduleBgmStep(step, time, stepDuration) {
     if (!this.ctx || !this.bgmFadeGain) return;
@@ -475,197 +499,250 @@ export class AudioManager {
     const bar = Math.floor(step / 16); // 0 to 15
     const stepInBar = step % 16;       // 0 to 15
 
-    // 16-Bar Harmonic Progression (Key: C Major with modal touches)
+    // 16-Bar Joyful Harmonic Progression (Key: C Major / G / F with modal jazz-pop bounce)
     const BARS = [
-      // Section A: Joyful, calm, sunny intro (Bars 0-3)
-      { root: 130.81, chord: [329.63, 392.00, 493.88] },         // Bar 0: Cmaj7
-      { root: 123.47, chord: [293.66, 392.00, 659.25] },         // Bar 1: G6/B
-      { root: 110.00, chord: [261.63, 329.63, 392.00] },         // Bar 2: Am7
-      { root: 82.41,  chord: [246.94, 329.63, 392.00] },         // Bar 3: Em7
-      // Section A2: Playful expansion (Bars 4-7)
-      { root: 87.31,  chord: [220.00, 261.63, 329.63, 392.00] }, // Bar 4: Fmaj7
-      { root: 82.41,  chord: [196.00, 261.63, 329.63] },         // Bar 5: C/E
-      { root: 73.42,  chord: [174.61, 220.00, 261.63] },         // Bar 6: Dm7
-      { root: 98.00,  chord: [196.00, 261.63, 293.66, 349.23] }, // Bar 7: G7sus4
-      // Section B: Melodic lift & whimsical exploration (Bars 8-11)
-      { root: 130.81, chord: [329.63, 392.00, 493.88, 587.33] }, // Bar 8: Cmaj9
-      { root: 103.83, chord: [329.63, 415.30, 493.88, 587.33] }, // Bar 9: E7/G#
-      { root: 110.00, chord: [261.63, 329.63, 392.00, 493.88] }, // Bar 10: Am9
-      { root: 73.42,  chord: [220.00, 277.18, 329.63, 392.00] }, // Bar 11: D7
-      // Section C: Atmospheric resolution & turnaround (Bars 12-15)
-      { root: 87.31,  chord: [220.00, 261.63, 329.63, 392.00] }, // Bar 12: Fmaj7
-      { root: 82.41,  chord: [196.00, 246.94, 293.66, 392.00] }, // Bar 13: Em7
-      { root: 73.42,  chord: [174.61, 220.00, 261.63, 329.63] }, // Bar 14: Dm7
-      { root: 98.00,  chord: [174.61, 246.94, 293.66, 392.00] }  // Bar 15: G7sus4 (seamless loop into Bar 0)
+      // Intro & Section A: Joyful, Bouncy & Catchy Hook (Bars 0-3)
+      { root: 130.81, chord: [329.63, 392.00, 523.25], horn: 659.25 },  // Bar 0: C Major
+      { root: 110.00, chord: [261.63, 329.63, 440.00], horn: 523.25 },  // Bar 1: A Minor
+      { root: 146.83, chord: [293.66, 349.23, 440.00], horn: 587.33 },  // Bar 2: D Minor
+      { root: 98.00,  chord: [246.94, 293.66, 392.00], horn: 493.88 },  // Bar 3: G7 (turn)
+
+      // Section A2: Playful Syncopation with Brass Counterpoint (Bars 4-7)
+      { root: 130.81, chord: [329.63, 392.00, 523.25], horn: 659.25 },  // Bar 4: C Major
+      { root: 164.81, chord: [329.63, 392.00, 493.88], horn: 587.33 },  // Bar 5: E Minor
+      { root: 174.61, chord: [261.63, 349.23, 440.00], horn: 659.25 },  // Bar 6: F Major
+      { root: 98.00,  chord: [246.94, 293.66, 392.00], horn: 783.99 },  // Bar 7: G Major
+
+      // Section B: Energetic Harmonic Lift (Bars 8-11)
+      { root: 174.61, chord: [349.23, 440.00, 523.25], horn: 698.46 },  // Bar 8: F Major (Bright lift!)
+      { root: 98.00,  chord: [293.66, 392.00, 493.88], horn: 783.99 },  // Bar 9: G Major
+      { root: 130.81, chord: [329.63, 392.00, 523.25], horn: 659.25 },  // Bar 10: C Major
+      { root: 110.00, chord: [261.63, 329.63, 440.00], horn: 523.25 },  // Bar 11: A Minor
+
+      // Section C: Playful Climax & Seamless Turnaround (Bars 12-15)
+      { root: 146.83, chord: [293.66, 349.23, 440.00], horn: 587.33 },  // Bar 12: D Minor
+      { root: 164.81, chord: [329.63, 392.00, 493.88], horn: 659.25 },  // Bar 13: E Minor
+      { root: 174.61, chord: [349.23, 440.00, 523.25], horn: 698.46 },  // Bar 14: F Major
+      { root: 98.00,  chord: [246.94, 293.66, 349.23], horn: 783.99 }   // Bar 15: G7sus4 (resolves right to Bar 0 C)
     ];
     const barData = BARS[bar] || BARS[0];
 
-    // ── 1. GENTLE ORGANIC PERCUSSION (Shaker, Woodblock & Round Tap) ──
+    // ── 1. CHEERFUL ACOUSTIC CASUAL DRUMS & PERCUSSION ────────────
     let playKick = false;
-    let playWoodblock = false;
+    let playRim = false;
     let playShaker = false;
     let shakerAccent = false;
+    let playWoodblock = false;
 
-    if (bar <= 3) {
-      // Intro: gentle kick tap on beat 1 & 3, soft shaker on 8ths
-      if (stepInBar === 0 || stepInBar === 8) playKick = true;
-      if (stepInBar % 2 === 0) playShaker = true;
-      if (stepInBar === 4 || stepInBar === 12) playWoodblock = true;
-    } else {
-      // Main groove: playful bounce
-      if (stepInBar === 0 || stepInBar === 8 || (bar % 2 === 1 && stepInBar === 14)) playKick = true;
-      if (stepInBar === 4 || stepInBar === 12) playWoodblock = true;
-      playShaker = true;
-      if (stepInBar % 4 === 2) shakerAccent = true;
+    // Bouncy kick on beats 1 & 3, plus syncopated upbeat kicks
+    if (stepInBar === 0 || stepInBar === 8 || ((bar % 2 === 1) && stepInBar === 14)) {
+      playKick = true;
+    }
+    // Crisp acoustic rim-clack / woodblock on beats 2 & 4
+    if (stepInBar === 4 || stepInBar === 12) {
+      playRim = true;
+    }
+    // Playful woodblock taps on syncopated offbeats
+    if (stepInBar === 6 || stepInBar === 10) {
+      playWoodblock = true;
+    }
+    // Swinging shakers on 16ths
+    playShaker = true;
+    if (stepInBar % 4 === 2 || stepInBar === 14) {
+      shakerAccent = true;
     }
 
     if (playKick) {
-      this._playSoftPercussion('kick', time, bar <= 3 ? 0.038 : 0.045);
+      this._playAcousticDrum('kick', time, 0.088);
+    }
+    if (playRim) {
+      this._playAcousticDrum('rim', time, 0.052);
     }
     if (playWoodblock) {
-      this._playSoftPercussion('woodblock', time, 0.022);
+      this._playAcousticDrum('woodblock', time, 0.038);
     }
     if (playShaker) {
-      this._playSoftPercussion('shaker', time, shakerAccent ? 0.016 : 0.009);
+      this._playAcousticDrum('shaker', time, shakerAccent ? 0.032 : 0.016);
     }
 
-    // ── 2. BOUNCY ACOUSTIC UPRIGHT BASS ──────────────────────────
+    // ── 2. BOUNCY UPRIGHT SLAP BASS ──────────────────────────────
+    // Groovy walking bassline with fifths, octaves, and approach notes
     let playBass = false;
     let bassFreq = barData.root;
+    let isSlap = false;
 
-    if (bar <= 3) {
-      if (stepInBar === 0 || stepInBar === 6 || stepInBar === 8 || stepInBar === 14) {
-        playBass = true;
-        bassFreq = (stepInBar === 6 || stepInBar === 14) ? barData.root * 1.5 : barData.root;
-      }
-    } else {
-      const bassSteps = [0, 4, 6, 8, 12, 14];
-      if (bassSteps.includes(stepInBar)) {
-        playBass = true;
-        bassFreq = (stepInBar === 6 || stepInBar === 14) ? barData.root * 1.5 : barData.root;
+    const bassPattern = [0, 4, 6, 8, 10, 12, 14];
+    if (bassPattern.includes(stepInBar)) {
+      playBass = true;
+      if (stepInBar === 0) {
+        bassFreq = barData.root;
+      } else if (stepInBar === 4) {
+        bassFreq = barData.root * 1.5; // 5th
+      } else if (stepInBar === 6) {
+        bassFreq = barData.root * 2.0; // Octave pop
+        isSlap = true;
+      } else if (stepInBar === 8) {
+        bassFreq = barData.root;
+      } else if (stepInBar === 10) {
+        bassFreq = barData.root * 1.5;
+      } else if (stepInBar === 12) {
+        bassFreq = barData.root * 1.33; // 4th
+      } else if (stepInBar === 14) {
+        // Chromatic approach to next bar root
+        bassFreq = barData.root * 0.94;
+        isSlap = true;
       }
     }
 
     if (playBass) {
-      this._playAcousticBass(bassFreq, time, 0.18, 0.038);
+      this._playUprightBass(bassFreq, time, 0.16, 0.085, isSlap);
     }
 
-    // ── 3. WARM RHODES CHORD SWELLS ──────────────────────────────
-    if (stepInBar === 4 || stepInBar === 12) {
-      this._playRhodesChord(barData.chord, time, 0.32, 0.011);
+    // ── 3. ACOUSTIC UKULELE / GUITAR STRUM (Rhythm Drive) ────────
+    // Joyful reggae/ska/pop upbeat strums on 16ths: steps 2, 6, 10, 14
+    if (stepInBar === 2 || stepInBar === 6 || stepInBar === 10 || stepInBar === 14) {
+      this._playUkuleleStrum(barData.chord, time, 0.034, stepInBar === 2 || stepInBar === 10);
     }
 
-    // ── 4. CHARMING MARIMBA LEAD MELODY ──────────────────────────
-    // 256-step composed melody (Key of C / Pentatonic / Lydian)
-    const MARIMBA_MELODY = {
-      // Bar 0 (Cmaj7)
-      0:   523.25, // C5
-      4:   659.25, // E5
-      8:   783.99, // G5
-      12:  659.25, // E5
-      // Bar 1 (G6/B)
-      16:  587.33, // D5
-      20:  493.88, // B4
-      24:  587.33, // D5
-      28:  783.99, // G5
-      // Bar 2 (Am7)
-      32:  880.00, // A5
-      36:  783.99, // G5
-      40:  659.25, // E5
-      44:  523.25, // C5
-      // Bar 3 (Em7)
-      48:  587.33, // D5
-      52:  493.88, // B4
-      56:  392.00, // G4
-      60:  440.00, // A4
-      // Bar 4 (Fmaj7) - Playful variation
-      64:  523.25, // C5
-      68:  659.25, // E5
-      72:  698.46, // F5
-      76:  783.99, // G5
-      // Bar 5 (C/E)
-      80:  880.00, // A5
-      84:  783.99, // G5
-      88:  659.25, // E5
-      92:  523.25, // C5
-      // Bar 6 (Dm7)
-      96:  587.33, // D5
-      100: 659.25, // E5
-      104: 587.33, // D5
-      108: 493.88, // B4
-      // Bar 7 (G7sus4)
-      112: 523.25, // C5
-      116: 587.33, // D5
-      120: 392.00, // G4
-      // Bar 8 (Cmaj9) - Section B High Register
-      128: 1046.50,// C6 (Bright playful peak!)
-      132: 987.77, // B5
-      136: 783.99, // G5
-      140: 880.00, // A5
-      // Bar 9 (E7/G#)
-      144: 987.77, // B5
-      148: 830.61, // G#5
-      152: 659.25, // E5
-      156: 783.99, // G5
-      // Bar 10 (Am9)
-      160: 880.00, // A5
-      164: 783.99, // G5
-      168: 659.25, // E5
-      172: 587.33, // D5
-      // Bar 11 (D7)
-      176: 739.99, // F#5
-      180: 880.00, // A5
-      184: 783.99, // G5
-      188: 659.25, // E5
-      // Bar 12 (Fmaj7) - Resolution
-      192: 698.46, // F5
-      196: 659.25, // E5
-      200: 587.33, // D5
-      204: 523.25, // C5
-      // Bar 13 (Em7)
-      208: 659.25, // E5
-      212: 587.33, // D5
-      216: 493.88, // B4
-      220: 392.00, // G4
-      // Bar 14 (Dm7)
-      224: 440.00, // A4
-      228: 523.25, // C5
-      232: 587.33, // D5
-      236: 659.25, // E5
-      // Bar 15 (G7sus4) - Seamless turnaround
-      240: 783.99, // G5
-      244: 659.25, // E5
-      248: 587.33, // D5
-      252: 493.88  // B4 (smoothly leads into C5 at step 0)
+    // ── 4. JOYFUL BRASS / MELODICA OFFBEAT STABS ─────────────────
+    // Signature cartoon adventure horn punches
+    if (stepInBar === 4 || stepInBar === 12 || (bar >= 8 && stepInBar === 7)) {
+      this._playHornStab(barData.horn, time, 0.14, 0.048);
+    }
+
+    // ── 5. ICONIC JOYFUL MARIMBA & XYLOPHONE LEAD MELODY ─────────
+    // Fast, catchy, playful singable theme (Key of C / Pentatonic / Lydian)
+    const MARIMBA_THEME = {
+      // Bar 0: Joyful Opening Hook!
+      0:   { freq: 523.25, dur: 0.18, vol: 0.088 }, // C5
+      2:   { freq: 587.33, dur: 0.14, vol: 0.082 }, // D5
+      4:   { freq: 659.25, dur: 0.22, vol: 0.092 }, // E5
+      7:   { freq: 783.99, dur: 0.20, vol: 0.095 }, // G5 (Bouncy leap!)
+      10:  { freq: 659.25, dur: 0.15, vol: 0.084 }, // E5
+      12:  { freq: 523.25, dur: 0.22, vol: 0.088 }, // C5
+      14:  { freq: 587.33, dur: 0.14, vol: 0.080 }, // D5
+
+      // Bar 1: Playful Answer Motif
+      16:  { freq: 659.25, dur: 0.18, vol: 0.088 }, // E5
+      18:  { freq: 698.46, dur: 0.14, vol: 0.082 }, // F5
+      20:  { freq: 783.99, dur: 0.24, vol: 0.094 }, // G5
+      24:  { freq: 880.00, dur: 0.26, vol: 0.098 }, // A5 (Peak!)
+      28:  { freq: 783.99, dur: 0.22, vol: 0.088 }, // G5
+
+      // Bar 2: Rhythmic Double-Tap Riff
+      32:  { freq: 587.33, dur: 0.14, vol: 0.084 }, // D5
+      34:  { freq: 587.33, dur: 0.14, vol: 0.080 }, // D5 (double strike)
+      36:  { freq: 659.25, dur: 0.18, vol: 0.088 }, // E5
+      40:  { freq: 587.33, dur: 0.20, vol: 0.085 }, // D5
+      44:  { freq: 523.25, dur: 0.24, vol: 0.088 }, // C5
+
+      // Bar 3: Turnaround Hook
+      48:  { freq: 493.88, dur: 0.18, vol: 0.082 }, // B4
+      52:  { freq: 587.33, dur: 0.18, vol: 0.084 }, // D5
+      56:  { freq: 783.99, dur: 0.28, vol: 0.095 }, // G5 (Bright jump!)
+      62:  { freq: 659.25, dur: 0.16, vol: 0.080 }, // E5
+
+      // Bar 4: Section A2 - Embellished High Variation
+      64:  { freq: 1046.50, dur: 0.20, vol: 0.098 }, // C6 (High sparkle!)
+      68:  { freq: 880.00,  dur: 0.18, vol: 0.090 }, // A5
+      72:  { freq: 783.99,  dur: 0.22, vol: 0.092 }, // G5
+      76:  { freq: 659.25,  dur: 0.18, vol: 0.086 }, // E5
+      78:  { freq: 698.46,  dur: 0.14, vol: 0.082 }, // F5
+
+      // Bar 5: Cascading Riff
+      80:  { freq: 783.99, dur: 0.20, vol: 0.092 }, // G5
+      84:  { freq: 659.25, dur: 0.16, vol: 0.086 }, // E5
+      88:  { freq: 587.33, dur: 0.18, vol: 0.084 }, // D5
+      92:  { freq: 523.25, dur: 0.24, vol: 0.088 }, // C5
+
+      // Bar 6: Jaunty Syncopated Figure
+      96:  { freq: 698.46, dur: 0.18, vol: 0.088 }, // F5
+      100: { freq: 783.99, dur: 0.18, vol: 0.090 }, // G5
+      104: { freq: 880.00, dur: 0.24, vol: 0.095 }, // A5
+      108: { freq: 987.77, dur: 0.20, vol: 0.092 }, // B5
+
+      // Bar 7: Resolution to G
+      112: { freq: 1046.50, dur: 0.24, vol: 0.096 }, // C6
+      116: { freq: 987.77,  dur: 0.18, vol: 0.088 }, // B5
+      120: { freq: 783.99,  dur: 0.28, vol: 0.090 }, // G5
+
+      // Bar 8: Section B Lift - Energetic Climax!
+      128: { freq: 880.00,  dur: 0.20, vol: 0.095 }, // A5
+      132: { freq: 1046.50, dur: 0.22, vol: 0.098 }, // C6
+      136: { freq: 1174.66, dur: 0.26, vol: 0.102 }, // D6 (Excitement peak!)
+      140: { freq: 1046.50, dur: 0.18, vol: 0.092 }, // C6
+
+      // Bar 9: Singing Brass & Marimba Counterpoint
+      144: { freq: 987.77,  dur: 0.20, vol: 0.092 }, // B5
+      148: { freq: 880.00,  dur: 0.18, vol: 0.088 }, // A5
+      152: { freq: 783.99,  dur: 0.22, vol: 0.090 }, // G5
+      156: { freq: 659.25,  dur: 0.20, vol: 0.086 }, // E5
+
+      // Bar 10: Playful Bounce
+      160: { freq: 698.46, dur: 0.18, vol: 0.088 }, // F5
+      164: { freq: 783.99, dur: 0.18, vol: 0.090 }, // G5
+      168: { freq: 880.00, dur: 0.24, vol: 0.094 }, // A5
+      172: { freq: 659.25, dur: 0.20, vol: 0.086 }, // E5
+
+      // Bar 11: Fast Triplet-feel Run
+      176: { freq: 587.33, dur: 0.14, vol: 0.084 }, // D5
+      178: { freq: 659.25, dur: 0.14, vol: 0.084 }, // E5
+      180: { freq: 698.46, dur: 0.16, vol: 0.088 }, // F5
+      184: { freq: 783.99, dur: 0.22, vol: 0.092 }, // G5
+      188: { freq: 880.00, dur: 0.24, vol: 0.096 }, // A5
+
+      // Bar 12: Section C Climax Run
+      192: { freq: 1046.50, dur: 0.22, vol: 0.100 }, // C6
+      196: { freq: 880.00,  dur: 0.18, vol: 0.090 }, // A5
+      200: { freq: 783.99,  dur: 0.20, vol: 0.092 }, // G5
+      204: { freq: 659.25,  dur: 0.20, vol: 0.088 }, // E5
+
+      // Bar 13: Chromatic Playful Descent
+      208: { freq: 698.46, dur: 0.18, vol: 0.088 }, // F5
+      212: { freq: 659.25, dur: 0.18, vol: 0.086 }, // E5
+      216: { freq: 587.33, dur: 0.20, vol: 0.085 }, // D5
+      220: { freq: 523.25, dur: 0.22, vol: 0.088 }, // C5
+
+      // Bar 14: Drum & Bass Driven Build
+      224: { freq: 440.00, dur: 0.18, vol: 0.084 }, // A4
+      228: { freq: 523.25, dur: 0.20, vol: 0.088 }, // C5
+      232: { freq: 587.33, dur: 0.22, vol: 0.090 }, // D5
+      236: { freq: 659.25, dur: 0.22, vol: 0.092 }, // E5
+
+      // Bar 15: Grand Seamless Turnaround!
+      240: { freq: 783.99, dur: 0.18, vol: 0.095 }, // G5
+      244: { freq: 880.00, dur: 0.18, vol: 0.096 }, // A5
+      248: { freq: 987.77, dur: 0.20, vol: 0.098 }, // B5
+      252: { freq: 1046.50, dur: 0.35, vol: 0.104 }  // C6 (Suspension connecting right into Step 0 C5!)
     };
 
-    const marimbaNote = MARIMBA_MELODY[step];
-    if (marimbaNote) {
-      this._playMarimbaNote(marimbaNote, time, 0.24, 0.034);
+    const note = MARIMBA_THEME[step];
+    if (note) {
+      this._playMarimbaNote(note.freq, time, note.dur, note.vol);
     }
 
-    // ── 5. SPARKLY CELESTA / BELL COUNTERPOINTS (Bars 4-12) ─────
-    if (bar >= 4 && bar <= 11) {
-      const CELESTA_NOTES = {
-        66: 1046.50, 74: 1318.51, 82: 1174.66, 90: 1046.50,
-        130: 1318.51, 138: 1567.98, 146: 1318.51, 154: 1174.66,
-        162: 1046.50, 170: 1174.66, 178: 1318.51, 186: 1567.98
+    // ── 6. SPARKLY GLOCKENSPIEL & CELESTA COUNTERPOINTS ──────────
+    // Adds magical diamond-bright sparkles to high registers
+    if (bar >= 4 && bar <= 12) {
+      const GLOCK_NOTES = {
+        66: 1318.51, 74: 1567.98, 82: 1318.51, 90: 1046.50,
+        130: 1567.98, 138: 1760.00, 146: 1567.98, 154: 1318.51
       };
-      const bellNote = CELESTA_NOTES[step];
-      if (bellNote) {
-        this._playBellNote(bellNote, time, 0.4, 0.018);
+      const gNote = GLOCK_NOTES[step];
+      if (gNote) {
+        this._playGlockenspiel(gNote, time, 0.42, 0.038);
       }
     }
   }
 
   _playMarimbaNote(freq, time, duration, vol) {
-    // 1. Fundamental warm acoustic body
+    // 1. Acoustic Rosewood Bar Fundamental
     const osc1 = this.ctx.createOscillator();
     const gain1 = this.ctx.createGain();
     osc1.type = 'sine';
     osc1.frequency.setValueAtTime(freq, time);
 
-    // 2. Soft wooden overtone (tuned slightly sharp to emulate real rosewood bar)
+    // 2. Tuned Wooden Mallet Strike Overtone (tuned ~3x with fast ring)
     const osc2 = this.ctx.createOscillator();
     const gain2 = this.ctx.createGain();
     osc2.type = 'triangle';
@@ -673,16 +750,16 @@ export class AudioManager {
 
     const filter = this.ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(1900, time);
-    filter.frequency.exponentialRampToValueAtTime(700, time + duration);
+    filter.frequency.setValueAtTime(2600, time);
+    filter.frequency.exponentialRampToValueAtTime(850, time + duration);
 
     gain1.gain.setValueAtTime(0.0001, time);
-    gain1.gain.linearRampToValueAtTime(vol, time + 0.006);
+    gain1.gain.linearRampToValueAtTime(vol, time + 0.005);
     gain1.gain.exponentialRampToValueAtTime(0.0001, time + duration);
 
     gain2.gain.setValueAtTime(0.0001, time);
-    gain2.gain.linearRampToValueAtTime(vol * 0.35, time + 0.004);
-    gain2.gain.exponentialRampToValueAtTime(0.0001, time + duration * 0.45);
+    gain2.gain.linearRampToValueAtTime(vol * 0.45, time + 0.003);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, time + duration * 0.4);
 
     osc1.connect(gain1);
     osc2.connect(gain2);
@@ -700,14 +777,99 @@ export class AudioManager {
     osc2.stop(time + duration + 0.02);
   }
 
-  _playBellNote(freq, time, duration, vol) {
+  _playHornStab(freq, time, duration, vol) {
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(freq, time);
+
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(freq * 1.005, time); // Subtle rich chorus
+
+    filter.type = 'lowpass';
+    filter.Q.setValueAtTime(2.2, time);
+    filter.frequency.setValueAtTime(1800, time);
+    filter.frequency.exponentialRampToValueAtTime(650, time + duration);
+
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.bgmFadeGain);
+
+    osc1.start(time);
+    osc2.start(time);
+    osc1.stop(time + duration + 0.02);
+    osc2.stop(time + duration + 0.02);
+  }
+
+  _playUkuleleStrum(chordNotes, time, vol, isDown = true) {
+    chordNotes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      // Stagger notes by 5ms to emulate natural acoustic finger strum
+      const noteTime = time + (isDown ? idx : (chordNotes.length - 1 - idx)) * 0.005;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1250, noteTime);
+      filter.Q.setValueAtTime(1.8, noteTime);
+
+      gain.gain.setValueAtTime(0.0001, noteTime);
+      gain.gain.linearRampToValueAtTime(vol, noteTime + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.12);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.bgmFadeGain);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.13);
+    });
+  }
+
+  _playUprightBass(freq, time, duration, vol, isSlap = false) {
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = isSlap ? 'sawtooth' : 'triangle';
+    osc.frequency.setValueAtTime(freq, time);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(isSlap ? 380 : 240, time);
+    filter.Q.setValueAtTime(1.6, time);
+
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.bgmFadeGain);
+
+    osc.start(time);
+    osc.stop(time + duration + 0.02);
+  }
+
+  _playGlockenspiel(freq, time, duration, vol) {
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, time);
 
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.008);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.006);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
 
     osc.connect(gain);
@@ -721,60 +883,12 @@ export class AudioManager {
     osc.stop(time + duration + 0.02);
   }
 
-  _playRhodesChord(chordNotes, time, duration, vol) {
-    chordNotes.forEach((freq) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const filter = this.ctx.createBiquadFilter();
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, time);
-
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(850, time);
-
-      gain.gain.setValueAtTime(0.0001, time);
-      gain.gain.linearRampToValueAtTime(vol, time + 0.035);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.bgmFadeGain);
-
-      osc.start(time);
-      osc.stop(time + duration + 0.02);
-    });
-  }
-
-  _playAcousticBass(freq, time, duration, vol) {
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, time);
-
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(220, time);
-
-    gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.bgmFadeGain);
-
-    osc.start(time);
-    osc.stop(time + duration + 0.02);
-  }
-
-  _playSoftPercussion(type, time, vol) {
+  _playAcousticDrum(type, time, vol) {
     if (type === 'kick') {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(90, time);
+      osc.frequency.setValueAtTime(95, time);
       osc.frequency.exponentialRampToValueAtTime(42, time + 0.08);
 
       gain.gain.setValueAtTime(vol, time);
@@ -784,27 +898,41 @@ export class AudioManager {
       gain.connect(this.bgmFadeGain);
       osc.start(time);
       osc.stop(time + 0.09);
-    } else if (type === 'woodblock') {
+    } else if (type === 'rim') {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(740, time);
-      osc.frequency.exponentialRampToValueAtTime(280, time + 0.025);
+      osc.frequency.setValueAtTime(680, time);
+      osc.frequency.exponentialRampToValueAtTime(220, time + 0.03);
 
       gain.gain.setValueAtTime(vol, time);
-      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.035);
 
       osc.connect(gain);
       gain.connect(this.bgmFadeGain);
       osc.start(time);
-      osc.stop(time + 0.035);
+      osc.stop(time + 0.04);
+    } else if (type === 'woodblock') {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(980, time);
+      osc.frequency.exponentialRampToValueAtTime(450, time + 0.025);
+
+      gain.gain.setValueAtTime(vol, time);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.028);
+
+      osc.connect(gain);
+      gain.connect(this.bgmFadeGain);
+      osc.start(time);
+      osc.stop(time + 0.03);
     } else if (type === 'shaker' && this.pinkNoiseBuffer) {
       const src = this.ctx.createBufferSource();
       src.buffer = this.pinkNoiseBuffer;
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'highpass';
-      filter.frequency.setValueAtTime(3900, time);
+      filter.frequency.setValueAtTime(4200, time);
 
       const gain = this.ctx.createGain();
       gain.gain.setValueAtTime(vol, time);
@@ -821,30 +949,21 @@ export class AudioManager {
 
   /* ═════════════════════════════════════════════════════════════
    * 2. SLINGSHOT MECHANICS & GAMEPLAY AUDIO
-   *  - Bird grabbing/pulling
-   *  - Elastic/stretch tension while pulling
-   *  - Bird release
-   *  - Fast launch whoosh/swish
-   *  - Subtle in-flight air movement
    * ═════════════════════════════════════════════════════════════ */
 
-  /**
-   * Tactile organic pop/chirp when player grabs/touches the bird in the slingshot.
-   */
   playBirdGrab() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
 
-    // Cheerful, friendly rubber touch / chirp
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(540, now);
-    osc.frequency.exponentialRampToValueAtTime(820, now + 0.035);
+    osc.frequency.exponentialRampToValueAtTime(840, now + 0.035);
 
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.008);
+    gain.gain.linearRampToValueAtTime(0.14, now + 0.008);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
 
     osc.connect(gain);
@@ -853,17 +972,12 @@ export class AudioManager {
     osc.stop(now + 0.055);
   }
 
-  /**
-   * Dynamic elastic tension audio while pulling back the slingshot.
-   * Generates micro-friction latex creaks and subtle harmonic tension as pull ratio scales from 0 to 1.
-   */
   updateSlingshotPull(ratio = 0) {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
     const clampedRatio = Math.max(0, Math.min(1.0, ratio));
 
-    // 1. Maintain continuous subtle rubber tension tone
     if (!this.pullOsc) {
       this.pullOsc = ctx.createOscillator();
       this.pullFilter = ctx.createBiquadFilter();
@@ -881,15 +995,13 @@ export class AudioManager {
       this.pullOsc.start(now);
     }
 
-    // Dynamic pitch and cutoff rising with elastic stretch
-    const targetFreq = 160 + clampedRatio * 240;
+    const targetFreq = 160 + clampedRatio * 250;
     this.pullOsc.frequency.linearRampToValueAtTime(targetFreq, now + 0.04);
     this.pullFilter.frequency.linearRampToValueAtTime(targetFreq * 1.5, now + 0.04);
 
-    const targetGain = clampedRatio > 0.08 ? (0.015 + clampedRatio * 0.045) : 0.0001;
+    const targetGain = clampedRatio > 0.08 ? (0.018 + clampedRatio * 0.048) : 0.0001;
     this.pullGain.gain.linearRampToValueAtTime(targetGain, now + 0.04);
 
-    // 2. Micro-friction latex creak ticks as pull displacement changes
     const pullDelta = Math.abs(clampedRatio - this.lastPullRatio);
     if (pullDelta > 0.06 && (now - this.lastPullTickTime > 0.075)) {
       this.lastPullTickTime = now;
@@ -901,7 +1013,7 @@ export class AudioManager {
       click.frequency.setValueAtTime(920 + Math.random() * 400, now);
       click.frequency.exponentialRampToValueAtTime(350, now + 0.012);
 
-      cGain.gain.setValueAtTime(0.028 * clampedRatio, now);
+      cGain.gain.setValueAtTime(0.03 * clampedRatio, now);
       cGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.015);
 
       click.connect(cGain);
@@ -911,9 +1023,6 @@ export class AudioManager {
     }
   }
 
-  /**
-   * Safely silences the continuous tension tone when slingshot is released or cancelled.
-   */
   stopSlingshotPull() {
     if (this.pullGain && this.ctx) {
       const now = this.ctx.currentTime;
@@ -931,9 +1040,6 @@ export class AudioManager {
     this.lastPullRatio = 0;
   }
 
-  /**
-   * Soft rubber snap-back when the player lets go without launching (< minPullDistance).
-   */
   playSlingshotCancel() {
     this.stopSlingshotPull();
     const ctx = this.ensureContext();
@@ -946,7 +1052,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(260, now);
     osc.frequency.exponentialRampToValueAtTime(140, now + 0.04);
 
-    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.setValueAtTime(0.07, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
     osc.connect(gain);
@@ -955,12 +1061,6 @@ export class AudioManager {
     osc.stop(now + 0.05);
   }
 
-  /**
-   * Classic Angry Birds style launch snap ("fwip-thwack!"):
-   *  - Sharp high-tension rubber band whip-crack snap
-   *  - Kinetic pouch pop & release thud
-   *  - Fast launch aerodynamic whoosh/swish
-   */
   playLaunch(power = 1.0) {
     this.stopSlingshotPull();
     const ctx = this.ensureContext();
@@ -968,14 +1068,14 @@ export class AudioManager {
     const now = ctx.currentTime;
     const clampedPower = Math.min(1.4, Math.max(0.6, power));
 
-    // 1. High-tension rubber band snap (the classic "thwack!" transient)
+    // Rubber band whip-crack snap
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'sawtooth';
     snapOsc.frequency.setValueAtTime(1450 * clampedPower, now);
     snapOsc.frequency.exponentialRampToValueAtTime(210, now + 0.034);
 
-    snapGain.gain.setValueAtTime(0.26 * clampedPower, now);
+    snapGain.gain.setValueAtTime(0.28 * clampedPower, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
 
     snapOsc.connect(snapGain);
@@ -983,14 +1083,14 @@ export class AudioManager {
     snapOsc.start(now);
     snapOsc.stop(now + 0.042);
 
-    // 2. Leather pouch kinetic release thud
+    // Leather pouch release pop
     const thumpOsc = ctx.createOscillator();
     const thumpGain = ctx.createGain();
     thumpOsc.type = 'sine';
     thumpOsc.frequency.setValueAtTime(160 * clampedPower, now);
     thumpOsc.frequency.exponentialRampToValueAtTime(42, now + 0.07);
 
-    thumpGain.gain.setValueAtTime(0.28 * clampedPower, now);
+    thumpGain.gain.setValueAtTime(0.30 * clampedPower, now);
     thumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
 
     thumpOsc.connect(thumpGain);
@@ -998,7 +1098,7 @@ export class AudioManager {
     thumpOsc.start(now);
     thumpOsc.stop(now + 0.085);
 
-    // 3. Fast aerodynamic launch whoosh/swish
+    // Resonant aerodynamic launch whoosh
     if (this.pinkNoiseBuffer) {
       const noise = ctx.createBufferSource();
       noise.buffer = this.pinkNoiseBuffer;
@@ -1010,7 +1110,7 @@ export class AudioManager {
       filter.Q.setValueAtTime(2.4, now);
 
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.22 * clampedPower, now);
+      noiseGain.gain.setValueAtTime(0.24 * clampedPower, now);
       noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.115);
 
       noise.connect(filter);
@@ -1022,14 +1122,12 @@ export class AudioManager {
     }
   }
 
-  // Backward compatibility aliases
   updateSlingshotCharge(power) { this.updateSlingshotPull(power); }
   stopSlingshotCharge() { this.stopSlingshotPull(); }
   playStretch(ratio) { this.updateSlingshotPull(ratio); }
 
   /* ═════════════════════════════════════════════════════════════
-   * IN-FLIGHT AERODYNAMIC AIR MOVEMENT
-   * Subtle, clean rush tracking projectile speed without whistling.
+   * IN-FLIGHT AERODYNAMICS
    * ═════════════════════════════════════════════════════════════ */
 
   startFlightSound() {
@@ -1049,7 +1147,7 @@ export class AudioManager {
 
     this.flightGain = ctx.createGain();
     this.flightGain.gain.setValueAtTime(0.0001, now);
-    this.flightGain.gain.linearRampToValueAtTime(0.035, now + 0.08);
+    this.flightGain.gain.linearRampToValueAtTime(0.040, now + 0.08);
 
     this.flightNoiseSrc.connect(this.flightFilter);
     this.flightFilter.connect(this.flightGain);
@@ -1064,7 +1162,7 @@ export class AudioManager {
     const normalizedSpeed = Math.min(2.5, Math.max(0.2, speed / 12));
 
     this.flightFilter.frequency.linearRampToValueAtTime(700 + normalizedSpeed * 450, now + 0.05);
-    const targetGain = Math.min(0.065, 0.02 + normalizedSpeed * 0.025);
+    const targetGain = Math.min(0.075, 0.02 + normalizedSpeed * 0.028);
     this.flightGain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
   }
 
@@ -1089,26 +1187,16 @@ export class AudioManager {
 
   /* ═════════════════════════════════════════════════════════════
    * 3. MATERIAL-SPECIFIC COLLISION & DESTRUCTION AUDIO
-   * WOOD: Cracking, snapping, splintering, wooden debris.
-   * STONE: Heavy impact, cracking, rock breaking, debris and dust.
-   * GLASS: Sharp impact, shattering, multiple small cascading fragments.
-   * METAL: Metallic impact, bending, buckling, plate resonance.
    * ═════════════════════════════════════════════════════════════ */
 
-  /**
-   * Realistic material collision impact sound upon physical contact.
-   */
   playMaterialImpact(material = 'wood', intensity = 1.0) {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
-    const vol = Math.min(0.32, Math.max(0.06, intensity * 0.22));
-
-    // Randomize pitch by +/- 8% for natural variation
+    const vol = Math.min(0.35, Math.max(0.07, intensity * 0.24));
     const pitchJitter = 0.92 + Math.random() * 0.16;
 
     if (material === 'stone') {
-      // 1. Sharp concussive cleavage transient
       const click = ctx.createOscillator();
       const clickGain = ctx.createGain();
       click.type = 'sawtooth';
@@ -1121,7 +1209,6 @@ export class AudioManager {
       click.start(now);
       click.stop(now + 0.025);
 
-      // 2. Heavy granite mass body thud
       const body = ctx.createOscillator();
       const bodyGain = ctx.createGain();
       const filter = ctx.createBiquadFilter();
@@ -1139,39 +1226,33 @@ export class AudioManager {
       bodyGain.connect(this.sfxDuckingGain);
       body.start(now);
       body.stop(now + 0.1);
-
     } else if (material === 'metal') {
-      // Metallic resonant clang
       [1450, 2200, 3100].forEach((baseFreq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(baseFreq * pitchJitter, now + idx * 0.003);
-        gain.gain.setValueAtTime(vol * 0.8, now + idx * 0.003);
+        gain.gain.setValueAtTime(vol * 0.85, now + idx * 0.003);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.003 + 0.07);
         osc.connect(gain);
         gain.connect(this.sfxDuckingGain);
         osc.start(now + idx * 0.003);
         osc.stop(now + idx * 0.003 + 0.075);
       });
-
     } else if (material === 'glass') {
-      // Brittle crystal chip
       [2300, 3400].forEach((baseFreq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(baseFreq * pitchJitter, now + idx * 0.006);
-        gain.gain.setValueAtTime(vol * 0.7, now + idx * 0.006);
+        gain.gain.setValueAtTime(vol * 0.75, now + idx * 0.006);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.006 + 0.05);
         osc.connect(gain);
         gain.connect(this.sfxDuckingGain);
         osc.start(now + idx * 0.006);
         osc.stop(now + idx * 0.006 + 0.055);
       });
-
     } else if (material === 'ground') {
-      // Earth / turf displacement
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
@@ -1184,15 +1265,13 @@ export class AudioManager {
       gain.connect(this.sfxDuckingGain);
       osc.start(now);
       osc.stop(now + 0.11);
-
     } else {
-      // Wood Structures: Solid timber knock upon impact
       const snap = ctx.createOscillator();
       const snapGain = ctx.createGain();
       snap.type = 'triangle';
       snap.frequency.setValueAtTime(850 * pitchJitter, now);
       snap.frequency.exponentialRampToValueAtTime(140, now + 0.02);
-      snapGain.gain.setValueAtTime(vol * 0.85, now);
+      snapGain.gain.setValueAtTime(vol * 0.88, now);
       snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
       snap.connect(snapGain);
       snapGain.connect(this.sfxDuckingGain);
@@ -1227,21 +1306,12 @@ export class AudioManager {
     this.playMaterialImpact(material, intensity);
   }
 
-  /**
-   * 4. REALISTIC DESTRUCTION AUDIO LAYERING & VOICE MANAGEMENT
-   * When multiple blocks break rapidly:
-   *  - Prioritizes audio and limits simultaneous voices to avoid distortion.
-   *  - Staggers micro-timings (12-25ms) so debris cascades naturally.
-   *  - Dynamic volume attenuation so 5 breaks don't blow out speakers.
-   *  - Blends into cohesive physical structural collapse event.
-   */
   playBlockBreak(type = 'wood', breakCount = 1) {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
 
     const now = ctx.currentTime;
 
-    // Track rapid consecutive breaks to avoid audio clutter
     if (now - this.lastBreakTime < 0.25) {
       this.recentBreakCountInWindow++;
     } else {
@@ -1249,9 +1319,7 @@ export class AudioManager {
     }
     this.lastBreakTime = now;
 
-    // Voice limiting: cap simultaneous individual destruction voices
     if (this.activeBreakVoices >= this.maxConcurrentBreaks) {
-      // If voice limit exceeded, trigger structural rumble instead of duplicate snap transients
       if (this.recentBreakCountInWindow >= 3) {
         this._playStructuralCollapseRumble(now, this.recentBreakCountInWindow);
       }
@@ -1263,10 +1331,7 @@ export class AudioManager {
       this.activeBreakVoices = Math.max(0, this.activeBreakVoices - 1);
     }, 180);
 
-    // Dynamic volume compression per voice: total energy remains balanced
     const countMult = Math.min(1.8, Math.max(0.65, 1.0 / Math.sqrt(Math.max(1, breakCount))));
-
-    // Random micro-timing stagger for natural chain reaction cascade
     const staggerDelay = (breakCount > 1) ? Math.random() * 0.024 : 0;
     const playTime = now + staggerDelay;
 
@@ -1280,7 +1345,6 @@ export class AudioManager {
       this._playWoodBreak(playTime, countMult);
     }
 
-    // Layer structural collapse rumble when multiple blocks break in sequence
     if (breakCount > 1 || this.recentBreakCountInWindow >= 3) {
       this._playStructuralCollapseRumble(playTime, Math.max(breakCount, this.recentBreakCountInWindow));
     }
@@ -1290,14 +1354,13 @@ export class AudioManager {
     const ctx = this.ctx;
     const pitchJitter = 0.90 + Math.random() * 0.20;
 
-    // 1. High-energy structural timber snap
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'triangle';
     snapOsc.frequency.setValueAtTime(1050 * pitchJitter, now);
     snapOsc.frequency.exponentialRampToValueAtTime(140, now + 0.035);
 
-    snapGain.gain.setValueAtTime(0.24 * countMult, now);
+    snapGain.gain.setValueAtTime(0.26 * countMult, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
 
     snapOsc.connect(snapGain);
@@ -1305,14 +1368,13 @@ export class AudioManager {
     snapOsc.start(now);
     snapOsc.stop(now + 0.05);
 
-    // 2. Hollow acoustic timber resonance
     const woodOsc = ctx.createOscillator();
     const woodGain = ctx.createGain();
     woodOsc.type = 'triangle';
     woodOsc.frequency.setValueAtTime(210 * pitchJitter, now);
     woodOsc.frequency.exponentialRampToValueAtTime(55, now + 0.12);
 
-    woodGain.gain.setValueAtTime(0.16 * countMult, now);
+    woodGain.gain.setValueAtTime(0.18 * countMult, now);
     woodGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
     woodOsc.connect(woodGain);
@@ -1320,7 +1382,6 @@ export class AudioManager {
     woodOsc.start(now);
     woodOsc.stop(now + 0.14);
 
-    // 3. Multi-stage splintering fiber bursts
     if (this.pinkNoiseBuffer) {
       [0.0, 0.010, 0.024, 0.042].forEach((offset, idx) => {
         const sSrc = ctx.createBufferSource();
@@ -1332,7 +1393,7 @@ export class AudioManager {
         sFilter.Q.setValueAtTime(2.8, now + offset);
 
         const sGain = ctx.createGain();
-        sGain.gain.setValueAtTime(0.13 * countMult, now + offset);
+        sGain.gain.setValueAtTime(0.14 * countMult, now + offset);
         sGain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.055);
 
         sSrc.connect(sFilter);
@@ -1349,7 +1410,6 @@ export class AudioManager {
     const ctx = this.ctx;
     const pitchJitter = 0.88 + Math.random() * 0.24;
 
-    // 1. Concussive rock cleavage fracture
     const crackOsc = ctx.createOscillator();
     const crackGain = ctx.createGain();
     crackOsc.type = 'sawtooth';
@@ -1361,7 +1421,7 @@ export class AudioManager {
     filter.frequency.setValueAtTime(280, now);
     filter.frequency.exponentialRampToValueAtTime(70, now + 0.2);
 
-    crackGain.gain.setValueAtTime(0.24 * countMult, now);
+    crackGain.gain.setValueAtTime(0.26 * countMult, now);
     crackGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.23);
 
     crackOsc.connect(filter);
@@ -1370,7 +1430,6 @@ export class AudioManager {
     crackOsc.start(now);
     crackOsc.stop(now + 0.24);
 
-    // 2. Gritty rock-on-rock tumbling crunch & debris
     if (this.pinkNoiseBuffer) {
       const noiseSrc = ctx.createBufferSource();
       noiseSrc.buffer = this.pinkNoiseBuffer;
@@ -1381,7 +1440,7 @@ export class AudioManager {
       nFilter.Q.setValueAtTime(1.4, now);
 
       const nGain = ctx.createGain();
-      nGain.gain.setValueAtTime(0.22 * countMult, now);
+      nGain.gain.setValueAtTime(0.24 * countMult, now);
       nGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 
       noiseSrc.connect(nFilter);
@@ -1396,14 +1455,13 @@ export class AudioManager {
     const ctx = this.ctx;
     const pitchJitter = 0.94 + Math.random() * 0.12;
 
-    // 1. Sharp initial crystal puncture
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'sine';
     snapOsc.frequency.setValueAtTime(3400 * pitchJitter, now);
     snapOsc.frequency.exponentialRampToValueAtTime(1200, now + 0.02);
 
-    snapGain.gain.setValueAtTime(0.18 * countMult, now);
+    snapGain.gain.setValueAtTime(0.20 * countMult, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
 
     snapOsc.connect(snapGain);
@@ -1411,7 +1469,6 @@ export class AudioManager {
     snapOsc.start(now);
     snapOsc.stop(now + 0.03);
 
-    // 2. Staggered cascade of multiple small crystal fragments (1800Hz - 4200Hz)
     const SHARD_FREQS = [2100, 2650, 3150, 3600, 4100, 2400];
     SHARD_FREQS.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
@@ -1420,7 +1477,7 @@ export class AudioManager {
       const start = now + idx * 0.012 + Math.random() * 0.006;
       osc.frequency.setValueAtTime(freq * pitchJitter + (Math.random() - 0.5) * 80, start);
 
-      gain.gain.setValueAtTime(0.09 * countMult, start);
+      gain.gain.setValueAtTime(0.10 * countMult, start);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.11);
 
       osc.connect(gain);
@@ -1434,14 +1491,13 @@ export class AudioManager {
     const ctx = this.ctx;
     const pitchJitter = 0.92 + Math.random() * 0.16;
 
-    // 1. Heavy industrial metal buckle & shear
     const buckleOsc = ctx.createOscillator();
     const buckleGain = ctx.createGain();
     buckleOsc.type = 'sawtooth';
     buckleOsc.frequency.setValueAtTime(440 * pitchJitter, now);
     buckleOsc.frequency.exponentialRampToValueAtTime(75, now + 0.16);
 
-    buckleGain.gain.setValueAtTime(0.24 * countMult, now);
+    buckleGain.gain.setValueAtTime(0.26 * countMult, now);
     buckleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
 
     buckleOsc.connect(buckleGain);
@@ -1449,14 +1505,13 @@ export class AudioManager {
     buckleOsc.start(now);
     buckleOsc.stop(now + 0.19);
 
-    // 2. Ringing plate modal resonance (inharmonic overtones)
     [1600, 2350, 3400].forEach((baseFreq, idx) => {
       const ring = ctx.createOscillator();
       const rGain = ctx.createGain();
       ring.type = 'triangle';
       ring.frequency.setValueAtTime(baseFreq * pitchJitter, now + idx * 0.008);
 
-      rGain.gain.setValueAtTime(0.12 * countMult, now + idx * 0.008);
+      rGain.gain.setValueAtTime(0.13 * countMult, now + idx * 0.008);
       rGain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.008 + 0.18);
 
       ring.connect(rGain);
@@ -1474,7 +1529,7 @@ export class AudioManager {
     rumbleOsc.frequency.setValueAtTime(52, now);
     rumbleOsc.frequency.exponentialRampToValueAtTime(24, now + 0.42);
 
-    const rumbleVol = Math.min(0.22, 0.09 + breakCount * 0.025);
+    const rumbleVol = Math.min(0.24, 0.10 + breakCount * 0.028);
     rumbleGain.gain.setValueAtTime(rumbleVol, now);
     rumbleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.44);
 
@@ -1485,14 +1540,7 @@ export class AudioManager {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * 5. COMPLETE TNT AUDIO SEQUENCE
-   * Complete 5-phase physical detonation:
-   *  1. Fuse ignition spark
-   *  2. Fuse burning/tension sizzle
-   *  3. Punchy concussive blast (calibrated for mobile & PC)
-   *  4. Debris cascade
-   *  5. Environmental reverb tail
-   * Synchronized precisely with the visual explosion!
+   * 4. COMPLETE TNT AUDIO SEQUENCE
    * ═════════════════════════════════════════════════════════════ */
 
   playTNTSequence() {
@@ -1500,10 +1548,9 @@ export class AudioManager {
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
 
-    // Trigger smooth audio ducking so the explosion takes full cinematic focus
     this.duck(0.25, 0.18, 0.50);
 
-    // ── Phase 1 & 2: Fuse Sizzle Transient (0 to 60ms) ──────────
+    // Fuse Sizzle
     if (this.pinkNoiseBuffer) {
       const fuseSrc = ctx.createBufferSource();
       fuseSrc.buffer = this.pinkNoiseBuffer;
@@ -1514,7 +1561,7 @@ export class AudioManager {
       fuseFilter.Q.setValueAtTime(3.5, now);
 
       const fuseGain = ctx.createGain();
-      fuseGain.gain.setValueAtTime(0.18, now);
+      fuseGain.gain.setValueAtTime(0.20, now);
       fuseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
 
       fuseSrc.connect(fuseFilter);
@@ -1524,9 +1571,7 @@ export class AudioManager {
       fuseSrc.stop(now + 0.065);
     }
 
-    // ── Phase 3: Punchy Concussive Mid-Bass Blast (t + 0.02s) ────
-    // Calibrated: Starts at 88Hz dropping to 34Hz.
-    // Perfectly audible on phone/tablet/laptop speakers without sub-30Hz blown-out distortion!
+    // Mid-Bass Blast (88Hz -> 32Hz, punchy and clear on mobile)
     const blastTime = now + 0.015;
 
     const osc = ctx.createOscillator();
@@ -1535,7 +1580,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(88, blastTime);
     osc.frequency.exponentialRampToValueAtTime(32, blastTime + 0.45);
 
-    gain.gain.setValueAtTime(0.38, blastTime);
+    gain.gain.setValueAtTime(0.40, blastTime);
     gain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.48);
 
     osc.connect(gain);
@@ -1543,7 +1588,7 @@ export class AudioManager {
     osc.start(blastTime);
     osc.stop(blastTime + 0.5);
 
-    // Plasma fireball wideband noise roar
+    // Plasma fireball roar
     if (this.pinkNoiseBuffer) {
       const roarSrc = ctx.createBufferSource();
       roarSrc.buffer = this.pinkNoiseBuffer;
@@ -1554,7 +1599,7 @@ export class AudioManager {
       roarFilter.frequency.exponentialRampToValueAtTime(85, blastTime + 0.42);
 
       const roarGain = ctx.createGain();
-      roarGain.gain.setValueAtTime(0.32, blastTime);
+      roarGain.gain.setValueAtTime(0.34, blastTime);
       roarGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.45);
 
       roarSrc.connect(roarFilter);
@@ -1564,14 +1609,14 @@ export class AudioManager {
       roarSrc.stop(blastTime + 0.48);
     }
 
-    // Casing shrapnel crack transient
+    // Shrapnel crack
     const shrapnelOsc = ctx.createOscillator();
     const shrapnelGain = ctx.createGain();
     shrapnelOsc.type = 'sawtooth';
     shrapnelOsc.frequency.setValueAtTime(780, blastTime);
     shrapnelOsc.frequency.exponentialRampToValueAtTime(120, blastTime + 0.05);
 
-    shrapnelGain.gain.setValueAtTime(0.24, blastTime);
+    shrapnelGain.gain.setValueAtTime(0.25, blastTime);
     shrapnelGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.055);
 
     shrapnelOsc.connect(shrapnelGain);
@@ -1579,7 +1624,7 @@ export class AudioManager {
     shrapnelOsc.start(blastTime);
     shrapnelOsc.stop(blastTime + 0.06);
 
-    // ── Phase 4: Secondary Debris Scattering (t + 0.12s to 0.45s) ─
+    // Debris scatter
     if (this.pinkNoiseBuffer) {
       [0.08, 0.16, 0.24].forEach((offset, idx) => {
         const dSrc = ctx.createBufferSource();
@@ -1591,7 +1636,7 @@ export class AudioManager {
         dFilter.Q.setValueAtTime(2.2, blastTime + offset);
 
         const dGain = ctx.createGain();
-        dGain.gain.setValueAtTime(0.14 - idx * 0.03, blastTime + offset);
+        dGain.gain.setValueAtTime(0.15 - idx * 0.03, blastTime + offset);
         dGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + offset + 0.12);
 
         dSrc.connect(dFilter);
@@ -1603,14 +1648,14 @@ export class AudioManager {
       });
     }
 
-    // ── Phase 5: Environmental Reverb Tail (t + 0.20s to 0.85s) ──
+    // Reverb tail
     const tailOsc = ctx.createOscillator();
     const tailGain = ctx.createGain();
     tailOsc.type = 'sine';
     tailOsc.frequency.setValueAtTime(48, blastTime + 0.1);
     tailOsc.frequency.exponentialRampToValueAtTime(22, blastTime + 0.65);
 
-    tailGain.gain.setValueAtTime(0.12, blastTime + 0.1);
+    tailGain.gain.setValueAtTime(0.14, blastTime + 0.1);
     tailGain.gain.exponentialRampToValueAtTime(0.0001, blastTime + 0.7);
 
     tailOsc.connect(tailGain);
@@ -1624,28 +1669,21 @@ export class AudioManager {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * 6. TARGET DEFEAT, POWERS & VICTORY/DEFEAT
+   * 5. TARGET DEFEAT, POWERS & VICTORY/DEFEAT
    * ═════════════════════════════════════════════════════════════ */
 
-  /**
-   * Juicy, highly satisfying target defeat pop:
-   *  - Snappy kinetic impact punch
-   *  - Bubble pop pitch drop
-   *  - Sparkling bounty star chime
-   */
   playTargetPop() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
 
-    // 1. Punchy kinetic transient
     const snap = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snap.type = 'triangle';
     snap.frequency.setValueAtTime(780, now);
     snap.frequency.exponentialRampToValueAtTime(140, now + 0.03);
 
-    snapGain.gain.setValueAtTime(0.26, now);
+    snapGain.gain.setValueAtTime(0.28, now);
     snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
 
     snap.connect(snapGain);
@@ -1653,14 +1691,13 @@ export class AudioManager {
     snap.start(now);
     snap.stop(now + 0.04);
 
-    // 2. Juicy bubble-pop body
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'triangle';
     osc.frequency.setValueAtTime(260, now);
     osc.frequency.exponentialRampToValueAtTime(55, now + 0.13);
 
-    gain.gain.setValueAtTime(0.24, now);
+    gain.gain.setValueAtTime(0.26, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
 
     osc.connect(gain);
@@ -1668,13 +1705,12 @@ export class AudioManager {
     osc.start(now);
     osc.stop(now + 0.15);
 
-    // 3. Sparkling reward chime
     const bell = ctx.createOscillator();
     const bGain = ctx.createGain();
     bell.type = 'sine';
-    bell.frequency.setValueAtTime(1174.66, now + 0.02); // D6
+    bell.frequency.setValueAtTime(1174.66, now + 0.02);
 
-    bGain.gain.setValueAtTime(0.12, now + 0.02);
+    bGain.gain.setValueAtTime(0.14, now + 0.02);
     bGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
 
     bell.connect(bGain);
@@ -1683,9 +1719,6 @@ export class AudioManager {
     bell.stop(now + 0.19);
   }
 
-  /**
-   * Special ability surge (Speedster boost / Heavy slam).
-   */
   playBoost() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1701,7 +1734,7 @@ export class AudioManager {
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(1400, now);
 
-    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.setValueAtTime(0.20, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
 
     osc.connect(filter);
@@ -1711,9 +1744,6 @@ export class AudioManager {
     osc.stop(now + 0.26);
   }
 
-  /**
-   * Sparkling crate / coin bounty collection.
-   */
   playCoin() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1726,7 +1756,7 @@ export class AudioManager {
       const noteTime = now + idx * 0.045;
       osc.frequency.setValueAtTime(freq, noteTime);
 
-      gain.gain.setValueAtTime(0.14, noteTime);
+      gain.gain.setValueAtTime(0.16, noteTime);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.19);
 
       osc.connect(gain);
@@ -1736,15 +1766,11 @@ export class AudioManager {
     });
   }
 
-  /**
-   * Celebratory Victory Fanfare with bright ascending chimes, triumphant bell chord, and sparkle.
-   */
   playVictory() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
 
-    // Ascending arpeggio: C5 -> E5 -> G5 -> C6
     const chord = [523.25, 659.25, 783.99, 1046.50];
     chord.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
@@ -1754,7 +1780,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(freq, noteTime);
 
       gain.gain.setValueAtTime(0.0001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.16, noteTime + 0.035);
+      gain.gain.linearRampToValueAtTime(0.18, noteTime + 0.035);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.65);
 
       osc.connect(gain);
@@ -1763,7 +1789,6 @@ export class AudioManager {
       osc.stop(noteTime + 0.70);
     });
 
-    // Sustained celebratory bell shimmer
     setTimeout(() => {
       if (!this.ctx || this.isMuted) return;
       const cNow = this.ctx.currentTime;
@@ -1772,7 +1797,7 @@ export class AudioManager {
         const bGain = this.ctx.createGain();
         bell.type = 'sine';
         bell.frequency.setValueAtTime(freq, cNow);
-        bGain.gain.setValueAtTime(0.09, cNow);
+        bGain.gain.setValueAtTime(0.11, cNow);
         bGain.gain.exponentialRampToValueAtTime(0.0001, cNow + 0.95);
         bell.connect(bGain);
         bGain.connect(this.sfxDuckingGain);
@@ -1782,9 +1807,6 @@ export class AudioManager {
     }, 420);
   }
 
-  /**
-   * Playful, gentle descending trombone defeat wobble ("wa-wa-waa").
-   */
   playDefeat() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1802,7 +1824,7 @@ export class AudioManager {
       filter.frequency.setValueAtTime(320, noteTime);
 
       gain.gain.setValueAtTime(0.0001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.11, noteTime + 0.04);
+      gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.04);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.32);
 
       osc.connect(filter);
@@ -1813,9 +1835,6 @@ export class AudioManager {
     });
   }
 
-  /**
-   * Snappy rewind tape/swish sound for retrying a stage.
-   */
   playRetry() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1828,7 +1847,7 @@ export class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(840, now + 0.06);
     osc.frequency.exponentialRampToValueAtTime(180, now + 0.12);
 
-    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.setValueAtTime(0.14, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
     osc.connect(gain);
@@ -1841,7 +1860,6 @@ export class AudioManager {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
     const now = ctx.currentTime;
-    // Pleasant rising arpeggio: C5, E5, G5, C6
     const notes = [523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
@@ -1852,7 +1870,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(freq, noteTime);
 
       gain.gain.setValueAtTime(0.001, noteTime);
-      gain.gain.exponentialRampToValueAtTime(0.18, noteTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.20, noteTime + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.35);
 
       osc.connect(gain);
@@ -1878,7 +1896,7 @@ export class AudioManager {
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.22, now + 0.35);
+    gain.gain.linearRampToValueAtTime(0.24, now + 0.35);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
 
     src.connect(filter);
@@ -1899,7 +1917,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(440, now);
     osc.frequency.exponentialRampToValueAtTime(880, now + 0.07);
 
-    gain.gain.setValueAtTime(0.09, now);
+    gain.gain.setValueAtTime(0.10, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
     osc.connect(gain);
@@ -1909,14 +1927,9 @@ export class AudioManager {
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * 7. SUBTLE, POLISHED UI SOUNDS
-   * Non-intrusive organic taps, smooth rising opens, soft dismissals,
-   * bouncy stage selections, and unlocks.
+   * 6. SUBTLE, POLISHED UI SOUNDS
    * ═════════════════════════════════════════════════════════════ */
 
-  /**
-   * Crisp, subtle organic button click/tap.
-   */
   playUiClick() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1928,7 +1941,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(950, now);
     osc.frequency.exponentialRampToValueAtTime(420, now + 0.018);
 
-    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.setValueAtTime(0.09, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.022);
 
     osc.connect(gain);
@@ -1937,9 +1950,6 @@ export class AudioManager {
     osc.stop(now + 0.025);
   }
 
-  /**
-   * Gentle, elegant rising chime for opening modal dialogs and menus.
-   */
   playMenuOpen() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1953,7 +1963,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(freq, noteTime);
 
       gain.gain.setValueAtTime(0.0001, noteTime);
-      gain.gain.linearRampToValueAtTime(0.08, noteTime + 0.015);
+      gain.gain.linearRampToValueAtTime(0.09, noteTime + 0.015);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.14);
 
       osc.connect(gain);
@@ -1963,9 +1973,6 @@ export class AudioManager {
     });
   }
 
-  /**
-   * Soft, gentle descending tap for closing modal dialogs or going back.
-   */
   playMenuClose() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -1977,7 +1984,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(540, now);
     osc.frequency.exponentialRampToValueAtTime(260, now + 0.05);
 
-    gain.gain.setValueAtTime(0.07, now);
+    gain.gain.setValueAtTime(0.08, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
 
     osc.connect(gain);
@@ -1990,9 +1997,6 @@ export class AudioManager {
     this.playMenuClose();
   }
 
-  /**
-   * Bouncy, cheerful stage selection bubble pop.
-   */
   playLevelSelect() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -2005,7 +2009,7 @@ export class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(784, now + 0.06);
 
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.10, now + 0.01);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
 
     osc.connect(gain);
@@ -2014,9 +2018,6 @@ export class AudioManager {
     osc.stop(now + 0.09);
   }
 
-  /**
-   * Sparkly reward chime for unlocking characters, zones, or items.
-   */
   playUnlock() {
     this.playLevelUnlock();
   }
@@ -2025,9 +2026,6 @@ export class AudioManager {
     this.playCoin();
   }
 
-  /**
-   * Soft, muted wooden thud for locked stage or invalid action.
-   */
   playError() {
     const ctx = this.ensureContext();
     if (!ctx || this.isMuted) return;
@@ -2043,7 +2041,7 @@ export class AudioManager {
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(220, now);
 
-    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.setValueAtTime(0.09, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
 
     osc.connect(filter);

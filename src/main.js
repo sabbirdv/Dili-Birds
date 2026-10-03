@@ -137,6 +137,7 @@ class DiliBirdsApp {
             }
           }).catch(() => {});
         }
+        this.audio?.enterMenu();
         this.ui.refreshHeaderAndMenu();
         const hasNextLevel = levelId < LEVELS.length;
         this.ui.hud.showResultModal({
@@ -153,6 +154,14 @@ class DiliBirdsApp {
           totalStars: this.storage.getTotalStars()
         });
       }
+    });
+
+    // Global audio unlock on any user interaction anywhere on screen
+    const triggerGlobalAudio = () => {
+      this.audio?.handleUserInteraction?.();
+    };
+    ['pointerdown', 'touchstart', 'click', 'keydown'].forEach((evt) => {
+      window.addEventListener(evt, triggerGlobalAudio, { passive: true });
     });
 
     // Load the highest unlocked level as a live 3D background diorama behind the initial menu

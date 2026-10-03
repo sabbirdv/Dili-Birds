@@ -276,6 +276,7 @@ export class HudController {
 
     // BGM Playback Mode Selectors
     const setBgmMode = (mode) => {
+      this.audio?.playUiClick?.();
       if (this.audio) {
         this.audio.setBgmMode(mode);
       } else if (this.storage) {
@@ -284,9 +285,19 @@ export class HudController {
       this.updateBgmModeUI(mode);
     };
 
-    document.getElementById('btn-bgm-mode-dashboard')?.addEventListener('click', () => setBgmMode('dashboard'));
-    document.getElementById('btn-bgm-mode-always')?.addEventListener('click', () => setBgmMode('always'));
-    document.getElementById('btn-bgm-mode-off')?.addEventListener('click', () => setBgmMode('off'));
+    const attachBgmModeBtn = (id, mode) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setBgmMode(mode);
+      });
+    };
+
+    attachBgmModeBtn('btn-bgm-mode-dashboard', 'dashboard');
+    attachBgmModeBtn('btn-bgm-mode-always', 'always');
+    attachBgmModeBtn('btn-bgm-mode-off', 'off');
 
     // Result Modal Buttons
     document.getElementById('btn-result-dashboard')?.addEventListener('click', () => {

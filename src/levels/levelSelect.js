@@ -158,6 +158,45 @@ export class LevelSelect {
   }
 
   /**
+   * Returns the maximum visible level:
+   * Defaults to level 8 initially.
+   * Then shows up to (unlockedLevel + 5), capped at 20.
+   */
+  getMaxVisibleLevel() {
+    const unlocked = this.storage ? Number(this.storage.getUnlockedLevel()) || 1 : 1;
+    return Math.min(20, Math.max(8, unlocked + 5));
+  }
+
+  /**
+   * Returns the allowed unscaled world width based on the maximum visible level.
+   * Scrolling right past this boundary is blocked so subsequent levels cannot be reached.
+   */
+  getAllowedWorldWidth() {
+    const maxVisibleLevel = this.getMaxVisibleLevel();
+    if (maxVisibleLevel >= 20) {
+      return MAP_TOTAL_WIDTH;
+    }
+    const maxNode = LEVEL_NODES.find((n) => n.id === maxVisibleLevel);
+    const nextNode = LEVEL_NODES.find((n) => n.id === maxVisibleLevel + 1);
+    if (!maxNode) return MAP_TOTAL_WIDTH;
+    if (nextNode) {
+      return Math.round((maxNode.x + nextNode.x) / 2);
+    }
+    return Math.min(MAP_TOTAL_WIDTH, maxNode.x + 100);
+  }
+
+  /**
+   * Returns the maximum scrollLeft allowed in the viewport.
+   */
+  getMaxScrollLeft() {
+    if (!this.viewportEl) return 0;
+    const allowedWorldWidth = this.getAllowedWorldWidth();
+    const scaledWidth = Math.round(allowedWorldWidth * this.currentScale);
+    const vpWidth = this.viewportEl.clientWidth || 0;
+    return Math.max(0, scaledWidth - vpWidth);
+  }
+
+  /**
    * Automatically adapts the map world scale to fit the mobile landscape screen height.
    * Completely eliminates vertical scrolling while ensuring all nodes, mascot pins, and CTA buttons are visible.
    */
@@ -177,10 +216,16 @@ export class LevelSelect {
 
     this.viewportEl.style.setProperty('--mobile-map-scale', scale.toFixed(3));
 
+    const allowedWorldWidth = this.getAllowedWorldWidth();
     const wrapper = this.gridEl;
     if (wrapper) {
-      wrapper.style.width = `${Math.round(MAP_TOTAL_WIDTH * scale)}px`;
+      wrapper.style.width = `${Math.round(allowedWorldWidth * scale)}px`;
       wrapper.style.height = `${Math.round(MAP_TOTAL_HEIGHT * scale)}px`;
+    }
+
+    const maxScroll = this.getMaxScrollLeft();
+    if (this.viewportEl.scrollLeft > maxScroll) {
+      this.viewportEl.scrollLeft = maxScroll;
     }
   }
 
@@ -231,11 +276,13 @@ export class LevelSelect {
       }
 
       if (this.hasDragged) {
-        this.pendingScrollLeft = this.scrollLeftStart - dx;
+        const maxScroll = this.getMaxScrollLeft();
+        this.pendingScrollLeft = Math.max(0, Math.min(maxScroll, this.scrollLeftStart - dx));
         if (!this.dragRafId) {
           this.dragRafId = requestAnimationFrame(() => {
             if (this.viewportEl && this.pendingScrollLeft !== null) {
-              this.viewportEl.scrollLeft = this.pendingScrollLeft;
+              const maxS = this.getMaxScrollLeft();
+              this.viewportEl.scrollLeft = Math.min(maxS, this.pendingScrollLeft);
             }
             this.dragRafId = null;
           });
@@ -261,7 +308,8 @@ export class LevelSelect {
         this.dragRafId = null;
       }
       if (this.pendingScrollLeft !== null) {
-        vp.scrollLeft = this.pendingScrollLeft;
+        const maxScroll = this.getMaxScrollLeft();
+        vp.scrollLeft = Math.max(0, Math.min(maxScroll, this.pendingScrollLeft));
         this.pendingScrollLeft = null;
       }
 
@@ -296,9 +344,18 @@ export class LevelSelect {
       const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       if (Math.abs(delta) > 0.5) {
         e.preventDefault();
-        vp.scrollLeft += delta * 1.15;
+        const maxScroll = this.getMaxScrollLeft();
+        vp.scrollLeft = Math.max(0, Math.min(maxScroll, vp.scrollLeft + delta * 1.15));
       }
     }, { passive: false });
+
+    // Native scroll event bounds enforcement
+    vp.addEventListener('scroll', () => {
+      const maxScroll = this.getMaxScrollLeft();
+      if (vp.scrollLeft > maxScroll) {
+        vp.scrollLeft = maxScroll;
+      }
+    });
   }
 
   startMomentumGlide(initialVelocity) {
@@ -307,13 +364,25 @@ export class LevelSelect {
 
     let v = initialVelocity * 16;
     const friction = 0.92;
+    const maxScroll = this.getMaxScrollLeft();
 
     const step = () => {
       if (Math.abs(v) < 0.25) {
         this.momentumRafId = null;
         return;
       }
-      vp.scrollLeft -= v;
+      const newScroll = vp.scrollLeft - v;
+      if (newScroll <= 0) {
+        vp.scrollLeft = 0;
+        this.momentumRafId = null;
+        return;
+      }
+      if (newScroll >= maxScroll) {
+        vp.scrollLeft = maxScroll;
+        this.momentumRafId = null;
+        return;
+      }
+      vp.scrollLeft = newScroll;
       v *= friction;
       this.momentumRafId = requestAnimationFrame(step);
     };
@@ -325,9 +394,10 @@ export class LevelSelect {
     if (!this.viewportEl) return;
     const node = LEVEL_NODES.find((n) => n.id === Number(levelId)) || LEVEL_NODES[0];
     const vpWidth = this.viewportEl.clientWidth || 800;
+    const maxScroll = this.getMaxScrollLeft();
     const targetScroll = (node.x * this.currentScale) - vpWidth / 2;
     this.viewportEl.scrollTo({
-      left: Math.max(0, targetScroll),
+      left: Math.max(0, Math.min(maxScroll, targetScroll)),
       behavior: smooth ? 'smooth' : 'auto'
     });
   }
@@ -855,9 +925,13 @@ export class LevelSelect {
    */
   buildLevelNodesHtml(unlockedLevel, avatarUrl) {
     let html = '';
+    const maxVisibleLevel = this.getMaxVisibleLevel();
 
     LEVEL_NODES.forEach((node) => {
       const levelId = node.id;
+      if (levelId > maxVisibleLevel) {
+        return;
+      }
       const levelObj = LEVELS.find((l) => l.id === levelId) || { id: levelId, name: node.name, coinReward: 100 };
       const isUnlocked = levelId <= unlockedLevel;
       const isActive = levelId === this.activeLevelId;
@@ -980,85 +1054,6 @@ export class LevelSelect {
     return html;
   }
 
-  /**
-   * Realistic Volumetric Cumulus Cloud Fog of War:
-   * Levels 1 through 10 visible initially.
-   * Levels 11 onward obscured by stylized, realistic white cloud layers with volumetric shading,
-   * ambient depth, and rolling mist, clearing progressively as stages are completed.
-   */
-  buildCloudFogOfWar(unlockedLevel) {
-    if (unlockedLevel >= 20) {
-      return '';
-    }
-
-    let fogStartX = 1910;
-    if (unlockedLevel > 10) {
-      const currentLevelNode = LEVEL_NODES[unlockedLevel - 1];
-      if (currentLevelNode) {
-        fogStartX = currentLevelNode.x + 95;
-      }
-    }
-
-    const fogWidth = Math.max(0, MAP_TOTAL_WIDTH - fogStartX + 60);
-
-    return `
-      <section
-        id="cloud-fog-overlay"
-        class="cloud-fog-of-war"
-        style="left: ${fogStartX}px; width: ${fogWidth}px;"
-        aria-label="Cloud Fog of War: Celestial Citadel"
-      >
-        <!-- Realistic Sunbeam Crepuscular Rays Streaming through Cloud Edges -->
-        <div class="cloud-sunray-bank" aria-hidden="true">
-          <div class="cloud-sunray ray-1"></div>
-          <div class="cloud-sunray ray-2"></div>
-          <div class="cloud-sunray ray-3"></div>
-        </div>
-
-        <!-- Realistic Volumetric Layered Cumulus Cloud Puffs on Leading Edge -->
-        <div class="cloud-puff-bank" aria-hidden="true">
-          <!-- Background Atmospheric Haze -->
-          <div class="cloud-billow haze-layer billow-bg-1"></div>
-          <div class="cloud-billow haze-layer billow-bg-2"></div>
-
-          <!-- Midground Volumetric Cumulus Bodies -->
-          <div class="cloud-billow billow-volumetric billow-1"></div>
-          <div class="cloud-billow billow-volumetric billow-2"></div>
-          <div class="cloud-billow billow-volumetric billow-3"></div>
-          <div class="cloud-billow billow-volumetric billow-4"></div>
-          <div class="cloud-billow billow-volumetric billow-5"></div>
-          <div class="cloud-billow billow-volumetric billow-6"></div>
-
-          <!-- Foreground Crisp Sunlit Cloud Puffs -->
-          <div class="cloud-billow billow-sunlit billow-7"></div>
-          <div class="cloud-billow billow-sunlit billow-8"></div>
-          <div class="cloud-billow billow-sunlit billow-9"></div>
-        </div>
-
-        <!-- Dense Misty Volumetric Fog Mass with Celestial Starlight -->
-        <div class="cloud-fog-body" aria-hidden="true">
-          <div class="cloud-fog-volumetric-gradient"></div>
-          <div class="cloud-celestial-stars"></div>
-        </div>
-
-        <!-- Frosted Zone 2 Celestial Citadel Seal & Tooltip -->
-        <div class="cloud-sanctuary-seal" id="cloud-sanctuary-seal" role="button" tabindex="0" title="Click to inspect Cloud Fog">
-          <div class="seal-icon-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="4" y="11" width="16" height="10" rx="3" />
-              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            </svg>
-          </div>
-          <div class="seal-text-group">
-            <span class="seal-kicker">ZONE 2 • CLOUD SANCTUARY</span>
-            <strong class="seal-title">Celestial Citadel</strong>
-            <p class="seal-hint">Conquer Stage ${Math.min(unlockedLevel, 10)} to dispel the mystical clouds!</p>
-          </div>
-        </div>
-      </section>
-    `;
-  }
-
   render() {
     if (!this.gridEl) return;
 
@@ -1079,9 +1074,6 @@ export class LevelSelect {
         <div class="map-nodes-layer" id="map-nodes-layer">
           ${this.buildLevelNodesHtml(unlockedLevel, avatarUrl)}
         </div>
-
-        <!-- 3. Dynamic Realistic White Cloud Fog of War -->
-        ${this.buildCloudFogOfWar(unlockedLevel)}
       </div>
     `;
 
@@ -1135,23 +1127,6 @@ export class LevelSelect {
             this.launchLevel(levelId);
           }
           return;
-        }
-
-        // Check Cloud Sanctuary Seal Click / Cloud Tap
-        const cloudSeal = e.target.closest('#cloud-sanctuary-seal, .cloud-fog-of-war');
-        if (cloudSeal) {
-          const seal = document.getElementById('cloud-sanctuary-seal');
-          if (seal) {
-            seal.classList.remove('seal-shake');
-            void seal.offsetWidth;
-            seal.classList.add('seal-shake');
-          }
-          const unlocked = this.storage.getUnlockedLevel();
-          this.audio?.playCloudWhoosh?.();
-          this.spawnMapSpeechBubble(
-            seal || e.target,
-            `☁️ Obscured by Cloud Fog! Complete Stage ${Math.min(unlocked, 10)} to clear the mist!`
-          );
         }
       });
 
@@ -1291,17 +1266,7 @@ export class LevelSelect {
     this.lockInput();
     this.centerOnLevel(10, true);
 
-    const cloudFogEl = document.getElementById('cloud-fog-overlay');
-    if (!cloudFogEl) {
-      this.storage.setZoneRevealed(2, true);
-      this.unlockInput();
-      return;
-    }
-
-    this.audio?.playCloudWhoosh?.();
-    cloudFogEl.classList.add('cloud-dissipating');
-
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 400));
 
     this.storage.setZoneRevealed(2, true);
     this.audio?.playLevelUnlock?.();

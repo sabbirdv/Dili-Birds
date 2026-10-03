@@ -183,6 +183,17 @@ export class GameScene {
     let minY = 0.0;   // ground surface
     let maxY = 8.0;   // structure height default
 
+    if (levelConfig?.platforms && levelConfig.platforms.length > 0) {
+      levelConfig.platforms.forEach((p) => {
+        const hx = (p.size?.[0] || 1.0) / 2;
+        const hy = (p.size?.[1] || 1.0) / 2;
+        minX = Math.min(minX, p.pos[0] - hx);
+        maxX = Math.max(maxX, p.pos[0] + hx);
+        minY = Math.min(minY, p.pos[1] - hy);
+        maxY = Math.max(maxY, p.pos[1] + hy);
+      });
+    }
+
     if (levelConfig?.blocks && levelConfig.blocks.length > 0) {
       minX = -18.5;
       maxX = 12.0;
@@ -210,9 +221,9 @@ export class GameScene {
 
     return {
       minX,
-      maxX: Math.max(14.0, maxX),
+      maxX: Math.max(15.0, maxX),
       minY: Math.min(0, minY),
-      maxY: Math.max(8.0, maxY)
+      maxY: Math.max(9.0, maxY)
     };
   }
 
@@ -401,6 +412,38 @@ export class GameScene {
     return tex;
   }
 
+  createProceduralHazardTexture() {
+    if (this._hazardTexture) return this._hazardTexture;
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // Vibrant warning yellow base matching Angry Birds aesthetic
+    ctx.fillStyle = '#facc15';
+    ctx.fillRect(0, 0, 128, 256);
+
+    // Diagonal hazard stripes matching user reference image
+    ctx.fillStyle = '#18181b';
+    const stripeW = 28;
+    for (let y = -128; y < 384; y += stripeW * 2) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(128, y + 128);
+      ctx.lineTo(128, y + 128 + stripeW);
+      ctx.lineTo(0, y + stripeW);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    this._hazardTexture = tex;
+    return tex;
+  }
+
   buildEnvironment() {
     this.stageGroup = new THREE.Group();
 
@@ -496,40 +539,42 @@ export class GameScene {
       this.padMesh?.material.color.setHex(0x92400e);
 
     } else if (themeId === 'celestial') {
-      this.scene.background = new THREE.Color(0x1e1b4b);
+      this.scene.background = new THREE.Color(0x1a2e56);
       if (this.scene.fog) {
-        this.scene.fog.color.setHex(0x312e81);
-        this.scene.fog.density = 0.0038;
+        this.scene.fog.color.setHex(0x253b70);
+        this.scene.fog.density = 0.0014;
       }
-      this.hemiLight?.color.setHex(0x818cf8);
-      this.hemiLight?.groundColor.setHex(0x0f172a);
-      if (this.hemiLight) this.hemiLight.intensity = 0.95;
-      this.dirLight?.color.setHex(0xc7d2fe);
-      if (this.dirLight) this.dirLight.intensity = 1.45;
-      this.fillLight?.color.setHex(0x38bdf8);
+      this.hemiLight?.color.setHex(0xc7d2fe);
+      this.hemiLight?.groundColor.setHex(0x1e293b);
+      if (this.hemiLight) this.hemiLight.intensity = 1.3;
+      this.dirLight?.color.setHex(0xe0f2fe);
+      if (this.dirLight) this.dirLight.intensity = 1.85;
+      this.fillLight?.color.setHex(0x67e8f9);
+      if (this.fillLight) this.fillLight.intensity = 0.85;
 
       this.grassMesh?.material.color.setHex(0x0284c7);
       this.trimMesh?.material.color.setHex(0x38bdf8);
-      this.cliffMesh?.material.color.setHex(0x1e1b4b);
+      this.cliffMesh?.material.color.setHex(0x334155);
       this.padMesh?.material.color.setHex(0x312e81);
 
     } else if (themeId === 'summit') {
-      this.scene.background = new THREE.Color(0x090d16);
+      this.scene.background = new THREE.Color(0x271936);
       if (this.scene.fog) {
-        this.scene.fog.color.setHex(0x2e1065);
-        this.scene.fog.density = 0.004;
+        this.scene.fog.color.setHex(0x3b1d4a);
+        this.scene.fog.density = 0.0015;
       }
-      this.hemiLight?.color.setHex(0xfca5a5);
-      this.hemiLight?.groundColor.setHex(0x18181b);
-      if (this.hemiLight) this.hemiLight.intensity = 1.1;
-      this.dirLight?.color.setHex(0xfecdd3);
-      if (this.dirLight) this.dirLight.intensity = 1.6;
+      this.hemiLight?.color.setHex(0xfed7aa);
+      this.hemiLight?.groundColor.setHex(0x3f1d24);
+      if (this.hemiLight) this.hemiLight.intensity = 1.35;
+      this.dirLight?.color.setHex(0xffedd5);
+      if (this.dirLight) this.dirLight.intensity = 1.95;
       this.fillLight?.color.setHex(0xf97316);
+      if (this.fillLight) this.fillLight.intensity = 0.95;
 
-      this.grassMesh?.material.color.setHex(0x334155);
-      this.trimMesh?.material.color.setHex(0xf59e0b);
-      this.cliffMesh?.material.color.setHex(0x0f172a);
-      this.padMesh?.material.color.setHex(0x1e293b);
+      this.grassMesh?.material.color.setHex(0x475569);
+      this.trimMesh?.material.color.setHex(0xf97316);
+      this.cliffMesh?.material.color.setHex(0x334155);
+      this.padMesh?.material.color.setHex(0xbe123c);
 
     } else {
       // Emerald
@@ -583,6 +628,17 @@ export class GameScene {
     // Apply evolving environment theme for this level group (1-5 emerald, 6-10 amber, 11-15 celestial, 16-20 summit)
     this.applyEnvironmentTheme(levelConfig?.id || 1);
 
+    // 0. Spawn Elevated Platforms (cliffs / pillars / plateaus)
+    this.platforms = [];
+    if (levelConfig?.platforms && levelConfig.platforms.length > 0) {
+      if (this.padMesh) this.padMesh.visible = false;
+      levelConfig.platforms.forEach((pCfg) => {
+        this.spawnPlatform(pCfg);
+      });
+    } else {
+      if (this.padMesh) this.padMesh.visible = true;
+    }
+
     // 1. Spawn Blocks (strictly on z = 0 plane)
     levelConfig.blocks.forEach((bCfg) => {
       this.spawnBlock(bCfg);
@@ -618,6 +674,11 @@ export class GameScene {
     }
     if (this.slingshot) {
       this.slingshot.setVisible(!isDashboard);
+    }
+    if (this.platforms) {
+      this.platforms.forEach((p) => {
+        if (p.mesh) p.mesh.visible = !isDashboard;
+      });
     }
     this.blocks.forEach((b) => {
       if (b.mesh) b.mesh.visible = !isDashboard;
@@ -683,6 +744,14 @@ export class GameScene {
     });
     this.targets = [];
 
+    if (this.platforms) {
+      this.platforms.forEach((p) => {
+        if (p.mesh) this.scene.remove(p.mesh);
+        if (p.body) this.world.removeBody(p.body);
+      });
+      this.platforms = [];
+    }
+
     this.particles.forEach((p) => {
       if (p.mesh) {
         this.scene.remove(p.mesh);
@@ -715,6 +784,126 @@ export class GameScene {
     this.onHideAbilityPrompt?.();
   }
 
+  spawnPlatform(cfg) {
+    const { pos, size, type = 'cliff' } = cfg;
+    const [w, h, d = 5.0] = size;
+    const alignedPos = [pos[0], pos[1], 0];
+
+    const platformGroup = new THREE.Group();
+
+    // Theme color palette matching the current world zone
+    const themeId = this.currentThemeId || 'emerald';
+    let cliffColor = 0x334155;
+    let deckColor = 0x1e293b;
+    let trimColor = 0x475569;
+
+    if (themeId === 'amber') {
+      cliffColor = 0x78350f;
+      deckColor = 0x451a03;
+      trimColor = 0x9a3412;
+    } else if (themeId === 'celestial') {
+      cliffColor = 0x2e3856;
+      deckColor = 0x1e293b;
+      trimColor = 0x6366f1;
+    } else if (themeId === 'summit') {
+      cliffColor = 0x334155;
+      deckColor = 0x1e293b;
+      trimColor = 0xbe123c;
+    }
+
+    // 1. Main rock cliff body with strata texture
+    const cliffGeo = new THREE.BoxGeometry(w, h, d);
+    const cliffMat = new THREE.MeshStandardMaterial({
+      map: this.cliffTex,
+      color: cliffColor,
+      roughness: 0.88,
+      metalness: 0.08
+    });
+    const cliffMesh = new THREE.Mesh(cliffGeo, cliffMat);
+    cliffMesh.castShadow = true;
+    cliffMesh.receiveShadow = true;
+    platformGroup.add(cliffMesh);
+
+    // 2. Beveled top deck slab (where structures stand)
+    const deckH = 0.22;
+    const deckGeo = new THREE.BoxGeometry(w + 0.16, deckH, d + 0.16);
+    const deckMat = new THREE.MeshStandardMaterial({
+      color: deckColor,
+      roughness: 0.65,
+      metalness: 0.2
+    });
+    const deckMesh = new THREE.Mesh(deckGeo, deckMat);
+    deckMesh.position.set(0, h / 2 - deckH / 2, 0);
+    deckMesh.receiveShadow = true;
+    platformGroup.add(deckMesh);
+
+    // 3. Iconic hazard corner warning plates (matching user reference image!)
+    const hazardTex = this.createProceduralHazardTexture();
+    const hazardMat = new THREE.MeshStandardMaterial({
+      map: hazardTex,
+      roughness: 0.45,
+      metalness: 0.1
+    });
+
+    const plateW = Math.min(0.42, w * 0.12);
+    const plateH = Math.min(0.85, h * 0.45);
+    const plateGeo = new THREE.BoxGeometry(plateW, plateH, 0.06);
+
+    // Left hazard corner plate
+    const leftHazard = new THREE.Mesh(plateGeo, hazardMat);
+    leftHazard.position.set(-w / 2 + plateW / 2 + 0.02, h / 2 - plateH / 2 - 0.04, d / 2 + 0.03);
+    platformGroup.add(leftHazard);
+
+    // Right hazard corner plate
+    const rightHazard = new THREE.Mesh(plateGeo, hazardMat);
+    rightHazard.position.set(w / 2 - plateW / 2 - 0.02, h / 2 - plateH / 2 - 0.04, d / 2 + 0.03);
+    platformGroup.add(rightHazard);
+
+    // 4. Subtle base foundation rim
+    const footerH = 0.26;
+    const footerGeo = new THREE.BoxGeometry(w + 0.24, footerH, d + 0.24);
+    const footerMat = new THREE.MeshStandardMaterial({
+      color: trimColor,
+      roughness: 0.92
+    });
+    const footerMesh = new THREE.Mesh(footerGeo, footerMat);
+    footerMesh.position.set(0, -h / 2 + footerH / 2, 0);
+    platformGroup.add(footerMesh);
+
+    platformGroup.position.set(...alignedPos);
+    this.scene.add(platformGroup);
+
+    // 2. CANNON.js static rigid body (rock-solid, unshakeable bedrock foundation)
+    const halfExtents = new CANNON.Vec3(w / 2, h / 2, d / 2);
+    const body = new CANNON.Body({
+      mass: 0,
+      shape: new CANNON.Box(halfExtents),
+      position: new CANNON.Vec3(...alignedPos),
+      material: this.defaultMaterial
+    });
+    body.type = CANNON.Body.STATIC;
+
+    body.addEventListener('collide', (event) => {
+      const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
+      if (this.isBirdBody(event.body)) {
+        this.audio?.stopFlightSound?.();
+      }
+      if (normalImpact > 1.2) {
+        this.audio?.playMaterialImpact('stone', Math.min(1.0, normalImpact * 0.05));
+      }
+    });
+
+    this.world.addBody(body);
+
+    if (!this.platforms) this.platforms = [];
+    this.platforms.push({
+      mesh: platformGroup,
+      body,
+      size,
+      pos
+    });
+  }
+
   spawnBlock(cfg) {
     const { type, pos, size, isStatic = false } = cfg;
     const alignedPos = [pos[0], pos[1], 0];
@@ -724,23 +913,23 @@ export class GameScene {
 
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
     const massMap = {
-      glass: 1.6,
-      wood: 3.2,
-      coin: 2.2,
-      tnt: 2.0,
-      stone: 5.6,
-      metal: 6.8
+      glass: 1.8,
+      wood: 3.6,
+      coin: 2.6,
+      tnt: 2.2,
+      stone: 6.5,
+      metal: 9.0
     };
     const hpMap = {
-      glass: 20,
-      coin: 26,
-      tnt: 16,
-      wood: 50,
-      stone: 95,
-      metal: 120
+      glass: 28,
+      coin: 48,
+      tnt: 22,
+      wood: 80,
+      stone: 145,
+      metal: 220
     };
 
-    const mass = isStatic ? 0 : (massMap[type] || 3.2);
+    const mass = isStatic ? 0 : (massMap[type] || 3.6);
 
     const body = new CANNON.Body({
       mass,
@@ -758,11 +947,11 @@ export class GameScene {
     }
 
     // Start settled on initial load; wakes up dynamically during gameplay
-    body.sleepSpeedLimit = 0.1;
-    body.sleepTimeLimit = 0.8;
+    body.sleepSpeedLimit = 0.12;
+    body.sleepTimeLimit = 0.6;
     body.sleep();
 
-    const maxHp = hpMap[type] || 50;
+    const maxHp = hpMap[type] || 80;
     const blockObj = {
       type,
       size,
@@ -793,7 +982,6 @@ export class GameScene {
         // Awaken full structure physics when bird actually strikes the tower
         if (!this.structureAwakened) {
           this.structureAwakened = true;
-          this.world.allowSleep = false;
           this.wakeAllStructures();
         }
 
@@ -806,8 +994,8 @@ export class GameScene {
           return;
         }
 
-        // Light graze or glancing collision (< 1.8 normal impact) deals zero damage
-        if (normalImpact < 1.8) {
+        // Light graze or glancing collision (< 1.6 normal impact) deals zero damage
+        if (normalImpact < 1.6) {
           this.audio?.playMaterialImpact(blockObj.type, 0.15);
           return;
         }
@@ -817,22 +1005,22 @@ export class GameScene {
         // Strategic material effectiveness matrix
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 3.2 : blockObj.type === 'wood' ? 1.4 : 0.8;
+          birdMultiplier = blockObj.type === 'glass' ? 2.8 : blockObj.type === 'wood' ? 1.4 : 0.75;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.6 : blockObj.type === 'metal' ? 2.5 : 1.8;
+          birdMultiplier = blockObj.type === 'stone' ? 2.3 : blockObj.type === 'metal' ? 2.1 : 1.6;
         } else if (birdType === 'red') {
-          birdMultiplier = blockObj.type === 'wood' ? 1.6 : 1.0;
+          birdMultiplier = blockObj.type === 'wood' ? 1.5 : 0.95;
         } else if (birdType === 'split') {
-          birdMultiplier = blockObj.type === 'glass' ? 1.8 : blockObj.type === 'wood' ? 1.4 : 1.0;
+          birdMultiplier = blockObj.type === 'glass' ? 1.7 : blockObj.type === 'wood' ? 1.3 : 0.85;
         } else if (birdType === 'fire') {
-          birdMultiplier = blockObj.type === 'wood' ? 2.8 : blockObj.type === 'glass' ? 2.2 : blockObj.type === 'tnt' ? 4.0 : 1.5;
+          birdMultiplier = blockObj.type === 'wood' ? 2.5 : blockObj.type === 'glass' ? 1.9 : blockObj.type === 'tnt' ? 3.5 : 1.4;
         } else if (birdType === 'vortex') {
-          birdMultiplier = blockObj.type === 'metal' ? 2.4 : blockObj.type === 'stone' ? 2.2 : 1.6;
+          birdMultiplier = blockObj.type === 'metal' ? 2.1 : blockObj.type === 'stone' ? 2.0 : 1.5;
         }
 
-        // Damage derived from normal impact collision force
-        const effectiveImpact = normalImpact - 1.2;
-        const dmg = effectiveImpact * 2.8 * birdMultiplier;
+        // Damage derived from normal impact collision force (tuned for realistic yet beatable toughness)
+        const effectiveImpact = Math.max(0, normalImpact - 1.2);
+        const dmg = effectiveImpact * 2.5 * birdMultiplier;
 
         if (dmg > 1.0) {
           this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, dmg * 0.06));
@@ -852,11 +1040,11 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 7.8) {
-        // Only high-velocity falls or heavy direct crushes damage blocks (prevents normal leaning from collapsing towers)
+      } else if (normalImpact >= 5.6) {
+        // High-velocity falls from elevated platforms or heavy crushing impacts
         blockObj.lastHitTime = now;
         this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 6.2) * 2.0;
+        const debrisDmg = (normalImpact - 4.0) * 2.6;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
@@ -903,7 +1091,7 @@ export class GameScene {
       radius,
       isBoss,
       birdType,
-      hp: isBoss ? 26 : 14,
+      hp: isBoss ? 40 : 20,
       destroyed: false,
       lastHitTime: 0
     };
@@ -920,7 +1108,7 @@ export class GameScene {
       }
 
       if (isBirdHit) {
-        if (normalImpact < 2.0) return;
+        if (normalImpact < 1.6) return;
         targetObj.lastHitTime = now;
         const dmg = (normalImpact - 1.2) * 2.8;
         if (dmg > 1.0) {
@@ -929,10 +1117,11 @@ export class GameScene {
             this.defeatTarget(targetObj);
           }
         }
-      } else if (normalImpact >= 4.8) {
-        // Crushed by heavy falling debris or toppling beams
+      } else if (normalImpact >= 3.2) {
+        // Crushed by heavy falling debris or falling from elevated cliff onto the ground
         targetObj.lastHitTime = now;
-        targetObj.hp -= (normalImpact - 3.4) * 3.0;
+        const fallDmg = (normalImpact - 2.0) * 3.8;
+        targetObj.hp -= fallDmg;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
         }
@@ -2036,25 +2225,7 @@ export class GameScene {
       t.mesh.quaternion.copy(t.body.quaternion);
     });
 
-    // Active structural gravity guarantee: prevent any airborne block or target from freezing asleep
-    if (this.isPlayingLevel && !this.levelResolved && this.structureAwakened) {
-      for (let i = 0; i < this.blocks.length; i++) {
-        const b = this.blocks[i];
-        if (b.body && b.body.sleepState === CANNON.Body.SLEEPING) {
-          if (b.body.position.y > 0.6) {
-            b.body.wakeUp();
-          }
-        }
-      }
-      for (let i = 0; i < this.targets.length; i++) {
-        const t = this.targets[i];
-        if (t.body && t.body.sleepState === CANNON.Body.SLEEPING) {
-          if (t.body.position.y > 0.8) {
-            t.body.wakeUp();
-          }
-        }
-      }
-    }
+    // Bodies sleep naturally when at rest, freeing CPU cycles for smooth 60fps rendering
 
     // Update pre-allocated explosion point light (zero runtime shader recompilation)
     if (this.explosionLight && this.explosionLightTimer > 0) {

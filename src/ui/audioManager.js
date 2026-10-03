@@ -62,15 +62,15 @@ export class AudioManager {
     this.lastPullRatio = 0;
     this.lastPullTickTime = 0;
 
-    // Cartoon Comical Slide Whistle Flight Synth
-    this.flightOsc = null;
-    this.flightOsc2 = null;
-    this.flightLfo = null;
-    this.flightLfoGain = null;
-    this.flightTremolo = null;
-    this.flightTremoloGain = null;
-    this.flightGain = null;
+    // Cartoon Bird Flight Sound System (Flapping Wings, Gentle Breeze & Peep)
     this.isFlightSoundActive = false;
+    this.flightStartTime = 0;
+    this.lastFlapTime = 0;
+    this.lastChirpTime = 0;
+    this.currentFlightSpeed = 15;
+    this.flightWindSrc = null;
+    this.flightWindFilter = null;
+    this.flightWindGain = null;
 
     // Destruction Concurrency & Voice Limiter
     this.activeBreakVoices = 0;
@@ -98,7 +98,7 @@ export class AudioManager {
           this.ctx.suspend().catch(() => {});
         }
       } else {
-        if (this.ctx && this.ctx.state === 'suspended' && !this.isMuted) {
+        if (this.ctx && this.ctx.state === 'suspended' && this.shouldBgmPlay()) {
           this.ctx.resume().then(() => {
             if (!this.isPlayingGameplay && !this.isBgmPlaying) {
               this.startBGM(0.3);
@@ -231,11 +231,11 @@ export class AudioManager {
 
     if (ctx.state === 'suspended') {
       ctx.resume().then(() => {
-        if (!this.isPlayingGameplay && !this.isBgmPlaying && !this.isMuted) {
+        if (!this.isPlayingGameplay && !this.isBgmPlaying && this.shouldBgmPlay()) {
           this.startBGM(0.3);
         }
       }).catch(() => {});
-    } else if (!this.isPlayingGameplay && !this.isBgmPlaying && !this.isMuted) {
+    } else if (!this.isPlayingGameplay && !this.isBgmPlaying && this.shouldBgmPlay()) {
       this.startBGM(0.3);
     }
   }
@@ -330,8 +330,25 @@ export class AudioManager {
    * 126 BPM, 16 Bars (256 sixteenth-note steps, 30.48s loop)
    * ═════════════════════════════════════════════════════════════ */
 
+  getBgmMode() {
+    return this.storage?.getBgmMode?.() || 'dashboard';
+  }
+
+  shouldBgmPlay() {
+    if (this.isMuted) return false;
+    const mode = this.getBgmMode();
+    if (mode === 'off') return false;
+    if (mode === 'dashboard' && this.isPlayingGameplay) return false;
+    return true;
+  }
+
   enterGameplay() {
     this.isPlayingGameplay = true;
+    if (!this.shouldBgmPlay()) {
+      this.stopBGM(0.25);
+      return;
+    }
+
     if (this.ctx && this.bgmFadeGain) {
       const now = this.ctx.currentTime;
       const cur = Math.max(0.0001, this.bgmFadeGain.gain.value);
@@ -339,14 +356,17 @@ export class AudioManager {
       this.bgmFadeGain.gain.setValueAtTime(cur, now);
       this.bgmFadeGain.gain.linearRampToValueAtTime(0.22, now + 0.40);
     }
-    if (!this.isBgmPlaying && !this.isMuted) {
+    if (!this.isBgmPlaying) {
       this.startBGM(0.40);
     }
   }
 
   enterMenu() {
     this.isPlayingGameplay = false;
-    if (this.isMuted) return;
+    if (!this.shouldBgmPlay()) {
+      this.stopBGM(0.25);
+      return;
+    }
 
     if (this.ctx) {
       const now = this.ctx.currentTime;
@@ -364,7 +384,7 @@ export class AudioManager {
       }
     }
 
-    if (!this.isBgmPlaying && !this.isMuted) {
+    if (!this.isBgmPlaying) {
       this.startBGM(0.35);
     }
   }
@@ -373,26 +393,29 @@ export class AudioManager {
     if (this.storage) {
       this.storage.setBgmMode(mode);
     }
-    if (mode === 'off') {
-      this.stopBGM(0.2);
-    } else {
-      if (this.isPlayingGameplay) {
-        if (this.bgmFadeGain && this.ctx) {
-          const now = this.ctx.currentTime;
-          this.bgmFadeGain.gain.linearRampToValueAtTime(0.22, now + 0.3);
-        }
-      } else {
-        if (this.bgmFadeGain && this.ctx) {
-          const now = this.ctx.currentTime;
-          this.bgmFadeGain.gain.linearRampToValueAtTime(1.0, now + 0.3);
-        }
+    this.handleUserInteraction();
+
+    if (this.shouldBgmPlay()) {
+      const targetGain = this.isPlayingGameplay ? 0.22 : 1.0;
+      if (this.bgmFadeGain && this.ctx) {
+        const now = this.ctx.currentTime;
+        this.bgmFadeGain.gain.cancelScheduledValues(now);
+        this.bgmFadeGain.gain.setValueAtTime(Math.max(0.0001, this.bgmFadeGain.gain.value), now);
+        this.bgmFadeGain.gain.linearRampToValueAtTime(targetGain, now + 0.3);
       }
       this.startBGM(0.35);
+    } else {
+      this.stopBGM(0.2);
     }
   }
 
   startBGM(fadeDuration = 0.35) {
-    if (this.isMuted) return;
+    if (!this.shouldBgmPlay()) {
+      if (this.isBgmPlaying) {
+        this.stopBGM(fadeDuration);
+      }
+      return;
+    }
 
     const ctx = this.ensureContext();
     if (!ctx) return;
@@ -425,7 +448,7 @@ export class AudioManager {
     this.bgmNextStepTime = ctx.currentTime + 0.04;
 
     const runScheduler = () => {
-      if (!this.isBgmPlaying || !this.ctx || this.isMuted) return;
+      if (!this.isBgmPlaying || !this.ctx || !this.shouldBgmPlay()) return;
 
       // If context is suspended by browser, wait cleanly
       if (this.ctx.state !== 'running') {
@@ -451,7 +474,14 @@ export class AudioManager {
     // Watchdog check: continuously verifies BGM is playing and gains are at correct levels
     if (!this.bgmWatchdogTimer) {
       this.bgmWatchdogTimer = setInterval(() => {
-        if (!this.isMuted && this.ctx && this.ctx.state === 'running') {
+        if (this.ctx && this.ctx.state === 'running') {
+          if (!this.shouldBgmPlay()) {
+            if (this.isBgmPlaying) {
+              this.stopBGM(0.2);
+            }
+            return;
+          }
+
           const target = this.isPlayingGameplay ? 0.22 : 1.0;
           if (!this.isBgmPlaying) {
             this.startBGM(0.3);
@@ -1095,7 +1125,7 @@ export class AudioManager {
 
   /**
    * Cartoon Slingshot Launch:
-   * Punchy cartoon rubber snap + comical cork pop + bright cartoon slide whistle launch chirp
+   * Punchy cartoon rubber snap + comical pop + joyful cartoon "Wheeee-Hoo!" launch whistle
    */
   playLaunch(power = 1.0) {
     this.stopSlingshotPull();
@@ -1108,47 +1138,56 @@ export class AudioManager {
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'sawtooth';
-    snapOsc.frequency.setValueAtTime(1750 * clampedPower, now);
-    snapOsc.frequency.exponentialRampToValueAtTime(240, now + 0.038);
+    snapOsc.frequency.setValueAtTime(1450 * clampedPower, now);
+    snapOsc.frequency.exponentialRampToValueAtTime(190, now + 0.035);
 
-    snapGain.gain.setValueAtTime(0.78 * clampedPower, now);
-    snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+    snapGain.gain.setValueAtTime(0.72 * clampedPower, now);
+    snapGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.040);
 
     snapOsc.connect(snapGain);
     snapGain.connect(this.sfxDuckingGain);
     snapOsc.start(now);
-    snapOsc.stop(now + 0.048);
+    snapOsc.stop(now + 0.045);
 
     // 2. Comical cartoon launch pop
     const popOsc = ctx.createOscillator();
     const popGain = ctx.createGain();
     popOsc.type = 'sine';
-    popOsc.frequency.setValueAtTime(180 * clampedPower, now);
-    popOsc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
+    popOsc.frequency.setValueAtTime(210 * clampedPower, now);
+    popOsc.frequency.exponentialRampToValueAtTime(45, now + 0.075);
 
-    popGain.gain.setValueAtTime(0.72 * clampedPower, now);
-    popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+    popGain.gain.setValueAtTime(0.68 * clampedPower, now);
+    popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.080);
 
     popOsc.connect(popGain);
     popGain.connect(this.sfxDuckingGain);
     popOsc.start(now);
-    popOsc.stop(now + 0.095);
+    popOsc.stop(now + 0.085);
 
-    // 3. Gentle cartoon launch whoop (soft warm sine 320Hz -> 620Hz, non-piercing)
+    // 3. Comical Cartoon Bird "Wheeeee-Hoo!" Launch Whistle (Joyful, expressive comic rise)
     const whistleOsc = ctx.createOscillator();
+    const whistleFilter = ctx.createBiquadFilter();
     const whistleGain = ctx.createGain();
-    whistleOsc.type = 'sine';
-    whistleOsc.frequency.setValueAtTime(320, now);
-    whistleOsc.frequency.exponentialRampToValueAtTime(620 * clampedPower, now + 0.08);
+
+    whistleOsc.type = 'triangle'; // Warm cartoon flute timbre
+    whistleOsc.frequency.setValueAtTime(420, now);
+    whistleOsc.frequency.exponentialRampToValueAtTime(960 * clampedPower, now + 0.13);
+    whistleOsc.frequency.exponentialRampToValueAtTime(740 * clampedPower, now + 0.32);
+
+    whistleFilter.type = 'lowpass';
+    whistleFilter.frequency.setValueAtTime(1250, now);
+    whistleFilter.Q.setValueAtTime(1.4, now);
 
     whistleGain.gain.setValueAtTime(0.0001, now);
-    whistleGain.gain.linearRampToValueAtTime(0.24 * clampedPower, now + 0.02);
-    whistleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.085);
+    whistleGain.gain.linearRampToValueAtTime(0.36 * clampedPower, now + 0.035);
+    whistleGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
 
-    whistleOsc.connect(whistleGain);
+    whistleOsc.connect(whistleFilter);
+    whistleFilter.connect(whistleGain);
     whistleGain.connect(this.sfxDuckingGain);
+
     whistleOsc.start(now);
-    whistleOsc.stop(now + 0.09);
+    whistleOsc.stop(now + 0.36);
   }
 
   updateSlingshotCharge(power) { this.updateSlingshotPull(power); }
@@ -1156,10 +1195,11 @@ export class AudioManager {
   playStretch(ratio) { this.updateSlingshotPull(ratio); }
 
   /* ═════════════════════════════════════════════════════════════
-   * CARTOON BIRD FLIGHT SOUND (Soft, Warm Cartoon Glide)
-   * Ultra-gentle, non-intrusive mellow tone ("soft soft sonay, kane lage na").
-   * Soft sine at 290Hz-380Hz, deep 480Hz lowpass filter, gentle vibrato,
-   * whisper-level volume (gain 0.032 - 0.055 max).
+   * CARTOON BIRD FLIGHT SOUND SYSTEM
+   * - Cute cartoon wing-flapping flutter ("fwt-fwt-fwt-fwt")
+   * - Soft dynamic cartoon air breeze (whoosh tracking speed)
+   * - Adorable occasional cartoon bird peep ("peep!")
+   * Zero annoying continuous drone or buzzing! 100% pure cartoon personality!
    * ═════════════════════════════════════════════════════════════ */
 
   startFlightSound() {
@@ -1168,89 +1208,169 @@ export class AudioManager {
     this.isFlightSoundActive = true;
     const now = ctx.currentTime;
 
-    // 1. Warm, Pure Mellow Sine Oscillator (Low-mid register: ~320 Hz, gentle and round)
-    this.flightOsc = ctx.createOscillator();
-    this.flightOsc.type = 'sine';
-    this.flightOsc.frequency.setValueAtTime(320, now);
+    this.flightStartTime = now;
+    this.lastFlapTime = now - 0.04;
+    this.lastChirpTime = now + 0.25;
+    this.currentFlightSpeed = 15;
 
-    // 2. Slow, Soothing Vibrato LFO (5.5 Hz, tiny ±6 Hz depth for gentle breath wobble)
-    this.flightLfo = ctx.createOscillator();
-    this.flightLfo.type = 'sine';
-    this.flightLfo.frequency.setValueAtTime(5.5, now);
+    // 1. Soft Dynamic Cartoon Air Breeze (Gentle whoosh following bird speed)
+    if (this.pinkNoiseBuffer) {
+      this.flightWindSrc = ctx.createBufferSource();
+      this.flightWindSrc.buffer = this.pinkNoiseBuffer;
+      this.flightWindSrc.loop = true;
 
-    this.flightLfoGain = ctx.createGain();
-    this.flightLfoGain.gain.setValueAtTime(6.0, now); // Gentle ±6 Hz depth (never harsh)
+      this.flightWindFilter = ctx.createBiquadFilter();
+      this.flightWindFilter.type = 'bandpass';
+      this.flightWindFilter.frequency.setValueAtTime(560, now);
+      this.flightWindFilter.Q.setValueAtTime(1.3, now);
 
-    this.flightLfo.connect(this.flightLfoGain);
-    this.flightLfoGain.connect(this.flightOsc.frequency);
+      this.flightWindGain = ctx.createGain();
+      this.flightWindGain.gain.setValueAtTime(0.0001, now);
+      this.flightWindGain.gain.linearRampToValueAtTime(0.075, now + 0.12);
 
-    // 3. Deep Warm Lowpass Filter (Cuts all high-frequency harshness at 480 Hz)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(480, now);
-    filter.Q.setValueAtTime(0.7, now); // Soft Butterworth damping
-
-    // 4. Ultra-Soft Output Gain (Whisper-gentle: starts at 0.035, never exceeds 0.055)
-    this.flightGain = ctx.createGain();
-    this.flightGain.gain.setValueAtTime(0.0001, now);
-    this.flightGain.gain.linearRampToValueAtTime(0.036, now + 0.12);
-
-    this.flightOsc.connect(filter);
-    filter.connect(this.flightGain);
-    this.flightGain.connect(this.sfxDuckingGain);
-
-    this.flightOsc.start(now);
-    this.flightLfo.start(now);
+      this.flightWindSrc.connect(this.flightWindFilter);
+      this.flightWindFilter.connect(this.flightWindGain);
+      this.flightWindGain.connect(this.sfxDuckingGain);
+      this.flightWindSrc.start(now);
+    }
   }
 
   updateFlightSound(speed = 10) {
-    if (!this.isFlightSoundActive || !this.flightOsc || !this.flightGain || !this.ctx) return;
+    if (!this.isFlightSoundActive || !this.ctx || this.isMuted) return;
     const now = this.ctx.currentTime;
-    const normalizedSpeed = Math.min(2.0, Math.max(0.2, speed / 14));
+    this.currentFlightSpeed = speed;
 
-    // Gentle, soft cartoon glide: smooth pitch range (290Hz to 380Hz)
-    const targetFreq = 290 + normalizedSpeed * 65;
-    this.flightOsc.frequency.cancelScheduledValues(now);
-    this.flightOsc.frequency.setValueAtTime(this.flightOsc.frequency.value, now);
-    this.flightOsc.frequency.linearRampToValueAtTime(targetFreq, now + 0.08);
+    const clampedSpeed = Math.min(32, Math.max(1, speed));
+    const speedRatio = clampedSpeed / 20;
 
-    // Gentle volume scaling: capped at ultra-soft 0.052 so it never hurts ears
-    const targetGain = Math.min(0.052, 0.030 + normalizedSpeed * 0.014);
-    this.flightGain.gain.cancelScheduledValues(now);
-    this.flightGain.gain.setValueAtTime(this.flightGain.gain.value, now);
-    this.flightGain.gain.linearRampToValueAtTime(targetGain, now + 0.08);
+    // 1. Modulate gentle air breeze with bird speed
+    if (this.flightWindFilter && this.flightWindGain) {
+      const targetFreq = 420 + Math.min(550, speedRatio * 300);
+      const targetGain = Math.min(0.095, 0.032 + speedRatio * 0.042);
+
+      this.flightWindFilter.frequency.setTargetAtTime(targetFreq, now, 0.06);
+      this.flightWindGain.gain.setTargetAtTime(targetGain, now, 0.06);
+    }
+
+    // 2. Dynamic Cartoon Wing-Flap Engine
+    // Frantic fast flapping at high launch speed (~14 flaps/s = 70ms),
+    // naturally relaxing as the bird reaches apex (~7.5 flaps/s = 135ms)
+    const flapInterval = Math.max(0.068, Math.min(0.138, 0.142 - (clampedSpeed / 30) * 0.074));
+    if (now - this.lastFlapTime >= flapInterval) {
+      this.lastFlapTime = now;
+      this._playWingFlap(now, clampedSpeed);
+    }
+
+    // 3. Playful Occasional Cartoon Bird Chirp ("peep!") during long soaring arcs
+    if (now - this.lastChirpTime >= 1.20 && now - this.flightStartTime >= 0.60 && clampedSpeed > 4) {
+      this.lastChirpTime = now;
+      this._playCartoonBirdPeep(now);
+    }
+  }
+
+  _playWingFlap(now, speed = 15) {
+    if (!this.ctx || this.isMuted) return;
+    const ctx = this.ctx;
+    const intensity = Math.min(1.2, Math.max(0.6, speed / 16));
+
+    // A. Soft feathery air puff (bandpassed noise transient)
+    if (this.pinkNoiseBuffer) {
+      const puffSrc = ctx.createBufferSource();
+      puffSrc.buffer = this.pinkNoiseBuffer;
+
+      const puffFilter = ctx.createBiquadFilter();
+      puffFilter.type = 'bandpass';
+      puffFilter.frequency.setValueAtTime(460 + Math.random() * 80, now);
+      puffFilter.Q.setValueAtTime(1.6, now);
+
+      const puffGain = ctx.createGain();
+      puffGain.gain.setValueAtTime(0.0001, now);
+      puffGain.gain.linearRampToValueAtTime(0.085 * intensity, now + 0.007);
+      puffGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+      puffSrc.connect(puffFilter);
+      puffFilter.connect(puffGain);
+      puffGain.connect(this.sfxDuckingGain);
+
+      puffSrc.start(now);
+      puffSrc.stop(now + 0.040);
+    }
+
+    // B. Warm round wing-beat body (soft low sine drop: 180Hz -> 72Hz)
+    const wingOsc = ctx.createOscillator();
+    const wingGain = ctx.createGain();
+
+    wingOsc.type = 'sine';
+    const startPitch = 175 + (Math.random() * 20 - 10);
+    wingOsc.frequency.setValueAtTime(startPitch, now);
+    wingOsc.frequency.exponentialRampToValueAtTime(72, now + 0.034);
+
+    wingGain.gain.setValueAtTime(0.0001, now);
+    wingGain.gain.linearRampToValueAtTime(0.095 * intensity, now + 0.006);
+    wingGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
+
+    wingOsc.connect(wingGain);
+    wingGain.connect(this.sfxDuckingGain);
+
+    wingOsc.start(now);
+    wingOsc.stop(now + 0.042);
+  }
+
+  _playCartoonBirdPeep(now) {
+    if (!this.ctx || this.isMuted) return;
+    const ctx = this.ctx;
+
+    // Adorable cartoon bird peep: rapid pitch jump up and down
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle'; // Warm, friendly cartoon timbre
+    const baseFreq = 1450 + (Math.random() * 180 - 90);
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.42, now + 0.030);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.08, now + 0.065);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(2200, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.14, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.sfxDuckingGain);
+
+    osc.start(now);
+    osc.stop(now + 0.080);
   }
 
   stopFlightSound() {
     if (!this.isFlightSoundActive) return;
     this.isFlightSoundActive = false;
 
-    if (this.flightGain && this.ctx) {
+    // Smoothly fade out and clean up wind source
+    if (this.flightWindGain && this.ctx) {
       const now = this.ctx.currentTime;
-      this.flightGain.gain.cancelScheduledValues(now);
-      this.flightGain.gain.setValueAtTime(this.flightGain.gain.value, now);
-      this.flightGain.gain.linearRampToValueAtTime(0.0001, now + 0.06);
+      this.flightWindGain.gain.cancelScheduledValues(now);
+      this.flightWindGain.gain.setValueAtTime(Math.max(0.0001, this.flightWindGain.gain.value), now);
+      this.flightWindGain.gain.linearRampToValueAtTime(0.0001, now + 0.04);
     }
 
-    const oscsToStop = [this.flightOsc, this.flightLfo];
+    const windSrc = this.flightWindSrc;
     setTimeout(() => {
-      oscsToStop.forEach((osc) => {
-        if (osc) {
-          try {
-            osc.stop();
-            osc.disconnect();
-          } catch {}
-        }
-      });
-    }, 70);
+      if (windSrc) {
+        try {
+          windSrc.stop();
+          windSrc.disconnect();
+        } catch {}
+      }
+    }, 50);
 
-    this.flightOsc = null;
-    this.flightOsc2 = null;
-    this.flightLfo = null;
-    this.flightLfoGain = null;
-    this.flightTremolo = null;
-    this.flightTremoloGain = null;
-    this.flightGain = null;
+    this.flightWindSrc = null;
+    this.flightWindFilter = null;
+    this.flightWindGain = null;
   }
 
   /* ═════════════════════════════════════════════════════════════

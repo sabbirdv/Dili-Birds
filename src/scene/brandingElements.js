@@ -222,12 +222,12 @@ export class BrandingElements {
       // Mystical deep indigo-to-cyan sky, luminous waving aurora borealis, stars
       // ══════════════════════════════════════════════════════════
       const sky = ctx.createLinearGradient(0, 0, 0, 1024);
-      sky.addColorStop(0.0, '#0f172a');    // cosmic deep midnight navy
-      sky.addColorStop(0.25, '#1e1b4b');   // mystical indigo
-      sky.addColorStop(0.48, '#312e81');   // royal twilight purple
+      sky.addColorStop(0.0, '#1e293b');    // vibrant deep navy
+      sky.addColorStop(0.25, '#2e3875');   // rich indigo
+      sky.addColorStop(0.48, '#4338ca');   // royal twilight purple
       sky.addColorStop(0.68, '#0284c7');   // glowing electric cyan
-      sky.addColorStop(0.82, '#0d9488');   // emerald-turquoise horizon glow
-      sky.addColorStop(1.0, '#134e4a');    // deep alpine crystal base
+      sky.addColorStop(0.82, '#0ea5e9');   // horizon glow
+      sky.addColorStop(1.0, '#164e63');    // crystal base
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, 2048, 1024);
 
@@ -311,13 +311,13 @@ export class BrandingElements {
       // Dramatic storm sky, fiery horizon, jagged gothic peaks, thunderclouds
       // ══════════════════════════════════════════════════════════
       const sky = ctx.createLinearGradient(0, 0, 0, 1024);
-      sky.addColorStop(0.0, '#090d16');    // obsidian shadow zenith
-      sky.addColorStop(0.24, '#1e1b4b');   // tempest purple
-      sky.addColorStop(0.44, '#4c1d95');   // electric twilight
-      sky.addColorStop(0.62, '#991b1b');   // blazing crimson dusk
-      sky.addColorStop(0.76, '#dc2626');   // volcanic furnace red
+      sky.addColorStop(0.0, '#271936');    // twilight plum
+      sky.addColorStop(0.24, '#3b1d54');   // tempest purple
+      sky.addColorStop(0.44, '#6b21a8');   // electric twilight
+      sky.addColorStop(0.62, '#b91c1c');   // blazing crimson dusk
+      sky.addColorStop(0.76, '#ef4444');   // volcanic furnace red
       sky.addColorStop(0.88, '#f59e0b');   // molten gold horizon
-      sky.addColorStop(1.0, '#1c1917');    // volcanic basalt earth
+      sky.addColorStop(1.0, '#292524');    // volcanic basalt earth
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, 2048, 1024);
 
@@ -688,8 +688,8 @@ export class BrandingElements {
     const hillPaletteMap = {
       emerald: [0x4a9c32, 0x3a8a28, 0x58a840],
       amber: [0xc2410c, 0xb45309, 0xd97706],
-      celestial: [0x3730a3, 0x1e1b4b, 0x0284c7],
-      summit: [0x1e293b, 0x0f172a, 0x334155]
+      celestial: [0x4338ca, 0x312e81, 0x0284c7],
+      summit: [0x334155, 0x1e293b, 0x475569]
     };
     const hillPalette = hillPaletteMap[theme] || hillPaletteMap.emerald;
     this.hillMeshes.forEach((mesh) => {
@@ -704,7 +704,7 @@ export class BrandingElements {
       emerald: [0xffc0d0, 0xf5a0be, 0xe88098],
       amber: [0xf59e0b, 0xd97706, 0xb45309],
       celestial: [0x38bdf8, 0x818cf8, 0x34d399],
-      summit: [0x475569, 0x64748b, 0x991b1b]
+      summit: [0x64748b, 0x94a3b8, 0xdc2626]
     };
     const canopyPalette = canopyPaletteMap[theme] || canopyPaletteMap.emerald;
     this.treeCanopyMeshes.forEach((mesh) => {
@@ -717,8 +717,8 @@ export class BrandingElements {
     const trunkColorMap = {
       emerald: 0x5c3a20,
       amber: 0x78350f,
-      celestial: 0x1e1b4b,
-      summit: 0x0f172a
+      celestial: 0x312e81,
+      summit: 0x27272a
     };
     const trunkColor = trunkColorMap[theme] || 0x5c3a20;
     this.treeTrunkMeshes.forEach((mesh) => {
@@ -814,14 +814,14 @@ export class BrandingElements {
   }
 
   /**
-   * Creates 65 falling cherry blossom petal meshes that drift and sway gently.
+   * Creates 18 lightweight falling cherry blossom petal meshes that drift gently in the menu.
    */
   buildCherryBlossomPetals() {
     const petalColors = [0xffc0d0, 0xf8a0c0, 0xf07898, 0xfff0f5, 0xffb0c8];
     const geo = new THREE.PlaneGeometry(1, 1);
 
-    for (let i = 0; i < 65; i++) {
-      const size = 0.06 + Math.random() * 0.12;
+    for (let i = 0; i < 18; i++) {
+      const size = 0.06 + Math.random() * 0.1;
       const mat = new THREE.MeshBasicMaterial({
         color: petalColors[i % petalColors.length],
         transparent: true,
@@ -1311,11 +1311,17 @@ export class BrandingElements {
   }
 
   setDashboardMode(isDashboard) {
+    this.isDashboardMode = Boolean(isDashboard);
     if (this.driftingGroup) {
       this.driftingGroup.visible = Boolean(isDashboard);
     }
     if (this.monumentGroup) {
       this.monumentGroup.visible = !isDashboard;
+    }
+    if (this.petals) {
+      this.petals.forEach((p) => {
+        p.mesh.visible = Boolean(isDashboard);
+      });
     }
   }
 
@@ -1362,17 +1368,18 @@ export class BrandingElements {
       if (c.group.position.x > 52) c.group.position.x = -52;
     });
 
-    // ── Animate falling cherry blossom petals ──
-    this.petals.forEach((p) => {
-      p.mesh.position.y += p.vy * deltaTime;
-      p.mesh.position.x += (p.vx + Math.sin(elapsedTime * 1.3 + p.phase) * 0.55) * deltaTime;
-      p.mesh.position.z += Math.cos(elapsedTime * 0.9 + p.phase * 1.3) * 0.28 * deltaTime;
+    // ── Animate falling cherry blossom petals (ONLY in dashboard/menu mode) ──
+    if (this.isDashboardMode !== false && this.petals.length > 0) {
+      this.petals.forEach((p) => {
+        p.mesh.position.y += p.vy * deltaTime;
+        p.mesh.position.x += (p.vx + Math.sin(elapsedTime * 1.3 + p.phase) * 0.55) * deltaTime;
+        p.mesh.position.z += Math.cos(elapsedTime * 0.9 + p.phase * 1.3) * 0.28 * deltaTime;
 
-      p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
-      p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
-      p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
+        p.mesh.rotation.x += p.rotSpeed.x * deltaTime;
+        p.mesh.rotation.y += p.rotSpeed.y * deltaTime;
+        p.mesh.rotation.z += p.rotSpeed.z * deltaTime;
 
-      if (p.mesh.position.y < -1.5) {
+        if (p.mesh.position.y < -1.5) {
         p.mesh.position.set(
           -42 + Math.random() * 84,
           18 + Math.random() * 12,
@@ -1385,6 +1392,7 @@ export class BrandingElements {
       }
     });
   }
+}
 
   updateBrandName(newBrandName) {
     this.brandName = newBrandName || 'Dili-Birds';

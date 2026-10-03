@@ -21,10 +21,11 @@ const RANDOM_CALLSIGNS = [
  * - 6 signature Dili-Birds character avatars loaded from src/assets/
  */
 export class ProfileModal {
-  constructor(storage, onProfileUpdated, onProgressReset) {
+  constructor(storage, onProfileUpdated, onProgressReset, audio = null) {
     this.storage = storage;
     this.onProfileUpdated = onProfileUpdated;
     this.onProgressReset = onProgressReset;
+    this.audio = audio;
 
     this.dialog = document.getElementById('profile-dialog');
     this.form = document.getElementById('profile-form');
@@ -77,6 +78,7 @@ export class ProfileModal {
       `;
 
       btn.addEventListener('click', () => {
+        this.audio?.playUiClick?.();
         this.selectAvatar(preset.url, preset.id);
         this.uploadStatusEl?.classList.add('hidden');
       });
@@ -171,6 +173,7 @@ export class ProfileModal {
     }
 
     this.closeBtn?.addEventListener('click', () => {
+      this.audio?.playMenuClose?.();
       if (this.dialog.open) {
         this.dialog.close();
       }
@@ -197,6 +200,7 @@ export class ProfileModal {
 
     // Random Callsign Generator button
     this.randomBtn?.addEventListener('click', () => {
+      this.audio?.playUiClick?.();
       const pick = RANDOM_CALLSIGNS[Math.floor(Math.random() * RANDOM_CALLSIGNS.length)];
       const suffix = Math.floor(10 + Math.random() * 89);
       this.usernameInput.value = `${pick}${suffix}`;
@@ -209,10 +213,12 @@ export class ProfileModal {
     // Camera Icon Overlay button (& clicking the avatar preview image) triggers hidden file input
     this.avatarCameraBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
+      this.audio?.playUiClick?.();
       this.avatarFileInput?.click();
     });
 
     this.avatarPreviewImg?.addEventListener('click', () => {
+      this.audio?.playUiClick?.();
       this.avatarFileInput?.click();
     });
 
@@ -232,9 +238,11 @@ export class ProfileModal {
       if (rawUsername.length < 2) {
         this.syncAriaInvalid(this.usernameInput);
         this.usernameInput?.focus();
+        this.audio?.playError?.();
         return;
       }
 
+      this.audio?.playUnlock?.();
       const isFirstProfileSetup = !this.storage.isProfileConfigured() || !this.storage.getServerRowId();
       const previousUsername = this.storage.getUsername();
 
@@ -249,6 +257,7 @@ export class ProfileModal {
 
     if (this.resetBtn) {
       this.resetBtn.addEventListener('click', () => {
+        this.audio?.playMenuBack?.();
         this.storage.resetProgress();
         this.updateLivePreview();
         this.onProgressReset?.();
@@ -261,6 +270,7 @@ export class ProfileModal {
 
   open() {
     if (!this.dialog) return;
+    this.audio?.playMenuOpen?.();
 
     this.usernameInput.value = this.storage.hasUsername() ? this.storage.getUsername() : '';
     this.usernameInput.removeAttribute('aria-invalid');

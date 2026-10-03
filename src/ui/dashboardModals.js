@@ -165,18 +165,22 @@ export class DashboardModals {
 
     // Close buttons & Leaderboard controls
     document.getElementById('btn-close-leaderboard')?.addEventListener('click', () => {
+      this.audio?.playMenuClose?.();
       this.leaderboardDialog?.close();
     });
 
     document.getElementById('btn-leaderboard-retry')?.addEventListener('click', () => {
+      this.audio?.playUiClick?.();
       this.loadLeaderboardData();
     });
 
     document.getElementById('btn-close-missions')?.addEventListener('click', () => {
+      this.audio?.playMenuClose?.();
       this.missionsDialog?.close();
     });
 
     document.getElementById('btn-close-characters')?.addEventListener('click', () => {
+      this.audio?.playMenuClose?.();
       this.charactersDialog?.close();
     });
 
@@ -184,6 +188,7 @@ export class DashboardModals {
     [this.leaderboardDialog, this.missionsDialog, this.charactersDialog].forEach((dialog) => {
       dialog?.addEventListener('click', (e) => {
         if (e.target === dialog) {
+          this.audio?.playMenuClose?.();
           dialog.close();
         }
       });
@@ -195,6 +200,7 @@ export class DashboardModals {
    * ═════════════════════════════════════════════════════════════ */
   openLeaderboard() {
     if (!this.leaderboardDialog) return;
+    this.audio?.playMenuOpen?.();
     this.leaderboardDialog.showModal();
     this.loadLeaderboardData();
   }
@@ -483,6 +489,7 @@ export class DashboardModals {
    * ═════════════════════════════════════════════════════════════ */
   openMissions() {
     if (!this.missionsDialog) return;
+    this.audio?.playMenuOpen?.();
     this.renderMissionsList();
     this.missionsDialog.showModal();
   }
@@ -570,6 +577,7 @@ export class DashboardModals {
    * ═════════════════════════════════════════════════════════════ */
   openCharacters() {
     if (!this.charactersDialog) return;
+    this.audio?.playMenuOpen?.();
     this.renderCharactersList();
     this.charactersDialog.showModal();
   }

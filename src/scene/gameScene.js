@@ -107,6 +107,7 @@ export class GameScene {
     this.targetLookAt = new THREE.Vector3(1.0, 4.2, 0.0);
     this.focusPoint = new THREE.Vector3(1.0, 4.2, 0.0);
     this.focusTimer = 0;
+    this.fortressCenterX = 12.0;
 
     this.updateStationaryCameraPosition(aspect);
 
@@ -239,6 +240,7 @@ export class GameScene {
 
     this.overviewLookAt.set(centerX, Math.max(3.6, centerY), 0.0);
     this.overviewCameraPos.set(centerX, Math.max(4.0, centerY + 0.3), targetZ);
+    this.fortressCenterX = Math.max(8.0, (bbox.maxX + Math.max(6.0, bbox.minX)) / 2);
 
     this.stationaryLookAt.copy(this.overviewLookAt);
     this.stationaryCameraPos.copy(this.overviewCameraPos);
@@ -754,8 +756,6 @@ export class GameScene {
           this.wakeAllStructures();
         }
 
-        this.triggerCameraImpactFocus(blockObj.body.position);
-
         // Light graze or glancing collision (< 1.8 normal impact) deals zero damage
         if (normalImpact < 1.8) {
           this.audio?.playMaterialImpact(blockObj.type, 0.15);
@@ -857,7 +857,6 @@ export class GameScene {
       }
 
       if (isBirdHit) {
-        this.triggerCameraImpactFocus(targetObj.body.position);
         if (normalImpact < 2.0) return;
         targetObj.lastHitTime = now;
         const dmg = (normalImpact - 1.2) * 2.8;
@@ -1204,8 +1203,8 @@ export class GameScene {
     this.score += 400;
     this.onToast?.('💥 BOOM! TNT Detonated!');
 
-    // Smooth, punchy camera shake trauma
-    this.cameraShakeTrauma = Math.min(0.85, this.cameraShakeTrauma + 0.55);
+    // Subtle, smooth camera shake trauma
+    this.cameraShakeTrauma = Math.min(0.35, this.cameraShakeTrauma + 0.22);
 
     // Modern multi-layer explosion VFX
     this.createModernExplosion(origin);
@@ -1842,31 +1841,36 @@ export class GameScene {
     const elapsedTime = this.clock.elapsedTime;
     this.branding?.update(elapsedTime, deltaTime);
 
-    // ── DYNAMIC ACTION CINEMATIC CAMERA CONTROLLER ──
-    // States: 'OVERVIEW', 'TRACKING', 'FOCUS', 'RETURN'
+    // ── PROFESSIONAL CINEMATIC CAMERA SYSTEM (ANGRY BIRDS STYLE) ──
+    // States: 'OVERVIEW', 'TRACKING', 'RETURN'
     if (this.cameraState === 'TRACKING') {
       if (this.activeBird && this.activeBird.body) {
         const bPos = this.activeBird.body.position;
-        const bVel = this.activeBird.body.velocity;
-        // Lead the projectile smoothly in the direction of flight
-        const leadX = Math.min(2.5, Math.max(0.4, bVel.x * 0.08));
-        const targetX = Math.max(this.slingshot.anchor.x + 2.0, bPos.x + leadX);
-        const targetY = Math.max(2.2, Math.min(bPos.y * 0.6 + 1.8, 14.0));
-        // Subtle ~30% zoom in to focus on projectile and upcoming impact area
-        const zoomZ = Math.max(24.0, this.overviewCameraPos.z * 0.68);
+        const startX = this.slingshot ? this.slingshot.anchor.x : -12.5;
+        const targetDestX = this.fortressCenterX || 12.0;
+        const totalDistance = Math.max(6.0, targetDestX - startX);
+        const flightProgress = THREE.MathUtils.clamp(
+          (bPos.x - startX) / totalDistance,
+          0.0,
+          1.0
+        );
+
+        // Smooth cinematic pan from slingshot overview towards fortress
+        const targetX = THREE.MathUtils.lerp(
+          this.overviewLookAt.x - 1.2,
+          targetDestX,
+          flightProgress
+        );
+
+        // Keep vertical height steady and serene at overviewLookAt.y (no vertical bobbing or jerking)
+        const targetY = this.overviewLookAt.y;
+
+        // Ultra-subtle, gentle zoom (~4-5% at most) so scale remains grand and visible
+        const targetZ = this.overviewCameraPos.z * 0.95;
 
         this.targetLookAt.set(targetX, targetY, 0);
-        this.targetCameraPos.set(targetX, targetY + 0.35, zoomZ);
+        this.targetCameraPos.set(targetX, targetY + 0.2, targetZ);
       } else {
-        this.cameraState = 'RETURN';
-      }
-    } else if (this.cameraState === 'FOCUS') {
-      this.focusTimer -= deltaTime;
-      const zoomZ = Math.max(24.0, this.overviewCameraPos.z * 0.70);
-      this.targetLookAt.set(this.focusPoint.x, Math.max(2.0, this.focusPoint.y), 0);
-      this.targetCameraPos.set(this.focusPoint.x, Math.max(2.4, this.focusPoint.y + 0.4), zoomZ);
-
-      if (this.focusTimer <= 0) {
         this.cameraState = 'RETURN';
       }
     } else if (this.cameraState === 'RETURN') {
@@ -1874,8 +1878,8 @@ export class GameScene {
       this.targetLookAt.copy(this.overviewLookAt);
 
       if (
-        this.currentCameraPos.distanceTo(this.overviewCameraPos) < 0.25 &&
-        this.currentLookAt.distanceTo(this.overviewLookAt) < 0.25
+        this.currentCameraPos.distanceTo(this.overviewCameraPos) < 0.15 &&
+        this.currentLookAt.distanceTo(this.overviewLookAt) < 0.15
       ) {
         this.cameraState = 'OVERVIEW';
       }
@@ -1885,38 +1889,30 @@ export class GameScene {
       this.targetLookAt.copy(this.overviewLookAt);
     }
 
-    // Smooth exponential damping / lerp
-    const lerpSpeed =
-      this.cameraState === 'TRACKING'
-        ? 6.8
-        : this.cameraState === 'FOCUS'
-        ? 4.8
-        : 3.6;
+    // Professional cinematic damping rate for buttery-smooth motion without sudden jerks
+    const lerpSpeed = this.cameraState === 'TRACKING' ? 2.4 : 2.0;
     const lerpFactor = 1.0 - Math.exp(-lerpSpeed * deltaTime);
     this.currentCameraPos.lerp(this.targetCameraPos, lerpFactor);
     this.currentLookAt.lerp(this.targetLookAt, lerpFactor);
 
-    // Dynamic Camera Shake (Screen Trauma) applied to current camera position & lookAt
+    // Subtle, gentle camera shake (strictly for TNT explosions, decayed rapidly with smooth harmonic wave)
     let camX = this.currentCameraPos.x;
     let camY = this.currentCameraPos.y;
     let camZ = this.currentCameraPos.z;
-    let lookX = this.currentLookAt.x;
-    let lookY = this.currentLookAt.y;
-    let lookZ = this.currentLookAt.z;
 
     if (this.cameraShakeTrauma > 0.001) {
       const traumaSq = this.cameraShakeTrauma * this.cameraShakeTrauma;
-      const offsetX = (Math.random() - 0.5) * 0.72 * traumaSq;
-      const offsetY = (Math.random() - 0.5) * 0.72 * traumaSq;
+      const timeFreq = performance.now() * 0.032;
+      const offsetX = Math.sin(timeFreq) * 0.12 * traumaSq;
+      const offsetY = Math.cos(timeFreq * 1.3) * 0.08 * traumaSq;
       camX += offsetX;
       camY += offsetY;
-      lookX += offsetX * 0.4;
-      lookY += offsetY * 0.4;
-      this.cameraShakeTrauma = Math.max(0, this.cameraShakeTrauma - deltaTime * 3.2);
+      // Fast exponential trauma dissipation so it never lingers or vibrates
+      this.cameraShakeTrauma = Math.max(0, this.cameraShakeTrauma - deltaTime * 4.8);
     }
 
     this.camera.position.set(camX, camY, camZ);
-    this.camera.lookAt(lookX, lookY, lookZ);
+    this.camera.lookAt(this.currentLookAt.x, this.currentLookAt.y, this.currentLookAt.z);
 
     // Render stationary camera frame
     this.renderer.render(this.scene, this.camera);

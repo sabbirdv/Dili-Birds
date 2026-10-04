@@ -2552,6 +2552,274 @@ html, body {
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.28);
 }
 
+/* Menu Reset All Data Section (Bottom of Menu - Outside Gameplay Only) */
+.menu-reset-data-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.menu-reset-data-section.hidden {
+  display: none !important;
+}
+
+.menu-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 0 2px;
+}
+
+.menu-reset-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(220, 38, 38, 0.28));
+  border: 1px solid rgba(239, 68, 68, 0.55);
+  color: #fca5a5;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.18);
+}
+
+.menu-reset-btn:hover {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.96));
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.55), 0 0 16px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.menu-reset-btn:active {
+  transform: scale(0.98);
+}
+
+.reset-btn-svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   RESET ALL DATA WARNING CONFIRMATION MODAL
+   ============================================================================ */
+.reset-confirm-dialog {
+  width: min(94vw, 540px);
+  border-radius: 24px;
+  border: 1px solid rgba(239, 68, 68, 0.42);
+  background: linear-gradient(155deg, rgba(17, 24, 39, 0.98), rgba(28, 16, 24, 0.97));
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.85), 0 0 40px rgba(239, 68, 68, 0.22);
+}
+
+.reset-confirm-shell {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 88vh;
+  overflow: hidden;
+}
+
+.warning-kicker {
+  color: #f87171 !important;
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+}
+
+.reset-heading {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.red-svg {
+  color: #ef4444;
+  width: 24px;
+  height: 24px;
+  stroke: #ef4444;
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.55));
+  flex-shrink: 0;
+}
+
+.reset-confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 4px;
+  max-height: 58vh;
+}
+
+.reset-confirm-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.reset-confirm-body::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.35);
+  border-radius: 4px;
+}
+
+.reset-alert-banner {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.reset-alert-banner .alert-icon {
+  font-size: 1.35rem;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.reset-alert-banner .alert-text strong {
+  display: block;
+  color: #fca5a5;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.reset-alert-banner .alert-text p {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.reset-alert-banner .alert-text em {
+  color: #f87171;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.reset-impact-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.impact-section-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.reset-impact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.impact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 11px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: background 0.15s ease;
+}
+
+.impact-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.impact-icon {
+  font-size: 1.05rem;
+  line-height: 1.25;
+  flex-shrink: 0;
+}
+
+.impact-info strong {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 1px;
+}
+
+.impact-info span {
+  display: block;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.reset-confirm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 2px;
+}
+
+.reset-cancel-btn {
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.reset-danger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: 1px solid #f87171;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.45);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reset-danger-btn:hover {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  box-shadow: 0 6px 22px rgba(239, 68, 68, 0.65), 0 0 16px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+
+.reset-danger-btn:active {
+  transform: scale(0.98);
+}
+
+.reset-danger-btn .btn-trash-svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
 /* Universal Coin Asset Icon */
 .coin-icon-img {
   width: 20px;

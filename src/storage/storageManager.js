@@ -642,4 +642,48 @@ export class StorageManager {
     this.saveState();
     return this.state;
   }
+
+  /**
+   * Complete Hard Reset: Wipes ALL user data across the game.
+   * Removes username, profile, custom avatar, achievements/claimed missions,
+   * unlocked levels, unlocked characters, stars, coins, high scores, daily streaks,
+   * player IDs, and cloud server row references. Reverts everything to initial state.
+   */
+  resetAllData() {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch (err) {
+      console.warn('Could not remove storage key:', err);
+    }
+
+    this.state = {
+      username: '',
+      avatarUrl: AVATAR_PRESETS[0].url,
+      avatarPresetId: AVATAR_PRESETS[0].id,
+      profileConfigured: false,
+      unlockedLevel: 1,
+      coins: 0,
+      levelStars: {},
+      levelHighScores: {},
+      claimedCoinLevels: {},
+      claimedMissions: {},
+      claimedCharacters: {},
+      seenHeroUnlocks: { commander_falcon: true },
+      zoneRevealed: { 1: true, 2: false, 3: false, 4: false, 5: false, 6: false },
+      dailyClaim: { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 },
+      equippedHeroId: 'crimson_ace',
+      brandName: DEFAULT_BRAND_NAME,
+      soundEnabled: true,
+      sfxVolume: 0.90,
+      bgmVolume: 0.90,
+      bgmMode: 'dashboard',
+      playerId: '',
+      serverRowId: null,
+      leaderboardRank: 1
+    };
+
+    this.saveState();
+    return this.state;
+  }
 }
+

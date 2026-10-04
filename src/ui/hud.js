@@ -109,7 +109,8 @@ export class HudController {
     onOpenProfile,
     onPauseGame,
     onResumeGame,
-    onActivateAbility
+    onActivateAbility,
+    onResetAllData
   }) {
     this.storage = storage;
     this.audio = audio;
@@ -123,6 +124,7 @@ export class HudController {
     this.onPauseGame = onPauseGame;
     this.onResumeGame = onResumeGame;
     this.onActivateAbility = onActivateAbility;
+    this.onResetAllData = onResetAllData;
 
     this.isGameplayActive = false;
     this.currentActiveBirdType = null;
@@ -149,6 +151,14 @@ export class HudController {
     this.menuAudioStatus = document.getElementById('menu-audio-status');
     this.menuFullscreenIcon = document.getElementById('menu-fullscreen-icon');
     this.menuFullscreenStatus = document.getElementById('menu-fullscreen-status');
+
+    // Reset Data elements (bottom of menu section outside gameplay + confirmation modal)
+    this.menuResetSection = document.getElementById('menu-reset-data-section');
+    this.btnMenuResetAllData = document.getElementById('btn-menu-reset-all-data');
+    this.resetConfirmDialog = document.getElementById('reset-confirm-dialog');
+    this.btnCloseResetConfirm = document.getElementById('btn-close-reset-confirm');
+    this.btnCancelReset = document.getElementById('btn-cancel-reset');
+    this.btnConfirmResetAll = document.getElementById('btn-confirm-reset-all');
 
     // Independent Volume Sliders
     this.sliderSfxVolume = document.getElementById('slider-sfx-volume');
@@ -421,6 +431,53 @@ export class HudController {
       e.stopPropagation();
       this.dismissAbilityTooltip();
     });
+
+    // Reset All Data Warning Confirmation Modal
+    this.btnMenuResetAllData?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.audio?.playMenuOpen?.();
+      this.openResetConfirmModal();
+    });
+
+    this.btnCloseResetConfirm?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.audio?.playMenuClose?.();
+      this.closeResetConfirmModal();
+    });
+
+    this.btnCancelReset?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.audio?.playMenuClose?.();
+      this.closeResetConfirmModal();
+    });
+
+    this.btnConfirmResetAll?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.audio?.playRetry?.();
+      this.closeResetConfirmModal();
+      this.closeGameMenu();
+      this.onResetAllData?.();
+    });
+
+    // Fallback for backdrop click on reset confirmation dialog
+    this.resetConfirmDialog?.addEventListener('click', (event) => {
+      if (event.target === this.resetConfirmDialog) {
+        this.closeResetConfirmModal();
+      }
+    });
+  }
+
+  openResetConfirmModal() {
+    if (!this.resetConfirmDialog) return;
+    if (!this.resetConfirmDialog.open) {
+      this.resetConfirmDialog.showModal();
+    }
+  }
+
+  closeResetConfirmModal() {
+    if (this.resetConfirmDialog?.open) {
+      this.resetConfirmDialog.close();
+    }
   }
 
   openGameMenu() {
@@ -438,11 +495,15 @@ export class HudController {
       gameplayActionsEl?.classList.remove('hidden');
       if (headerKickerEl) headerKickerEl.textContent = 'MISSION STATUS';
       if (titleTextEl) titleTextEl.textContent = 'Game Paused';
+      // RESET ALL DATA BUTTON ONLY IN OUTSIDE OF GAME SECTION: Hide while playing
+      this.menuResetSection?.classList.add('hidden');
     } else {
-      // Dashboard Mode: Hide gameplay action buttons
+      // Dashboard Mode (Outside of game): Hide gameplay action buttons
       gameplayActionsEl?.classList.add('hidden');
       if (headerKickerEl) headerKickerEl.textContent = 'AUDIO & SETTINGS';
       if (titleTextEl) titleTextEl.textContent = 'Game Settings';
+      // SHOW RESET ALL DATA BUTTON ONLY OUTSIDE GAMEPLAY
+      this.menuResetSection?.classList.remove('hidden');
     }
 
     if (this.storage) {
@@ -532,6 +593,7 @@ export class HudController {
     this.rescueTrackerEl?.classList.add('hidden');
     this.hideBirdAbility();
     this.closeGameMenu();
+    this.closeResetConfirmModal();
     this.hideAimTelemetry();
   }
 

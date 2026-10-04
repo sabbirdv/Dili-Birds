@@ -528,9 +528,121 @@
             </button>
           </div>
         </div>
-      </section>
+
+        <!-- Reset All Data Section (ONLY visible outside of game section) -->
+        <div class="menu-reset-data-section" id="menu-reset-data-section">
+          <div class="menu-divider" aria-hidden="true"></div>
+          <button type="button" id="btn-menu-reset-all-data" class="action-btn menu-reset-btn" title="Permanently delete all user progress and reset all game data">
+            <svg class="reset-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+            <span>Reset All Data</span>
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       RESET ALL DATA WARNING CONFIRMATION MODAL
+       ═══════════════════════════════════════════════════════════ -->
+  <dialog id="reset-confirm-dialog" class="game-dialog modal-dashboard-dialog reset-confirm-dialog" closedby="any" aria-labelledby="reset-confirm-title">
+    <div class="modal-dialog-shell reset-confirm-shell glass-card">
+      <header class="modal-dialog-header">
+        <div class="modal-title-wrap">
+          <span class="modal-kicker warning-kicker">⚠️ CRITICAL WARNING • IRREVERSIBLE ACTION</span>
+          <h2 id="reset-confirm-title" class="modal-heading reset-heading">
+            <svg class="modal-head-svg red-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Reset All Game Data?
+          </h2>
+        </div>
+        <button type="button" id="btn-close-reset-confirm" class="dialog-close-btn" aria-label="Cancel and Close" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+
+      <div class="reset-confirm-body">
+        <div class="reset-alert-banner">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-text">
+            <strong>Are you sure you want to delete all user data?</strong>
+            <p>This action is <em>permanent and cannot be undone</em>. Everything you have unlocked, scored, or customized will be wiped completely from this device.</p>
+          </div>
+        </div>
+
+        <div class="reset-impact-section">
+          <h4 class="impact-section-title">WHAT WILL HAPPEN IF YOU RESET ALL DATA:</h4>
+          <ul class="reset-impact-list">
+            <li class="impact-item">
+              <span class="impact-icon">👤</span>
+              <div class="impact-info">
+                <strong>Username &amp; Pilot Profile Removed</strong>
+                <span>Your Commander username callsign, profile settings, and customized avatar will be deleted.</span>
+              </div>
+            </li>
+            <li class="impact-item">
+              <span class="impact-icon">🗺️</span>
+              <div class="impact-info">
+                <strong>Unlocked Levels Re-Locked</strong>
+                <span>All campaign roadmap progress will reset back to Level 1. Levels 2–70 will be locked.</span>
+              </div>
+            </li>
+            <li class="impact-item">
+              <span class="impact-icon">⭐</span>
+              <div class="impact-info">
+                <strong>Stars &amp; High Scores Erased</strong>
+                <span>All earned stage stars (reverting to 0 ★) and demolition high scores will be wiped clean.</span>
+              </div>
+            </li>
+            <li class="impact-item">
+              <span class="impact-icon">🪙</span>
+              <div class="impact-info">
+                <strong>Treasury Coin Balance Cleared</strong>
+                <span>Your coin treasury will be completely reset back to 0 coins.</span>
+              </div>
+            </li>
+            <li class="impact-item">
+              <span class="impact-icon">🦅</span>
+              <div class="impact-info">
+                <strong>Unlocked Characters &amp; Abilities Locked</strong>
+                <span>All special unlocked birds (Sonic Boost, Meteor Slam, Tri-Cluster, Inferno, Vortex, Volt) will be locked.</span>
+              </div>
+            </li>
+            <li class="impact-item">
+              <span class="impact-icon">🎯</span>
+              <div class="impact-info">
+                <strong>Achievements &amp; Missions Cleared</strong>
+                <span>All completed command quests, claimed mission rewards, and 7-day daily streaks will be erased.</span>
+              </div>
+            </li>
+            <li class="impact-item">
+              <span class="impact-icon">🏆</span>
+              <div class="impact-info">
+                <strong>Leaderboard Session Reset</strong>
+                <span>Your local player ID and ranking session will be unlinked for a fresh start.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <footer class="reset-confirm-footer">
+        <button type="button" id="btn-cancel-reset" class="action-btn secondary-btn reset-cancel-btn">
+          <span>Cancel &amp; Keep Data</span>
+        </button>
+        <button type="button" id="btn-confirm-reset-all" class="action-btn reset-danger-btn">
+          <svg class="btn-trash-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          <span>Yes, Reset Everything</span>
+        </button>
+      </footer>
     </div>
   </dialog>
+
 
   <!-- Sleek User Profile Setup Screen (<dialog closedby="any"> + fallback) -->
   <dialog id="profile-dialog" class="game-dialog profile-setup-dialog" closedby="any" aria-labelledby="profile-dialog-title">

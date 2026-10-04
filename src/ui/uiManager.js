@@ -25,7 +25,8 @@ export class UIManager {
     onPauseGame,
     onResumeGame,
     onSetDashboard3DMode,
-    onActivateAbility
+    onActivateAbility,
+    onResetAllData
   }) {
     this.storage = storage;
     this.audio = audio;
@@ -37,6 +38,7 @@ export class UIManager {
     this.onPauseGame = onPauseGame;
     this.onResumeGame = onResumeGame;
     this.onSetDashboard3DMode = onSetDashboard3DMode;
+    this.onResetAllData = onResetAllData;
 
     // Dedicated Full-Screen Pages
     this.dashboardScreenEl = document.getElementById('dashboard-screen');
@@ -110,7 +112,8 @@ export class UIManager {
       onOpenProfile: () => this.profileModal.open('username'),
       onPauseGame: () => this.onPauseGame?.(),
       onResumeGame: () => this.onResumeGame?.(),
-      onActivateAbility: () => onActivateAbility?.()
+      onActivateAbility: () => onActivateAbility?.(),
+      onResetAllData: () => this.handleResetAllData()
     });
 
     this.dashboardModals = new DashboardModals({
@@ -379,6 +382,32 @@ export class UIManager {
     this.hud?.updateLevelHeader(levelConfig);
     this.refreshHeaderStats();
     this.hud?.show();
+  }
+
+  handleResetAllData() {
+    this.storage.resetAllData();
+    this.currentPlayingLevelId = null;
+
+    if (this.levelSelect) {
+      this.levelSelect.focusedLevelId = 1;
+      this.levelSelect.activeLevelId = 1;
+      this.levelSelect.lastPreviewedLevelId = 1;
+      this.levelSelect.pendingLevelUnlock = null;
+      this.levelSelect.pendingZoneUnlock = null;
+      this.levelSelect.render();
+    }
+
+    if (typeof this.onResetAllData === 'function') {
+      this.onResetAllData();
+    }
+
+    this.showDashboardView();
+    this.refreshHeaderAndMenu();
+
+    // Re-prompt fresh user to create their Commander profile callsign
+    requestAnimationFrame(() => {
+      this.profileModal?.open();
+    });
   }
 }
 

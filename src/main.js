@@ -70,6 +70,18 @@ class DiliBirdsApp {
       },
       onActivateAbility: () => {
         this.gameScene?.triggerBirdAbility();
+      },
+      onResetAllData: () => {
+        this.audio?.enterMenu();
+        const previewLevel = LEVELS[0];
+        this.currentLevelConfig = LEVELS[0];
+        this.levelSelect.focusedLevelId = 1;
+        this.levelSelect.activeLevelId = 1;
+        this.levelSelect.lastPreviewedLevelId = 1;
+        this.levelSelect.pendingLevelUnlock = null;
+        this.levelSelect.pendingZoneUnlock = null;
+        this.levelSelect.render();
+        this.gameScene?.loadLevel(previewLevel, true);
       }
     });
 

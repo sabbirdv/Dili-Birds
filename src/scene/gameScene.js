@@ -122,7 +122,7 @@ export class GameScene {
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -137,8 +137,8 @@ export class GameScene {
     this.dirLight = new THREE.DirectionalLight(0xfff5e0, 1.55);
     this.dirLight.position.set(-8, 32, 28);
     this.dirLight.castShadow = true;
-    this.dirLight.shadow.mapSize.width = 2048;
-    this.dirLight.shadow.mapSize.height = 2048;
+    this.dirLight.shadow.mapSize.width = 1024;
+    this.dirLight.shadow.mapSize.height = 1024;
     this.dirLight.shadow.camera.near = 2;
     this.dirLight.shadow.camera.far = 130;
     const d = 38;
@@ -170,6 +170,22 @@ export class GameScene {
     this.sharedSparkGeo = new THREE.BoxGeometry(0.14, 0.14, 0.14);
     this.sharedSparkMat1 = new THREE.MeshBasicMaterial({ color: 0xfef08a });
     this.sharedSparkMat2 = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+
+    // Pre-allocated shared materials for debris fragments to prevent runtime shader compilation
+    this.sharedDebrisMaterials = {
+      wood: new THREE.MeshBasicMaterial({ color: 0xc27838 }),
+      stone: new THREE.MeshBasicMaterial({ color: 0x64748b }),
+      glass: new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.82 }),
+      metal: new THREE.MeshBasicMaterial({ color: 0x94a3b8 }),
+      coin: new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
+    };
+    this.sharedSmokeMaterial = new THREE.MeshBasicMaterial({
+      color: 0x475569,
+      transparent: true,
+      opacity: 0.65,
+      depthWrite: false
+    });
+    this.burstMatCache = new Map();
   }
 
   /**
@@ -283,7 +299,7 @@ export class GameScene {
     this.world = new CANNON.World();
     this.world.gravity.set(0, -18.0, 0);
     this.world.allowSleep = true;
-    this.world.solver.iterations = 35;
+    this.world.solver.iterations = 14;
 
     this.defaultMaterial = new CANNON.Material('default');
     const contactMat = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, {
@@ -315,20 +331,43 @@ export class GameScene {
   }
 
   /**
-   * Immediately awakens all active blocks and targets in the physics world so that
-   * realistic gravity and collision impulses propagate without freezing in mid-air.
+   * Awakens sleeping structures so realistic gravity and collision impulses propagate smoothly.
    */
   wakeAllStructures() {
     for (let i = 0; i < this.blocks.length; i++) {
       const b = this.blocks[i];
-      if (!b.destroyed && b.body) {
+      if (!b.destroyed && b.body && b.body.sleepState === CANNON.Body.SLEEPING) {
         b.body.wakeUp();
       }
     }
     for (let i = 0; i < this.targets.length; i++) {
       const t = this.targets[i];
-      if (!t.destroyed && t.body) {
+      if (!t.destroyed && t.body && t.body.sleepState === CANNON.Body.SLEEPING) {
         t.body.wakeUp();
+      }
+    }
+  }
+
+  wakeStructuresNear(pos, radius = 6.5) {
+    const rSq = radius * radius;
+    for (let i = 0; i < this.blocks.length; i++) {
+      const b = this.blocks[i];
+      if (!b.destroyed && b.body && b.body.sleepState === CANNON.Body.SLEEPING) {
+        const dx = b.body.position.x - pos.x;
+        const dy = b.body.position.y - pos.y;
+        if (dx * dx + dy * dy < rSq) {
+          b.body.wakeUp();
+        }
+      }
+    }
+    for (let i = 0; i < this.targets.length; i++) {
+      const t = this.targets[i];
+      if (!t.destroyed && t.body && t.body.sleepState === CANNON.Body.SLEEPING) {
+        const dx = t.body.position.x - pos.x;
+        const dy = t.body.position.y - pos.y;
+        if (dx * dx + dy * dy < rSq) {
+          t.body.wakeUp();
+        }
       }
     }
   }
@@ -951,7 +990,9 @@ export class GameScene {
     body.sleepTimeLimit = 0.6;
     body.sleep();
 
-    const maxHp = hpMap[type] || 80;
+    const lvl = this.currentLevelId || 1;
+    const lvlScale = lvl > 30 ? Math.min(1.35, 1.0 + (lvl - 30) * 0.008) : 1.0;
+    const maxHp = Math.round((hpMap[type] || 80) * lvlScale);
     const blockObj = {
       type,
       size,
@@ -979,7 +1020,7 @@ export class GameScene {
       // Direct impact from player bird
       if (isBirdHit) {
         this.audio?.stopFlightSound?.();
-        // Awaken full structure physics when bird actually strikes the tower
+        // Awaken nearby structure physics when bird actually strikes the tower
         if (!this.structureAwakened) {
           this.structureAwakened = true;
           this.wakeAllStructures();
@@ -1017,9 +1058,9 @@ export class GameScene {
         } else if (birdType === 'vortex') {
           birdMultiplier = blockObj.type === 'metal' ? 2.1 : blockObj.type === 'stone' ? 2.0 : 1.5;
         } else if (birdType === 'lightning') {
-          birdMultiplier = blockObj.type === 'metal' ? 1.5 : blockObj.type === 'stone' ? 1.1 : blockObj.type === 'glass' ? 1.2 : 0.8;
+          birdMultiplier = blockObj.type === 'metal' ? 1.5 : blockObj.type === 'stone' ? 1.3 : blockObj.type === 'glass' ? 1.2 : 1.2;
         } else if (birdType === 'chrono') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.5 : blockObj.type === 'metal' ? 2.4 : blockObj.type === 'glass' ? 2.2 : 1.8;
+          birdMultiplier = blockObj.type === 'stone' ? 2.0 : blockObj.type === 'metal' ? 1.9 : blockObj.type === 'glass' ? 1.76 : 1.44;
         }
 
         // Damage derived from normal impact collision force (tuned for realistic yet beatable toughness)
@@ -1044,11 +1085,11 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 5.0) {
+      } else if (normalImpact >= 6.5) {
         // High-velocity falls from elevated platforms or heavy crushing impacts
         blockObj.lastHitTime = now;
         this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 4.0) * 2.6;
+        const debrisDmg = (normalImpact - 5.5) * 2.0;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
@@ -1089,13 +1130,18 @@ export class GameScene {
     body.sleepTimeLimit = 0.8;
     body.sleep();
 
+    const lvl = this.currentLevelId || 1;
+    const targetLvlScale = lvl > 30 ? Math.min(1.4, 1.0 + (lvl - 30) * 0.01) : 1.0;
+    const baseHp = isBoss ? 45 : 24;
+    const targetHp = Math.round(baseHp * targetLvlScale);
+
     const targetObj = {
       mesh,
       body,
       radius,
       isBoss,
       birdType,
-      hp: isBoss ? 40 : 20,
+      hp: targetHp,
       destroyed: false,
       lastHitTime: 0
     };
@@ -1121,10 +1167,10 @@ export class GameScene {
             this.defeatTarget(targetObj);
           }
         }
-      } else if (normalImpact >= 3.2) {
+      } else if (normalImpact >= 4.0) {
         // Crushed by heavy falling debris or falling from elevated cliff onto the ground
         targetObj.lastHitTime = now;
-        const fallDmg = (normalImpact - 2.0) * 3.8;
+        const fallDmg = (normalImpact - 2.8) * 2.8;
         targetObj.hp -= fallDmg;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
@@ -1207,7 +1253,7 @@ export class GameScene {
       fire: 2.8,
       vortex: 3.8,
       lightning: 2.05,
-      chrono: 3.6
+      chrono: 2.88
     };
     const mass = massMap[this.activeBird.type] || 2.5;
 
@@ -1595,8 +1641,8 @@ export class GameScene {
     this.audio?.playExplosion?.();
     this.audio?.playBoost?.();
     this.spawnChronoFX(origin);
-    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.95);
-    this.wakeAllStructures();
+    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.75);
+    this.wakeStructuresNear(origin, 7.5);
 
     // High velocity quantum phase warp acceleration
     if (this.activeBird && this.activeBird.body) {
@@ -1604,8 +1650,9 @@ export class GameScene {
       this.activeBird.body.velocity.y *= 0.85;
     }
 
-    const chronoRadius = 4.2;
-    // Shatter and dislodge destructible blocks in wide radius
+    // Shockwave radius reduced by 20% (4.2 -> 3.36)
+    const chronoRadius = 3.36;
+    // Shatter and dislodge destructible blocks in balanced radius
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
       const bPos = b.body.position;
@@ -1616,12 +1663,14 @@ export class GameScene {
           this.destroyBlock(b);
         } else {
           const falloff = 1 - dist / chronoRadius;
-          const dmg = falloff * (b.type === 'stone' ? 52 : b.type === 'metal' ? 48 : b.type === 'glass' ? 58 : 36);
+          // Damage rebalanced by 20%
+          const dmg = falloff * (b.type === 'stone' ? 42 : b.type === 'metal' ? 38 : b.type === 'glass' ? 46 : 29);
           b.hp -= dmg;
           const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
           if (impulseDir.length() > 0.01) {
             impulseDir.normalize();
-            b.body.applyImpulse(impulseDir.scale(falloff * 12.0), bPos);
+            // Impulse reduced by 20% (12.0 -> 9.6)
+            b.body.applyImpulse(impulseDir.scale(falloff * 9.6), bPos);
           }
           if (b.hp <= 0) {
             this.destroyBlock(b);
@@ -1630,7 +1679,7 @@ export class GameScene {
       }
     });
 
-    // Damage & dislodge targets
+    // Damage & dislodge targets (rebalanced by 20%)
     [...this.targets].forEach((t) => {
       if (t.destroyed || !t.body) return;
       const tPos = t.body.position;
@@ -1638,11 +1687,11 @@ export class GameScene {
       if (dist < chronoRadius) {
         t.body.wakeUp();
         const falloff = 1 - dist / chronoRadius;
-        t.hp -= falloff * 30;
+        t.hp -= falloff * 24;
         const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
         if (impulseDir.length() > 0.01) {
           impulseDir.normalize();
-          t.body.applyImpulse(impulseDir.scale(falloff * 10), tPos);
+          t.body.applyImpulse(impulseDir.scale(falloff * 8.0), tPos);
         }
         if (t.hp <= 0) {
           this.defeatTarget(t);
@@ -1652,7 +1701,7 @@ export class GameScene {
   }
 
   spawnChronoFX(origin) {
-    // 1. Violet & Magenta dual expanding quantum shockwaves
+    // 1. Violet & Magenta dual expanding quantum shockwaves (calibrated by 20%)
     const shockwaveMat = new THREE.MeshBasicMaterial({
       color: 0xa855f7,
       transparent: true,
@@ -1665,11 +1714,11 @@ export class GameScene {
     this.particles.push({
       type: 'shockwave',
       mesh,
-      baseScale: 0.4,
-      maxExpansion: 8.4,
+      baseScale: 0.35,
+      maxExpansion: 6.7,
       baseOpacity: 0.95,
       life: 1.0,
-      decay: 2.2
+      decay: 2.3
     });
 
     // Secondary cyan pulse
@@ -1686,16 +1735,16 @@ export class GameScene {
       type: 'shockwave',
       mesh: mesh2,
       baseScale: 0.2,
-      maxExpansion: 6.0,
+      maxExpansion: 4.8,
       baseOpacity: 0.85,
       life: 0.8,
       decay: 2.8
     });
 
-    // 2. Quantum time-warp burst particles
-    this.spawnBurstParticles(origin, 0xa855f7, 32);
-    this.spawnBurstParticles(origin, 0xec4899, 24);
-    this.spawnBurstParticles(origin, 0x38bdf8, 16);
+    // 2. Quantum time-warp burst particles (optimized counts)
+    this.spawnBurstParticles(origin, 0xa855f7, 20);
+    this.spawnBurstParticles(origin, 0xec4899, 16);
+    this.spawnBurstParticles(origin, 0x38bdf8, 12);
   }
 
   destroyBlock(blockObj) {
@@ -1710,17 +1759,17 @@ export class GameScene {
     this.world.removeBody(blockObj.body);
     this.blocks = this.blocks.filter((b) => b !== blockObj);
 
-    // CRITICAL: Wake up all structures in the physics world so gravity acts immediately
-    this.wakeAllStructures();
+    // Wake up nearby structures so gravity acts naturally without waking entire world
+    this.wakeStructuresNear(pos, 5.2);
 
     // Specifically for blocks directly above or resting on this block, give them an immediate gravity nudge
     this.blocks.forEach((b) => {
       if (!b.destroyed && b.body) {
-        b.body.wakeUp();
         const bHalfWidth = (b.size?.[0] || 1.0) / 2;
         const horizOverlap = Math.abs(b.body.position.x - pos.x) < (halfWidth + bHalfWidth + 0.3);
         const isAbove = b.body.position.y > pos.y - halfHeight;
         if (isAbove && horizOverlap) {
+          b.body.wakeUp();
           if (b.body.velocity.y > -0.5) {
             b.body.velocity.y = -1.5;
           }
@@ -1730,10 +1779,10 @@ export class GameScene {
 
     this.targets.forEach((t) => {
       if (!t.destroyed && t.body) {
-        t.body.wakeUp();
         const horizOverlap = Math.abs(t.body.position.x - pos.x) < (halfWidth + (t.radius || 0.75) + 0.3);
         const isAbove = t.body.position.y > pos.y - halfHeight;
         if (isAbove && horizOverlap) {
+          t.body.wakeUp();
           if (t.body.velocity.y > -0.5) {
             t.body.velocity.y = -1.5;
           }
@@ -1772,15 +1821,15 @@ export class GameScene {
 
   /**
    * Spawns physical 3D debris fragments and stylized smoke/dust puffs when a block breaks,
-   * replacing instant vanishing with a satisfying tactile shattering effect.
+   * using shared materials and lightweight meshes for silky smooth 60fps performance.
    */
   spawnBlockShatter(blockObj, origin) {
     const size = blockObj.size || [1.0, 1.0, 1.0];
     const type = blockObj.type || 'wood';
 
-    // Prune oldest particles if pool is full to maintain 60 FPS
-    if (this.particles.length > 70) {
-      const dropCount = Math.min(15, this.particles.length - 55);
+    // Prune oldest particles if pool is full to maintain silky 60 FPS
+    if (this.particles.length > 45) {
+      const dropCount = Math.min(12, this.particles.length - 35);
       for (let k = 0; k < dropCount; k++) {
         const oldP = this.particles.shift();
         if (oldP?.mesh) {
@@ -1789,58 +1838,32 @@ export class GameScene {
       }
     }
 
-    // 1. Physical tumbling 3D debris chunks
-    const paletteMap = {
-      wood: [0xc27838, 0x8f4f1a, 0xd97706],
-      stone: [0x64748b, 0x475569, 0x94a3b8],
-      glass: [0x7dd3fc, 0x38bdf8, 0xe0f2fe],
-      metal: [0x94a3b8, 0x64748b, 0x334155, 0x38bdf8],
-      coin: [0xfbbf24, 0xf59e0b, 0x38bdf8]
-    };
-    const colors = paletteMap[type] || [0xc27838, 0x8f4f1a];
-    const chunkCount = type === 'stone' || type === 'metal' ? 6 : type === 'glass' ? 7 : 5;
+    // 1. Physical tumbling 3D debris chunks using zero-allocation pre-cached materials
+    const mat = (this.sharedDebrisMaterials && this.sharedDebrisMaterials[type]) || this.sharedDebrisMaterials?.wood;
+    const chunkCount = type === 'stone' || type === 'metal' ? 5 : type === 'glass' ? 5 : 4;
 
     for (let i = 0; i < chunkCount; i++) {
-      const color = colors[i % colors.length];
       const chunkW = Math.max(0.12, (size[0] / 3) * (0.6 + Math.random() * 0.7));
       const chunkH = Math.max(0.12, (size[1] / 3) * (0.6 + Math.random() * 0.7));
       const chunkD = Math.max(0.12, (size[2] / 2) * (0.6 + Math.random() * 0.7));
 
-      const isGlass = type === 'glass';
-      const isMetal = type === 'metal';
-      const mat = isGlass
-        ? new THREE.MeshPhysicalMaterial({
-            color,
-            transparent: true,
-            opacity: 0.85,
-            roughness: 0.1,
-            metalness: 0.1,
-            transmission: 0.3
-          })
-        : new THREE.MeshStandardMaterial({
-            color,
-            roughness: isMetal ? 0.28 : type === 'stone' ? 0.8 : 0.55,
-            metalness: isMetal ? 0.85 : type === 'coin' ? 0.6 : 0.05
-          });
-
-      // Scale unit box via matrix rather than allocating new geometries every hit
       const mesh = new THREE.Mesh(this.sharedUnitBoxGeo, mat);
       mesh.scale.set(chunkW, chunkH, chunkD);
-      mesh.castShadow = true;
+      mesh.castShadow = false; // Disable heavy shadow maps on transient fragments
       const offsetX = (Math.random() - 0.5) * (size[0] * 0.6);
       const offsetY = (Math.random() - 0.5) * (size[1] * 0.6);
       mesh.position.set(origin.x + offsetX, origin.y + offsetY, (Math.random() - 0.5) * 0.3);
       this.scene.add(mesh);
 
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 7.5 + (offsetX * 3.5),
-        Math.random() * 5.5 + 2.0,
-        (Math.random() - 0.5) * 2.2
+        (Math.random() - 0.5) * 7.0 + (offsetX * 3.0),
+        Math.random() * 5.0 + 2.0,
+        (Math.random() - 0.5) * 2.0
       );
       const rotVel = new THREE.Vector3(
-        (Math.random() - 0.5) * 14,
-        (Math.random() - 0.5) * 14,
-        (Math.random() - 0.5) * 16
+        (Math.random() - 0.5) * 12,
+        (Math.random() - 0.5) * 12,
+        (Math.random() - 0.5) * 14
       );
 
       this.particles.push({
@@ -1850,43 +1873,37 @@ export class GameScene {
         rotVel,
         baseScaleVec: new THREE.Vector3(chunkW, chunkH, chunkD),
         baseScale: 1.0,
-        life: 1.0,
-        decay: 1.3
+        life: 0.9,
+        decay: 1.5,
+        sharedMaterial: true
       });
     }
 
-    // Additional shear sparks for metal breaks
+    // Additional shear sparks for metal breaks (optimized count)
     if (type === 'metal') {
-      for (let s = 0; s < 8; s++) {
+      for (let s = 0; s < 4; s++) {
         const sMesh = new THREE.Mesh(this.sharedSparkGeo, s % 2 === 0 ? this.sharedSparkMat1 : this.sharedSparkMat2);
         sMesh.position.copy(origin);
         this.scene.add(sMesh);
-        const sVel = new THREE.Vector3((Math.random() - 0.5) * 10, Math.random() * 7 + 2, (Math.random() - 0.5) * 2);
+        const sVel = new THREE.Vector3((Math.random() - 0.5) * 9, Math.random() * 6 + 2, (Math.random() - 0.5) * 2);
         this.particles.push({
           type: 'debris',
           mesh: sMesh,
           vel: sVel,
           rotVel: new THREE.Vector3(8, 8, 8),
           baseScale: 0.8,
-          life: 0.8,
-          decay: 2.2,
+          life: 0.7,
+          decay: 2.4,
           sharedMaterial: true
         });
       }
     }
 
-    // 2. Soft stylized dust / smoke puff
-    const dustCount = 3;
-    const dustColor = type === 'stone' || type === 'metal' ? 0x94a3b8 : type === 'glass' ? 0xe0f2fe : 0xd1a06d;
+    // 2. Soft stylized dust / smoke puff using shared smoke material
+    const dustCount = 2;
     for (let i = 0; i < dustCount; i++) {
-      const dustMat = new THREE.MeshBasicMaterial({
-        color: dustColor,
-        transparent: true,
-        opacity: 0.55,
-        depthWrite: false
-      });
-      const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, dustMat);
-      mesh.scale.setScalar(0.28);
+      const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, this.sharedSmokeMaterial);
+      mesh.scale.setScalar(0.26);
       mesh.position.set(
         origin.x + (Math.random() - 0.5) * (size[0] * 0.5),
         origin.y + (Math.random() - 0.5) * (size[1] * 0.5),
@@ -1895,8 +1912,8 @@ export class GameScene {
       this.scene.add(mesh);
 
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 2.2,
-        Math.random() * 2.2 + 0.8,
+        (Math.random() - 0.5) * 2.0,
+        Math.random() * 2.0 + 0.8,
         0
       );
 
@@ -1904,10 +1921,11 @@ export class GameScene {
         type: 'smoke',
         mesh,
         vel,
-        baseScale: 0.28,
+        baseScale: 0.26,
         baseOpacity: 0.55,
-        life: 1.0,
-        decay: 1.9
+        life: 0.85,
+        decay: 2.1,
+        sharedMaterial: true
       });
     }
   }
@@ -1923,12 +1941,12 @@ export class GameScene {
     // Modern multi-layer explosion VFX
     this.createModernExplosion(origin);
 
-    // Awaken entire fortress
-    this.wakeAllStructures();
+    // Awaken nearby structures
+    this.wakeStructuresNear(origin, 7.5);
 
     // Balanced, punchy blast radius & force
-    const blastRadius = 3.9;
-    const blastForce = 17.5;
+    const blastRadius = 3.5;
+    const blastForce = 14.5;
 
     // Push and damage nearby blocks
     const affectedBlocks = [...this.blocks];
@@ -1958,7 +1976,7 @@ export class GameScene {
         const factor = 1 - dist / blastRadius;
         const strength = factor * blastForce;
         b.body.applyImpulse(new CANNON.Vec3(dirX * strength, (dirY + 0.3) * strength, 0));
-        b.hp -= factor * 65;
+        b.hp -= factor * 50;
 
         if (b.hp <= 0) {
           if (b.type === 'tnt') {
@@ -2083,19 +2101,11 @@ export class GameScene {
       decay: 3.0
     });
 
-    // 3. Volumetric Billowing Smoke Plumes
-    const smokeColors = [0x1e293b, 0x334155, 0x475569, 0x0f172a, 0x64748b];
-    const smokeCount = 12;
+    // 3. Volumetric Billowing Smoke Plumes (optimized count & shared material)
+    const smokeCount = 6;
     for (let i = 0; i < smokeCount; i++) {
-      const color = smokeColors[i % smokeColors.length];
-      const radius = 0.42 + Math.random() * 0.35;
-      const smokeMat = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 0.8,
-        depthWrite: false
-      });
-      const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, smokeMat);
+      const radius = 0.4 + Math.random() * 0.3;
+      const mesh = new THREE.Mesh(this.sharedUnitSphereGeo, this.sharedSmokeMaterial);
       mesh.scale.setScalar(radius);
       mesh.position.set(
         origin.x + (Math.random() - 0.5) * 0.5,
@@ -2105,11 +2115,11 @@ export class GameScene {
       this.scene.add(mesh);
 
       const angle = (i / smokeCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
-      const speed = 2.6 + Math.random() * 3.4;
+      const speed = 2.4 + Math.random() * 2.8;
       const vel = new THREE.Vector3(
         Math.cos(angle) * speed,
-        Math.sin(angle) * speed * 0.8 + 2.0,
-        (Math.random() - 0.5) * 1.4
+        Math.sin(angle) * speed * 0.8 + 1.8,
+        (Math.random() - 0.5) * 1.2
       );
 
       this.particles.push({
@@ -2117,14 +2127,15 @@ export class GameScene {
         mesh,
         vel,
         baseScale: radius,
-        baseOpacity: 0.8,
-        life: 1.0,
-        decay: 1.3
+        baseOpacity: 0.65,
+        life: 0.9,
+        decay: 1.4,
+        sharedMaterial: true
       });
     }
 
-    // 4. Incandescent High-Speed Sparks & Shrapnel Embers
-    const sparkCount = 26;
+    // 4. Incandescent High-Speed Sparks & Shrapnel Embers (optimized count)
+    const sparkCount = 14;
     for (let i = 0; i < sparkCount; i++) {
       const mesh = new THREE.Mesh(
         this.sharedSparkGeo,
@@ -2134,16 +2145,16 @@ export class GameScene {
       this.scene.add(mesh);
 
       const angle = Math.random() * Math.PI * 2;
-      const speed = 7.5 + Math.random() * 11.0;
+      const speed = 7.0 + Math.random() * 9.0;
       const vel = new THREE.Vector3(
         Math.cos(angle) * speed,
-        Math.sin(angle) * speed * 0.9 + 3.2,
-        (Math.random() - 0.5) * 2.8
+        Math.sin(angle) * speed * 0.9 + 3.0,
+        (Math.random() - 0.5) * 2.5
       );
       const rotVel = new THREE.Vector3(
-        (Math.random() - 0.5) * 18,
-        (Math.random() - 0.5) * 18,
-        (Math.random() - 0.5) * 18
+        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 16,
+        (Math.random() - 0.5) * 16
       );
 
       this.particles.push({
@@ -2152,8 +2163,8 @@ export class GameScene {
         vel,
         rotVel,
         baseScale: 1.1,
-        life: 1.0,
-        decay: 1.6,
+        life: 0.85,
+        decay: 1.8,
         sharedMaterial: true
       });
     }
@@ -2161,8 +2172,8 @@ export class GameScene {
     // 5. Dynamic Flash Light using pre-allocated point light (ZERO runtime shader recompilation!)
     if (this.explosionLight) {
       this.explosionLight.position.set(origin.x, origin.y, 2.0);
-      this.explosionLight.intensity = 6.5;
-      this.explosionLightTimer = 0.32;
+      this.explosionLight.intensity = 5.5;
+      this.explosionLightTimer = 0.28;
     }
   }
 
@@ -2175,8 +2186,8 @@ export class GameScene {
     this.world.removeBody(targetObj.body);
     this.targets = this.targets.filter((t) => t !== targetObj);
 
-    // Awaken structures so anything supported by this target falls naturally
-    this.wakeAllStructures();
+    // Awaken nearby structures smoothly
+    this.wakeStructuresNear(pos, 5.0);
 
     this.audio?.playTargetPop();
     const pts = targetObj.isBoss ? 1000 : 500;
@@ -2194,22 +2205,26 @@ export class GameScene {
         : targetObj.birdType === 'boss'
         ? 0x818cf8
         : 0x38bdf8;
-    this.spawnBurstParticles(pos, burstColor, 20);
+    this.spawnBurstParticles(pos, burstColor, 16);
     this.emitHudStats();
   }
 
-  spawnBurstParticles(origin, colorHex, count = 14) {
-    const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.45 });
+  spawnBurstParticles(origin, colorHex, count = 12) {
+    let mat = this.burstMatCache.get(colorHex);
+    if (!mat) {
+      mat = new THREE.MeshBasicMaterial({ color: colorHex });
+      this.burstMatCache.set(colorHex, mat);
+    }
 
     for (let i = 0; i < count; i++) {
       const mesh = new THREE.Mesh(this.sharedUnitBoxGeo, mat);
-      const scale = 0.12 + Math.random() * 0.14;
+      const scale = 0.12 + Math.random() * 0.12;
       mesh.scale.set(scale, scale, scale);
       mesh.position.copy(origin);
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 10,
-        Math.random() * 7 + 2,
-        (Math.random() - 0.5) * 3.5
+        (Math.random() - 0.5) * 8.5,
+        Math.random() * 6 + 2,
+        (Math.random() - 0.5) * 2.8
       );
       this.scene.add(mesh);
       this.particles.push({
@@ -2218,8 +2233,9 @@ export class GameScene {
         vel,
         rotVel: new THREE.Vector3((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, 0),
         baseScale: scale,
-        life: 1.0,
-        decay: 1.5
+        life: 0.85,
+        decay: 1.7,
+        sharedMaterial: true
       });
     }
   }
@@ -2440,7 +2456,7 @@ export class GameScene {
     const deltaTime = Math.min(this.clock.getDelta(), 0.05);
 
     // Step physics world with fixed 60Hz substeps for deterministic trajectory accuracy
-    this.world.step(1 / 60, deltaTime, 4);
+    this.world.step(1 / 60, deltaTime, 2);
 
     // Sync active launched bird mesh with physics body strictly on z = 0 plane
     if (this.activeBird && this.activeBird.body) {

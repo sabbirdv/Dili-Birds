@@ -713,6 +713,16 @@ export class LevelSelect {
    * Defaults to level 8 initially.
    * Then shows up to (unlockedLevel + 5), capped at 20.
    */
+  invalidateScrollCache() {
+    this._cachedMaxScroll = null;
+    this._cachedAllowedWidth = null;
+  }
+
+  /**
+   * Returns the maximum visible level:
+   * Defaults to level 8 initially.
+   * Then shows up to (unlockedLevel + 5), capped at 70.
+   */
   getMaxVisibleLevel() {
     const unlocked = this.storage ? Number(this.storage.getUnlockedLevel()) || 1 : 1;
     return Math.min(70, Math.max(8, unlocked + 5));
@@ -723,28 +733,37 @@ export class LevelSelect {
    * Scrolling right past this boundary is blocked so subsequent levels cannot be reached.
    */
   getAllowedWorldWidth() {
+    if (this._cachedAllowedWidth != null) return this._cachedAllowedWidth;
     const maxVisibleLevel = this.getMaxVisibleLevel();
     if (maxVisibleLevel >= 70) {
+      this._cachedAllowedWidth = MAP_TOTAL_WIDTH;
       return MAP_TOTAL_WIDTH;
     }
     const maxNode = LEVEL_NODES.find((n) => n.id === maxVisibleLevel);
     const nextNode = LEVEL_NODES.find((n) => n.id === maxVisibleLevel + 1);
-    if (!maxNode) return MAP_TOTAL_WIDTH;
-    if (nextNode) {
-      return Math.round((maxNode.x + nextNode.x) / 2);
+    if (!maxNode) {
+      this._cachedAllowedWidth = MAP_TOTAL_WIDTH;
+      return MAP_TOTAL_WIDTH;
     }
-    return Math.min(MAP_TOTAL_WIDTH, maxNode.x + 100);
+    if (nextNode) {
+      this._cachedAllowedWidth = Math.round((maxNode.x + nextNode.x) / 2);
+    } else {
+      this._cachedAllowedWidth = Math.min(MAP_TOTAL_WIDTH, maxNode.x + 100);
+    }
+    return this._cachedAllowedWidth;
   }
 
   /**
    * Returns the maximum scrollLeft allowed in the viewport.
    */
   getMaxScrollLeft() {
+    if (this._cachedMaxScroll != null) return this._cachedMaxScroll;
     if (!this.viewportEl) return 0;
     const allowedWorldWidth = this.getAllowedWorldWidth();
     const scaledWidth = Math.round(allowedWorldWidth * this.currentScale);
     const vpWidth = this.viewportEl.clientWidth || 0;
-    return Math.max(0, scaledWidth - vpWidth);
+    this._cachedMaxScroll = Math.max(0, scaledWidth - vpWidth);
+    return this._cachedMaxScroll;
   }
 
   /**
@@ -753,6 +772,7 @@ export class LevelSelect {
    */
   updateMobileScaling() {
     if (!this.viewportEl) return;
+    this.invalidateScrollCache();
     const vpHeight = this.viewportEl.clientHeight || 360;
     const baseHeight = MAP_TOTAL_HEIGHT;
 
@@ -796,6 +816,7 @@ export class LevelSelect {
         this.dragRafId = null;
       }
       this.pendingScrollLeft = null;
+      this.invalidateScrollCache();
 
       this.isPointerDown = true;
       this.hasDragged = false;
@@ -806,6 +827,7 @@ export class LevelSelect {
       this.scrollLeftStart = vp.scrollLeft;
       this.lastTime = performance.now();
       this.velocityX = 0;
+      this.dragMaxScroll = this.getMaxScrollLeft();
     });
 
     vp.addEventListener('pointermove', (e) => {
@@ -823,13 +845,12 @@ export class LevelSelect {
       }
 
       if (this.hasDragged) {
-        const maxScroll = this.getMaxScrollLeft();
+        const maxScroll = this.dragMaxScroll != null ? this.dragMaxScroll : this.getMaxScrollLeft();
         this.pendingScrollLeft = Math.max(0, Math.min(maxScroll, this.scrollLeftStart - dx));
         if (!this.dragRafId) {
           this.dragRafId = requestAnimationFrame(() => {
             if (this.viewportEl && this.pendingScrollLeft !== null) {
-              const maxS = this.getMaxScrollLeft();
-              this.viewportEl.scrollLeft = Math.min(maxS, this.pendingScrollLeft);
+              this.viewportEl.scrollLeft = this.pendingScrollLeft;
             }
             this.dragRafId = null;
           });
@@ -837,7 +858,7 @@ export class LevelSelect {
 
         const now = performance.now();
         const dt = now - this.lastTime;
-        if (dt > 10) {
+        if (dt > 12) {
           this.velocityX = (e.clientX - this.lastX) / dt;
           this.lastX = e.clientX;
           this.lastTime = now;
@@ -855,7 +876,7 @@ export class LevelSelect {
         this.dragRafId = null;
       }
       if (this.pendingScrollLeft !== null) {
-        const maxScroll = this.getMaxScrollLeft();
+        const maxScroll = this.dragMaxScroll != null ? this.dragMaxScroll : this.getMaxScrollLeft();
         vp.scrollLeft = Math.max(0, Math.min(maxScroll, this.pendingScrollLeft));
         this.pendingScrollLeft = null;
       }
@@ -896,13 +917,19 @@ export class LevelSelect {
       }
     }, { passive: false });
 
-    // Native scroll event bounds enforcement
+    // Native scroll event bounds enforcement (throttled check)
+    let scrollBoundsTimer = null;
     vp.addEventListener('scroll', () => {
-      const maxScroll = this.getMaxScrollLeft();
-      if (vp.scrollLeft > maxScroll) {
-        vp.scrollLeft = maxScroll;
+      if (!scrollBoundsTimer) {
+        scrollBoundsTimer = setTimeout(() => {
+          scrollBoundsTimer = null;
+          const maxScroll = this.getMaxScrollLeft();
+          if (vp.scrollLeft > maxScroll) {
+            vp.scrollLeft = maxScroll;
+          }
+        }, 120);
       }
-    });
+    }, { passive: true });
   }
 
   startMomentumGlide(initialVelocity) {
@@ -1069,13 +1096,13 @@ export class LevelSelect {
             <stop offset="100%" stop-color="#0284c7" />
           </linearGradient>
 
-          <!-- Soft Glow Filters -->
-          <filter id="roadGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
+          <!-- Soft Glow Filters (Optimized for silky smooth 60fps pan) -->
+          <filter id="roadGlowFilter" x="-15%" y="-15%" width="130%" height="130%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
-          <filter id="lightBeaconGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="8" result="blur" />
+          <filter id="lightBeaconGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3.5" result="blur" />
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
 

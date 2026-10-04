@@ -35,7 +35,7 @@ export class SlingshotController {
     this.launchPowerMultiplier = 8.2;
 
     // Physics constants matching cannon-es world in GameScene
-    this.gravityY = -20.0;
+    this.gravityY = -18.0;
     this.birdLinearDamping = 0.01;
 
     // Current state

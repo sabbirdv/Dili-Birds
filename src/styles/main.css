@@ -1170,14 +1170,14 @@ html, body {
 .roadmap-grid-wrapper {
   position: relative;
   display: block;
-  width: calc(6600px * var(--mobile-map-scale, 1));
+  width: calc(13200px * var(--mobile-map-scale, 1));
   height: calc(460px * var(--mobile-map-scale, 1));
   overflow: hidden;
 }
 
 .map-world-container {
   position: relative;
-  width: 6600px;
+  width: 13200px;
   height: 460px;
   transform-origin: top left;
   transform: scale(var(--mobile-map-scale, 1)) translateZ(0);
@@ -1257,6 +1257,9 @@ html, body {
   justify-content: center;
   cursor: pointer;
   outline: none;
+  contain: layout style;
+  content-visibility: auto;
+  contain-intrinsic-size: 96px 96px;
   transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 

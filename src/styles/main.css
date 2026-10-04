@@ -5410,7 +5410,138 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Characters Codex Sub-components */
+/* Characters Codex Sub-components & Unified Layout */
+.characters-codex-dialog .modal-dialog-shell {
+  max-height: min(92vh, 860px);
+  padding: 20px 22px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.characters-codex-dialog .modal-dialog-header {
+  flex-shrink: 0;
+}
+
+.characters-codex-scroll-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 4px;
+  padding-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.characters-codex-scroll-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.characters-codex-scroll-body::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 999px;
+}
+
+.characters-codex-scroll-body::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 999px;
+}
+
+.characters-codex-scroll-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.65);
+}
+
+.characters-codex-scroll-body #modal-milestone-banner,
+.characters-codex-scroll-body .modal-milestone-banner {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.characters-codex-scroll-body .modal-milestone-info {
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.characters-codex-scroll-body .milestones-banner-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.characters-codex-scroll-body .milestones-track-container.modal-track {
+  position: relative;
+  padding: 4px 2px 2px 2px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.characters-codex-scroll-body .milestones-progress-line {
+  position: absolute;
+  top: 25px;
+  left: 24px;
+  right: 24px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.characters-codex-scroll-body .milestones-nodes-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.characters-codex-scroll-body .milestone-step-node {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.characters-codex-scroll-body .node-hero-name {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+}
+
 .modal-milestone-banner {
   padding: 10px 16px;
   border-radius: 14px;
@@ -5434,13 +5565,23 @@ html, body {
 
 .characters-roster-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
   grid-auto-rows: auto;
   gap: 14px;
-  max-height: min(490px, calc(90vh - 210px));
-  overflow-y: auto;
-  padding-right: 6px;
-  padding-bottom: 10px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+  padding-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.characters-codex-scroll-body .characters-roster-grid {
+  flex: 1 0 auto;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+  padding-bottom: 4px;
 }
 
 .hero-collection-card {
@@ -7158,4 +7299,412 @@ html, body {
   width: 13px;
   height: 13px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHARACTER CODEX RESPONSIVE PERFECTION (MOBILE PORTRAIT & LANDSCAPE)
+   ═══════════════════════════════════════════════════════════════════ */
+.characters-codex-dialog {
+  max-width: 96vw;
+  box-sizing: border-box;
+}
+
+.characters-codex-dialog .modal-dialog-shell {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.characters-codex-scroll-body {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* Base tablet & mobile scale */
+@media screen and (max-width: 768px), screen and (max-height: 600px) {
+  .modal-dashboard-dialog.characters-codex-dialog {
+    width: min(96vw, 760px);
+    border-radius: 20px;
+    margin: auto;
+  }
+
+  .characters-codex-dialog .modal-dialog-shell {
+    padding: 14px 16px;
+    gap: 10px;
+    max-height: 94vh;
+  }
+
+  .characters-codex-dialog .modal-dialog-header {
+    gap: 8px;
+    align-items: center;
+  }
+
+  .characters-codex-dialog .modal-kicker {
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+  }
+
+  .characters-codex-dialog .modal-heading {
+    font-size: 1.15rem;
+    gap: 6px;
+  }
+
+  .characters-codex-dialog .modal-head-svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .characters-codex-dialog .dialog-close-btn {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .characters-codex-scroll-body {
+    gap: 10px;
+    padding-right: 2px;
+  }
+
+  .characters-codex-scroll-body .modal-milestone-info {
+    padding: 10px 12px 8px 12px;
+    border-radius: 14px;
+  }
+
+  .characters-codex-scroll-body .milestone-banner-top {
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+
+  .characters-codex-scroll-body .milestone-badge-lead {
+    font-size: 0.64rem;
+  }
+
+  .characters-codex-scroll-body .milestones-next-teaser {
+    font-size: 0.66rem;
+    padding: 2px 7px;
+  }
+
+  .characters-codex-scroll-body .milestones-track-container.modal-track {
+    padding: 2px 0;
+  }
+
+  .characters-codex-scroll-body .milestones-progress-line {
+    top: 20px;
+    left: 16px;
+    right: 16px;
+    height: 3px;
+  }
+
+  .characters-codex-scroll-body .node-avatar-frame {
+    width: 34px;
+    height: 34px;
+    padding: 1.5px;
+    border-width: 1.5px;
+  }
+
+  .characters-codex-scroll-body .node-status-badge {
+    width: 13px;
+    height: 13px;
+  }
+
+  .characters-codex-scroll-body .node-status-badge svg {
+    width: 8px;
+    height: 8px;
+  }
+
+  .characters-codex-scroll-body .node-step-lvl {
+    font-size: 0.58rem;
+    line-height: 1.1;
+  }
+
+  .characters-codex-scroll-body .node-hero-name {
+    font-size: 0.58rem;
+    line-height: 1.1;
+  }
+
+  .characters-roster-grid {
+    gap: 10px;
+  }
+}
+
+/* Portrait mobile layout (under 640px) */
+@media screen and (max-width: 640px) {
+  .modal-dashboard-dialog.characters-codex-dialog {
+    width: 95vw;
+    border-radius: 16px;
+  }
+
+  .characters-codex-dialog .modal-dialog-shell {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .characters-codex-scroll-body .characters-roster-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .hero-collection-card {
+    padding: 12px;
+    gap: 10px;
+    border-radius: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-portrait-frame {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+
+  .hero-display-name {
+    font-size: 1rem;
+  }
+
+  .hero-archetype {
+    font-size: 0.62rem;
+  }
+
+  .hero-status-pill {
+    font-size: 0.58rem;
+    padding: 2px 6px;
+  }
+
+  .hero-rec-tag {
+    font-size: 0.58rem;
+    padding: 1px 5px;
+  }
+
+  .hero-power-row {
+    padding: 2px 6px;
+  }
+
+  .power-label {
+    font-size: 0.56rem;
+  }
+
+  .power-val {
+    font-size: 0.66rem;
+  }
+
+  .hero-ability-box {
+    padding: 5px 8px;
+    border-radius: 8px;
+  }
+
+  .ability-title {
+    font-size: 0.7rem;
+  }
+
+  .ability-desc {
+    font-size: 0.66rem;
+    line-height: 1.3;
+  }
+
+  .stat-line {
+    font-size: 0.62rem;
+    gap: 6px;
+  }
+
+  .stat-name {
+    width: 58px;
+  }
+
+  .hero-footer-actions-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .hero-footer-actions-row .btn-hero-claim,
+  .hero-footer-actions-row .btn-hero-equip,
+  .hero-footer-actions-row .hero-locked-tag {
+    flex: 1 1 auto;
+    font-size: 0.74rem;
+    padding: 6px 10px;
+  }
+
+  .hero-footer-actions-row .btn-hero-inspect {
+    font-size: 0.7rem;
+    padding: 6px 10px;
+  }
+}
+
+/* Very narrow devices (under 420px) */
+@media screen and (max-width: 420px) {
+  .characters-codex-dialog .modal-dialog-shell {
+    padding: 10px 8px;
+    gap: 6px;
+  }
+
+  .characters-codex-dialog .modal-heading {
+    font-size: 1.02rem;
+  }
+
+  .characters-codex-scroll-body .modal-milestone-info {
+    padding: 8px;
+  }
+
+  .characters-codex-scroll-body .milestones-progress-line {
+    top: 17px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .characters-codex-scroll-body .node-avatar-frame {
+    width: 28px;
+    height: 28px;
+  }
+
+  .characters-codex-scroll-body .node-step-lvl {
+    font-size: 0.52rem;
+  }
+
+  .characters-codex-scroll-body .node-hero-name {
+    font-size: 0.52rem;
+  }
+
+  .hero-collection-card {
+    padding: 10px 8px;
+    gap: 8px;
+  }
+
+  .hero-portrait-frame {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* Mobile Landscape perfection (short screen height <= 520px) */
+@media screen and (max-height: 520px) {
+  .modal-dashboard-dialog.characters-codex-dialog {
+    width: min(96vw, 840px);
+    border-radius: 16px;
+  }
+
+  .characters-codex-dialog .modal-dialog-shell {
+    max-height: 96vh;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .characters-codex-dialog .modal-dialog-header {
+    padding-bottom: 2px;
+  }
+
+  .characters-codex-dialog .modal-kicker {
+    font-size: 0.54rem;
+  }
+
+  .characters-codex-dialog .modal-heading {
+    font-size: 1.02rem;
+  }
+
+  .characters-codex-dialog .dialog-close-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .characters-codex-scroll-body {
+    gap: 8px;
+    padding-right: 2px;
+  }
+
+  .characters-codex-scroll-body .modal-milestone-info {
+    padding: 6px 10px;
+    border-radius: 12px;
+  }
+
+  .characters-codex-scroll-body .milestone-banner-top {
+    margin-bottom: 4px;
+    gap: 4px;
+  }
+
+  .characters-codex-scroll-body .milestone-badge-lead {
+    font-size: 0.58rem;
+  }
+
+  .characters-codex-scroll-body .milestones-next-teaser {
+    font-size: 0.6rem;
+    padding: 1px 6px;
+  }
+
+  .characters-codex-scroll-body .milestones-progress-line {
+    top: 18px;
+    left: 14px;
+    right: 14px;
+  }
+
+  .characters-codex-scroll-body .node-avatar-frame {
+    width: 28px;
+    height: 28px;
+  }
+
+  .characters-codex-scroll-body .node-status-badge {
+    width: 11px;
+    height: 11px;
+  }
+
+  .characters-codex-scroll-body .node-step-lvl {
+    font-size: 0.52rem;
+  }
+
+  .characters-codex-scroll-body .node-hero-name {
+    font-size: 0.52rem;
+  }
+
+  .characters-roster-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+    gap: 8px;
+  }
+
+  .hero-collection-card {
+    padding: 8px 10px;
+    gap: 8px;
+    border-radius: 12px;
+  }
+
+  .hero-portrait-frame {
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
+  }
+
+  .hero-display-name {
+    font-size: 0.94rem;
+  }
+
+  .hero-details {
+    gap: 4px;
+  }
+
+  .hero-ability-box {
+    padding: 4px 6px;
+  }
+
+  .hero-stats-bars {
+    gap: 2px;
+  }
+
+  .hero-footer-actions-row {
+    gap: 6px;
+  }
+
+  .hero-footer-actions-row .btn-hero-claim,
+  .hero-footer-actions-row .btn-hero-equip,
+  .hero-footer-actions-row .hero-locked-tag {
+    font-size: 0.7rem;
+    padding: 5px 8px;
+  }
+
+  .hero-footer-actions-row .btn-hero-inspect {
+    font-size: 0.68rem;
+    padding: 5px 8px;
+  }
+}
+
 

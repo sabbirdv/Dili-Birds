@@ -374,7 +374,7 @@
   <!-- ═══════════════════════════════════════════════════════════
        3. CHARACTER COLLECTION & MILESTONE REWARDS CODEX DIALOG
        ═══════════════════════════════════════════════════════════ -->
-  <dialog id="characters-dialog" class="game-dialog modal-dashboard-dialog modal-wide" closedby="any" aria-labelledby="characters-title">
+  <dialog id="characters-dialog" class="game-dialog modal-dashboard-dialog modal-wide characters-codex-dialog" closedby="any" aria-labelledby="characters-title">
     <div class="modal-dialog-shell glass-card">
       <header class="modal-dialog-header">
         <div class="modal-title-wrap">
@@ -391,12 +391,14 @@
         </button>
       </header>
 
-      <div id="modal-milestone-banner" class="modal-milestone-banner">
-        <!-- Dynamic milestone unlock hint -->
-      </div>
+      <div class="characters-codex-scroll-body">
+        <div id="modal-milestone-banner" class="modal-milestone-banner">
+          <!-- Dynamic milestone unlock hint -->
+        </div>
 
-      <div id="characters-roster-grid" class="characters-roster-grid">
-        <!-- Populated dynamically by DashboardModals -->
+        <div id="characters-roster-grid" class="characters-roster-grid">
+          <!-- Populated dynamically by DashboardModals -->
+        </div>
       </div>
     </div>
   </dialog>

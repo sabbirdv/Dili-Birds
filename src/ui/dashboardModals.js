@@ -942,6 +942,10 @@ export class DashboardModals {
     this.audio?.playMenuOpen?.();
     this.renderCharactersList();
     this.charactersDialog.showModal();
+    const scrollBody = this.charactersDialog.querySelector('.characters-codex-scroll-body');
+    if (scrollBody) {
+      scrollBody.scrollTop = 0;
+    }
   }
 
   claimHero(heroId, rewardCoins) {

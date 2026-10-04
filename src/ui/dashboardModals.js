@@ -216,9 +216,9 @@ export const HEROES_DATA = [
     abilityName: 'Thunderbolt Surge',
     abilityDesc: 'Tap mid-flight to discharge high-frequency electric plasma bolts. Arcs through metal girders and stone columns, electrocuting multiple structures and targets simultaneously with piercing shockwaves.',
     recommendedLevels: 'Levels 21–35',
-    speed: 94,
-    power: 78,
-    pierce: 99,
+    speed: 90,
+    power: 62,
+    pierce: 92,
     claimReward: 500,
     themeColor: '#06b6d4'
   }

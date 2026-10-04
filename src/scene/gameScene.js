@@ -1017,7 +1017,7 @@ export class GameScene {
         } else if (birdType === 'vortex') {
           birdMultiplier = blockObj.type === 'metal' ? 2.1 : blockObj.type === 'stone' ? 2.0 : 1.5;
         } else if (birdType === 'lightning') {
-          birdMultiplier = blockObj.type === 'metal' ? 2.4 : blockObj.type === 'stone' ? 1.76 : blockObj.type === 'glass' ? 1.92 : 1.28;
+          birdMultiplier = blockObj.type === 'metal' ? 1.9 : blockObj.type === 'stone' ? 1.4 : blockObj.type === 'glass' ? 1.5 : 1.0;
         }
 
         // Damage derived from normal impact collision force (tuned for realistic yet beatable toughness)
@@ -1204,7 +1204,7 @@ export class GameScene {
       split: 2.4,
       fire: 2.8,
       vortex: 3.8,
-      lightning: 3.2
+      lightning: 2.55
     };
     const mass = massMap[this.activeBird.type] || 2.5;
 
@@ -1456,11 +1456,11 @@ export class GameScene {
 
     // High velocity forward boost for penetrating strike
     if (this.activeBird && this.activeBird.body) {
-      this.activeBird.body.velocity.x *= 1.28;
+      this.activeBird.body.velocity.x *= 1.15;
       this.activeBird.body.velocity.y *= 0.7;
     }
 
-    const lightningRadius = 5.2;
+    const lightningRadius = 4.2;
     // Zap nearby destructible blocks
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1472,13 +1472,13 @@ export class GameScene {
           this.destroyBlock(b);
         } else {
           const falloff = 1 - dist / lightningRadius;
-          // High voltage conductively destroys metal, stone, glass (-20% tuned power)
-          const dmg = falloff * (b.type === 'metal' ? 68 : b.type === 'stone' ? 52 : b.type === 'glass' ? 60 : 40);
+          // High voltage conductively destroys metal, stone, glass
+          const dmg = falloff * (b.type === 'metal' ? 54 : b.type === 'stone' ? 41 : b.type === 'glass' ? 48 : 32);
           b.hp -= dmg;
           const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
           if (impulseDir.length() > 0.01) {
             impulseDir.normalize();
-            b.body.applyImpulse(impulseDir.scale(falloff * 16), bPos);
+            b.body.applyImpulse(impulseDir.scale(falloff * 12), bPos);
           }
           if (b.hp <= 0) {
             this.destroyBlock(b);
@@ -1495,11 +1495,11 @@ export class GameScene {
       if (dist < lightningRadius) {
         t.body.wakeUp();
         const falloff = 1 - dist / lightningRadius;
-        t.hp -= falloff * 36;
+        t.hp -= falloff * 28;
         const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
         if (impulseDir.length() > 0.01) {
           impulseDir.normalize();
-          t.body.applyImpulse(impulseDir.scale(falloff * 13), tPos);
+          t.body.applyImpulse(impulseDir.scale(falloff * 10), tPos);
         }
         if (t.hp <= 0) {
           this.defeatTarget(t);

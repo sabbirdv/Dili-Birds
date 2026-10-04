@@ -445,9 +445,9 @@ export class HudController {
       if (this.menuCoins) this.menuCoins.textContent = this.storage.getCoins().toLocaleString();
       if (this.menuStars) {
         const stars = this.storage.getTotalStars();
-        const playedCount = this.storage.getPlayedLevelsCount ? this.storage.getPlayedLevelsCount() : 0;
-        const maxStarsForPlayed = playedCount > 0 ? playedCount * 3 : 0;
-        this.menuStars.textContent = `${stars} / ${maxStarsForPlayed}`;
+        const unlockedCount = Math.min(Math.max(1, Number(this.storage.getUnlockedLevel()) || 1), 35);
+        const maxStarsForUnlocked = unlockedCount * 3;
+        this.menuStars.textContent = `${stars} / ${maxStarsForUnlocked}`;
       }
       const sfxVal = this.storage.getSfxVolume();
       const bgmVal = this.storage.getBgmVolume();

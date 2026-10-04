@@ -1170,14 +1170,14 @@ html, body {
 .roadmap-grid-wrapper {
   position: relative;
   display: block;
-  width: calc(3800px * var(--mobile-map-scale, 1));
+  width: calc(6600px * var(--mobile-map-scale, 1));
   height: calc(460px * var(--mobile-map-scale, 1));
   overflow: hidden;
 }
 
 .map-world-container {
   position: relative;
-  width: 3800px;
+  width: 6600px;
   height: 460px;
   transform-origin: top left;
   transform: scale(var(--mobile-map-scale, 1)) translateZ(0);
@@ -1187,13 +1187,13 @@ html, body {
   overflow: hidden;
 }
 
-/* SVG Terrain Layer */
+/* SVG Terrain Layer - fills full width and height of container */
 .map-terrain-svg {
   position: absolute;
   top: 0;
   left: 0;
-  width: 3800px;
-  height: 460px;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 1;
   transform: translateZ(0);
@@ -1885,45 +1885,56 @@ html, body {
 /* ═════════════════════════════════════════════════════════════
    MOBILE LANDSCAPE STRICT ZERO-VERTICAL-SCROLL RESPONSIVE SYSTEM
    ═════════════════════════════════════════════════════════════ */
-@media (max-height: 520px), (max-width: 900px) and (orientation: landscape) {
+@media (max-height: 600px), (max-width: 1024px) and (orientation: landscape) {
   .roadmap-page {
     height: 100vh !important;
     max-height: 100vh !important;
     overflow: hidden !important;
+    padding: 0 !important;
   }
 
   .roadmap-scroll-shell {
-    padding: 4px 8px 6px 8px !important;
+    padding: max(2px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(2px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)) !important;
     gap: 4px !important;
     height: 100% !important;
     max-height: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .roadmap-nav-bar {
-    padding: 3px 10px !important;
+    padding: 2px 10px !important;
     gap: 8px !important;
     border-radius: 12px !important;
+    min-height: 38px !important;
+    flex-shrink: 0 !important;
   }
 
   .btn-back-to-dashboard {
-    padding: 4px 12px !important;
-    font-size: 0.78rem !important;
+    padding: 4px 10px !important;
+    font-size: 0.76rem !important;
   }
 
   .roadmap-page-title {
-    font-size: 1.15rem !important;
+    font-size: 1.1rem !important;
   }
 
   .progress-summary.compact-summary {
-    gap: 8px !important;
+    gap: 6px !important;
+    padding: 2px 8px !important;
   }
 
   .summary-item .summary-title {
-    display: none;
+    display: none !important;
   }
 
   .summary-item .summary-val {
-    font-size: 0.8rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .summary-avatar {
+    width: 24px !important;
+    height: 24px !important;
   }
 
   .roadmap-stage-board-card {
@@ -1933,12 +1944,20 @@ html, body {
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: calc(100% - 44px) !important;
+    overflow: hidden !important;
   }
 
   .roadmap-3d-viewport {
-    border-radius: 12px !important;
+    border-radius: 14px !important;
     min-height: 0 !important;
     height: 100% !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    border: 1px solid rgba(56, 189, 248, 0.28) !important;
   }
 }
 
@@ -2207,7 +2226,20 @@ html, body {
 }
 
 .menu-list-btn .list-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
   font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.menu-list-btn .list-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  display: block;
 }
 
 .menu-list-btn .list-badge {
@@ -2230,7 +2262,8 @@ html, body {
   margin-top: 4px;
 }
 
-.resume-cta-btn {
+.resume-cta-btn,
+.dashboard-cta-btn {
   width: 100%;
   padding: 12px 18px;
   font-size: 0.95rem;
@@ -2239,6 +2272,33 @@ html, body {
   justify-content: center;
   gap: 8px;
   border-radius: 14px;
+}
+
+.dashboard-cta-btn .btn-icon,
+.resume-cta-btn .btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.dashboard-cta-btn .btn-icon svg,
+.resume-cta-btn .btn-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  display: block;
+}
+
+.dashboard-cta-btn .btn-text,
+.resume-cta-btn .btn-text {
+  display: inline-block !important;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
 }
 
 .main-menu-list-btn {
@@ -3367,7 +3427,7 @@ html, body {
     border-radius: 8px;
   }
 
-  .btn-text {
+  .nav-btn .btn-text {
     display: none;
   }
 
@@ -3639,8 +3699,15 @@ html, body {
     font-size: 0.82rem;
   }
 
-  .resume-cta-btn {
+  .resume-cta-btn,
+  .dashboard-cta-btn {
     padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+
+  .resume-cta-btn .btn-text,
+  .dashboard-cta-btn .btn-text {
+    display: inline-block !important;
     font-size: 0.88rem;
   }
 

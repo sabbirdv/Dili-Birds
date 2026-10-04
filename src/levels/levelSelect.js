@@ -223,13 +223,9 @@ export class LevelSelect {
     const vpHeight = this.viewportEl.clientHeight || 360;
     const baseHeight = MAP_TOTAL_HEIGHT;
 
-    // In mobile landscape or short viewports, scale down to fit comfortably
-    let scale = 1.0;
-    if (vpHeight < baseHeight) {
-      scale = Math.max(0.60, Math.min(1.0, (vpHeight - 2) / baseHeight));
-    } else {
-      scale = Math.min(1.25, vpHeight / baseHeight);
-    }
+    // Scale map to comfortably fill the viewport height without vertical scrolling
+    let scale = vpHeight / baseHeight;
+    scale = Math.max(0.55, Math.min(1.4, scale));
     this.currentScale = scale;
 
     this.viewportEl.style.setProperty('--mobile-map-scale', scale.toFixed(3));
@@ -449,9 +445,9 @@ export class LevelSelect {
       <svg
         class="map-terrain-svg"
         viewBox="0 0 ${MAP_TOTAL_WIDTH} ${MAP_TOTAL_HEIGHT}"
-        width="${MAP_TOTAL_WIDTH}"
-        height="${MAP_TOTAL_HEIGHT}"
-        preserveAspectRatio="xMidYMid meet"
+        width="100%"
+        height="100%"
+        preserveAspectRatio="none"
         aria-hidden="true"
       >
         <defs>

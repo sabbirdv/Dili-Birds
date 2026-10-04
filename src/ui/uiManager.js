@@ -275,11 +275,13 @@ export class UIManager {
     } else if (this.summaryCoinsEl) {
       this.summaryCoinsEl.innerHTML = `<img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" /> <span id="summary-coins-text">${coins.toLocaleString()} Coins</span>`;
     }
+    const unlockedLevelsCount = Math.min(Math.max(1, Number(unlockedLevel) || 1), this.totalLevelsCount);
+    const maxAchievableStars = unlockedLevelsCount * 3;
     const starsValEl = document.getElementById('summary-stars-val') || this.summaryStarsValEl;
     if (starsValEl) {
-      starsValEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3}`;
+      starsValEl.textContent = `${totalStars} / ${maxAchievableStars}`;
     } else if (this.summaryStarsEl) {
-      this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
+      this.summaryStarsEl.textContent = `${totalStars} / ${maxAchievableStars} ★`;
     }
   }
 

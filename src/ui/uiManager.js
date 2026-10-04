@@ -98,12 +98,6 @@ export class UIManager {
       this.audio
     );
 
-    this.dashboardModals = new DashboardModals({
-      storage: this.storage,
-      audio: this.audio,
-      onRefreshHeader: () => this.refreshHeaderAndMenu()
-    });
-
     this.hud = new HudController({
       storage: this.storage,
       audio: this.audio,
@@ -117,6 +111,13 @@ export class UIManager {
       onPauseGame: () => this.onPauseGame?.(),
       onResumeGame: () => this.onResumeGame?.(),
       onActivateAbility: () => onActivateAbility?.()
+    });
+
+    this.dashboardModals = new DashboardModals({
+      storage: this.storage,
+      audio: this.audio,
+      onRefreshHeader: () => this.refreshHeaderAndMenu(),
+      onInspectHero: (hero) => this.hud?.openHeroSurprise(hero)
     });
 
     this.bindTopBarEvents();
@@ -274,8 +275,9 @@ export class UIManager {
     } else if (this.summaryCoinsEl) {
       this.summaryCoinsEl.innerHTML = `<img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" /> <span id="summary-coins-text">${coins.toLocaleString()} Coins</span>`;
     }
-    if (this.summaryStarsValEl) {
-      this.summaryStarsValEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3}`;
+    const starsValEl = document.getElementById('summary-stars-val') || this.summaryStarsValEl;
+    if (starsValEl) {
+      starsValEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3}`;
     } else if (this.summaryStarsEl) {
       this.summaryStarsEl.textContent = `${totalStars} / ${this.totalLevelsCount * 3} ★`;
     }
@@ -345,7 +347,12 @@ export class UIManager {
     if (this.levelSelect?.pendingZone2Unlock) {
       this.levelSelect.pendingZone2Unlock = false;
       setTimeout(() => {
-        this.levelSelect.animateCloudRemoval();
+        this.levelSelect.animateCloudRemoval(2);
+      }, 400);
+    } else if (this.levelSelect?.pendingZone3Unlock) {
+      this.levelSelect.pendingZone3Unlock = false;
+      setTimeout(() => {
+        this.levelSelect.animateCloudRemoval(3);
       }, 400);
     } else if (this.levelSelect?.pendingLevelUnlock) {
       const nextId = this.levelSelect.pendingLevelUnlock;

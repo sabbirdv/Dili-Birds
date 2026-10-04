@@ -195,7 +195,7 @@
             <div class="card-text-block">
               <span class="card-kicker-tag">HEROES CODEX</span>
               <h3 class="card-heading">Character Roster</h3>
-              <p class="card-desc">Unlock 6 specialized birds with supersonic, seismic, split, thermal, and vortex abilities.</p>
+              <p class="card-desc">Unlock 7 specialized birds with supersonic, seismic, split, thermal, vortex, and high-voltage lightning abilities.</p>
             </div>
             <div class="card-action-cue">
               <span>Explore Heroes</span>
@@ -235,7 +235,7 @@
             <div class="summary-divider"></div>
             <div class="summary-item">
               <span class="summary-title">Stage Progress</span>
-              <strong class="summary-val" id="summary-level">1 / 20</strong>
+              <strong class="summary-val" id="summary-level">1 / 35</strong>
             </div>
             <div class="summary-divider"></div>
             <div class="summary-item">
@@ -250,7 +250,7 @@
               <span class="summary-title">Stars</span>
               <strong class="summary-val star-accent" id="summary-stars">
                 <svg class="pill-star-svg gold-star" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span id="summary-stars-val">0 / 60</span>
+                <span id="summary-stars-val">0 / 105</span>
               </strong>
             </div>
           </section>
@@ -663,6 +663,23 @@
       </div>
       <p class="result-message" id="result-message">All targets eliminated!</p>
 
+      <!-- Surprise New Hero Unlock Banner on Result Card -->
+      <div id="result-hero-unlock-card" class="result-hero-unlock-card hidden" role="button" tabindex="0" title="Click to reveal new unlocked hero!">
+        <div class="unlock-gift-icon-wrap">
+          <span class="gift-bounce-emoji">🎁</span>
+          <span class="gift-sparkle-emoji">✨</span>
+        </div>
+        <div class="unlock-card-meta">
+          <span class="unlock-kicker-pill">🎉 NEW HERO UNLOCKED!</span>
+          <strong class="unlock-hero-headline" id="result-unlock-hero-title">Speedster Swift</strong>
+          <span class="unlock-hero-subtext">Tap to unbox special ability &amp; battle powers!</span>
+        </div>
+        <button type="button" id="btn-result-open-surprise" class="btn-result-open-surprise" title="Reveal Surprise Hero">
+          <span>SURPRISE!</span>
+          <span class="cta-arrow" aria-hidden="true">➔</span>
+        </button>
+      </div>
+
       <div class="result-stats-grid">
         <div class="result-stat-box">
           <span class="r-label">STAGE SCORE</span>
@@ -692,6 +709,90 @@
           <span class="cta-arrow" aria-hidden="true">➔</span>
         </button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- Surprise Character Unlock Reveal Modal Dialog -->
+  <dialog id="hero-surprise-dialog" class="game-dialog surprise-modal-dialog" closedby="any" aria-labelledby="surprise-hero-name">
+    <div class="surprise-modal-shell glass-card">
+      <div class="surprise-ambient-glow" id="surprise-ambient-glow" aria-hidden="true"></div>
+
+      <header class="surprise-modal-header">
+        <div class="surprise-kicker-badge">
+          <span class="surprise-gift-emoji">🎁</span>
+          <span>NEW CHARACTER RECRUITED!</span>
+          <span class="surprise-gift-emoji">✨</span>
+        </div>
+        <button type="button" id="btn-close-surprise" class="dialog-close-btn" aria-label="Close Surprise Modal" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </header>
+
+      <div class="surprise-modal-content">
+        <!-- Hero Avatar Showcase with spinning ring & particle halo -->
+        <div class="surprise-avatar-showcase">
+          <div class="surprise-avatar-halo" id="surprise-avatar-halo">
+            <div class="surprise-halo-ring"></div>
+            <img id="surprise-hero-avatar" class="surprise-hero-img" src="" alt="Unlocked Character" />
+            <div class="surprise-stage-badge" id="surprise-stage-badge">STAGE 3 UNLOCK</div>
+          </div>
+        </div>
+
+        <div class="surprise-hero-headline">
+          <span class="surprise-archetype-pill" id="surprise-archetype-pill">Sonic Plasma Orb</span>
+          <h2 class="surprise-hero-name" id="surprise-hero-name">Speedster Swift</h2>
+          <p class="surprise-hero-power" id="surprise-hero-power">Supersonic Dash &amp; Glass Penetration</p>
+        </div>
+
+        <!-- Special Ability Card Showcase -->
+        <div class="surprise-ability-card" id="surprise-ability-card">
+          <div class="surprise-ability-header">
+            <span class="surprise-ability-icon-circle" id="surprise-ability-icon-circle">⚡</span>
+            <div class="surprise-ability-title-wrap">
+              <span class="surprise-ability-kicker">SPECIAL ABILITY</span>
+              <strong class="surprise-ability-name" id="surprise-ability-name">Supersonic Boost</strong>
+            </div>
+          </div>
+          <p class="surprise-ability-desc" id="surprise-ability-desc">
+            Tap screen mid-flight to ignite high-velocity plasma thrust. Shatters through multi-layer glass structures with 3.2x demolition force.
+          </p>
+          <div class="surprise-ability-how-to" id="surprise-ability-how-to">
+            <span class="tip-sparkle">🎮 Tip:</span> Tap anywhere on screen while this bird is flying to unleash its ability!
+          </div>
+        </div>
+
+        <!-- Combat Stats Gauges -->
+        <div class="surprise-stats-row">
+          <div class="surprise-stat-col">
+            <div class="stat-top">
+              <span class="stat-lbl">Velocity</span>
+              <strong class="stat-val" id="surprise-val-velocity">99%</strong>
+            </div>
+            <div class="stat-gauge"><div class="stat-gauge-fill" id="surprise-gauge-velocity" style="width: 99%;"></div></div>
+          </div>
+          <div class="surprise-stat-col">
+            <div class="stat-top">
+              <span class="stat-lbl">Demolition</span>
+              <strong class="stat-val" id="surprise-val-power">75%</strong>
+            </div>
+            <div class="stat-gauge"><div class="stat-gauge-fill" id="surprise-gauge-power" style="width: 75%;"></div></div>
+          </div>
+          <div class="surprise-stat-col">
+            <div class="stat-top">
+              <span class="stat-lbl">Penetration</span>
+              <strong class="stat-val" id="surprise-val-pierce">96%</strong>
+            </div>
+            <div class="stat-gauge"><div class="stat-gauge-fill" id="surprise-gauge-pierce" style="width: 96%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="surprise-modal-footer">
+        <button type="button" id="btn-surprise-continue" class="action-btn primary-btn surprise-continue-cta">
+          <span id="surprise-continue-btn-text">DEPLOY &amp; CONTINUE</span>
+          <span class="cta-arrow" aria-hidden="true">➔</span>
+        </button>
+      </footer>
     </div>
   </dialog>
 

@@ -16,7 +16,10 @@ const DEFAULT_STATE = {
   claimedCoinLevels: {}, // Tracks level IDs where coins have already been awarded
   claimedMissions: {}, // Tracks mission IDs where quest rewards have been claimed
   claimedCharacters: {}, // Tracks unlocked heroes claimed by player
-  zoneRevealed: { 1: true, 2: false }, // Tracks revealed zones on roadmap
+  seenHeroUnlocks: { commander_falcon: true }, // Tracks heroes whose unlock surprise modal has been seen
+  zoneRevealed: { 1: true, 2: false, 3: false }, // Tracks revealed zones on roadmap
+  dailyClaim: { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 },
+  equippedHeroId: 'crimson_ace',
   brandName: DEFAULT_BRAND_NAME,
   soundEnabled: true,
   sfxVolume: 0.90,
@@ -86,7 +89,37 @@ export class StorageManager {
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
         claimedMissions: { ...(parsed.claimedMissions || {}) },
         claimedCharacters: { ...(parsed.claimedCharacters || {}) },
-        zoneRevealed: { 1: true, 2: Boolean(parsed.zoneRevealed?.[2] || Number(parsed.unlockedLevel) > 10) },
+        seenHeroUnlocks: (() => {
+          const seen = { commander_falcon: true, ...(parsed.seenHeroUnlocks || {}) };
+          const unlockedLvl = Math.max(1, Number(parsed.unlockedLevel) || 1);
+          const milestones = [
+            { id: 'commander_falcon', lvl: 1 },
+            { id: 'speedster_swift', lvl: 3 },
+            { id: 'bomber_titan', lvl: 5 },
+            { id: 'splitter_trio', lvl: 7 },
+            { id: 'inferno_flare', lvl: 11 },
+            { id: 'vortex_titan', lvl: 16 },
+            { id: 'volt_striker', lvl: 21 }
+          ];
+          milestones.forEach((m) => {
+            if (m.lvl < unlockedLvl) {
+              seen[m.id] = true;
+            }
+          });
+          return seen;
+        })(),
+        zoneRevealed: {
+          1: true,
+          2: Boolean(parsed.zoneRevealed?.[2] || Number(parsed.unlockedLevel) > 10),
+          3: Boolean(parsed.zoneRevealed?.[3] || Number(parsed.unlockedLevel) > 20)
+        },
+        dailyClaim: parsed.dailyClaim && typeof parsed.dailyClaim === 'object' ? {
+          lastClaimDate: parsed.dailyClaim.lastClaimDate || null,
+          streak: Number(parsed.dailyClaim.streak) || 0,
+          totalClaimedCoins: Number(parsed.dailyClaim.totalClaimedCoins) || 0,
+          lastClaimTimestamp: Number(parsed.dailyClaim.lastClaimTimestamp) || 0
+        } : { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 },
+        equippedHeroId: typeof parsed.equippedHeroId === 'string' && parsed.equippedHeroId ? parsed.equippedHeroId : 'crimson_ace',
         playerId: typeof parsed.playerId === 'string' && parsed.playerId ? parsed.playerId : '',
         serverRowId: parsed.serverRowId !== undefined ? parsed.serverRowId : null
       };
@@ -164,11 +197,21 @@ export class StorageManager {
   }
 
   getStarsForLevel(levelId) {
-    return Number(this.state.levelStars[levelId]) || 0;
+    if (!this.state?.levelStars) return 0;
+    const num = Number(levelId);
+    return Math.max(
+      Number(this.state.levelStars[num]) || 0,
+      Number(this.state.levelStars[String(levelId)]) || 0
+    );
   }
 
   getHighScoreForLevel(levelId) {
-    return Number(this.state.levelHighScores[levelId]) || 0;
+    if (!this.state?.levelHighScores) return 0;
+    const num = Number(levelId);
+    return Math.max(
+      Number(this.state.levelHighScores[num]) || 0,
+      Number(this.state.levelHighScores[String(levelId)]) || 0
+    );
   }
 
   isZoneRevealed(zoneId) {
@@ -189,6 +232,7 @@ export class StorageManager {
   }
 
   getTotalStars() {
+    if (!this.state?.levelStars) return 0;
     return Object.values(this.state.levelStars).reduce((acc, s) => acc + (Number(s) || 0), 0);
   }
 
@@ -284,19 +328,23 @@ export class StorageManager {
       this.state.levelStars = {};
     }
     const prevStars = this.getStarsForLevel(id);
+    const earnedStarsNum = Math.min(3, Math.max(0, Number(starsEarned) || 0));
     let starsAdded = 0;
-    if (starsEarned > prevStars) {
-      starsAdded = starsEarned - prevStars;
-      this.state.levelStars[id] = starsEarned;
+    if (earnedStarsNum > prevStars) {
+      starsAdded = earnedStarsNum - prevStars;
+      this.state.levelStars[id] = earnedStarsNum;
+      this.state.levelStars[String(id)] = earnedStarsNum;
     }
-    const bestStars = this.state.levelStars[id] || 0;
+    const bestStars = this.getStarsForLevel(id);
 
     if (!this.state.levelHighScores) {
       this.state.levelHighScores = {};
     }
     const prevHigh = Number(this.state.levelHighScores[id]) || 0;
-    if (score > prevHigh) {
-      this.state.levelHighScores[id] = score;
+    const scoreNum = Math.max(0, Number(score) || 0);
+    if (scoreNum > prevHigh) {
+      this.state.levelHighScores[id] = scoreNum;
+      this.state.levelHighScores[String(id)] = scoreNum;
     }
 
     let actualCoinsAwarded = 0;
@@ -305,6 +353,7 @@ export class StorageManager {
         this.state.claimedCoinLevels = {};
       }
       this.state.claimedCoinLevels[id] = true;
+      this.state.claimedCoinLevels[String(id)] = true;
       actualCoinsAwarded = Math.max(0, Number(coinsEarned) || 0);
       if (actualCoinsAwarded > 0) {
         this.addCoins(actualCoinsAwarded);
@@ -313,12 +362,19 @@ export class StorageManager {
 
     const prevUnlocked = this.getUnlockedLevel();
     let unlockedNewZone = false;
+    let didAdvanceLevel = false;
 
     // Sequential level unlocking
     if (id >= this.state.unlockedLevel && id < totalLevelsCount) {
       this.state.unlockedLevel = id + 1;
+      didAdvanceLevel = true;
       if (id === 10 && prevUnlocked <= 10) {
         unlockedNewZone = true;
+        this.setZoneRevealed(2, true);
+      }
+      if (id === 20 && prevUnlocked <= 20) {
+        unlockedNewZone = true;
+        this.setZoneRevealed(3, true);
       }
     }
 
@@ -327,11 +383,13 @@ export class StorageManager {
       actualCoinsAwarded,
       isFirstTimeWin,
       prevStars,
-      starsEarned,
+      starsEarned: earnedStarsNum,
       starsAdded,
       bestStars,
       totalStars: this.getTotalStars(),
       unlockedNewZone,
+      didAdvanceLevel,
+      prevUnlockedLevel: prevUnlocked,
       newUnlockedLevel: this.state.unlockedLevel
     };
   }
@@ -403,6 +461,19 @@ export class StorageManager {
     return Boolean(this.state.claimedCharacters?.[heroId]);
   }
 
+  hasSeenHeroUnlock(heroId) {
+    return Boolean(this.state.seenHeroUnlocks?.[heroId]);
+  }
+
+  markHeroUnlockSeen(heroId) {
+    if (!this.state.seenHeroUnlocks) {
+      this.state.seenHeroUnlocks = { commander_falcon: true };
+    }
+    this.state.seenHeroUnlocks[heroId] = true;
+    this.saveState();
+    return true;
+  }
+
   claimCharacter(heroId, coinReward = 0) {
     if (this.hasClaimedCharacter(heroId)) return false;
     if (!this.state.claimedCharacters) this.state.claimedCharacters = {};
@@ -412,6 +483,115 @@ export class StorageManager {
     }
     this.saveState();
     return true;
+  }
+
+  /* ═════════════════════════════════════════════════════════════
+   * DAILY COIN CLAIM SYSTEM (7-DAY STREAK SUPPLY DROP)
+   * ═════════════════════════════════════════════════════════════ */
+  getDailyRewardSchedule() {
+    return [100, 150, 200, 250, 300, 400, 600];
+  }
+
+  getTodayDateString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  getDailyClaimStatus() {
+    const today = this.getTodayDateString();
+    const dc = this.state.dailyClaim || { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 };
+    const schedule = this.getDailyRewardSchedule();
+
+    const isClaimedToday = dc.lastClaimDate === today;
+
+    // Check if streak was broken (missed yesterday)
+    let currentStreak = Number(dc.streak) || 0;
+    if (!isClaimedToday && dc.lastClaimDate) {
+      try {
+        const lastParts = dc.lastClaimDate.split('-').map(Number);
+        const todayParts = today.split('-').map(Number);
+        const lastDate = new Date(lastParts[0], lastParts[1] - 1, lastParts[2]);
+        const todayDate = new Date(todayParts[0], todayParts[1] - 1, todayParts[2]);
+        const diffMs = todayDate.getTime() - lastDate.getTime();
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        if (diffDays > 1) {
+          currentStreak = 0; // Streak broken, restart from Day 1
+        }
+      } catch (e) {
+        currentStreak = 0;
+      }
+    }
+
+    const dayIndex = isClaimedToday
+      ? ((Math.max(1, currentStreak) - 1) % schedule.length)
+      : (currentStreak % schedule.length);
+
+    const dayNumber = dayIndex + 1;
+    const rewardCoins = schedule[dayIndex];
+
+    // Compute live countdown until midnight (next daily drop)
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+    const remainingMs = Math.max(0, midnight.getTime() - now.getTime());
+    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+
+    return {
+      canClaim: !isClaimedToday,
+      isClaimedToday,
+      currentStreak,
+      dayNumber,
+      rewardCoins,
+      schedule,
+      remainingMs,
+      hours,
+      minutes,
+      seconds
+    };
+  }
+
+  claimDailyReward() {
+    const status = this.getDailyClaimStatus();
+    if (!status.canClaim) {
+      return { success: false, reason: 'already_claimed' };
+    }
+
+    const today = this.getTodayDateString();
+    if (!this.state.dailyClaim) {
+      this.state.dailyClaim = { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 };
+    }
+
+    const newStreak = status.currentStreak + 1;
+    const rewardCoins = status.rewardCoins;
+
+    this.state.dailyClaim.lastClaimDate = today;
+    this.state.dailyClaim.streak = newStreak;
+    this.state.dailyClaim.totalClaimedCoins = (this.state.dailyClaim.totalClaimedCoins || 0) + rewardCoins;
+    this.state.dailyClaim.lastClaimTimestamp = Date.now();
+
+    this.addCoins(rewardCoins);
+    this.saveState();
+
+    return {
+      success: true,
+      rewardCoins,
+      newStreak,
+      totalCoins: this.getCoins()
+    };
+  }
+
+  getEquippedHeroId() {
+    return this.state.equippedHeroId || 'crimson_ace';
+  }
+
+  setEquippedHeroId(heroId) {
+    this.state.equippedHeroId = heroId;
+    this.saveState();
+    return this.state.equippedHeroId;
   }
 
   resetProgress() {
@@ -438,7 +618,9 @@ export class StorageManager {
       claimedCoinLevels: {},
       claimedMissions: {},
       claimedCharacters: {},
-      zoneRevealed: { 1: true, 2: false },
+      zoneRevealed: { 1: true, 2: false, 3: false },
+      dailyClaim: { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 },
+      equippedHeroId: 'crimson_ace',
       serverRowId: this.state.serverRowId
     };
     this.saveState();

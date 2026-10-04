@@ -69,6 +69,13 @@ export const BIRD_ABILITY_CONFIG = {
     color: '#6366f1',
     hint: 'Tap mid-flight to trigger a gravitational vortex!'
   },
+  lightning: {
+    name: 'Thunderbolt Surge',
+    icon: '⚡',
+    hasAbility: true,
+    color: '#06b6d4',
+    hint: 'Tap mid-flight to discharge high-voltage chain lightning arcs!'
+  },
   red: {
     name: 'Winged Striker',
     icon: '🎯',
@@ -174,6 +181,35 @@ export class HudController {
     this.abilityBtnNameEl = document.getElementById('ability-btn-name');
     this.abilityBtnStatusEl = document.getElementById('ability-btn-status');
     this.btnDismissAbilityTooltip = document.getElementById('btn-dismiss-ability-tooltip');
+
+    // Surprise New Hero Unlock Reveal Modal elements
+    this.resultHeroUnlockCard = document.getElementById('result-hero-unlock-card');
+    this.resultUnlockHeroTitle = document.getElementById('result-unlock-hero-title');
+    this.btnResultOpenSurprise = document.getElementById('btn-result-open-surprise');
+    this.heroSurpriseDialog = document.getElementById('hero-surprise-dialog');
+    this.btnCloseSurprise = document.getElementById('btn-close-surprise');
+    this.btnSurpriseContinue = document.getElementById('btn-surprise-continue');
+    this.surpriseHeroAvatar = document.getElementById('surprise-hero-avatar');
+    this.surpriseStageBadge = document.getElementById('surprise-stage-badge');
+    this.surpriseArchetypePill = document.getElementById('surprise-archetype-pill');
+    this.surpriseHeroName = document.getElementById('surprise-hero-name');
+    this.surpriseHeroPower = document.getElementById('surprise-hero-power');
+    this.surpriseAbilityIconCircle = document.getElementById('surprise-ability-icon-circle');
+    this.surpriseAbilityName = document.getElementById('surprise-ability-name');
+    this.surpriseAbilityDesc = document.getElementById('surprise-ability-desc');
+    this.surpriseAbilityCard = document.getElementById('surprise-ability-card');
+    this.surpriseAmbientGlow = document.getElementById('surprise-ambient-glow');
+    this.surpriseAvatarHalo = document.getElementById('surprise-avatar-halo');
+    this.surpriseValVelocity = document.getElementById('surprise-val-velocity');
+    this.surpriseGaugeVelocity = document.getElementById('surprise-gauge-velocity');
+    this.surpriseValPower = document.getElementById('surprise-val-power');
+    this.surpriseGaugePower = document.getElementById('surprise-gauge-power');
+    this.surpriseValPierce = document.getElementById('surprise-val-pierce');
+    this.surpriseGaugePierce = document.getElementById('surprise-gauge-pierce');
+    this.surpriseContinueBtnText = document.getElementById('surprise-continue-btn-text');
+
+    this.pendingSurpriseHero = null;
+    this.surpriseOnContinueCallback = null;
 
     this.confettiAnimationId = null;
     this.confettiParticles = [];
@@ -318,10 +354,46 @@ export class HudController {
       this.onRetryLevel?.();
     });
 
-    this.btnResultNext?.addEventListener('click', () => {
+    const triggerSurpriseReveal = (e) => {
+      e?.preventDefault?.();
+      e?.stopPropagation?.();
+      if (this.pendingSurpriseHero) {
+        this.openHeroSurprise(this.pendingSurpriseHero, () => {
+          this.closeResultModal();
+          this.onNextLevel?.();
+        });
+      }
+    };
+
+    this.resultHeroUnlockCard?.addEventListener('click', triggerSurpriseReveal);
+    this.btnResultOpenSurprise?.addEventListener('click', triggerSurpriseReveal);
+
+    this.btnResultNext?.addEventListener('click', (e) => {
+      if (this.pendingSurpriseHero) {
+        triggerSurpriseReveal(e);
+        return;
+      }
       this.audio?.playLevelSelect?.();
       this.closeResultModal();
       this.onNextLevel?.();
+    });
+
+    this.btnCloseSurprise?.addEventListener('click', () => {
+      this.closeHeroSurprise();
+    });
+
+    this.btnSurpriseContinue?.addEventListener('click', () => {
+      const cb = this.surpriseOnContinueCallback;
+      this.closeHeroSurprise();
+      if (typeof cb === 'function') {
+        cb();
+      }
+    });
+
+    this.heroSurpriseDialog?.addEventListener('click', (e) => {
+      if (e.target === this.heroSurpriseDialog) {
+        this.closeHeroSurprise();
+      }
     });
 
     // Listen for Escape key, backdrop dismiss, or dialog close to resume game
@@ -777,6 +849,76 @@ export class HudController {
     this.confettiParticles = [];
   }
 
+  openHeroSurprise(hero, onContinue = null) {
+    if (!this.heroSurpriseDialog || !hero) return;
+    this.surpriseOnContinueCallback = onContinue;
+    this.audio?.playVictory?.();
+    this.startConfetti();
+
+    if (this.surpriseHeroAvatar) this.surpriseHeroAvatar.src = hero.avatarUrl;
+    if (this.surpriseStageBadge) this.surpriseStageBadge.textContent = `STAGE ${hero.milestoneLevel} UNLOCK`;
+    if (this.surpriseArchetypePill) this.surpriseArchetypePill.textContent = hero.archetype;
+    if (this.surpriseHeroName) this.surpriseHeroName.textContent = hero.name;
+    if (this.surpriseHeroPower) this.surpriseHeroPower.textContent = hero.specialPower;
+
+    const abilityIcons = {
+      speed: '⚡',
+      heavy: '💣',
+      split: '✨',
+      fire: '🔥',
+      vortex: '🌀',
+      lightning: '⚡',
+      red: '🎯'
+    };
+    if (this.surpriseAbilityIconCircle) {
+      this.surpriseAbilityIconCircle.textContent = abilityIcons[hero.type] || '⚡';
+    }
+    if (this.surpriseAbilityName) this.surpriseAbilityName.textContent = hero.abilityName;
+    if (this.surpriseAbilityDesc) this.surpriseAbilityDesc.textContent = hero.abilityDesc;
+
+    const heroColor = hero.themeColor || '#38bdf8';
+    if (this.surpriseAmbientGlow) {
+      this.surpriseAmbientGlow.style.background = `radial-gradient(circle, ${heroColor}55 0%, transparent 70%)`;
+    }
+    if (this.surpriseAvatarHalo) {
+      this.surpriseAvatarHalo.style.setProperty('--halo-color', heroColor);
+    }
+    if (this.surpriseAbilityCard) {
+      this.surpriseAbilityCard.style.setProperty('--card-theme-color', heroColor);
+    }
+
+    if (this.surpriseValVelocity) this.surpriseValVelocity.textContent = `${hero.speed}%`;
+    if (this.surpriseGaugeVelocity) this.surpriseGaugeVelocity.style.width = `${hero.speed}%`;
+    if (this.surpriseValPower) this.surpriseValPower.textContent = `${hero.power}%`;
+    if (this.surpriseGaugePower) this.surpriseGaugePower.style.width = `${hero.power}%`;
+    if (this.surpriseValPierce) this.surpriseValPierce.textContent = `${hero.pierce}%`;
+    if (this.surpriseGaugePierce) this.surpriseGaugePierce.style.width = `${hero.pierce}%`;
+
+    if (this.surpriseContinueBtnText) {
+      this.surpriseContinueBtnText.textContent = onContinue
+        ? `DEPLOY ${hero.name.toUpperCase()} ➔`
+        : 'CLOSE & CONTINUE';
+    }
+
+    this.storage?.markHeroUnlockSeen?.(hero.id);
+
+    if (!this.heroSurpriseDialog.open) {
+      this.heroSurpriseDialog.showModal();
+    }
+  }
+
+  closeHeroSurprise() {
+    this.audio?.playMenuClose?.();
+    if (this.heroSurpriseDialog?.open) {
+      this.heroSurpriseDialog.close();
+    }
+    if (this.pendingSurpriseHero) {
+      this.storage?.markHeroUnlockSeen?.(this.pendingSurpriseHero.id);
+      this.pendingSurpriseHero = null;
+      this.resultHeroUnlockCard?.classList.add('hidden');
+    }
+  }
+
   showResultModal({
     won,
     levelId,
@@ -788,7 +930,8 @@ export class HudController {
     prevStars = 0,
     starsAdded = 0,
     bestStars = 0,
-    totalStars = 0
+    totalStars = 0,
+    newlyUnlockedHero = null
   }) {
     if (!this.resultDialog) return;
 
@@ -839,6 +982,22 @@ export class HudController {
         this.resultMessage.innerHTML = `Fortress demolished! Stage Best: <strong>${displayStars}/3 Stars</strong>.<br><span class="replay-coin-text">(Replay clear: coins already claimed on first clear — 0 coins added)</span>`;
       }
 
+      // Check if a new hero was unlocked with this victory
+      if (newlyUnlockedHero) {
+        this.pendingSurpriseHero = newlyUnlockedHero;
+        if (this.resultHeroUnlockCard) {
+          this.resultHeroUnlockCard.classList.remove('hidden');
+          if (this.resultUnlockHeroTitle) {
+            this.resultUnlockHeroTitle.textContent = `${newlyUnlockedHero.name}!`;
+          }
+        }
+      } else {
+        this.pendingSurpriseHero = null;
+        if (this.resultHeroUnlockCard) {
+          this.resultHeroUnlockCard.classList.add('hidden');
+        }
+      }
+
       if (this.btnResultRetry) {
         this.btnResultRetry.classList.remove('primary-btn');
         this.btnResultRetry.classList.add('secondary-btn');
@@ -860,6 +1019,11 @@ export class HudController {
       // ═══════════════════════════════════════════════════════════
       this.resultDialog.classList.remove('result-dialog-victory');
       this.resultDialog.classList.add('result-dialog-failed');
+
+      this.pendingSurpriseHero = null;
+      if (this.resultHeroUnlockCard) {
+        this.resultHeroUnlockCard.classList.add('hidden');
+      }
 
       // Prominent RED Highlight Banner to make failure unmistakable
       if (this.resultStatusHighlight) {
@@ -908,6 +1072,7 @@ export class HudController {
 
   closeResultModal() {
     this.stopVictoryCelebration();
+    this.closeHeroSurprise();
     if (this.resultDialog && this.resultDialog.open) {
       this.resultDialog.close();
     }

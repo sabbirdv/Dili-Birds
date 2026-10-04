@@ -66,6 +66,42 @@ export const VORTEX_TITAN_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent
 </svg>
 `)}`;
 
+export const VOLT_STRIKER_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="voltBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="55%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#082f49" />
+    </radialGradient>
+    <linearGradient id="voltBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#00f0ff" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="48" fill="url(#voltBg)" stroke="#38bdf8" stroke-width="2.5" />
+  <circle cx="50" cy="50" r="39" fill="none" stroke="#67e8f9" stroke-width="2" stroke-dasharray="10 5" opacity="0.8" />
+  <!-- Lightning bolt top crest -->
+  <polygon points="52,4 42,22 49,22 40,36 58,18 51,18" fill="url(#voltBoltGrad)" stroke="#0284c7" stroke-width="1.2" />
+  <!-- Speech-bubble pill character body -->
+  <rect x="22" y="34" width="56" height="32" rx="16" fill="#0284c7" stroke="#0369a1" stroke-width="2" />
+  <polygon points="50,66 52,73 53,66" fill="#0284c7" />
+  <!-- Side lightning fins -->
+  <polygon points="12,48 22,42 18,52" fill="#38bdf8" />
+  <polygon points="88,48 78,42 82,52" fill="#38bdf8" />
+  <!-- Chevron eyes -->
+  <g transform="translate(34, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <g transform="translate(66, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <path d="M44 58 Q50 64 56 58" fill="none" stroke="#090d16" stroke-width="2.4" stroke-linecap="round" />
+</svg>
+`)}`;
+
 export const HEROES_DATA = [
   {
     id: 'commander_falcon',
@@ -168,10 +204,35 @@ export const HEROES_DATA = [
     pierce: 95,
     claimReward: 400,
     themeColor: '#818cf8'
+  },
+  {
+    id: 'volt_striker',
+    name: 'Volt Striker',
+    archetype: 'High-Voltage Arc Generator',
+    type: 'lightning',
+    avatarUrl: VOLT_STRIKER_AVATAR,
+    milestoneLevel: 21,
+    specialPower: 'Thunderbolt Surge & Chain Lightning',
+    abilityName: 'Thunderbolt Surge',
+    abilityDesc: 'Tap mid-flight to discharge high-frequency electric plasma bolts. Arcs through metal girders and stone columns, electrocuting multiple structures and targets simultaneously with piercing shockwaves.',
+    recommendedLevels: 'Levels 21–35',
+    speed: 94,
+    power: 98,
+    pierce: 99,
+    claimReward: 500,
+    themeColor: '#06b6d4'
   }
 ];
 
 export const MISSIONS_DATA = [
+  {
+    id: 'mission_daily_claim',
+    title: 'Daily Supply Drop',
+    desc: 'Claim your first free daily coin drop from the supply treasury.',
+    target: 1,
+    rewardCoins: 100,
+    getProgress: (storage) => (storage.state?.dailyClaim?.totalClaimedCoins > 0 ? 1 : 0)
+  },
   {
     id: 'mission_first_flight',
     title: 'First Flight',
@@ -243,14 +304,63 @@ export const MISSIONS_DATA = [
     target: 20,
     rewardCoins: 600,
     getProgress: (storage) => (storage.getStarsForLevel(20) > 0 ? 20 : Math.min(19, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_volt_unlocked',
+    title: 'Thunderstorm Genesis',
+    desc: 'Reach Stage 21 to unlock Volt Striker high-voltage character.',
+    target: 21,
+    rewardCoins: 500,
+    getProgress: (storage) => Math.min(21, storage.getUnlockedLevel())
+  },
+  {
+    id: 'mission_stage_25',
+    title: 'Plasma Conqueror',
+    desc: 'Clear Stage 25 in the Storm Bastion.',
+    target: 25,
+    rewardCoins: 400,
+    getProgress: (storage) => (storage.getStarsForLevel(25) > 0 ? 25 : Math.min(24, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_stage_30',
+    title: 'Titan Dominator',
+    desc: 'Clear Stage 30 and demolish the Colossus of Sparks.',
+    target: 30,
+    rewardCoins: 500,
+    getProgress: (storage) => (storage.getStarsForLevel(30) > 0 ? 30 : Math.min(29, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_grand_emperor',
+    title: 'Supreme Apex Sovereign',
+    desc: 'Clear Stage 35 and achieve total victory across all 35 realms.',
+    target: 35,
+    rewardCoins: 1000,
+    getProgress: (storage) => (storage.getStarsForLevel(35) > 0 ? 35 : Math.min(34, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_star_overlord',
+    title: 'Centurion of Stars',
+    desc: 'Earn 50 or more Stars across your completed campaign stages.',
+    target: 50,
+    rewardCoins: 600,
+    getProgress: (storage) => Math.min(50, storage.getTotalStars())
+  },
+  {
+    id: 'mission_star_perfection',
+    title: 'Starlight Legend',
+    desc: 'Earn 90 or more Stars across your completed campaign stages.',
+    target: 90,
+    rewardCoins: 800,
+    getProgress: (storage) => Math.min(90, storage.getTotalStars())
   }
 ];
 
 export class DashboardModals {
-  constructor({ storage, audio, onRefreshHeader }) {
+  constructor({ storage, audio, onRefreshHeader, onInspectHero }) {
     this.storage = storage;
     this.audio = audio;
     this.onRefreshHeader = onRefreshHeader;
+    this.onInspectHero = onInspectHero;
 
     this.leaderboardDialog = document.getElementById('leaderboard-dialog');
     this.missionsDialog = document.getElementById('missions-dialog');
@@ -625,18 +735,118 @@ export class DashboardModals {
   /* ═════════════════════════════════════════════════════════════
    * MISSIONS & TASKS MODAL
    * ═════════════════════════════════════════════════════════════ */
+  /* ═════════════════════════════════════════════════════════════
+   * MISSIONS & TASKS MODAL WITH DAILY COIN CLAIM SUPPLY DROP
+   * ═════════════════════════════════════════════════════════════ */
   openMissions() {
     if (!this.missionsDialog) return;
     this.audio?.playMenuOpen?.();
     this.renderMissionsList();
+    this.startDailyCountdownTimer();
     this.missionsDialog.showModal();
+
+    const onDialogClose = () => {
+      this.stopDailyCountdownTimer();
+      this.missionsDialog?.removeEventListener('close', onDialogClose);
+    };
+    this.missionsDialog.addEventListener('close', onDialogClose);
+  }
+
+  startDailyCountdownTimer() {
+    this.stopDailyCountdownTimer();
+    this.dailyCountdownTimerId = setInterval(() => {
+      const countdownEl = document.getElementById('daily-reset-countdown');
+      if (!countdownEl) return;
+      const status = this.storage.getDailyClaimStatus();
+      if (status.canClaim) {
+        this.renderMissionsList();
+      } else {
+        countdownEl.textContent = `Reset in ${String(status.hours).padStart(2, '0')}:${String(status.minutes).padStart(2, '0')}:${String(status.seconds).padStart(2, '0')}`;
+      }
+    }, 1000);
+  }
+
+  stopDailyCountdownTimer() {
+    if (this.dailyCountdownTimerId) {
+      clearInterval(this.dailyCountdownTimerId);
+      this.dailyCountdownTimerId = null;
+    }
   }
 
   renderMissionsList() {
     const listEl = document.getElementById('missions-list-container');
     if (!listEl) return;
 
-    let html = '';
+    // 1. Daily Supply Drop / Daily Coin Claim Hero Card
+    const dailyStatus = this.storage.getDailyClaimStatus();
+    const streakDays = [1, 2, 3, 4, 5, 6, 7];
+
+    let streakCardsHtml = '';
+    streakDays.forEach((dayNum) => {
+      const reward = dailyStatus.schedule[dayNum - 1];
+      const isPast = dailyStatus.currentStreak >= dayNum && (dailyStatus.isClaimedToday || dayNum < dailyStatus.dayNumber);
+      const isCurrent = dayNum === dailyStatus.dayNumber;
+
+      let stateClass = '';
+      let badgeText = `+${reward}`;
+      if (isPast) {
+        stateClass = 'completed-day';
+        badgeText = '✓';
+      } else if (isCurrent) {
+        stateClass = dailyStatus.canClaim ? 'active-claimable pulse-ring' : 'active-claimed';
+      } else {
+        stateClass = 'future-day';
+      }
+
+      streakCardsHtml += `
+        <div class="daily-streak-node ${stateClass}" title="Day ${dayNum}: +${reward} Free Coins">
+          <span class="daily-node-day">D${dayNum}</span>
+          <img class="daily-node-coin" src="${coinLogoUrl}" alt="Coin" />
+          <span class="daily-node-val">${badgeText}</span>
+        </div>
+      `;
+    });
+
+    const dailyBannerHtml = `
+      <section class="daily-reward-banner glass-card" aria-label="Daily Coin Supply Drop">
+        <div class="daily-banner-header">
+          <div class="daily-header-left">
+            <span class="daily-tag-kicker">DAILY SUPPLY DROP</span>
+            <h3 class="daily-heading">Daily Treasury Rewards</h3>
+          </div>
+          <div class="daily-streak-count-badge">
+            <span class="streak-flame">⚡</span>
+            <span>Streak: <strong>${dailyStatus.currentStreak} Days</strong></span>
+          </div>
+        </div>
+
+        <div class="daily-streak-track">
+          ${streakCardsHtml}
+        </div>
+
+        <div class="daily-banner-action-row">
+          <div class="daily-reward-preview">
+            <span class="preview-label">Today's Supply:</span>
+            <strong class="preview-amount">+${dailyStatus.rewardCoins} Free Coins</strong>
+          </div>
+          ${dailyStatus.canClaim ? `
+            <button type="button" class="btn-daily-claim pulse-glow" id="btn-claim-daily-coin">
+              <span>CLAIM TODAY</span>
+              <img class="coin-icon-img" src="${coinLogoUrl}" alt="Coin" />
+              <span>+${dailyStatus.rewardCoins}</span>
+            </button>
+          ` : `
+            <div class="daily-claimed-status-pill">
+              <span class="status-check">✓ Claimed Today</span>
+              <span class="daily-countdown" id="daily-reset-countdown">Reset in ${String(dailyStatus.hours).padStart(2, '0')}:${String(dailyStatus.minutes).padStart(2, '0')}:${String(dailyStatus.seconds).padStart(2, '0')}</span>
+            </div>
+          `}
+        </div>
+      </section>
+    `;
+
+    // 2. Campaign Missions & Quests List
+    let missionsHtml = '';
     MISSIONS_DATA.forEach((mission) => {
       const progress = mission.getProgress(this.storage);
       const isComplete = progress >= mission.target;
@@ -666,7 +876,7 @@ export class DashboardModals {
         `;
       }
 
-      html += `
+      missionsHtml += `
         <article class="mission-card ${isComplete && !isClaimed ? 'ready-card' : ''}">
           <div class="mission-info-col">
             <div class="mission-header-row">
@@ -689,9 +899,23 @@ export class DashboardModals {
       `;
     });
 
-    listEl.innerHTML = html;
+    listEl.innerHTML = dailyBannerHtml + missionsHtml;
 
-    // Attach click events to claim buttons
+    // Attach click event for daily claim
+    const dailyBtn = listEl.querySelector('#btn-claim-daily-coin');
+    if (dailyBtn) {
+      dailyBtn.addEventListener('click', () => {
+        const res = this.storage.claimDailyReward();
+        if (res.success) {
+          this.audio?.playCoin?.();
+          this.audio?.playVictory?.();
+          this.onRefreshHeader?.();
+          this.renderMissionsList();
+        }
+      });
+    }
+
+    // Attach click events to mission claim buttons
     listEl.querySelectorAll('.btn-mission-action.ready').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const targetBtn = e.currentTarget;
@@ -704,14 +928,14 @@ export class DashboardModals {
 
   claimMission(missionId, rewardCoins) {
     if (this.storage.claimMission(missionId, rewardCoins)) {
-      this.audio?.playCoin();
+      this.audio?.playCoin?.();
       this.onRefreshHeader?.();
       this.renderMissionsList();
     }
   }
 
   /* ═════════════════════════════════════════════════════════════
-   * CHARACTER COLLECTION & MILESTONE REWARD MODAL
+   * CHARACTER COLLECTION & MILESTONE REWARD MODAL (7 HEROES)
    * ═════════════════════════════════════════════════════════════ */
   openCharacters() {
     if (!this.charactersDialog) return;
@@ -734,15 +958,16 @@ export class DashboardModals {
     if (!gridEl) return;
 
     const unlockedLevel = this.storage.getUnlockedLevel();
+    const equippedHeroId = this.storage.getEquippedHeroId();
 
     // Render Milestone Progression Stepper Track inside Characters Codex
     if (milestoneBannerEl) {
       let nextLockedHero = HEROES_DATA.find((h) => h.milestoneLevel > unlockedLevel);
       let bannerHint = nextLockedHero
         ? `Next Unlock: <strong>${nextLockedHero.name}</strong> at <strong>Level ${nextLockedHero.milestoneLevel}</strong>!`
-        : `All 6 Legendary Birds Unlocked & Ready!`;
+        : `All 7 Legendary Birds Unlocked & Ready!`;
 
-      const maxMilestone = 16;
+      const maxMilestone = 21;
       const pct = Math.min(100, Math.max(8, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
 
       let nodesHtml = '';
@@ -768,7 +993,7 @@ export class DashboardModals {
       milestoneBannerEl.innerHTML = `
         <div class="modal-milestone-info">
           <div class="milestone-banner-top">
-            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES (LEVELS 1–20)</span>
+            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES (LEVELS 1–35)</span>
             <span class="milestones-next-teaser">${bannerHint}</span>
           </div>
           <div class="milestones-track-container modal-track">
@@ -787,6 +1012,7 @@ export class DashboardModals {
     HEROES_DATA.forEach((hero) => {
       const isUnlocked = unlockedLevel >= hero.milestoneLevel;
       const isClaimed = this.storage.hasClaimedCharacter(hero.id);
+      const isLead = equippedHeroId === hero.id;
 
       let statusPill = '';
       let actionFooterHtml = '';
@@ -794,31 +1020,51 @@ export class DashboardModals {
       if (!isUnlocked) {
         statusPill = `<span class="hero-status-pill locked"><svg class="lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg> UNLOCKS AT LEVEL ${hero.milestoneLevel}</span>`;
         actionFooterHtml = `
-          <div class="hero-locked-tag">
-            <svg class="lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
-            <span>Complete Stage ${hero.milestoneLevel} to Recruit</span>
+          <div class="hero-footer-actions-row">
+            <div class="hero-locked-tag">
+              <svg class="lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+              <span>Unlocks in Stage ${hero.milestoneLevel}</span>
+            </div>
+            <button type="button" class="btn-hero-inspect secondary" data-hero-id="${hero.id}" title="Preview Ability & Stats">
+              <svg class="inspect-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>DETAILS</span>
+            </button>
           </div>
         `;
       } else if (!isClaimed) {
         statusPill = `<span class="hero-status-pill ready-claim"><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> UNLOCKED • CLAIM BONUS</span>`;
         actionFooterHtml = `
-          <button type="button" class="btn-hero-claim ready" data-hero-id="${hero.id}" data-reward="${hero.claimReward}">
-            <span class="btn-claim-text">CLAIM HERO BONUS</span>
-            <span class="btn-claim-reward">+${hero.claimReward} <img class="coin-icon-mini" src="${coinLogoUrl}" alt="Coin" /></span>
-          </button>
+          <div class="hero-footer-actions-row">
+            <button type="button" class="btn-hero-claim ready" data-hero-id="${hero.id}" data-reward="${hero.claimReward}">
+              <span class="btn-claim-text">CLAIM BONUS</span>
+              <span class="btn-claim-reward">+${hero.claimReward} <img class="coin-icon-mini" src="${coinLogoUrl}" alt="Coin" /></span>
+            </button>
+            <button type="button" class="btn-hero-inspect highlight" data-hero-id="${hero.id}" title="View Hero Ability Card">
+              <svg class="inspect-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>ABILITY CARD</span>
+            </button>
+          </div>
         `;
       } else {
-        statusPill = `<span class="hero-status-pill unlocked"><svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> ACTIVE IN SQUAD</span>`;
+        statusPill = isLead
+          ? `<span class="hero-status-pill lead-pill"><svg class="star-svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> SQUAD LEADER</span>`
+          : `<span class="hero-status-pill unlocked"><svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> ACTIVE IN SQUAD</span>`;
+
         actionFooterHtml = `
-          <div class="hero-claimed-tag">
-            <svg class="check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>UNLOCKED &amp; READY IN BATTLE</span>
+          <div class="hero-footer-actions-row">
+            <button type="button" class="btn-hero-equip ${isLead ? 'active-lead' : ''}" data-hero-id="${hero.id}" title="${isLead ? 'Current Squad Lead' : 'Equip as Squad Leader'}">
+              <span>${isLead ? '★ SQUAD LEAD' : 'EQUIP LEAD'}</span>
+            </button>
+            <button type="button" class="btn-hero-inspect highlight" data-hero-id="${hero.id}" title="View Hero Ability Card">
+              <svg class="inspect-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>ABILITY CARD</span>
+            </button>
           </div>
         `;
       }
 
       html += `
-        <article class="hero-collection-card ${isUnlocked ? 'unlocked-card' : 'locked-card'}" style="--hero-color: ${hero.themeColor};">
+        <article class="hero-collection-card ${isUnlocked ? 'unlocked-card' : 'locked-card'} ${isLead ? 'squad-lead-card' : ''}" style="--hero-color: ${hero.themeColor};">
           <div class="hero-card-glow" aria-hidden="true"></div>
 
           <div class="hero-portrait-frame">
@@ -882,6 +1128,28 @@ export class DashboardModals {
         const heroId = targetBtn.dataset.heroId;
         const reward = Number(targetBtn.dataset.reward) || 0;
         this.claimHero(heroId, reward);
+      });
+    });
+
+    // Attach click events to equip as squad lead
+    gridEl.querySelectorAll('.btn-hero-equip').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const heroId = e.currentTarget.dataset.heroId;
+        this.storage.setEquippedHeroId(heroId);
+        this.audio?.playBoost?.();
+        this.renderCharactersList();
+      });
+    });
+
+    // Attach click events to inspect ability card buttons
+    gridEl.querySelectorAll('.btn-hero-inspect').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const heroId = e.currentTarget.dataset.heroId;
+        const hero = HEROES_DATA.find((h) => h.id === heroId);
+        if (hero) {
+          this.audio?.playUiClick?.();
+          this.onInspectHero?.(hero);
+        }
       });
     });
   }

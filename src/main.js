@@ -3,6 +3,7 @@ import { AudioManager } from './ui/audioManager.js';
 import { LevelSelect } from './levels/levelSelect.js';
 import { LEVELS } from './levels/levelData.js';
 import { UIManager } from './ui/uiManager.js';
+import { HEROES_DATA } from './ui/dashboardModals.js';
 import { GameScene } from './scene/gameScene.js';
 import { requestFullscreen } from './ui/fullscreenHelper.js';
 import { leaderboardService } from './services/leaderboardService.js';
@@ -115,6 +116,7 @@ class DiliBirdsApp {
         let starsAdded = 0;
         let prevStars = 0;
         let bestStars = starsEarned;
+        let newlyUnlockedHero = null;
         if (won) {
           const result = this.storage.recordLevelWin(
             levelId,
@@ -128,14 +130,42 @@ class DiliBirdsApp {
           starsAdded = result?.starsAdded ?? 0;
           prevStars = result?.prevStars ?? 0;
           bestStars = result?.bestStars ?? this.storage.getStarsForLevel(levelId);
-          const unlockedNewZone = Boolean(result?.unlockedNewZone);
+          const prevUnlockedLevel = result?.prevUnlockedLevel || this.storage.getUnlockedLevel();
           const newUnlockedLevel = result?.newUnlockedLevel || this.storage.getUnlockedLevel();
-          this.levelSelect.focusedLevelId = newUnlockedLevel;
+          const didAdvanceLevel = Boolean(result?.didAdvanceLevel);
+          const unlockedNewZone = Boolean(result?.unlockedNewZone);
 
-          if (unlockedNewZone || (levelId === 10 && !this.storage.isZoneRevealed(2))) {
-            this.levelSelect.pendingZone2Unlock = true;
-          } else if (newUnlockedLevel > levelId) {
-            this.levelSelect.pendingLevelUnlock = newUnlockedLevel;
+          if (didAdvanceLevel) {
+            this.levelSelect.focusedLevelId = newUnlockedLevel;
+            this.levelSelect.activeLevelId = newUnlockedLevel;
+            if (levelId === 10 && !this.storage.isZoneRevealed(2)) {
+              this.levelSelect.pendingZone2Unlock = true;
+            } else if (levelId === 20 && !this.storage.isZoneRevealed(3)) {
+              this.levelSelect.pendingZone3Unlock = true;
+            } else {
+              this.levelSelect.pendingLevelUnlock = newUnlockedLevel;
+            }
+          } else {
+            // Replay mode: Keep focus and active stage directly on the replayed stage
+            this.levelSelect.focusedLevelId = levelId;
+            this.levelSelect.activeLevelId = levelId;
+            this.levelSelect.pendingLevelUnlock = null;
+            this.levelSelect.pendingZone2Unlock = false;
+            this.levelSelect.pendingZone3Unlock = false;
+          }
+
+          // Strictly FIRST-TIME UNLOCK ONLY:
+          // Triggers only when advancing a level, previous level was below milestone, new level reaches milestone, and never seen before.
+          if (didAdvanceLevel) {
+            newlyUnlockedHero = HEROES_DATA.find(
+              (h) =>
+                prevUnlockedLevel < h.milestoneLevel &&
+                newUnlockedLevel >= h.milestoneLevel &&
+                !this.storage.hasSeenHeroUnlock(h.id)
+            ) || null;
+            if (newlyUnlockedHero) {
+              this.storage.markHeroUnlockSeen(newlyUnlockedHero.id);
+            }
           }
 
           // Save best score and stars per level using Supabase, and preserve progress across sessions
@@ -167,7 +197,8 @@ class DiliBirdsApp {
           prevStars,
           starsAdded,
           bestStars,
-          totalStars: this.storage.getTotalStars()
+          totalStars: this.storage.getTotalStars(),
+          newlyUnlockedHero
         });
       }
     });

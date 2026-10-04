@@ -917,16 +917,16 @@ export class GameScene {
       wood: 3.6,
       coin: 2.6,
       tnt: 2.2,
-      stone: 6.5,
-      metal: 9.0
+      stone: 6.0,
+      metal: 8.0
     };
     const hpMap = {
       glass: 28,
       coin: 48,
       tnt: 22,
       wood: 80,
-      stone: 145,
-      metal: 220
+      stone: 135,
+      metal: 200
     };
 
     const mass = isStatic ? 0 : (massMap[type] || 3.6);
@@ -995,7 +995,7 @@ export class GameScene {
         }
 
         // Light graze or glancing collision (< 1.6 normal impact) deals zero damage
-        if (normalImpact < 1.6) {
+        if (normalImpact < 1.5) {
           this.audio?.playMaterialImpact(blockObj.type, 0.15);
           return;
         }
@@ -1016,6 +1016,8 @@ export class GameScene {
           birdMultiplier = blockObj.type === 'wood' ? 2.5 : blockObj.type === 'glass' ? 1.9 : blockObj.type === 'tnt' ? 3.5 : 1.4;
         } else if (birdType === 'vortex') {
           birdMultiplier = blockObj.type === 'metal' ? 2.1 : blockObj.type === 'stone' ? 2.0 : 1.5;
+        } else if (birdType === 'lightning') {
+          birdMultiplier = blockObj.type === 'metal' ? 3.0 : blockObj.type === 'stone' ? 2.2 : blockObj.type === 'glass' ? 2.4 : 1.6;
         }
 
         // Damage derived from normal impact collision force (tuned for realistic yet beatable toughness)
@@ -1040,7 +1042,7 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 5.6) {
+      } else if (normalImpact >= 5.0) {
         // High-velocity falls from elevated platforms or heavy crushing impacts
         blockObj.lastHitTime = now;
         this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
@@ -1201,7 +1203,8 @@ export class GameScene {
       heavy: 4.8,
       split: 2.4,
       fire: 2.8,
-      vortex: 3.8
+      vortex: 3.8,
+      lightning: 3.2
     };
     const mass = massMap[this.activeBird.type] || 2.5;
 
@@ -1234,7 +1237,8 @@ export class GameScene {
       heavy: '💣 Tap or Click mid-flight for Meteor Slam!',
       split: '✨ Tap or Click mid-flight for Tri-Cluster Split!',
       fire: '🔥 Tap or Click mid-flight for Inferno Burst!',
-      vortex: '🌀 Tap or Click mid-flight for Vortex Shockwave!'
+      vortex: '🌀 Tap or Click mid-flight for Vortex Shockwave!',
+      lightning: '⚡ Tap or Click mid-flight for Thunderbolt Surge!'
     };
     if (prompts[this.activeBird.type]) {
       this.onShowAbilityPrompt?.(prompts[this.activeBird.type]);
@@ -1276,6 +1280,10 @@ export class GameScene {
       this.activeBird.abilityUsed = true;
       this.onHideAbilityPrompt?.();
       this.triggerVortexShockwave(pos);
+    } else if (bType === 'lightning') {
+      this.activeBird.abilityUsed = true;
+      this.onHideAbilityPrompt?.();
+      this.triggerLightningSurge(pos);
     }
   }
 
@@ -1437,6 +1445,142 @@ export class GameScene {
       decay: 2.2
     });
     this.spawnBurstParticles(origin, 0xa5b4fc, 24);
+  }
+
+  triggerLightningSurge(origin) {
+    this.audio?.playExplosion?.();
+    this.audio?.playBoost?.();
+    this.spawnLightningFX(origin);
+    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.85);
+    this.wakeAllStructures();
+
+    // High velocity forward boost for penetrating strike
+    if (this.activeBird && this.activeBird.body) {
+      this.activeBird.body.velocity.x *= 1.35;
+      this.activeBird.body.velocity.y *= 0.7;
+    }
+
+    const lightningRadius = 6.2;
+    // Zap nearby destructible blocks
+    [...this.blocks].forEach((b) => {
+      if (b.destroyed || !b.body) return;
+      const bPos = b.body.position;
+      const dist = Math.hypot(bPos.x - origin.x, bPos.y - origin.y);
+      if (dist < lightningRadius) {
+        b.body.wakeUp();
+        if (b.type === 'tnt') {
+          this.destroyBlock(b);
+        } else {
+          const falloff = 1 - dist / lightningRadius;
+          // High voltage conductively destroys metal, stone, glass
+          const dmg = falloff * (b.type === 'metal' ? 85 : b.type === 'stone' ? 65 : b.type === 'glass' ? 75 : 50);
+          b.hp -= dmg;
+          const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
+          if (impulseDir.length() > 0.01) {
+            impulseDir.normalize();
+            b.body.applyImpulse(impulseDir.scale(falloff * 20), bPos);
+          }
+          if (b.hp <= 0) {
+            this.destroyBlock(b);
+          }
+        }
+      }
+    });
+
+    // Zap nearby targets
+    [...this.targets].forEach((t) => {
+      if (t.destroyed || !t.body) return;
+      const tPos = t.body.position;
+      const dist = Math.hypot(tPos.x - origin.x, tPos.y - origin.y);
+      if (dist < lightningRadius) {
+        t.body.wakeUp();
+        const falloff = 1 - dist / lightningRadius;
+        t.hp -= falloff * 45;
+        const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
+        if (impulseDir.length() > 0.01) {
+          impulseDir.normalize();
+          t.body.applyImpulse(impulseDir.scale(falloff * 16), tPos);
+        }
+        if (t.hp <= 0) {
+          this.defeatTarget(t);
+        }
+      }
+    });
+  }
+
+  spawnLightningFX(origin) {
+    // 1. Cyan-electric expanding shockwave ring
+    const shockwaveMat = new THREE.MeshBasicMaterial({
+      color: 0x00f0ff,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false
+    });
+    const mesh = new THREE.Mesh(this.sharedShockwaveGeo, shockwaveMat);
+    mesh.position.set(origin.x, origin.y, 0.12);
+    this.scene.add(mesh);
+    this.particles.push({
+      type: 'shockwave',
+      mesh,
+      baseScale: 0.35,
+      maxExpansion: 6.8,
+      baseOpacity: 0.95,
+      life: 1.0,
+      decay: 2.5
+    });
+
+    // 2. High-energy burst spark particles
+    this.spawnBurstParticles(origin, 0x00f0ff, 28);
+    this.spawnBurstParticles(origin, 0xfef08a, 16);
+
+    // 3. Lightning arc branches to nearest objects
+    const arcGroup = new THREE.Group();
+    const arcMat = new THREE.LineBasicMaterial({
+      color: 0xa5f3fc,
+      linewidth: 3,
+      transparent: true,
+      opacity: 0.95
+    });
+
+    const nearbyObjects = [];
+    this.targets.forEach((t) => {
+      if (!t.destroyed && t.mesh) {
+        const d = origin.distanceTo(t.mesh.position);
+        if (d < 6.2 && d > 0.1) nearbyObjects.push({ pos: t.mesh.position.clone(), dist: d });
+      }
+    });
+    this.blocks.forEach((b) => {
+      if (!b.destroyed && b.mesh) {
+        const d = origin.distanceTo(b.mesh.position);
+        if (d < 5.8 && d > 0.1) nearbyObjects.push({ pos: b.mesh.position.clone(), dist: d });
+      }
+    });
+
+    nearbyObjects.sort((a, b) => a.dist - b.dist).slice(0, 5).forEach((item) => {
+      const points = [];
+      const steps = 6;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const p = origin.clone().lerp(item.pos, t);
+        if (i > 0 && i < steps) {
+          p.x += (Math.random() - 0.5) * 0.45;
+          p.y += (Math.random() - 0.5) * 0.45;
+        }
+        points.push(p);
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(points);
+      const line = new THREE.Line(geo, arcMat);
+      arcGroup.add(line);
+    });
+
+    this.scene.add(arcGroup);
+    setTimeout(() => {
+      this.scene.remove(arcGroup);
+      arcGroup.traverse((c) => {
+        if (c.geometry) c.geometry.dispose();
+      });
+      arcMat.dispose();
+    }, 180);
   }
 
   destroyBlock(blockObj) {

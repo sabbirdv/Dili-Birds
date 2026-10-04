@@ -25,7 +25,7 @@ export const LEVELS = [
     "birds": [
       "red",
       "red",
-      "speed",
+      "red",
       "red"
     ],
     "platforms": [
@@ -498,8 +498,8 @@ export const LEVELS = [
     "coinReward": 95,
     "birds": [
       "red",
-      "speed",
-      "speed",
+      "red",
+      "red",
       "red"
     ],
     "platforms": [
@@ -867,10 +867,11 @@ export const LEVELS = [
     "description": "A colossal fortress constructed from impenetrable granite columns and armored pillboxes.",
     "coinReward": 100,
     "birds": [
-      "red",
-      "heavy",
       "speed",
-      "red"
+      "red",
+      "speed",
+      "red",
+      "speed"
     ],
     "platforms": [
       {
@@ -1224,10 +1225,11 @@ export const LEVELS = [
     "description": "A massive multi-level stone colonnade garrison with heavily protected bunker apartments.",
     "coinReward": 110,
     "birds": [
+      "speed",
       "red",
       "speed",
-      "heavy",
-      "split"
+      "speed",
+      "red"
     ],
     "platforms": [
       {
@@ -1643,11 +1645,11 @@ export const LEVELS = [
     "description": "The fortified Emerald Citadel housing the Boss Pig inside an armored royal granite vault.",
     "coinReward": 160,
     "birds": [
-      "red",
+      "heavy",
       "speed",
       "heavy",
-      "heavy",
-      "fire"
+      "red",
+      "speed"
     ],
     "platforms": [
       {
@@ -2115,11 +2117,11 @@ export const LEVELS = [
     "description": "A heavily fortified medium tier stronghold with reinforced multi-tier pillars and armored bunkers.",
     "coinReward": 140,
     "birds": [
-      "red",
+      "heavy",
       "speed",
       "heavy",
       "speed",
-      "fire"
+      "red"
     ],
     "platforms": [
       {
@@ -2525,10 +2527,11 @@ export const LEVELS = [
     "description": "A heavily fortified hard tier stronghold with reinforced multi-tier pillars and armored bunkers.",
     "coinReward": 150,
     "birds": [
-      "speed",
       "split",
       "heavy",
-      "fire"
+      "speed",
+      "split",
+      "red"
     ],
     "platforms": [
       {
@@ -2993,11 +2996,11 @@ export const LEVELS = [
     "description": "A heavily fortified hard tier stronghold with reinforced multi-tier pillars and armored bunkers.",
     "coinReward": 160,
     "birds": [
-      "red",
       "split",
-      "speed",
       "heavy",
-      "fire"
+      "speed",
+      "split",
+      "red"
     ],
     "platforms": [
       {
@@ -3463,10 +3466,10 @@ export const LEVELS = [
     "coinReward": 170,
     "birds": [
       "split",
+      "heavy",
       "speed",
       "heavy",
-      "heavy",
-      "fire"
+      "split"
     ],
     "platforms": [
       {
@@ -3895,11 +3898,11 @@ export const LEVELS = [
     "description": "A heavily fortified boss tier stronghold with reinforced multi-tier pillars and armored bunkers.",
     "coinReward": 180,
     "birds": [
-      "speed",
-      "heavy",
       "split",
       "heavy",
-      "fire"
+      "speed",
+      "heavy",
+      "split"
     ],
     "platforms": [
       {
@@ -4308,6 +4311,7 @@ export const LEVELS = [
       "fire",
       "heavy",
       "speed",
+      "split",
       "fire"
     ],
     "platforms": [
@@ -4718,7 +4722,7 @@ export const LEVELS = [
       "fire",
       "heavy",
       "split",
-      "vortex"
+      "fire"
     ],
     "platforms": [
       {
@@ -5128,7 +5132,7 @@ export const LEVELS = [
       "fire",
       "heavy",
       "speed",
-      "vortex"
+      "fire"
     ],
     "platforms": [
       {
@@ -6066,7 +6070,7 @@ export const LEVELS = [
       "split",
       "fire",
       "heavy",
-      "vortex"
+      "fire"
     ],
     "platforms": [
       {
@@ -8815,6 +8819,4303 @@ export const LEVELS = [
         "radius": 0.44,
         "isBoss": false,
         "birdType": "blue"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Thunderfall Gate",
+    "zone": "Thunder Peaks",
+    "icon": "⚡",
+    "difficulty": "Advanced",
+    "description": "First gateway into the electrified mountains. High-voltage metal towers conduct lightning arcs straight through structural joints.",
+    "coinReward": 300,
+    "birds": [
+      "lightning",
+      "speed",
+      "heavy",
+      "red"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          1.8,
+          0
+        ],
+        "size": [
+          4.8,
+          3.6,
+          5
+        ],
+        "type": "stone"
+      },
+      {
+        "pos": [
+          15.2,
+          2.2,
+          0
+        ],
+        "size": [
+          4.6,
+          4.4,
+          5
+        ],
+        "type": "stone"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          5.2,
+          0
+        ],
+        "size": [
+          3.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.8,
+          5.9,
+          0
+        ],
+        "size": [
+          0.35,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.2,
+          5.9,
+          0
+        ],
+        "size": [
+          0.35,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          8.5,
+          6.6,
+          0
+        ],
+        "size": [
+          2,
+          0.2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.5,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.8,
+          5,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.6,
+          5,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.2,
+          6.2,
+          0
+        ],
+        "size": [
+          3.4,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.4,
+          7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16,
+          7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.2,
+          7.8,
+          0
+        ],
+        "size": [
+          2.2,
+          0.22,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.5,
+          5.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          15.2,
+          4.9,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.2,
+          6.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "name": "Storm Pillar Bastion",
+    "zone": "Thunder Peaks",
+    "icon": "⛈️",
+    "difficulty": "Advanced",
+    "description": "Three rising lightning spires standing amidst howling gale winds. Chain your lightning strike to shatter multiple columns in one blow.",
+    "coinReward": 320,
+    "birds": [
+      "lightning",
+      "split",
+      "fire",
+      "heavy"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.2,
+          1.6,
+          0
+        ],
+        "size": [
+          3.8,
+          3.2,
+          5
+        ],
+        "type": "stone"
+      },
+      {
+        "pos": [
+          12.5,
+          2.5,
+          0
+        ],
+        "size": [
+          4.4,
+          5,
+          5
+        ],
+        "type": "stone"
+      },
+      {
+        "pos": [
+          17.5,
+          1.8,
+          0
+        ],
+        "size": [
+          3.8,
+          3.6,
+          5
+        ],
+        "type": "stone"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          6.4,
+          3.8,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          3.8,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          4.8,
+          0
+        ],
+        "size": [
+          2.2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.2,
+          5.5,
+          0
+        ],
+        "size": [
+          0.35,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.2,
+          5.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.8,
+          5.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          7.1,
+          0
+        ],
+        "size": [
+          3.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          11.8,
+          7.9,
+          0
+        ],
+        "size": [
+          0.35,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13.2,
+          7.9,
+          0
+        ],
+        "size": [
+          0.35,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          8.7,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          5.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          18.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.5,
+          5.2,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.2,
+          4.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          12.5,
+          6.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.5,
+          7.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          17.5,
+          4.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "name": "Electric Gorge",
+    "zone": "Thunder Peaks",
+    "icon": "⚡",
+    "difficulty": "Expert",
+    "description": "Deep mountain chasm spanned by suspended iron suspension girders. Target the structural load beams to trigger cascading collapses.",
+    "coinReward": 330,
+    "birds": [
+      "lightning",
+      "vortex",
+      "speed",
+      "split",
+      "red"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8,
+          1.7,
+          0
+        ],
+        "size": [
+          4.4,
+          3.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          15,
+          1.7,
+          0
+        ],
+        "size": [
+          5.6,
+          3.4,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          4,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.2,
+          4,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          5,
+          0
+        ],
+        "size": [
+          3,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8,
+          3.8,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.5,
+          4.6,
+          0
+        ],
+        "size": [
+          2.6,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          11.5,
+          5.4,
+          0
+        ],
+        "size": [
+          0.35,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15,
+          5.3,
+          0
+        ],
+        "size": [
+          4.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14,
+          6.2,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16,
+          6.2,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15,
+          7.2,
+          0
+        ],
+        "size": [
+          2.6,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          15,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8,
+          4.4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          11.5,
+          6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          14,
+          4.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          16,
+          4.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "Static Spire Outpost",
+    "zone": "Thunder Peaks",
+    "icon": "🗼",
+    "difficulty": "Expert",
+    "description": "Twin lightning accumulator towers designed to absorb aerial shockwaves. High altitude glass observatories require surgical precision.",
+    "coinReward": 340,
+    "birds": [
+      "heavy",
+      "lightning",
+      "fire",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          9,
+          2,
+          0
+        ],
+        "size": [
+          4.6,
+          4,
+          5
+        ],
+        "type": "stone"
+      },
+      {
+        "pos": [
+          15.5,
+          2,
+          0
+        ],
+        "size": [
+          4.6,
+          4,
+          5
+        ],
+        "type": "stone"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.8,
+          4.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.2,
+          4.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9,
+          6.1,
+          0
+        ],
+        "size": [
+          3,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.4,
+          7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.6,
+          7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          9,
+          7.9,
+          0
+        ],
+        "size": [
+          1.8,
+          0.2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          9,
+          4.5,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.3,
+          4.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.7,
+          4.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          6.1,
+          0
+        ],
+        "size": [
+          3,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.9,
+          7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.1,
+          7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          7.9,
+          0
+        ],
+        "size": [
+          1.8,
+          0.22,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          9,
+          5.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9,
+          7.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.5,
+          5.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.5,
+          7.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "Plasma Stronghold",
+    "zone": "Thunder Peaks",
+    "icon": "⚡",
+    "difficulty": "Zone Boss",
+    "description": "Zone 3 Apex Stronghold! The Plasma Warlord oversees the storm generators from inside a reinforced multi-tier blast shelter.",
+    "coinReward": 380,
+    "birds": [
+      "lightning",
+      "heavy",
+      "fire",
+      "vortex",
+      "split"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.5,
+          1.6,
+          0
+        ],
+        "size": [
+          4,
+          3.2,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          13,
+          1.8,
+          0
+        ],
+        "size": [
+          5.8,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18.2,
+          1.6,
+          0
+        ],
+        "size": [
+          3.8,
+          3.2,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          6.5,
+          3.8,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          3.8,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.5,
+          4.8,
+          0
+        ],
+        "size": [
+          2.6,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          7.5,
+          3.7,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.2,
+          4.4,
+          0
+        ],
+        "size": [
+          0.42,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.8,
+          4.4,
+          0
+        ],
+        "size": [
+          0.42,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13,
+          4,
+          0
+        ],
+        "size": [
+          0.4,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13,
+          5.6,
+          0
+        ],
+        "size": [
+          4.2,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.8,
+          6.7,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.2,
+          6.7,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13,
+          7.8,
+          0
+        ],
+        "size": [
+          3.2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13,
+          8.5,
+          0
+        ],
+        "size": [
+          1.8,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          11.8,
+          3.9,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          14.2,
+          3.9,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          17.3,
+          3.8,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          19.1,
+          3.8,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          4.8,
+          0
+        ],
+        "size": [
+          2.4,
+          0.22,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.5,
+          4.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18.2,
+          4.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          12,
+          4.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          14,
+          4.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13,
+          6.9,
+          0
+        ],
+        "radius": 0.58,
+        "isBoss": true,
+        "birdType": "boss"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "name": "Bunker of Thunder",
+    "zone": "Storm Bastion",
+    "icon": "🛡️",
+    "difficulty": "Master",
+    "description": "Enter the Storm Bastion! Deep underground blast doors sealed with heavy tungsten armor plates. High pierce attacks required.",
+    "coinReward": 350,
+    "birds": [
+      "lightning",
+      "vortex",
+      "heavy",
+      "fire",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          11,
+          1.6,
+          0
+        ],
+        "size": [
+          8.8,
+          3.2,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.8,
+          3.8,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.8,
+          3.8,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.2,
+          3.8,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.2,
+          3.8,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11,
+          4.9,
+          0
+        ],
+        "size": [
+          7.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.8,
+          5.8,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          10.8,
+          5.8,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.2,
+          5.8,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11,
+          6.8,
+          0
+        ],
+        "size": [
+          5.4,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          11,
+          7.6,
+          0
+        ],
+        "size": [
+          2.4,
+          0.2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.8,
+          3.6,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          13.2,
+          3.6,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.8,
+          4.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          11,
+          3.9,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.2,
+          4.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.8,
+          6.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12,
+          6.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "name": "Obsidian Rampart",
+    "zone": "Storm Bastion",
+    "icon": "⛰️",
+    "difficulty": "Master",
+    "description": "Stepped volcanic terraces carved out of black volcanic glass. Detonate the central explosive depot to bring the cliffs down.",
+    "coinReward": 360,
+    "birds": [
+      "heavy",
+      "lightning",
+      "split",
+      "fire",
+      "red"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.5,
+          1.5,
+          0
+        ],
+        "size": [
+          4,
+          3,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.2,
+          2.6,
+          0
+        ],
+        "size": [
+          4.4,
+          5.2,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          17,
+          3.8,
+          0
+        ],
+        "size": [
+          4,
+          7.6,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          6.6,
+          3.6,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.4,
+          3.6,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.5,
+          4.6,
+          0
+        ],
+        "size": [
+          2.4,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11,
+          5.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.4,
+          5.8,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.2,
+          6.9,
+          0
+        ],
+        "size": [
+          3,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.2,
+          5.6,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16,
+          8.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          18,
+          8.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17,
+          9.2,
+          0
+        ],
+        "size": [
+          2.6,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          17,
+          8,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.5,
+          4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          12.2,
+          6.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.2,
+          7.4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          17,
+          8.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          17,
+          9.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "name": "Twin Storm Towers",
+    "zone": "Storm Bastion",
+    "icon": "🏰",
+    "difficulty": "Master",
+    "description": "Two towering spires facing off across an electric void. Strike the suspension arch or unleash a gravitational vortex.",
+    "coinReward": 370,
+    "birds": [
+      "lightning",
+      "split",
+      "heavy",
+      "vortex",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          1.8,
+          0
+        ],
+        "size": [
+          4.8,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          15.5,
+          1.8,
+          0
+        ],
+        "size": [
+          4.8,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          5.3,
+          0
+        ],
+        "size": [
+          3.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.8,
+          6.4,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.2,
+          6.4,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          8.5,
+          7.5,
+          0
+        ],
+        "size": [
+          2,
+          0.2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.5,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          5.3,
+          0
+        ],
+        "size": [
+          3.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.8,
+          6.4,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.2,
+          6.4,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          7.5,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          15.5,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.5,
+          4.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          8.5,
+          6.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.5,
+          4.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.5,
+          6.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          12,
+          5.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "name": "Titan Barricade",
+    "zone": "Storm Bastion",
+    "icon": "🌋",
+    "difficulty": "Nightmare",
+    "description": "Multi-layered volcanic fortress with heavy steel barricades. The fortress is loaded with unstable explosive ordinance.",
+    "coinReward": 390,
+    "birds": [
+      "lightning",
+      "fire",
+      "vortex",
+      "heavy",
+      "split"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          12.5,
+          1.8,
+          0
+        ],
+        "size": [
+          9.6,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          4.2,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11,
+          4.2,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14,
+          4.2,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.5,
+          4.2,
+          0
+        ],
+        "size": [
+          0.45,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          5.3,
+          0
+        ],
+        "size": [
+          8.8,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.8,
+          6.5,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          6.5,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.2,
+          6.5,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          7.8,
+          0
+        ],
+        "size": [
+          6.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          9.8,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          15.2,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          9.8,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          12.5,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.2,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          11,
+          6.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          14,
+          6.8,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          12.5,
+          8.4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "name": "Colossus of Sparks",
+    "zone": "Storm Bastion",
+    "icon": "👑",
+    "difficulty": "Zone Boss",
+    "description": "Major Milestone Boss Battle! The Grand Spark Colossus commands the inner sanctum. Shatter the core generator to claim the realm.",
+    "coinReward": 420,
+    "birds": [
+      "lightning",
+      "vortex",
+      "fire",
+      "heavy",
+      "split",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.5,
+          1.8,
+          0
+        ],
+        "size": [
+          4.4,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          13.2,
+          2,
+          0
+        ],
+        "size": [
+          6.4,
+          4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18.5,
+          1.8,
+          0
+        ],
+        "size": [
+          4.2,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.4,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.6,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.5,
+          5.3,
+          0
+        ],
+        "size": [
+          2.8,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          7.5,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.4,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.2,
+          6,
+          0
+        ],
+        "size": [
+          5.2,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.8,
+          7.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.6,
+          7.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13.2,
+          8.4,
+          0
+        ],
+        "size": [
+          3.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.2,
+          9.2,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          11.8,
+          4.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          14.6,
+          4.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.4,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.6,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.5,
+          5.3,
+          0
+        ],
+        "size": [
+          2.8,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          18.5,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.5,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18.5,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          11.8,
+          5.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          14.6,
+          5.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.2,
+          5.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.2,
+          7.4,
+          0
+        ],
+        "radius": 0.58,
+        "isBoss": true,
+        "birdType": "boss"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "name": "Quantum Overlook",
+    "zone": "Cyber Apex",
+    "icon": "🌌",
+    "difficulty": "Nightmare",
+    "description": "Welcome to the Cyber Apex! Floating crystal terraces high in the celestial stratosphere. Anti-gravity grid shields require high impulse power.",
+    "coinReward": 430,
+    "birds": [
+      "speed",
+      "lightning",
+      "split",
+      "heavy",
+      "fire"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          2.4,
+          0
+        ],
+        "size": [
+          4.4,
+          4.8,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          15.2,
+          3,
+          0
+        ],
+        "size": [
+          4.8,
+          6,
+          5
+        ],
+        "type": "crystal"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          5.4,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.8,
+          5.4,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          8.5,
+          6.5,
+          0
+        ],
+        "size": [
+          3.2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.5,
+          7.3,
+          0
+        ],
+        "size": [
+          0.35,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13.8,
+          6.6,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.6,
+          6.6,
+          0
+        ],
+        "size": [
+          0.4,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.2,
+          7.8,
+          0
+        ],
+        "size": [
+          3.4,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.5,
+          8.7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.9,
+          8.7,
+          0
+        ],
+        "size": [
+          0.35,
+          1.6,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.2,
+          9.6,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          15.2,
+          6.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.5,
+          5.9,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          8.5,
+          7.9,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.2,
+          7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.2,
+          8.9,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "name": "Nebula Core Redoubt",
+    "zone": "Cyber Apex",
+    "icon": "🪐",
+    "difficulty": "Nightmare",
+    "description": "Concentric defensive barriers guarding the orbital power core. Use the Vortex or Thunderbolt to break through multiple rings.",
+    "coinReward": 440,
+    "birds": [
+      "vortex",
+      "lightning",
+      "fire",
+      "heavy",
+      "split"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.2,
+          1.8,
+          0
+        ],
+        "size": [
+          3.8,
+          3.6,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          12.8,
+          2.2,
+          0
+        ],
+        "size": [
+          5.6,
+          4.4,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          18,
+          1.8,
+          0
+        ],
+        "size": [
+          3.8,
+          3.6,
+          5
+        ],
+        "type": "crystal"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          6.4,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          5.2,
+          0
+        ],
+        "size": [
+          2.2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11,
+          5,
+          0
+        ],
+        "size": [
+          0.45,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.6,
+          5,
+          0
+        ],
+        "size": [
+          0.45,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          6.2,
+          0
+        ],
+        "size": [
+          4.4,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          11.8,
+          7.2,
+          0
+        ],
+        "size": [
+          0.38,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13.8,
+          7.2,
+          0
+        ],
+        "size": [
+          0.38,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          8.2,
+          0
+        ],
+        "size": [
+          2.8,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.8,
+          4.7,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          17.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          18.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18,
+          5.2,
+          0
+        ],
+        "size": [
+          2.2,
+          0.22,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.2,
+          4.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18,
+          4.6,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          11.8,
+          5.4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          13.8,
+          5.4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          12.8,
+          7.4,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "name": "Astral Vault",
+    "zone": "Cyber Apex",
+    "icon": "💎",
+    "difficulty": "Grand Master",
+    "description": "Deep celestial treasury vaults surrounded by crystal spires. Hidden TNT deposits can spark an all-encompassing chain reaction.",
+    "coinReward": 460,
+    "birds": [
+      "lightning",
+      "vortex",
+      "heavy",
+      "fire",
+      "speed",
+      "split"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          2,
+          0
+        ],
+        "size": [
+          4.8,
+          4,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          15.5,
+          2,
+          0
+        ],
+        "size": [
+          4.8,
+          4,
+          5
+        ],
+        "type": "crystal"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.8,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          5.8,
+          0
+        ],
+        "size": [
+          3.4,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          7.8,
+          6.8,
+          0
+        ],
+        "size": [
+          0.38,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          9.2,
+          6.8,
+          0
+        ],
+        "size": [
+          0.38,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          7.8,
+          0
+        ],
+        "size": [
+          2.2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.5,
+          4.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.2,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.8,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          5.8,
+          0
+        ],
+        "size": [
+          3.4,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.8,
+          6.8,
+          0
+        ],
+        "size": [
+          0.38,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.2,
+          6.8,
+          0
+        ],
+        "size": [
+          0.38,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          7.8,
+          0
+        ],
+        "size": [
+          2.2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          15.5,
+          4.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.5,
+          5,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          8.5,
+          7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.5,
+          5,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.5,
+          7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          12,
+          6.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "name": "Sky Empress Bastion",
+    "zone": "Cyber Apex",
+    "icon": "⚡",
+    "difficulty": "Grand Master",
+    "description": "The Penultimate Challenge before the Apex! Three floating fortresses interconnected with high-voltage superconductor bridges.",
+    "coinReward": 480,
+    "birds": [
+      "lightning",
+      "vortex",
+      "heavy",
+      "fire",
+      "split",
+      "speed",
+      "red"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.5,
+          2,
+          0
+        ],
+        "size": [
+          4,
+          4,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          12.8,
+          3.2,
+          0
+        ],
+        "size": [
+          5,
+          6.4,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          18,
+          2,
+          0
+        ],
+        "size": [
+          4,
+          4,
+          5
+        ],
+        "type": "crystal"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.5,
+          4.6,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          4.6,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.5,
+          5.7,
+          0
+        ],
+        "size": [
+          2.6,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          7.5,
+          4.4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.2,
+          6.9,
+          0
+        ],
+        "size": [
+          0.42,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.4,
+          6.9,
+          0
+        ],
+        "size": [
+          0.42,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          8.1,
+          0
+        ],
+        "size": [
+          4,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          12,
+          9.2,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13.6,
+          9.2,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          10.3,
+          0
+        ],
+        "size": [
+          2.4,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.8,
+          6.7,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          17,
+          4.6,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          19,
+          4.6,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18,
+          5.7,
+          0
+        ],
+        "size": [
+          2.6,
+          0.24,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.5,
+          5,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18,
+          5,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          11.8,
+          7.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          13.8,
+          7.3,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          12.8,
+          9.5,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "name": "Supreme Grand Apex",
+    "zone": "Cyber Apex",
+    "icon": "👑",
+    "difficulty": "Ultimate Finale",
+    "description": "The Supreme Campaign Grand Finale! Defeat the Cyber Emperor in his monumental royal palace citadel. All 7 Hero Birds stand ready for victory!",
+    "coinReward": 500,
+    "birds": [
+      "lightning",
+      "vortex",
+      "fire",
+      "heavy",
+      "split",
+      "speed",
+      "red"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7,
+          1.8,
+          0
+        ],
+        "size": [
+          4.2,
+          3.6,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          13,
+          2,
+          0
+        ],
+        "size": [
+          6.8,
+          4,
+          5
+        ],
+        "type": "crystal"
+      },
+      {
+        "pos": [
+          19,
+          1.8,
+          0
+        ],
+        "size": [
+          4.2,
+          3.6,
+          5
+        ],
+        "type": "crystal"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          5.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7,
+          5.3,
+          0
+        ],
+        "size": [
+          3.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          6.4,
+          6.4,
+          0
+        ],
+        "size": [
+          0.35,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          7.6,
+          6.4,
+          0
+        ],
+        "size": [
+          0.35,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7,
+          7.4,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          7,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.6,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.4,
+          4.6,
+          0
+        ],
+        "size": [
+          0.45,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13,
+          6,
+          0
+        ],
+        "size": [
+          5.6,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.6,
+          7.4,
+          0
+        ],
+        "size": [
+          0.42,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.4,
+          7.4,
+          0
+        ],
+        "size": [
+          0.42,
+          2.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13,
+          8.7,
+          0
+        ],
+        "size": [
+          3.8,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          12.2,
+          9.8,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          13.8,
+          9.8,
+          0
+        ],
+        "size": [
+          0.38,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13,
+          10.9,
+          0
+        ],
+        "size": [
+          2.6,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          11.6,
+          4.3,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          14.4,
+          4.3,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.8,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          20.2,
+          4.2,
+          0
+        ],
+        "size": [
+          0.4,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19,
+          5.3,
+          0
+        ],
+        "size": [
+          3.2,
+          0.25,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          18.4,
+          6.4,
+          0
+        ],
+        "size": [
+          0.35,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          19.6,
+          6.4,
+          0
+        ],
+        "size": [
+          0.35,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19,
+          7.4,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          19,
+          4,
+          0
+        ],
+        "size": [
+          0.7,
+          0.7,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7,
+          6.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          19,
+          4.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          19,
+          6.7,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.6,
+          5.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          14.4,
+          5.2,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13,
+          7.6,
+          0
+        ],
+        "radius": 0.62,
+        "isBoss": true,
+        "birdType": "boss"
+      },
+      {
+        "pos": [
+          13,
+          10,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
       }
     ]
   }

@@ -483,6 +483,91 @@ function createVortexAccents(radius, scale) {
 }
 
 /**
+ * Creates sculpted high-voltage lightning bolt crest & electric arc fins for 'lightning' (Volt Striker).
+ */
+function createLightningAccents(radius, scale) {
+  const group = new THREE.Group();
+
+  const boltMat = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    emissive: 0x00f0ff,
+    emissiveIntensity: 0.85,
+    roughness: 0.12,
+    metalness: 0.65
+  });
+
+  const sparkMat = new THREE.MeshBasicMaterial({
+    color: 0xfef08a,
+    transparent: true,
+    opacity: 0.85
+  });
+
+  // Top sculpted 3D lightning bolt crest
+  const boltShape = new THREE.Shape();
+  const s = scale * 0.45;
+  boltShape.moveTo(0, 0.8 * s);
+  boltShape.lineTo(0.35 * s, 0.1 * s);
+  boltShape.lineTo(0.08 * s, 0.1 * s);
+  boltShape.lineTo(0.4 * s, -0.7 * s);
+  boltShape.lineTo(-0.15 * s, -0.05 * s);
+  boltShape.lineTo(0.08 * s, -0.05 * s);
+  boltShape.closePath();
+
+  const boltGeo = new THREE.ExtrudeGeometry(boltShape, {
+    depth: 0.05 * scale,
+    bevelEnabled: true,
+    bevelThickness: 0.015 * scale,
+    bevelSize: 0.012 * scale,
+    bevelSegments: 2
+  });
+  boltGeo.center();
+
+  const topBolt = new THREE.Mesh(boltGeo, boltMat);
+  topBolt.position.set(0, radius * 0.94, 0);
+  topBolt.rotation.set(0.1, 0, 0.1);
+  group.add(topBolt);
+
+  // High-voltage twin angular arc fins on flanks
+  [-1, 1].forEach((dir) => {
+    const finShape = new THREE.Shape();
+    finShape.moveTo(0, 0);
+    finShape.lineTo(dir * 0.38 * scale, 0.22 * scale);
+    finShape.lineTo(dir * 0.24 * scale, 0);
+    finShape.lineTo(dir * 0.44 * scale, -0.22 * scale);
+    finShape.lineTo(0, -0.08 * scale);
+    finShape.closePath();
+
+    const finGeo = new THREE.ExtrudeGeometry(finShape, {
+      depth: 0.02 * scale,
+      bevelEnabled: false
+    });
+    const finMesh = new THREE.Mesh(finGeo, boltMat);
+    finMesh.position.set(dir * radius * 0.72, -0.05 * scale, 0);
+    group.add(finMesh);
+
+    // Glowing spark node
+    const spark = new THREE.Mesh(new THREE.SphereGeometry(0.055 * scale, 8, 8), sparkMat);
+    spark.position.set(dir * (radius + 0.08 * scale), 0.12 * scale, 0);
+    group.add(spark);
+  });
+
+  // Ionized electric plasma halo ring
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0x00f0ff,
+    transparent: true,
+    opacity: 0.65
+  });
+  const haloRing = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.9, 0.016 * scale, 8, 36),
+    ringMat
+  );
+  haloRing.rotation.set(0.7, 0.6, 0.2);
+  group.add(haloRing);
+
+  return group;
+}
+
+/**
  * Creates a full 3D Bird model accurately sculpted to match the custom character system:
  * - 'red' (Commander Falcon): Winged Blue Dili-Bird with 3D swept wings & aero stability orb
  * - 'speed' (Speedster Swift): Electric Blue 3D Glass Energy Orb with aerodynamic twin fins & sonic filaments
@@ -557,6 +642,16 @@ export function createBirdMesh(type = 'red') {
       orbEmissive: 0x3730a3,
       orbOpacity: 0.44,
       ringColor: 0xc7d2fe
+    },
+    lightning: {
+      radius: 0.48,
+      bodyColor: 0x0284c7,
+      metalness: 0.35,
+      roughness: 0.15,
+      orbColor: 0x06b6d4,
+      orbEmissive: 0x00e5ff,
+      orbOpacity: 0.46,
+      ringColor: 0xa5f3fc
     }
   };
 
@@ -633,6 +728,10 @@ export function createBirdMesh(type = 'red') {
     // Dual-axis gyroscopic anti-gravity rings
     const vortexAccents = createVortexAccents(radius, scale);
     group.add(vortexAccents);
+  } else if (type === 'lightning') {
+    // Sculpted lightning bolt crest + arc fins & plasma halo
+    const lightningAccents = createLightningAccents(radius, scale);
+    group.add(lightningAccents);
   }
 
   group.userData = { radius, type };

@@ -41,10 +41,27 @@ export const LEVEL_NODES = [
   { id: 17, x: 3110, y: 310, zoneId: 2, zone: 'Crown Summit',   name: 'Stormkeep Citadel' },
   { id: 18, x: 3280, y: 160, zoneId: 2, zone: 'Crown Summit',   name: 'Dragon Spine Rampart' },
   { id: 19, x: 3440, y: 300, zoneId: 2, zone: 'Crown Summit',   name: 'Infernal Vaults' },
-  { id: 20, x: 3580, y: 150, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Summit Apex', milestone: 'crown' }
+  { id: 20, x: 3580, y: 150, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Summit Apex', milestone: 'crown' },
+
+  // Zone 3: Thunder Peaks & Cyber Apex (Levels 21–35)
+  { id: 21, x: 3770, y: 290, zoneId: 3, zone: 'Thunder Peaks',  name: 'Thunderfall Gate' },
+  { id: 22, x: 3950, y: 150, zoneId: 3, zone: 'Thunder Peaks',  name: 'Storm Pillar Bastion' },
+  { id: 23, x: 4130, y: 310, zoneId: 3, zone: 'Thunder Peaks',  name: 'Electric Gorge' },
+  { id: 24, x: 4310, y: 150, zoneId: 3, zone: 'Thunder Peaks',  name: 'Static Spire Outpost' },
+  { id: 25, x: 4490, y: 290, zoneId: 3, zone: 'Thunder Peaks',  name: 'Plasma Stronghold', milestone: 'sunburst' },
+  { id: 26, x: 4680, y: 140, zoneId: 3, zone: 'Storm Bastion',  name: 'Bunker of Thunder' },
+  { id: 27, x: 4860, y: 310, zoneId: 3, zone: 'Storm Bastion',  name: 'Obsidian Rampart' },
+  { id: 28, x: 5040, y: 160, zoneId: 3, zone: 'Storm Bastion',  name: 'Twin Storm Towers' },
+  { id: 29, x: 5220, y: 310, zoneId: 3, zone: 'Storm Bastion',  name: 'Titan Barricade' },
+  { id: 30, x: 5410, y: 160, zoneId: 3, zone: 'Storm Bastion',  name: 'Colossus of Sparks', milestone: 'airship' },
+  { id: 31, x: 5610, y: 300, zoneId: 3, zone: 'Cyber Apex',     name: 'Quantum Overlook' },
+  { id: 32, x: 5790, y: 150, zoneId: 3, zone: 'Cyber Apex',     name: 'Nebula Core Redoubt' },
+  { id: 33, x: 5970, y: 310, zoneId: 3, zone: 'Cyber Apex',     name: 'Astral Vault' },
+  { id: 34, x: 6150, y: 150, zoneId: 3, zone: 'Cyber Apex',     name: 'Sky Empress Bastion' },
+  { id: 35, x: 6330, y: 290, zoneId: 3, zone: 'Cyber Apex',     name: 'Supreme Grand Apex', milestone: 'crown' }
 ];
 
-export const MAP_TOTAL_WIDTH = 3800;
+export const MAP_TOTAL_WIDTH = 6600;
 export const MAP_TOTAL_HEIGHT = 460;
 
 /**
@@ -103,13 +120,14 @@ export class LevelSelect {
     this.viewportEl = document.getElementById('roadmap-viewport');
 
     const unlocked = this.storage.getUnlockedLevel();
-    this.activeLevelId = Math.min(20, Math.max(1, unlocked));
+    this.activeLevelId = Math.min(35, Math.max(1, unlocked));
     this.focusedLevelId = this.activeLevelId;
     this.lastPreviewedLevelId = null;
-    this.currentZoneId = unlocked > 10 ? 2 : 1;
+    this.currentZoneId = unlocked > 20 ? 3 : unlocked > 10 ? 2 : 1;
 
     this.isInputLocked = false;
     this.pendingZone2Unlock = false;
+    this.pendingZone3Unlock = false;
     this.pendingLevelUnlock = null;
 
     // Drag / Pan interaction state
@@ -164,7 +182,7 @@ export class LevelSelect {
    */
   getMaxVisibleLevel() {
     const unlocked = this.storage ? Number(this.storage.getUnlockedLevel()) || 1 : 1;
-    return Math.min(20, Math.max(8, unlocked + 5));
+    return Math.min(35, Math.max(8, unlocked + 5));
   }
 
   /**
@@ -173,7 +191,7 @@ export class LevelSelect {
    */
   getAllowedWorldWidth() {
     const maxVisibleLevel = this.getMaxVisibleLevel();
-    if (maxVisibleLevel >= 20) {
+    if (maxVisibleLevel >= 35) {
       return MAP_TOTAL_WIDTH;
     }
     const maxNode = LEVEL_NODES.find((n) => n.id === maxVisibleLevel);
@@ -611,23 +629,27 @@ export class LevelSelect {
         <use href="#decoBgCloud" x="1650" y="30" transform="scale(0.8)" />
         <use href="#decoBgCloud" x="2400" y="40" transform="scale(0.9)" />
         <use href="#decoBgCloud" x="3150" y="35" transform="scale(0.85)" />
+        <use href="#decoBgCloud" x="3900" y="40" transform="scale(0.9)" />
+        <use href="#decoBgCloud" x="4650" y="30" transform="scale(0.85)" />
+        <use href="#decoBgCloud" x="5400" y="45" transform="scale(0.95)" />
+        <use href="#decoBgCloud" x="6150" y="35" transform="scale(0.85)" />
 
-        <!-- 2. LAYERED MOUNTAIN RIDGES (SMOOTH ORGANIC CURVES - NO JAGGED POLYGONS) -->
+        <!-- 2. LAYERED MOUNTAIN RIDGES (SMOOTH ORGANIC CURVES ACROSS 6600PX) -->
         <!-- Layer 1: Far Mountain Silhouettes -->
         <path
-          d="M 0 240 C 250 140, 500 130, 750 230 C 1000 150, 1250 140, 1500 220 C 1750 160, 2000 150, 2250 210 C 2500 140, 2750 150, 3000 210 C 3300 140, 3550 150, 3800 230 L 3800 460 L 0 460 Z"
+          d="M 0 240 C 250 140, 500 130, 750 230 C 1000 150, 1250 140, 1500 220 C 1750 160, 2000 150, 2250 210 C 2500 140, 2750 150, 3000 210 C 3300 140, 3550 150, 3800 230 C 4100 140, 4400 150, 4700 220 C 5000 140, 5300 150, 5600 210 C 5900 140, 6200 150, 6600 230 L 6600 460 L 0 460 Z"
           fill="url(#farMountainGrad)"
           opacity="0.38"
         />
 
         <!-- Layer 2: Mid-Distance Mountain Ridge -->
         <path
-          d="M 0 270 C 200 180, 400 170, 650 260 C 900 190, 1150 180, 1400 250 C 1650 190, 1900 190, 2150 240 C 2400 180, 2650 170, 2900 230 C 3200 170, 3500 180, 3800 250 L 3800 460 L 0 460 Z"
+          d="M 0 270 C 200 180, 400 170, 650 260 C 900 190, 1150 180, 1400 250 C 1650 190, 1900 190, 2150 240 C 2400 180, 2650 170, 2900 230 C 3200 170, 3500 180, 3800 250 C 4100 180, 4400 170, 4700 240 C 5000 180, 5300 170, 5600 230 C 5900 170, 6200 180, 6600 250 L 6600 460 L 0 460 Z"
           fill="url(#midMountainGrad)"
           opacity="0.5"
         />
 
-        <!-- 3. CONTINUOUS ROLLING MEADOW HILLS (HARMONIOUS BIO-TRANSITION ACROSS 3800PX) -->
+        <!-- 3. CONTINUOUS ROLLING MEADOW HILLS (HARMONIOUS BIO-TRANSITION ACROSS 6600PX) -->
 
         <!-- Zone 1 Far Rolling Hills (x: 0 to 1950) -->
         <path
@@ -658,6 +680,21 @@ export class LevelSelect {
           opacity="0.5"
         />
 
+        <!-- Zone 3 Far Thunder & Cyber Hills (x: 3750 to 6640) -->
+        <path
+          d="M 3750 310 C 3950 170, 4150 180, 4350 290 C 4550 170, 4750 180, 4950 290 C 5150 170, 5350 180, 5550 290 C 5750 170, 5950 180, 6150 290 C 6350 170, 6500 180, 6640 280 L 6640 460 L 3750 460 Z"
+          fill="url(#celestialHillGradFar)"
+        />
+        <!-- Zone 3 Far Hill Crest Lightning Rim -->
+        <path
+          d="M 3750 310 C 3950 170, 4150 180, 4350 290 C 4550 170, 4750 180, 4950 290 C 5150 170, 5350 180, 5550 290 C 5750 170, 5950 180, 6150 290 C 6350 170, 6500 180, 6640 280"
+          fill="none"
+          stroke="#38bdf8"
+          stroke-width="4"
+          stroke-linecap="round"
+          opacity="0.55"
+        />
+
         <!-- Zone 1 Near Rolling Pastures (x: 0 to 2050) -->
         <path
           d="M -40 350 C 160 260, 340 250, 520 360 C 700 260, 890 250, 1080 360 C 1260 260, 1450 270, 1630 360 C 1810 270, 2000 260, 2190 360 L 2190 460 L -40 460 Z"
@@ -680,6 +717,20 @@ export class LevelSelect {
           d="M 2050 360 C 2240 260, 2430 270, 2620 360 C 2810 260, 3000 270, 3190 360 C 3380 260, 3560 270, 3840 340"
           fill="none"
           stroke="#e9d5ff"
+          stroke-width="4.5"
+          stroke-linecap="round"
+          opacity="0.6"
+        />
+
+        <!-- Zone 3 Near Thunder Highlands (x: 3750 to 6640) -->
+        <path
+          d="M 3750 360 C 3940 260, 4130 270, 4320 360 C 4510 260, 4700 270, 4890 360 C 5080 260, 5270 270, 5460 360 C 5650 260, 5840 270, 6030 360 C 6220 260, 6410 270, 6640 340 L 6640 460 L 3750 460 Z"
+          fill="url(#celestialHillGradNear)"
+        />
+        <path
+          d="M 3750 360 C 3940 260, 4130 270, 4320 360 C 4510 260, 4700 270, 4890 360 C 5080 260, 5270 270, 5460 360 C 5650 260, 5840 270, 6030 360 C 6220 260, 6410 270, 6640 340"
+          fill="none"
+          stroke="#67e8f9"
           stroke-width="4.5"
           stroke-linecap="round"
           opacity="0.6"
@@ -882,6 +933,45 @@ export class LevelSelect {
         </g>
 
         <!-- ═════════════════════════════════════════════════════════════
+             ZONE 3 SCENERY: THUNDER PEAKS & CYBER APEX PROPS
+             ═════════════════════════════════════════════════════════════ -->
+        <!-- Stage 21: High-Voltage Lightning Pylon & Spark Banner -->
+        <g transform="translate(3720, 100)">
+          <line x1="20" y1="120" x2="20" y2="20" stroke="#0284c7" stroke-width="4.5" stroke-linecap="round" />
+          <polygon points="10,20 20,4 30,20" fill="#38bdf8" />
+          <polygon points="12,45 20,25 28,45" fill="#facc15" filter="url(#lightBeaconGlow)" />
+          <image href="${subChar4Url}" x="4" y="60" width="32" height="32" class="actor-lookout" />
+        </g>
+
+        <!-- Stage 25: Plasma Obelisk Monument -->
+        <g transform="translate(4440, 90)">
+          <ellipse cx="25" cy="55" rx="28" ry="8" fill="#0c4a6e" opacity="0.4" />
+          <polygon points="15,50 25,10 35,50" fill="#06b6d4" stroke="#22d3ee" stroke-width="2" filter="url(#lightBeaconGlow)" />
+          <image href="${logoBlueUrl}" x="12" y="22" width="26" height="15" />
+        </g>
+
+        <!-- Stage 30: Colossus Storm Gateway -->
+        <g transform="translate(5350, 40)">
+          <rect x="10" y="40" width="80" height="65" rx="5" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" />
+          <polygon points="35,40 50,8 65,40" fill="#0284c7" stroke="#00f0ff" stroke-width="2" />
+          <image href="${char3Url}" x="28" y="24" width="44" height="44" class="actor-bob-slow" />
+        </g>
+
+        <!-- Stage 35: Supreme Cyber Grand Apex Palace -->
+        <g transform="translate(6250, 25)" opacity="0.98">
+          <rect x="15" y="55" width="120" height="75" rx="6" fill="#020617" stroke="#38bdf8" stroke-width="3" />
+          <rect x="0" y="28" width="34" height="102" rx="4" fill="#0f172a" stroke="#00f0ff" stroke-width="2" />
+          <rect x="116" y="28" width="34" height="102" rx="4" fill="#0f172a" stroke="#00f0ff" stroke-width="2" />
+          <polygon points="55,55 75,6 95,55" fill="#facc15" stroke="#eab308" stroke-width="2.5" filter="url(#lightBeaconGlow)" />
+          <image href="${logoWhiteUrl}" x="52" y="68" width="46" height="24" style="filter: drop-shadow(0 0 12px #38bdf8);" />
+          <!-- Golden Royal Crown atop Supreme Palace -->
+          <g transform="translate(52, -22)">
+            <polygon points="12,12 18,2 24,8 30,2 36,12" fill="#facc15" stroke="#ca8a04" stroke-width="2" filter="url(#roadGlowFilter)" />
+            <image href="${mascotCharUrl}" x="0" y="8" width="48" height="48" style="filter: drop-shadow(0 4px 16px rgba(56, 189, 248, 0.9));" />
+          </g>
+        </g>
+
+        <!-- ═════════════════════════════════════════════════════════════
              6. THE CONTINUOUS WAVY PATH (MULTI-LAYER RIBBON)
              ═════════════════════════════════════════════════════════════ -->
 
@@ -978,7 +1068,7 @@ export class LevelSelect {
           <div class="active-beacon-pulse" aria-hidden="true"></div>
 
           <div class="active-commander-mascot" id="commander-pin-${levelId}" title="Active Stage ${levelId}">
-            <div class="mascot-speech-cloud">Stage ${levelId}</div>
+            <div class="mascot-speech-cloud">Stage ${levelId}${starsEarned > 0 ? ` • ${starsEarned}★` : ''}</div>
             <img src="${mascotCharUrl}" alt="Dili Bird" class="mascot-bird-img" />
           </div>
 
@@ -1061,8 +1151,8 @@ export class LevelSelect {
     const avatarUrl = this.storage.getAvatarUrl();
 
     // Default activeLevelId to highest unlocked level if unset or beyond unlocked boundary
-    if (!this.activeLevelId || this.activeLevelId > Math.min(20, unlockedLevel)) {
-      this.activeLevelId = Math.min(20, Math.max(1, unlockedLevel));
+    if (!this.activeLevelId || this.activeLevelId > Math.min(35, unlockedLevel)) {
+      this.activeLevelId = Math.min(35, Math.max(1, unlockedLevel));
     }
 
     const html = `
@@ -1262,25 +1352,27 @@ export class LevelSelect {
     });
   }
 
-  async animateCloudRemoval() {
+  async animateCloudRemoval(zoneNum = 2) {
     this.lockInput();
-    this.centerOnLevel(10, true);
+    const prevLvl = zoneNum === 3 ? 20 : 10;
+    const nextLvl = zoneNum === 3 ? 21 : 11;
+    this.centerOnLevel(prevLvl, true);
 
     await new Promise((r) => setTimeout(r, 400));
 
-    this.storage.setZoneRevealed(2, true);
+    this.storage.setZoneRevealed(zoneNum, true);
     this.audio?.playLevelUnlock?.();
     this.render();
 
-    this.centerOnLevel(11, true);
+    this.centerOnLevel(nextLvl, true);
 
-    const level11Node = document.getElementById('node-level-11');
-    if (level11Node) {
-      level11Node.classList.add('node-unlocked-flare');
-      setTimeout(() => level11Node.classList.remove('node-unlocked-flare'), 1000);
+    const nextNode = document.getElementById(`node-level-${nextLvl}`);
+    if (nextNode) {
+      nextNode.classList.add('node-unlocked-flare');
+      setTimeout(() => nextNode.classList.remove('node-unlocked-flare'), 1000);
     }
 
-    await this.animatePlayerMarker(10, 11);
+    await this.animatePlayerMarker(prevLvl, nextLvl);
     this.unlockInput();
   }
 }

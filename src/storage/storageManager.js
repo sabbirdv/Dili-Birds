@@ -83,15 +83,39 @@ export class StorageManager {
           ? (parsed.bgmVolume < 0.90 ? 0.90 : Math.max(0, Math.min(1, parsed.bgmVolume)))
           : 0.90,
         bgmMode: ['dashboard', 'always', 'off'].includes(parsed.bgmMode) ? parsed.bgmMode : 'dashboard',
-        coins: Math.max(0, Number(parsed.coins) || 0),
-        levelStars: { ...(parsed.levelStars || {}) },
+        coins: (() => {
+          const rawCoins = Math.max(0, Number(parsed.coins) || 0);
+          // Upper sanity bound on legitimate coins possible across all 70 stages and rewards
+          const MAX_PLAUSIBLE_COINS = 150000;
+          if (rawCoins > MAX_PLAUSIBLE_COINS) {
+            console.warn('[StorageManager] Tampered coin value detected in localStorage (>150,000), clamping to legitimate maximum.');
+            return MAX_PLAUSIBLE_COINS;
+          }
+          return rawCoins;
+        })(),
+        levelStars: (() => {
+          const rawStars = parsed.levelStars && typeof parsed.levelStars === 'object' ? parsed.levelStars : {};
+          const cleanStars = {};
+          for (const [lvlKey, starVal] of Object.entries(rawStars)) {
+            const lvlNum = Number(lvlKey);
+            // Levels can only be 1 to 70, stars can only be 1 to 3
+            if (Number.isInteger(lvlNum) && lvlNum >= 1 && lvlNum <= 70) {
+              const stars = Math.max(0, Math.min(3, Math.floor(Number(starVal) || 0)));
+              if (stars > 0) {
+                cleanStars[lvlNum] = stars;
+              }
+            }
+          }
+          return cleanStars;
+        })(),
+        unlockedLevel: Math.max(1, Math.min(70, Number(parsed.unlockedLevel) || 1)),
         levelHighScores: { ...(parsed.levelHighScores || {}) },
         claimedCoinLevels: { ...(parsed.claimedCoinLevels || {}) },
         claimedMissions: { ...(parsed.claimedMissions || {}) },
         claimedCharacters: { ...(parsed.claimedCharacters || {}) },
         seenHeroUnlocks: (() => {
           const seen = { commander_falcon: true, ...(parsed.seenHeroUnlocks || {}) };
-          const unlockedLvl = Math.max(1, Number(parsed.unlockedLevel) || 1);
+          const unlockedLvl = Math.max(1, Math.min(70, Number(parsed.unlockedLevel) || 1));
           const milestones = [
             { id: 'commander_falcon', lvl: 1 },
             { id: 'speedster_swift', lvl: 3 },

@@ -635,19 +635,8 @@ export class DashboardModals {
     });
 
     try {
-      // 1. Sync current player's data to live Dili-Birds-Data table
-      const syncUsername = this.storage.getUsername() || 'Commander';
-      const syncRes = await leaderboardService.syncPlayerScore({
-        serverRowId: this.storage.getServerRowId(),
-        username: syncUsername,
-        score: currentCoins,
-        star: currentStars
-      });
-      if (syncRes?.success && syncRes.rowId && !this.storage.getServerRowId()) {
-        this.storage.setServerRowId(syncRes.rowId);
-      }
-
-      // 2. Fetch all live records from the server (STRICT: no demo or placeholder data)
+      // STRICT SECURITY: Never sync or update Supabase from localStorage!
+      // The leaderboard modal is strictly read-only and queries verified live server records.
       const res = await leaderboardService.fetchLiveLeaderboard();
 
       if (!res.success) {
@@ -659,7 +648,7 @@ export class DashboardModals {
 
         const errorDescEl = document.getElementById('leaderboard-error-desc');
         if (errorDescEl) {
-          if (res.isRlsBlocked || syncRes?.isRlsBlocked) {
+          if (res.isRlsBlocked) {
             errorDescEl.innerHTML = `Supabase Row-Level Security (RLS) is blocking data operations on table <code>Dili-Birds-Data</code>.<br><span style="font-size:0.85em;color:#94a3b8;">Please enable public read/write RLS policies in your Supabase SQL Editor.</span>`;
           } else {
             errorDescEl.textContent = res.error || ERROR_CONNECTION_FAILED;
@@ -759,12 +748,13 @@ export class DashboardModals {
         currentCoins
       );
 
-      // Find player's matching record from live server data to display exact matching score
+      // Find player's matching record from live server data to display exact matching score & stars
       const matchingPilot = res.data.find((pilot) => {
         return (serverRowId && String(pilot.id) === String(serverRowId)) ||
                (pilot.name && pilot.name.trim().toLowerCase() === currentUsername.trim().toLowerCase());
       });
       const exactScore = matchingPilot ? (Number(matchingPilot.score) || 0) : currentCoins;
+      const exactStars = matchingPilot ? (Number(matchingPilot.star !== undefined ? matchingPilot.star : matchingPilot.stars) || 0) : currentStars;
 
       if (rankInfo?.rank) {
         this.storage.setLeaderboardRank(rankInfo.rank);
@@ -778,9 +768,9 @@ export class DashboardModals {
         username: currentUsername,
         avatar: currentAvatar,
         level: currentLevel,
-        stars: currentStars,
+        stars: exactStars,
         score: exactScore,
-        coins: currentCoins,
+        coins: exactScore,
         isLive: true,
         isCalculating: false
       });

@@ -1026,24 +1026,26 @@ export class GameScene {
     this.scene.add(mesh);
 
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
+    // Softer, realistic block mass so bird momentum naturally displaces structures
     const massMap = {
-      glass: 1.8,
-      wood: 3.2,
-      coin: 2.0,
-      tnt: 2.2,
-      stone: 6.0,
-      metal: 8.0
+      glass: 1.4,
+      wood: 2.4,
+      coin: 1.6,
+      tnt: 1.8,
+      stone: 4.2,
+      metal: 5.6
     };
+    // Softer block durability for satisfying, classic Angry Birds-style destruction
     const hpMap = {
-      glass: 28,
-      coin: 30,
-      tnt: 22,
-      wood: 90,
-      stone: 145,
-      metal: 200,
+      glass: 18,
+      coin: 22,
+      tnt: 14,
+      wood: 54,
+      stone: 90,
+      metal: 125,
     };
 
-    const mass = isStatic ? 0 : (massMap[type] || 3.6);
+    const mass = isStatic ? 0 : (massMap[type] || 2.8);
 
     const body = new CANNON.Body({
       mass,
@@ -1066,8 +1068,8 @@ export class GameScene {
     body.sleep();
 
     const lvl = this.currentLevelId || 1;
-    const lvlScale = lvl > 30 ? Math.min(1.18, 1.0 + (lvl - 30) * 0.004) : 1.0;
-    const maxHp = Math.round((hpMap[type] || 80) * lvlScale);
+    const lvlScale = lvl > 30 ? Math.min(1.10, 1.0 + (lvl - 30) * 0.0025) : 1.0;
+    const maxHp = Math.round((hpMap[type] || 60) * lvlScale);
     const blockObj = {
       type,
       size,
@@ -1107,37 +1109,37 @@ export class GameScene {
           return;
         }
 
-        // Light graze or glancing collision (< 1.6 normal impact) deals zero damage
-        if (normalImpact < 1.5) {
+        // Light graze (< 1.2 normal impact) deals minimal bounce audio
+        if (normalImpact < 1.2) {
           this.audio?.playMaterialImpact(blockObj.type, 0.15);
           return;
         }
 
         blockObj.lastHitTime = now;
 
-        // Strategic material effectiveness matrix (calibrated to exact midpoint)
+        // Strategic material effectiveness matrix (enhanced for punchy, satisfying breaks)
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.8 : blockObj.type === 'wood' ? 1.4 : 0.75;
+          birdMultiplier = blockObj.type === 'glass' ? 3.2 : blockObj.type === 'wood' ? 1.6 : 0.85;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.3 : blockObj.type === 'metal' ? 2.1 : 1.6;
+          birdMultiplier = blockObj.type === 'stone' ? 2.6 : blockObj.type === 'metal' ? 2.4 : 1.9;
         } else if (birdType === 'red') {
-          birdMultiplier = blockObj.type === 'wood' ? 1.5 : 0.95;
+          birdMultiplier = blockObj.type === 'wood' ? 1.8 : 1.15;
         } else if (birdType === 'split') {
-          birdMultiplier = blockObj.type === 'glass' ? 1.7 : blockObj.type === 'wood' ? 1.3 : 0.85;
+          birdMultiplier = blockObj.type === 'glass' ? 2.0 : blockObj.type === 'wood' ? 1.5 : 1.0;
         } else if (birdType === 'fire') {
-          birdMultiplier = blockObj.type === 'wood' ? 2.5 : blockObj.type === 'glass' ? 1.9 : blockObj.type === 'tnt' ? 3.5 : 1.4;
+          birdMultiplier = blockObj.type === 'wood' ? 2.8 : blockObj.type === 'glass' ? 2.2 : blockObj.type === 'tnt' ? 4.0 : 1.6;
         } else if (birdType === 'vortex') {
-          birdMultiplier = blockObj.type === 'metal' ? 2.1 : blockObj.type === 'stone' ? 2.0 : 1.5;
+          birdMultiplier = blockObj.type === 'metal' ? 2.3 : blockObj.type === 'stone' ? 2.2 : 1.7;
         } else if (birdType === 'lightning') {
-          birdMultiplier = blockObj.type === 'metal' ? 1.5 : blockObj.type === 'stone' ? 1.3 : blockObj.type === 'glass' ? 1.2 : 1.2;
+          birdMultiplier = blockObj.type === 'metal' ? 1.7 : blockObj.type === 'stone' ? 1.5 : blockObj.type === 'glass' ? 1.4 : 1.3;
         } else if (birdType === 'chrono') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.25 : blockObj.type === 'metal' ? 2.15 : blockObj.type === 'glass' ? 1.98 : 1.62;
+          birdMultiplier = blockObj.type === 'stone' ? 2.4 : blockObj.type === 'metal' ? 2.3 : blockObj.type === 'glass' ? 2.1 : 1.75;
         }
 
-        // Damage derived from normal impact collision force (tuned for realistic yet beatable toughness)
-        const effectiveImpact = Math.max(0, normalImpact - 1.2);
-        const dmg = effectiveImpact * 2.5 * birdMultiplier;
+        // Damage derived from normal impact collision force (tuned softer so blocks shatter cleanly on solid hits)
+        const effectiveImpact = Math.max(0, normalImpact - 0.8);
+        const dmg = effectiveImpact * 3.2 * birdMultiplier;
 
         if (dmg > 1.0) {
           this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, dmg * 0.06));
@@ -1157,11 +1159,11 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 5.75) {
-        // High-velocity falls from elevated platforms or heavy crushing impacts (calibrated to exact midpoint)
+      } else if (normalImpact >= 3.8) {
+        // Falling structures, tumbling debris, and cascading collapses naturally crush blocks underneath
         blockObj.lastHitTime = now;
         this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 4.75) * 2.3;
+        const debrisDmg = (normalImpact - 2.8) * 3.0;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
@@ -1203,8 +1205,8 @@ export class GameScene {
     body.sleep();
 
     const lvl = this.currentLevelId || 1;
-    const targetLvlScale = lvl > 30 ? Math.min(1.18, 1.0 + (lvl - 30) * 0.005) : 1.0;
-    const baseHp = isBoss ? 42 : 22;
+    const targetLvlScale = lvl > 30 ? Math.min(1.10, 1.0 + (lvl - 30) * 0.003) : 1.0;
+    const baseHp = isBoss ? 35 : 18;
     const targetHp = Math.round(baseHp * targetLvlScale);
 
     const targetObj = {
@@ -1230,19 +1232,19 @@ export class GameScene {
       }
 
       if (isBirdHit) {
-        if (normalImpact < 1.6) return;
+        if (normalImpact < 1.4) return;
         targetObj.lastHitTime = now;
-        const dmg = (normalImpact - 1.2) * 2.8;
+        const dmg = (normalImpact - 0.9) * 3.4;
         if (dmg > 1.0) {
           targetObj.hp -= dmg;
           if (targetObj.hp <= 0) {
             this.defeatTarget(targetObj);
           }
         }
-      } else if (normalImpact >= 3.6) {
-        // Crushed by heavy falling debris or falling from elevated cliff onto the ground (midpoint)
+      } else if (normalImpact >= 2.8) {
+        // Crushed by falling debris, collapsing roofs, or high drops
         targetObj.lastHitTime = now;
-        const fallDmg = (normalImpact - 2.4) * 3.3;
+        const fallDmg = (normalImpact - 1.8) * 3.6;
         targetObj.hp -= fallDmg;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
@@ -1466,7 +1468,7 @@ export class GameScene {
     this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.6);
     this.wakeStructuresNear(origin, 6.5);
 
-    const blastRadius = 3.8;
+    const blastRadius = 4.2;
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
       const bPos = b.body.position;
@@ -1477,12 +1479,12 @@ export class GameScene {
           this.destroyBlock(b);
         } else {
           const falloff = 1 - dist / blastRadius;
-          const dmg = falloff * (b.type === 'wood' ? 65 : b.type === 'glass' ? 50 : 35);
+          const dmg = falloff * (b.type === 'wood' ? 75 : b.type === 'glass' ? 60 : 45);
           b.hp -= dmg;
           const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
           if (impulseDir.length() > 0.01) {
             impulseDir.normalize();
-            b.body.applyImpulse(impulseDir.scale(falloff * 14), bPos);
+            b.body.applyImpulse(impulseDir.scale(falloff * 15), bPos);
           }
           if (b.hp <= 0) {
             this.destroyBlock(b);
@@ -1498,11 +1500,11 @@ export class GameScene {
       if (dist < blastRadius) {
         t.body.wakeUp();
         const falloff = 1 - dist / blastRadius;
-        t.hp -= falloff * 30;
+        t.hp -= falloff * 35;
         const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
         if (impulseDir.length() > 0.01) {
           impulseDir.normalize();
-          t.body.applyImpulse(impulseDir.scale(falloff * 12), tPos);
+          t.body.applyImpulse(impulseDir.scale(falloff * 14), tPos);
         }
         if (t.hp <= 0) {
           this.defeatTarget(t);
@@ -1517,7 +1519,7 @@ export class GameScene {
     this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.75);
     this.wakeStructuresNear(origin, 7.0);
 
-    const shockwaveRadius = 5.8;
+    const shockwaveRadius = 6.2;
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
       const bPos = b.body.position;
@@ -1526,8 +1528,8 @@ export class GameScene {
         b.body.wakeUp();
         const falloff = 1 - dist / shockwaveRadius;
         const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0).unit();
-        b.body.applyImpulse(impulseDir.scale(falloff * 24), bPos);
-        b.hp -= falloff * 25;
+        b.body.applyImpulse(impulseDir.scale(falloff * 25), bPos);
+        b.hp -= falloff * 32;
         if (b.hp <= 0) {
           this.destroyBlock(b);
         }
@@ -1542,8 +1544,8 @@ export class GameScene {
         t.body.wakeUp();
         const falloff = 1 - dist / shockwaveRadius;
         const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0).unit();
-        t.body.applyImpulse(impulseDir.scale(falloff * 20), tPos);
-        t.hp -= falloff * 20;
+        t.body.applyImpulse(impulseDir.scale(falloff * 22), tPos);
+        t.hp -= falloff * 25;
         if (t.hp <= 0) {
           this.defeatTarget(t);
         }
@@ -1582,11 +1584,11 @@ export class GameScene {
 
     // High velocity forward boost for penetrating strike
     if (this.activeBird && this.activeBird.body) {
-      this.activeBird.body.velocity.x *= 1.08;
-      this.activeBird.body.velocity.y *= 0.7;
+      this.activeBird.body.velocity.x *= 1.12;
+      this.activeBird.body.velocity.y *= 0.75;
     }
 
-    const lightningRadius = 3.35;
+    const lightningRadius = 3.8;
     // Zap nearby destructible blocks
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1599,12 +1601,12 @@ export class GameScene {
         } else {
           const falloff = 1 - dist / lightningRadius;
           // High voltage conductively destroys metal, stone, glass
-          const dmg = falloff * (b.type === 'metal' ? 43 : b.type === 'stone' ? 33 : b.type === 'glass' ? 38 : 25);
+          const dmg = falloff * (b.type === 'metal' ? 52 : b.type === 'stone' ? 42 : b.type === 'glass' ? 46 : 32);
           b.hp -= dmg;
           const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
           if (impulseDir.length() > 0.01) {
             impulseDir.normalize();
-            b.body.applyImpulse(impulseDir.scale(falloff * 9.6), bPos);
+            b.body.applyImpulse(impulseDir.scale(falloff * 11.0), bPos);
           }
           if (b.hp <= 0) {
             this.destroyBlock(b);
@@ -1621,11 +1623,11 @@ export class GameScene {
       if (dist < lightningRadius) {
         t.body.wakeUp();
         const falloff = 1 - dist / lightningRadius;
-        t.hp -= falloff * 22;
+        t.hp -= falloff * 28;
         const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
         if (impulseDir.length() > 0.01) {
           impulseDir.normalize();
-          t.body.applyImpulse(impulseDir.scale(falloff * 8), tPos);
+          t.body.applyImpulse(impulseDir.scale(falloff * 9.5), tPos);
         }
         if (t.hp <= 0) {
           this.defeatTarget(t);
@@ -1722,8 +1724,8 @@ export class GameScene {
       this.activeBird.body.velocity.y *= 0.85;
     }
 
-    // Shockwave radius set to exact midpoint (4.2 and 3.36 -> 3.78)
-    const chronoRadius = 3.78;
+    // Shockwave radius tuned for satisfying, soft structural collapse
+    const chronoRadius = 4.0;
     // Shatter and dislodge destructible blocks in balanced radius
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1735,14 +1737,12 @@ export class GameScene {
           this.destroyBlock(b);
         } else {
           const falloff = 1 - dist / chronoRadius;
-          // Damage balanced to exact midpoint
-          const dmg = falloff * (b.type === 'stone' ? 47 : b.type === 'metal' ? 43 : b.type === 'glass' ? 52 : 32.5);
+          const dmg = falloff * (b.type === 'stone' ? 52 : b.type === 'metal' ? 46 : b.type === 'glass' ? 56 : 38);
           b.hp -= dmg;
           const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
           if (impulseDir.length() > 0.01) {
             impulseDir.normalize();
-            // Impulse balanced to exact midpoint (10.8)
-            b.body.applyImpulse(impulseDir.scale(falloff * 10.8), bPos);
+            b.body.applyImpulse(impulseDir.scale(falloff * 11.5), bPos);
           }
           if (b.hp <= 0) {
             this.destroyBlock(b);
@@ -1751,7 +1751,7 @@ export class GameScene {
       }
     });
 
-    // Damage & dislodge targets (calibrated to exact midpoint)
+    // Damage & dislodge targets smoothly
     [...this.targets].forEach((t) => {
       if (t.destroyed || !t.body) return;
       const tPos = t.body.position;
@@ -1759,11 +1759,11 @@ export class GameScene {
       if (dist < chronoRadius) {
         t.body.wakeUp();
         const falloff = 1 - dist / chronoRadius;
-        t.hp -= falloff * 27;
+        t.hp -= falloff * 30;
         const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
         if (impulseDir.length() > 0.01) {
           impulseDir.normalize();
-          t.body.applyImpulse(impulseDir.scale(falloff * 9.0), tPos);
+          t.body.applyImpulse(impulseDir.scale(falloff * 9.8), tPos);
         }
         if (t.hp <= 0) {
           this.defeatTarget(t);
@@ -2016,9 +2016,9 @@ export class GameScene {
     // Awaken nearby structures
     this.wakeStructuresNear(origin, 7.5);
 
-    // Balanced, punchy blast radius & force (calibrated to exact midpoint)
-    const blastRadius = 3.7;
-    const blastForce = 16.0;
+    // Balanced, punchy blast radius & force
+    const blastRadius = 4.0;
+    const blastForce = 17.5;
 
     // Push and damage nearby blocks
     const affectedBlocks = [...this.blocks];
@@ -2048,7 +2048,7 @@ export class GameScene {
         const factor = 1 - dist / blastRadius;
         const strength = factor * blastForce;
         b.body.applyImpulse(new CANNON.Vec3(dirX * strength, (dirY + 0.3) * strength, 0));
-        b.hp -= factor * 57.5;
+        b.hp -= factor * 68;
 
         if (b.hp <= 0) {
           if (b.type === 'tnt') {
@@ -2101,7 +2101,7 @@ export class GameScene {
         const targetStrength = factor * blastForce * 0.8;
         t.body.applyImpulse(new CANNON.Vec3(dirX * targetStrength, (dirY + 0.3) * targetStrength, 0));
 
-        t.hp -= factor * 32.5;
+        t.hp -= factor * 38;
         if (t.hp <= 0) {
           this.defeatTarget(t);
         }

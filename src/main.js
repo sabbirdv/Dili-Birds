@@ -185,15 +185,14 @@ class DiliBirdsApp {
             }
           }
 
-          // Save best score and stars per level using Supabase, and preserve progress across sessions
-          leaderboardService.syncLevelProgress({
+          // Increment verified score and stars on Supabase directly from game turn results
+          // STRICT SECURITY: Never pass or read bulk numbers from localStorage!
+          leaderboardService.recordVerifiedLevelWin({
             serverRowId: this.storage.getServerRowId(),
             username: this.storage.getUsername(),
             levelId,
-            score,
-            stars: bestStars,
-            totalScore: this.storage.getCoins(),
-            totalStars: this.storage.getTotalStars()
+            coinsEarned: actualCoinsAwarded,
+            starsAdded
           }).then((res) => {
             if (res?.success && res.rowId && !this.storage.getServerRowId()) {
               this.storage.setServerRowId(res.rowId);

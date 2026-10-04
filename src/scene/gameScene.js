@@ -1039,7 +1039,7 @@ export class GameScene {
     const hpMap = {
       glass: 18,
       coin: 22,
-      tnt: 14,
+      tnt: 10,
       wood: 54,
       stone: 90,
       metal: 125,
@@ -1120,21 +1120,21 @@ export class GameScene {
         // Strategic material effectiveness matrix (enhanced for punchy, satisfying breaks)
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 3.2 : blockObj.type === 'wood' ? 1.6 : 0.85;
+          birdMultiplier = blockObj.type === 'glass' ? 3.2 : blockObj.type === 'wood' ? 1.6 : blockObj.type === 'tnt' ? 2.5 : 0.85;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.6 : blockObj.type === 'metal' ? 2.4 : 1.9;
+          birdMultiplier = blockObj.type === 'stone' ? 2.6 : blockObj.type === 'metal' ? 2.4 : blockObj.type === 'tnt' ? 3.0 : 1.9;
         } else if (birdType === 'red') {
-          birdMultiplier = blockObj.type === 'wood' ? 1.8 : 1.15;
+          birdMultiplier = blockObj.type === 'wood' ? 1.8 : blockObj.type === 'tnt' ? 2.5 : 1.15;
         } else if (birdType === 'split') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.0 : blockObj.type === 'wood' ? 1.5 : 1.0;
+          birdMultiplier = blockObj.type === 'glass' ? 2.0 : blockObj.type === 'wood' ? 1.5 : blockObj.type === 'tnt' ? 2.2 : 1.0;
         } else if (birdType === 'fire') {
           birdMultiplier = blockObj.type === 'wood' ? 2.8 : blockObj.type === 'glass' ? 2.2 : blockObj.type === 'tnt' ? 4.0 : 1.6;
         } else if (birdType === 'vortex') {
-          birdMultiplier = blockObj.type === 'metal' ? 2.3 : blockObj.type === 'stone' ? 2.2 : 1.7;
+          birdMultiplier = blockObj.type === 'metal' ? 2.3 : blockObj.type === 'stone' ? 2.2 : blockObj.type === 'tnt' ? 2.6 : 1.7;
         } else if (birdType === 'lightning') {
-          birdMultiplier = blockObj.type === 'metal' ? 1.7 : blockObj.type === 'stone' ? 1.5 : blockObj.type === 'glass' ? 1.4 : 1.3;
+          birdMultiplier = blockObj.type === 'metal' ? 1.7 : blockObj.type === 'stone' ? 1.5 : blockObj.type === 'glass' ? 1.4 : blockObj.type === 'tnt' ? 2.5 : 1.3;
         } else if (birdType === 'chrono') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.4 : blockObj.type === 'metal' ? 2.3 : blockObj.type === 'glass' ? 2.1 : 1.75;
+          birdMultiplier = blockObj.type === 'stone' ? 2.4 : blockObj.type === 'metal' ? 2.3 : blockObj.type === 'glass' ? 2.1 : blockObj.type === 'tnt' ? 2.6 : 1.75;
         }
 
         // Damage derived from normal impact collision force (tuned softer so blocks shatter cleanly on solid hits)
@@ -1159,11 +1159,22 @@ export class GameScene {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 3.8) {
+      } else if (blockObj.type === 'tnt') {
+        // Highly sensitive explosive trigger: collapsing debris, falling blocks, or tumbling targets easily detonate TNT
+        if (normalImpact >= 1.2) {
+          blockObj.lastHitTime = now;
+          this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.1));
+          const tntFallDmg = (normalImpact - 0.5) * 16.0;
+          blockObj.hp -= tntFallDmg;
+          if (blockObj.hp <= 0 || normalImpact >= 1.5) {
+            this.destroyBlock(blockObj);
+          }
+        }
+      } else if (normalImpact >= 3.6) {
         // Falling structures, tumbling debris, and cascading collapses naturally crush blocks underneath
         blockObj.lastHitTime = now;
         this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 2.8) * 3.0;
+        const debrisDmg = (normalImpact - 2.6) * 3.2;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);

@@ -307,31 +307,31 @@ export class BrandingElements {
 
     } else if (theme === 'summit') {
       // ══════════════════════════════════════════════════════════
-      // THEME 4: CROWN SUMMIT & VOLCANIC STORM FORTRESS (Levels 16–20)
-      // Dramatic storm sky, fiery horizon, jagged gothic peaks, thunderclouds
+      // THEME 4: CROWN SUMMIT & VOLCANIC STORM FORTRESS (Levels 36–50)
+      // Bright dramatic dusk, luminous amethyst sky, golden horizon — crisp high visibility
       // ══════════════════════════════════════════════════════════
       const sky = ctx.createLinearGradient(0, 0, 0, 1024);
-      sky.addColorStop(0.0, '#271936');    // twilight plum
-      sky.addColorStop(0.24, '#3b1d54');   // tempest purple
-      sky.addColorStop(0.44, '#6b21a8');   // electric twilight
-      sky.addColorStop(0.62, '#b91c1c');   // blazing crimson dusk
-      sky.addColorStop(0.76, '#ef4444');   // volcanic furnace red
-      sky.addColorStop(0.88, '#f59e0b');   // molten gold horizon
-      sky.addColorStop(1.0, '#292524');    // volcanic basalt earth
+      sky.addColorStop(0.0, '#581c87');    // vibrant royal purple zenith
+      sky.addColorStop(0.24, '#7c3aed');   // luminous violet
+      sky.addColorStop(0.44, '#c026d3');   // vivid magenta
+      sky.addColorStop(0.62, '#e11d48');   // radiant rose dusk
+      sky.addColorStop(0.76, '#f97316');   // blazing bright sunset amber
+      sky.addColorStop(0.88, '#fef08a');   // luminous golden-white horizon
+      sky.addColorStop(1.0, '#78350f');    // warm earthy base
       ctx.fillStyle = sky;
       ctx.fillRect(0, 0, 2048, 1024);
 
       // Distant lightning flash radiance along horizon
-      const lg = ctx.createRadialGradient(920, 620, 30, 920, 620, 600);
-      lg.addColorStop(0, 'rgba(254, 240, 138, 0.75)');
-      lg.addColorStop(0.25, 'rgba(239, 68, 68, 0.45)');
-      lg.addColorStop(0.65, 'rgba(147, 51, 234, 0.18)');
-      lg.addColorStop(1, 'rgba(76, 29, 149, 0)');
+      const lg = ctx.createRadialGradient(920, 560, 30, 920, 560, 600);
+      lg.addColorStop(0, 'rgba(255, 255, 230, 0.90)');
+      lg.addColorStop(0.25, 'rgba(254, 215, 170, 0.65)');
+      lg.addColorStop(0.65, 'rgba(217, 70, 239, 0.25)');
+      lg.addColorStop(1, 'rgba(147, 51, 234, 0)');
       ctx.fillStyle = lg;
       ctx.fillRect(0, 0, 2048, 1024);
 
-      // Towering jagged obsidian peaks & dramatic gothic spires
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      // Towering jagged peaks in soft atmospheric contrast
+      ctx.fillStyle = 'rgba(76, 29, 149, 0.45)';
       ctx.beginPath();
       ctx.moveTo(0, 1024);
       [
@@ -342,11 +342,11 @@ export class BrandingElements {
       ctx.closePath();
       ctx.fill();
 
-      // Near volcanic basalt ramparts
+      // Near basalt ramparts
       const bGrad = ctx.createLinearGradient(0, 660, 0, 1024);
-      bGrad.addColorStop(0, '#1e293b');
-      bGrad.addColorStop(0.5, '#0f172a');
-      bGrad.addColorStop(1, '#090d16');
+      bGrad.addColorStop(0, 'rgba(100, 116, 139, 0.65)');
+      bGrad.addColorStop(0.5, 'rgba(71, 85, 105, 0.65)');
+      bGrad.addColorStop(1, 'rgba(51, 65, 85, 0.85)');
       ctx.fillStyle = bGrad;
       ctx.beginPath();
       ctx.moveTo(0, 1024);
@@ -364,9 +364,117 @@ export class BrandingElements {
       this.paintObeliskSilhouette(ctx, 1780, 690, 1.9);
 
       // Dramatic thundercloud anvil clouds with incandescent rim light
-      this.paintAnimeCloud(ctx, 360, 180, 320, 110, 0.85);
-      this.paintAnimeCloud(ctx, 1020, 140, 380, 135, 0.88);
-      this.paintAnimeCloud(ctx, 1680, 190, 330, 120, 0.82);
+      this.paintAnimeCloud(ctx, 360, 180, 320, 110, 0.90);
+      this.paintAnimeCloud(ctx, 1020, 140, 380, 135, 0.92);
+      this.paintAnimeCloud(ctx, 1680, 190, 330, 120, 0.88);
+
+    } else if (theme === 'solar') {
+      // ══════════════════════════════════════════════════════════
+      // THEME 5: SOLAR FOUNDRY & GALACTIC HORIZON (Levels 51–60)
+      // Brilliant solar radiance, gold & crimson flares, high-key ambient
+      // ══════════════════════════════════════════════════════════
+      const sky = ctx.createLinearGradient(0, 0, 0, 1024);
+      sky.addColorStop(0.0, '#c2410c');    // rich vermilion zenith
+      sky.addColorStop(0.25, '#ea580c');   // solar orange
+      sky.addColorStop(0.50, '#f97316');   // blazing amber
+      sky.addColorStop(0.70, '#facc15');   // brilliant solar yellow
+      sky.addColorStop(0.85, '#fef9c3');   // incandescent white horizon
+      sky.addColorStop(1.0, '#9a3412');    // rich bronze terrain
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Giant radiant solar orb
+      const sg = ctx.createRadialGradient(1024, 460, 40, 1024, 460, 560);
+      sg.addColorStop(0, 'rgba(255, 255, 240, 0.95)');
+      sg.addColorStop(0.25, 'rgba(254, 240, 138, 0.70)');
+      sg.addColorStop(0.60, 'rgba(251, 146, 60, 0.30)');
+      sg.addColorStop(1, 'rgba(234, 88, 12, 0)');
+      ctx.fillStyle = sg;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Distant industrial foundry pinnacles
+      ctx.fillStyle = 'rgba(154, 52, 18, 0.45)';
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 680], [200, 520], [380, 650], [600, 490], [820, 630],
+        [1040, 460], [1280, 620], [1520, 500], [1760, 640], [2048, 530], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      // Near glowing dunes
+      const sGrad = ctx.createLinearGradient(0, 640, 0, 1024);
+      sGrad.addColorStop(0, 'rgba(217, 119, 6, 0.75)');
+      sGrad.addColorStop(1, 'rgba(146, 64, 14, 0.85)');
+      ctx.fillStyle = sGrad;
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 720], [260, 650], [540, 710], [820, 640], [1100, 700],
+        [1380, 630], [1660, 710], [1940, 650], [2048, 710], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      this.paintAnimeCloud(ctx, 320, 190, 300, 105, 0.90);
+      this.paintAnimeCloud(ctx, 960, 150, 360, 125, 0.92);
+      this.paintAnimeCloud(ctx, 1620, 200, 310, 110, 0.88);
+
+    } else if (theme === 'cosmic') {
+      // ══════════════════════════════════════════════════════════
+      // THEME 6: COSMIC APEX & SUPREME REALM (Levels 61–70)
+      // Luminous electric indigo, glowing cyan starlight, radiant nebulas
+      // ══════════════════════════════════════════════════════════
+      const sky = ctx.createLinearGradient(0, 0, 0, 1024);
+      sky.addColorStop(0.0, '#312e81');    // vibrant royal indigo zenith
+      sky.addColorStop(0.25, '#4338ca');   // electric purple
+      sky.addColorStop(0.50, '#2563eb');   // brilliant azure
+      sky.addColorStop(0.70, '#06b6d4');   // glowing electric cyan
+      sky.addColorStop(0.85, '#a5f3fc');   // luminous horizon glow
+      sky.addColorStop(1.0, '#1e1b4b');    // crystal dark base
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Starfield
+      for (let s = 0; s < 180; s++) {
+        const sx = (s * 97) % 2040 + 4;
+        const sy = (s * 43) % 480 + 10;
+        const sRadius = (s % 3 === 0) ? 2.5 : 1.5;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.beginPath();
+        ctx.arc(sx, sy, sRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Luminous cyan nebula ribbons
+      const nebGrad = ctx.createRadialGradient(1024, 480, 50, 1024, 480, 550);
+      nebGrad.addColorStop(0, 'rgba(165, 243, 252, 0.85)');
+      nebGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.50)');
+      nebGrad.addColorStop(0.7, 'rgba(129, 140, 248, 0.25)');
+      nebGrad.addColorStop(1, 'rgba(49, 46, 129, 0)');
+      ctx.fillStyle = nebGrad;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Floating crystal archipelago silhouettes in clean contrast
+      ctx.fillStyle = 'rgba(67, 56, 202, 0.40)';
+      ctx.beginPath();
+      ctx.moveTo(0, 1024);
+      [
+        [0, 680], [180, 540], [380, 660], [620, 500], [860, 640],
+        [1100, 480], [1340, 630], [1580, 520], [1820, 650], [2048, 550], [2048, 1024]
+      ].forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.closePath();
+      ctx.fill();
+
+      this.paintCrystalTreeSilhouette(ctx, 360, 710, 1.8);
+      this.paintCrystalTreeSilhouette(ctx, 840, 690, 1.9);
+      this.paintCrystalTreeSilhouette(ctx, 1380, 680, 2.0);
+      this.paintCrystalTreeSilhouette(ctx, 1820, 700, 1.7);
+
+      this.paintAnimeCloud(ctx, 340, 180, 280, 100, 0.88);
+      this.paintAnimeCloud(ctx, 980, 150, 340, 120, 0.90);
+      this.paintAnimeCloud(ctx, 1600, 210, 290, 105, 0.85);
 
     } else {
       // ══════════════════════════════════════════════════════════
@@ -689,7 +797,9 @@ export class BrandingElements {
       emerald: [0x4a9c32, 0x3a8a28, 0x58a840],
       amber: [0xc2410c, 0xb45309, 0xd97706],
       celestial: [0x4338ca, 0x312e81, 0x0284c7],
-      summit: [0x334155, 0x1e293b, 0x475569]
+      summit: [0x64748b, 0x475569, 0x7c3aed],
+      solar: [0xd97706, 0xb45309, 0xea580c],
+      cosmic: [0x4338ca, 0x312e81, 0x0ea5e9]
     };
     const hillPalette = hillPaletteMap[theme] || hillPaletteMap.emerald;
     this.hillMeshes.forEach((mesh) => {
@@ -704,7 +814,9 @@ export class BrandingElements {
       emerald: [0xffc0d0, 0xf5a0be, 0xe88098],
       amber: [0xf59e0b, 0xd97706, 0xb45309],
       celestial: [0x38bdf8, 0x818cf8, 0x34d399],
-      summit: [0x64748b, 0x94a3b8, 0xdc2626]
+      summit: [0xc084fc, 0xf472b6, 0xfb7185],
+      solar: [0xfde047, 0xfbbf24, 0xf97316],
+      cosmic: [0x38bdf8, 0xa855f7, 0x67e8f9]
     };
     const canopyPalette = canopyPaletteMap[theme] || canopyPaletteMap.emerald;
     this.treeCanopyMeshes.forEach((mesh) => {
@@ -718,7 +830,9 @@ export class BrandingElements {
       emerald: 0x5c3a20,
       amber: 0x78350f,
       celestial: 0x312e81,
-      summit: 0x27272a
+      summit: 0x475569,
+      solar: 0x7c2d12,
+      cosmic: 0x1e1b4b
     };
     const trunkColor = trunkColorMap[theme] || 0x5c3a20;
     this.treeTrunkMeshes.forEach((mesh) => {
@@ -732,7 +846,9 @@ export class BrandingElements {
       emerald: [0xffc0d0, 0xf8a0c0, 0xf07898, 0xfff0f5],
       amber: [0xfbbf24, 0xf59e0b, 0xd97706, 0xfde047],
       celestial: [0x38bdf8, 0xa5f3fc, 0xc084fc, 0x67e8f9],
-      summit: [0xf97316, 0xef4444, 0xfbbf24, 0xdc2626]
+      summit: [0xf472b6, 0xc084fc, 0xfbbf24, 0xf43f5e],
+      solar: [0xfef08a, 0xfde047, 0xf97316, 0xfbbf24],
+      cosmic: [0xa5f3fc, 0x38bdf8, 0xc084fc, 0x818cf8]
     };
     const pPalette = particleColorsMap[theme] || particleColorsMap.emerald;
     this.petals.forEach((p, idx) => {
@@ -743,18 +859,22 @@ export class BrandingElements {
   }
 
   /**
-   * Sets the theme based on the level ID (1-5 emerald, 6-10 amber, 11-15 celestial, 16-20 summit)
+   * Sets the theme based on the level ID across all 70 levels
    */
   setThemeForLevel(levelId = 1) {
     const id = Number(levelId) || 1;
-    if (id <= 5) {
+    if (id <= 10) {
       this.setTheme('emerald');
-    } else if (id <= 10) {
+    } else if (id <= 20) {
       this.setTheme('amber');
-    } else if (id <= 15) {
+    } else if (id <= 35) {
       this.setTheme('celestial');
-    } else {
+    } else if (id <= 50) {
       this.setTheme('summit');
+    } else if (id <= 60) {
+      this.setTheme('solar');
+    } else {
+      this.setTheme('cosmic');
     }
   }
 

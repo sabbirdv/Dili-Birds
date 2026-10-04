@@ -545,89 +545,155 @@ export class GameScene {
   applyEnvironmentTheme(levelId = 1) {
     const id = Number(levelId) || 1;
     let themeId = 'emerald';
-    if (id <= 5) {
+    if (id <= 10) {
       themeId = 'emerald';
-    } else if (id <= 10) {
+    } else if (id <= 20) {
       themeId = 'amber';
-    } else if (id <= 15) {
+    } else if (id <= 35) {
       themeId = 'celestial';
-    } else {
+    } else if (id <= 50) {
       themeId = 'summit';
+    } else if (id <= 60) {
+      themeId = 'solar';
+    } else {
+      themeId = 'cosmic';
     }
 
     if (this.currentThemeId === themeId && this.hasAppliedSceneTheme) return;
     this.currentThemeId = themeId;
     this.hasAppliedSceneTheme = true;
 
+    // Ensure tone mapping exposure is high and punchy for crisp gameplay clarity
+    if (this.renderer) {
+      this.renderer.toneMappingExposure = 1.15;
+    }
+
     if (themeId === 'amber') {
-      this.scene.background = new THREE.Color(0xb45309);
+      // Warm golden canyon sunset — bright horizon, crisp warm daylight illumination
+      this.scene.background = new THREE.Color(0xd97706);
       if (this.scene.fog) {
-        this.scene.fog.color.setHex(0xfce7c8);
-        this.scene.fog.density = 0.0035;
+        this.scene.fog.color.setHex(0xfef3c7);
+        this.scene.fog.density = 0.0010;
       }
-      this.hemiLight?.color.setHex(0xffedd5);
-      this.hemiLight?.groundColor.setHex(0x78350f);
-      if (this.hemiLight) this.hemiLight.intensity = 1.05;
+      this.hemiLight?.color.setHex(0xfff7ed);
+      this.hemiLight?.groundColor.setHex(0x9a3412);
+      if (this.hemiLight) this.hemiLight.intensity = 1.45;
+
       this.dirLight?.color.setHex(0xffedd5);
-      if (this.dirLight) this.dirLight.intensity = 1.65;
-      this.fillLight?.color.setHex(0xfde047);
+      if (this.dirLight) this.dirLight.intensity = 2.05;
+
+      this.fillLight?.color.setHex(0xfef08a);
+      if (this.fillLight) this.fillLight.intensity = 1.05;
 
       this.grassMesh?.material.color.setHex(0xd97706);
       this.trimMesh?.material.color.setHex(0xb45309);
-      this.cliffMesh?.material.color.setHex(0x78350f);
-      this.padMesh?.material.color.setHex(0x92400e);
+      this.cliffMesh?.material.color.setHex(0x9a3412);
+      this.padMesh?.material.color.setHex(0x78350f);
 
     } else if (themeId === 'celestial') {
-      this.scene.background = new THREE.Color(0x1a2e56);
+      // Mystical twilight aurora — vibrant cyan & royal indigo sky, high-key crystal illumination
+      this.scene.background = new THREE.Color(0x2563eb);
       if (this.scene.fog) {
-        this.scene.fog.color.setHex(0x253b70);
-        this.scene.fog.density = 0.0014;
+        this.scene.fog.color.setHex(0x60a5fa);
+        this.scene.fog.density = 0.0008;
       }
-      this.hemiLight?.color.setHex(0xc7d2fe);
-      this.hemiLight?.groundColor.setHex(0x1e293b);
-      if (this.hemiLight) this.hemiLight.intensity = 1.3;
-      this.dirLight?.color.setHex(0xe0f2fe);
-      if (this.dirLight) this.dirLight.intensity = 1.85;
-      this.fillLight?.color.setHex(0x67e8f9);
-      if (this.fillLight) this.fillLight.intensity = 0.85;
+      this.hemiLight?.color.setHex(0xe0f2fe);
+      this.hemiLight?.groundColor.setHex(0x1e3a8a);
+      if (this.hemiLight) this.hemiLight.intensity = 1.65;
+
+      this.dirLight?.color.setHex(0xf0fdf4);
+      if (this.dirLight) this.dirLight.intensity = 2.25;
+
+      this.fillLight?.color.setHex(0x38bdf8);
+      if (this.fillLight) this.fillLight.intensity = 1.15;
 
       this.grassMesh?.material.color.setHex(0x0284c7);
       this.trimMesh?.material.color.setHex(0x38bdf8);
-      this.cliffMesh?.material.color.setHex(0x334155);
-      this.padMesh?.material.color.setHex(0x312e81);
+      this.cliffMesh?.material.color.setHex(0x475569);
+      this.padMesh?.material.color.setHex(0x1e293b);
 
     } else if (themeId === 'summit') {
-      this.scene.background = new THREE.Color(0x271936);
+      // Dramatic mountain summit & nebula — vibrant purple/crimson sky, bright studio highlights
+      this.scene.background = new THREE.Color(0x6b21a8);
       if (this.scene.fog) {
-        this.scene.fog.color.setHex(0x3b1d4a);
-        this.scene.fog.density = 0.0015;
+        this.scene.fog.color.setHex(0xc084fc);
+        this.scene.fog.density = 0.0008;
       }
-      this.hemiLight?.color.setHex(0xfed7aa);
-      this.hemiLight?.groundColor.setHex(0x3f1d24);
-      if (this.hemiLight) this.hemiLight.intensity = 1.35;
-      this.dirLight?.color.setHex(0xffedd5);
-      if (this.dirLight) this.dirLight.intensity = 1.95;
-      this.fillLight?.color.setHex(0xf97316);
-      if (this.fillLight) this.fillLight.intensity = 0.95;
+      this.hemiLight?.color.setHex(0xfce7f3);
+      this.hemiLight?.groundColor.setHex(0x4c1d95);
+      if (this.hemiLight) this.hemiLight.intensity = 1.65;
 
-      this.grassMesh?.material.color.setHex(0x475569);
-      this.trimMesh?.material.color.setHex(0xf97316);
+      this.dirLight?.color.setHex(0xffedd5);
+      if (this.dirLight) this.dirLight.intensity = 2.25;
+
+      this.fillLight?.color.setHex(0xf472b6);
+      if (this.fillLight) this.fillLight.intensity = 1.10;
+
+      this.grassMesh?.material.color.setHex(0x64748b);
+      this.trimMesh?.material.color.setHex(0xf43f5e);
+      this.cliffMesh?.material.color.setHex(0x475569);
+      this.padMesh?.material.color.setHex(0x334155);
+
+    } else if (themeId === 'solar') {
+      // Solar Foundry & Golden Horizon — brilliant warm daylight, golden aura
+      this.scene.background = new THREE.Color(0xea580c);
+      if (this.scene.fog) {
+        this.scene.fog.color.setHex(0xfef08a);
+        this.scene.fog.density = 0.0008;
+      }
+      this.hemiLight?.color.setHex(0xffedd5);
+      this.hemiLight?.groundColor.setHex(0x7c2d12);
+      if (this.hemiLight) this.hemiLight.intensity = 1.60;
+
+      this.dirLight?.color.setHex(0xffedd5);
+      if (this.dirLight) this.dirLight.intensity = 2.30;
+
+      this.fillLight?.color.setHex(0xfde047);
+      if (this.fillLight) this.fillLight.intensity = 1.15;
+
+      this.grassMesh?.material.color.setHex(0xc2410c);
+      this.trimMesh?.material.color.setHex(0xf59e0b);
+      this.cliffMesh?.material.color.setHex(0x78350f);
+      this.padMesh?.material.color.setHex(0x451a03);
+
+    } else if (themeId === 'cosmic') {
+      // Cosmic Apex & Singularity Realm — electric violet/cyan radiance, luminous rim lighting
+      this.scene.background = new THREE.Color(0x312e81);
+      if (this.scene.fog) {
+        this.scene.fog.color.setHex(0xa5b4fc);
+        this.scene.fog.density = 0.0007;
+      }
+      this.hemiLight?.color.setHex(0xe0e7ff);
+      this.hemiLight?.groundColor.setHex(0x1e1b4b);
+      if (this.hemiLight) this.hemiLight.intensity = 1.70;
+
+      this.dirLight?.color.setHex(0xf0fdf4);
+      if (this.dirLight) this.dirLight.intensity = 2.35;
+
+      this.fillLight?.color.setHex(0x67e8f9);
+      if (this.fillLight) this.fillLight.intensity = 1.20;
+
+      this.grassMesh?.material.color.setHex(0x4338ca);
+      this.trimMesh?.material.color.setHex(0x818cf8);
       this.cliffMesh?.material.color.setHex(0x334155);
-      this.padMesh?.material.color.setHex(0xbe123c);
+      this.padMesh?.material.color.setHex(0x1e293b);
 
     } else {
-      // Emerald
-      this.scene.background = new THREE.Color(0x4da8e0);
+      // Emerald Valley & Sunny Skies (Default / Levels 1–10)
+      this.scene.background = new THREE.Color(0x38bdf8);
       if (this.scene.fog) {
-        this.scene.fog.color.setHex(0xb8daf0);
-        this.scene.fog.density = 0.003;
+        this.scene.fog.color.setHex(0xbae6fd);
+        this.scene.fog.density = 0.0015;
       }
       this.hemiLight?.color.setHex(0xf0f9ff);
       this.hemiLight?.groundColor.setHex(0x1e293b);
-      if (this.hemiLight) this.hemiLight.intensity = 0.95;
+      if (this.hemiLight) this.hemiLight.intensity = 1.40;
+
       this.dirLight?.color.setHex(0xfff5e0);
-      if (this.dirLight) this.dirLight.intensity = 1.55;
+      if (this.dirLight) this.dirLight.intensity = 2.05;
+
       this.fillLight?.color.setHex(0xe0f2fe);
+      if (this.fillLight) this.fillLight.intensity = 0.95;
 
       this.grassMesh?.material.color.setHex(0xffffff);
       this.trimMesh?.material.color.setHex(0x3f6212);
@@ -837,17 +903,25 @@ export class GameScene {
     let trimColor = 0x475569;
 
     if (themeId === 'amber') {
+      cliffColor = 0x9a3412;
+      deckColor = 0x78350f;
+      trimColor = 0xd97706;
+    } else if (themeId === 'celestial') {
+      cliffColor = 0x334155;
+      deckColor = 0x1e3a8a;
+      trimColor = 0x38bdf8;
+    } else if (themeId === 'summit') {
+      cliffColor = 0x475569;
+      deckColor = 0x4c1d95;
+      trimColor = 0xf43f5e;
+    } else if (themeId === 'solar') {
       cliffColor = 0x78350f;
       deckColor = 0x451a03;
-      trimColor = 0x9a3412;
-    } else if (themeId === 'celestial') {
-      cliffColor = 0x2e3856;
-      deckColor = 0x1e293b;
-      trimColor = 0x6366f1;
-    } else if (themeId === 'summit') {
+      trimColor = 0xf59e0b;
+    } else if (themeId === 'cosmic') {
       cliffColor = 0x334155;
-      deckColor = 0x1e293b;
-      trimColor = 0xbe123c;
+      deckColor = 0x1e1b4b;
+      trimColor = 0x818cf8;
     }
 
     // 1. Main rock cliff body with strata texture
@@ -953,15 +1027,15 @@ export class GameScene {
     const halfExtents = new CANNON.Vec3(size[0] / 2, size[1] / 2, size[2] / 2);
     const massMap = {
       glass: 1.8,
-      wood: 3.6,
-      coin: 2.6,
+      wood: 3.2,
+      coin: 2.0,
       tnt: 2.2,
-      stone: 7.0,
-      metal: 9.0
+      stone: 6.0,
+      metal: 8.0
     };
     const hpMap = {
       glass: 28,
-      coin: 48,
+      coin: 35,
       tnt: 22,
       wood: 90,
       stone: 145,

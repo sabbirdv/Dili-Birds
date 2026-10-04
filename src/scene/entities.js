@@ -929,20 +929,20 @@ function getProceduralBlockTexture(type) {
     });
 
   } else if (type === 'stone') {
-    // Chiseled granite masonry blocks with mortar grooves and rich stone stippling
-    ctx.fillStyle = '#64748b';
+    // Chiseled granite masonry blocks with bright mortar grooves and high-visibility stone highlights
+    ctx.fillStyle = '#94a3b8';
     ctx.fillRect(0, 0, 512, 512);
 
     // Masonry courses (3 rows of staggered ashlar stone)
     const stoneGrad = ctx.createLinearGradient(0, 0, 0, 512);
-    stoneGrad.addColorStop(0, '#78889e');
-    stoneGrad.addColorStop(0.5, '#64748b');
-    stoneGrad.addColorStop(1, '#475569');
+    stoneGrad.addColorStop(0, '#cbd5e1');
+    stoneGrad.addColorStop(0.5, '#94a3b8');
+    stoneGrad.addColorStop(1, '#64748b');
     ctx.fillStyle = stoneGrad;
     ctx.fillRect(0, 0, 512, 512);
 
-    // Mortar lines
-    ctx.fillStyle = '#1e293b';
+    // Bright, crisp mortar lines
+    ctx.fillStyle = '#334155';
     ctx.fillRect(0, 168, 512, 10);
     ctx.fillRect(0, 338, 512, 10);
     // Vertical joints
@@ -956,30 +956,30 @@ function getProceduralBlockTexture(type) {
       const rx = (i * 73) % 500 + 6;
       const ry = (i * 127) % 500 + 6;
       const size = (i % 3) + 2;
-      ctx.fillStyle = i % 2 === 0 ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.22)';
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(255, 255, 255, 0.28)' : 'rgba(30, 41, 59, 0.22)';
       ctx.fillRect(rx, ry, size, size);
     }
 
-    // Outer stone edge bevel
-    ctx.strokeStyle = '#334155';
+    // Outer stone edge bevel & bright highlight border
+    ctx.strokeStyle = '#475569';
     ctx.lineWidth = 14;
     ctx.strokeRect(7, 7, 498, 498);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.lineWidth = 5;
     ctx.strokeRect(16, 16, 480, 480);
 
   } else if (type === 'metal') {
-    // Industrial reinforced steel girder / riveted iron plate
+    // Industrial reinforced steel girder with high-contrast metallic luster and bright cyan rivets
     const metalGrad = ctx.createLinearGradient(0, 0, 512, 512);
-    metalGrad.addColorStop(0, '#475569');
-    metalGrad.addColorStop(0.3, '#334155');
-    metalGrad.addColorStop(0.7, '#1e293b');
-    metalGrad.addColorStop(1, '#0f172a');
+    metalGrad.addColorStop(0, '#94a3b8');
+    metalGrad.addColorStop(0.3, '#64748b');
+    metalGrad.addColorStop(0.7, '#475569');
+    metalGrad.addColorStop(1, '#334155');
     ctx.fillStyle = metalGrad;
     ctx.fillRect(0, 0, 512, 512);
 
-    // Diagonal hazard/industrial cross-brace embossing
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+    // Diagonal hazard/industrial cross-brace embossing with bright neon-cyan highlight
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
     ctx.lineWidth = 28;
     ctx.beginPath();
     ctx.moveTo(30, 30);
@@ -989,31 +989,31 @@ function getProceduralBlockTexture(type) {
     ctx.stroke();
 
     // Inner plate bevel
-    ctx.strokeStyle = '#64748b';
+    ctx.strokeStyle = '#94a3b8';
     ctx.lineWidth = 8;
     ctx.strokeRect(40, 40, 432, 432);
 
     // Outer reinforced steel flange
-    ctx.strokeStyle = '#0f172a';
-    ctx.lineWidth = 20;
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 16;
     ctx.strokeRect(10, 10, 492, 492);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(22, 22, 468, 468);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(20, 20, 472, 472);
 
-    // Riveted industrial perimeter studs
-    ctx.fillStyle = '#94a3b8';
+    // Riveted industrial perimeter studs with bright steel gleam
+    ctx.fillStyle = '#e2e8f0';
     for (let x = 32; x <= 480; x += 64) {
       [32, 480].forEach((y) => {
         ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.arc(x, y, 7, 0, Math.PI * 2);
         ctx.fill();
       });
     }
     for (let y = 96; y <= 416; y += 64) {
       [32, 480].forEach((x) => {
         ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.arc(x, y, 7, 0, Math.PI * 2);
         ctx.fill();
       });
     }

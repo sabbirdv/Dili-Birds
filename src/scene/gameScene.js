@@ -1477,9 +1477,9 @@ export class GameScene {
     this.audio?.playExplosion?.();
     this.createModernExplosion(origin);
     this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.6);
-    this.wakeStructuresNear(origin, 6.5);
+    this.wakeStructuresNear(origin, 5.5);
 
-    const blastRadius = 3.0;
+    const blastRadius = 2.0;
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
       const bPos = b.body.position;
@@ -1599,7 +1599,7 @@ export class GameScene {
       this.activeBird.body.velocity.y *= 0.75;
     }
 
-    const lightningRadius = 3.0;
+    const lightningRadius = 2.0;
     // Zap nearby destructible blocks
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1648,7 +1648,7 @@ export class GameScene {
   }
 
   spawnLightningFX(origin) {
-    // 1. Cyan-electric expanding shockwave ring
+    // 1. Cyan-electric expanding shockwave ring (calibrated for 2.0m radius)
     const shockwaveMat = new THREE.MeshBasicMaterial({
       color: 0x00f0ff,
       transparent: true,
@@ -1662,7 +1662,7 @@ export class GameScene {
       type: 'shockwave',
       mesh,
       baseScale: 0.35,
-      maxExpansion: 5.5,
+      maxExpansion: 3.8,
       baseOpacity: 0.95,
       life: 1.0,
       decay: 2.5
@@ -1735,8 +1735,8 @@ export class GameScene {
       this.activeBird.body.velocity.y *= 0.85;
     }
 
-    // Shockwave radius set to exactly 3.0m
-    const chronoRadius = 3.0;
+    // Shockwave radius set to exactly 2.0m
+    const chronoRadius = 2.0;
     // Shatter and dislodge destructible blocks in balanced radius
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1784,7 +1784,7 @@ export class GameScene {
   }
 
   spawnChronoFX(origin) {
-    // 1. Violet & Magenta dual expanding quantum shockwaves (calibrated for 3.0m radius)
+    // 1. Violet & Magenta dual expanding quantum shockwaves (calibrated for 2.0m radius)
     const shockwaveMat = new THREE.MeshBasicMaterial({
       color: 0xa855f7,
       transparent: true,
@@ -1798,7 +1798,7 @@ export class GameScene {
       type: 'shockwave',
       mesh,
       baseScale: 0.35,
-      maxExpansion: 5.8,
+      maxExpansion: 4.0,
       baseOpacity: 0.95,
       life: 1.0,
       decay: 2.3
@@ -1818,7 +1818,7 @@ export class GameScene {
       type: 'shockwave',
       mesh: mesh2,
       baseScale: 0.2,
-      maxExpansion: 4.0,
+      maxExpansion: 2.7,
       baseOpacity: 0.85,
       life: 0.8,
       decay: 2.8

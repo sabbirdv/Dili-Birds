@@ -275,7 +275,7 @@ export const HEROES_DATA = [
     abilityDesc: 'Tap mid-flight to phase forward at quantum velocity, triggering a multi-directional temporal shockwave that collapses load-bearing joints and shatters stone, metal, and glass.',
     recommendedLevels: 'Levels 50–70',
     speed: 96,
-    power: 78,
+    power: 88,
     pierce: 95,
     claimReward: 800,
     themeColor: '#a855f7'

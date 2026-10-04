@@ -1257,9 +1257,7 @@ html, body {
   justify-content: center;
   cursor: pointer;
   outline: none;
-  contain: layout style;
-  content-visibility: auto;
-  contain-intrinsic-size: 96px 96px;
+  overflow: visible;
   transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -1412,14 +1410,15 @@ html, body {
 /* Enlarged Stars Crown Arched Over Completed Circle */
 .node-stars-crown {
   position: absolute;
-  top: -24px;
+  top: -22px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: flex-end;
-  gap: 4px;
-  z-index: 5;
+  gap: 5px;
+  z-index: 20;
   pointer-events: none;
+  overflow: visible;
 }
 
 .crown-star {
@@ -1427,17 +1426,18 @@ html, body {
   line-height: 1;
   color: rgba(255, 255, 255, 0.25);
   transition: all 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7));
 }
 
 .crown-star.center {
-  font-size: 1.8rem;
-  margin-bottom: 5px;
+  font-size: 1.85rem;
+  margin-bottom: 6px;
 }
 
 .crown-star.earned {
   color: #fbbf24;
-  text-shadow: 0 0 12px rgba(251, 191, 36, 1), 0 2px 4px rgba(0, 0, 0, 0.7);
-  filter: drop-shadow(0 2px 3px rgba(180, 83, 9, 0.9));
+  text-shadow: 0 0 14px rgba(251, 191, 36, 1), 0 2px 4px rgba(0, 0, 0, 0.85);
+  filter: drop-shadow(0 2px 4px rgba(180, 83, 9, 0.95));
 }
 
 /* Active Frontier Bird Mascot Pin (Perched on top of Node) */

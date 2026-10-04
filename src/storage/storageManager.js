@@ -17,7 +17,7 @@ const DEFAULT_STATE = {
   claimedMissions: {}, // Tracks mission IDs where quest rewards have been claimed
   claimedCharacters: {}, // Tracks unlocked heroes claimed by player
   seenHeroUnlocks: { commander_falcon: true }, // Tracks heroes whose unlock surprise modal has been seen
-  zoneRevealed: { 1: true, 2: false, 3: false }, // Tracks revealed zones on roadmap
+  zoneRevealed: { 1: true, 2: false, 3: false, 4: false, 5: false, 6: false }, // Tracks revealed zones on roadmap
   dailyClaim: { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 },
   equippedHeroId: 'crimson_ace',
   brandName: DEFAULT_BRAND_NAME,
@@ -111,7 +111,10 @@ export class StorageManager {
         zoneRevealed: {
           1: true,
           2: Boolean(parsed.zoneRevealed?.[2] || Number(parsed.unlockedLevel) > 10),
-          3: Boolean(parsed.zoneRevealed?.[3] || Number(parsed.unlockedLevel) > 20)
+          3: Boolean(parsed.zoneRevealed?.[3] || Number(parsed.unlockedLevel) > 20),
+          4: Boolean(parsed.zoneRevealed?.[4] || Number(parsed.unlockedLevel) > 35),
+          5: Boolean(parsed.zoneRevealed?.[5] || Number(parsed.unlockedLevel) > 50),
+          6: Boolean(parsed.zoneRevealed?.[6] || Number(parsed.unlockedLevel) > 60)
         },
         dailyClaim: parsed.dailyClaim && typeof parsed.dailyClaim === 'object' ? {
           lastClaimDate: parsed.dailyClaim.lastClaimDate || null,
@@ -217,7 +220,8 @@ export class StorageManager {
   isZoneRevealed(zoneId) {
     const zid = Number(zoneId);
     if (zid <= 1) return true;
-    if (this.getUnlockedLevel() > 10) return true;
+    const threshold = zid === 2 ? 10 : zid === 3 ? 20 : zid === 4 ? 35 : zid === 5 ? 50 : 60;
+    if (this.getUnlockedLevel() > threshold) return true;
     return Boolean(this.state.zoneRevealed?.[zid]);
   }
 
@@ -375,6 +379,18 @@ export class StorageManager {
       if (id === 20 && prevUnlocked <= 20) {
         unlockedNewZone = true;
         this.setZoneRevealed(3, true);
+      }
+      if (id === 35 && prevUnlocked <= 35) {
+        unlockedNewZone = true;
+        this.setZoneRevealed(4, true);
+      }
+      if (id === 50 && prevUnlocked <= 50) {
+        unlockedNewZone = true;
+        this.setZoneRevealed(5, true);
+      }
+      if (id === 60 && prevUnlocked <= 60) {
+        unlockedNewZone = true;
+        this.setZoneRevealed(6, true);
       }
     }
 
@@ -618,7 +634,7 @@ export class StorageManager {
       claimedCoinLevels: {},
       claimedMissions: {},
       claimedCharacters: {},
-      zoneRevealed: { 1: true, 2: false, 3: false },
+      zoneRevealed: { 1: true, 2: false, 3: false, 4: false, 5: false, 6: false },
       dailyClaim: { lastClaimDate: null, streak: 0, totalClaimedCoins: 0, lastClaimTimestamp: 0 },
       equippedHeroId: 'crimson_ace',
       serverRowId: this.state.serverRowId

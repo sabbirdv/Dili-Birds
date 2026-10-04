@@ -76,6 +76,13 @@ export const BIRD_ABILITY_CONFIG = {
     color: '#06b6d4',
     hint: 'Tap mid-flight to discharge high-voltage chain lightning arcs!'
   },
+  chrono: {
+    name: 'Temporal Warp Surge',
+    icon: '⏳',
+    hasAbility: true,
+    color: '#a855f7',
+    hint: 'Tap mid-flight for quantum phase shockwave & warp boost!'
+  },
   red: {
     name: 'Winged Striker',
     icon: '🎯',
@@ -868,6 +875,7 @@ export class HudController {
       fire: '🔥',
       vortex: '🌀',
       lightning: '⚡',
+      chrono: '⏳',
       red: '🎯'
     };
     if (this.surpriseAbilityIconCircle) {

@@ -346,15 +346,11 @@ export class UIManager {
     this.levelSelect?.render();
     this.refreshHeaderStats();
 
-    if (this.levelSelect?.pendingZone2Unlock) {
-      this.levelSelect.pendingZone2Unlock = false;
+    if (this.levelSelect?.pendingZoneUnlock) {
+      const z = this.levelSelect.pendingZoneUnlock;
+      this.levelSelect.pendingZoneUnlock = null;
       setTimeout(() => {
-        this.levelSelect.animateCloudRemoval(2);
-      }, 400);
-    } else if (this.levelSelect?.pendingZone3Unlock) {
-      this.levelSelect.pendingZone3Unlock = false;
-      setTimeout(() => {
-        this.levelSelect.animateCloudRemoval(3);
+        this.levelSelect.animateCloudRemoval(z);
       }, 400);
     } else if (this.levelSelect?.pendingLevelUnlock) {
       const nextId = this.levelSelect.pendingLevelUnlock;

@@ -139,9 +139,15 @@ class DiliBirdsApp {
             this.levelSelect.focusedLevelId = newUnlockedLevel;
             this.levelSelect.activeLevelId = newUnlockedLevel;
             if (levelId === 10 && !this.storage.isZoneRevealed(2)) {
-              this.levelSelect.pendingZone2Unlock = true;
+              this.levelSelect.pendingZoneUnlock = 2;
             } else if (levelId === 20 && !this.storage.isZoneRevealed(3)) {
-              this.levelSelect.pendingZone3Unlock = true;
+              this.levelSelect.pendingZoneUnlock = 3;
+            } else if (levelId === 35 && !this.storage.isZoneRevealed(4)) {
+              this.levelSelect.pendingZoneUnlock = 4;
+            } else if (levelId === 50 && !this.storage.isZoneRevealed(5)) {
+              this.levelSelect.pendingZoneUnlock = 5;
+            } else if (levelId === 60 && !this.storage.isZoneRevealed(6)) {
+              this.levelSelect.pendingZoneUnlock = 6;
             } else {
               this.levelSelect.pendingLevelUnlock = newUnlockedLevel;
             }
@@ -150,8 +156,7 @@ class DiliBirdsApp {
             this.levelSelect.focusedLevelId = levelId;
             this.levelSelect.activeLevelId = levelId;
             this.levelSelect.pendingLevelUnlock = null;
-            this.levelSelect.pendingZone2Unlock = false;
-            this.levelSelect.pendingZone3Unlock = false;
+            this.levelSelect.pendingZoneUnlock = null;
           }
 
           // Strictly FIRST-TIME UNLOCK ONLY:

@@ -19,49 +19,583 @@ import logoBlackUrl from '../assets/logo-black.png';
  * perfectly fitting any mobile landscape screen without vertical scrolling.
  */
 export const LEVEL_NODES = [
-  // Zone 1: Sky Haven & Emerald Bastions (Levels 1–10)
-  { id: 1,  x: 180,  y: 290, zoneId: 1, zone: 'Emerald Valley', name: 'Timber Watchtower' },
-  { id: 2,  x: 360,  y: 150, zoneId: 1, zone: 'Crystal Ridge',  name: 'Twin Crystal Spires' },
-  { id: 3,  x: 540,  y: 310, zoneId: 1, zone: 'Emerald Valley', name: 'Stone Bastion Fortress' },
-  { id: 4,  x: 720,  y: 150, zoneId: 1, zone: 'Emerald Valley', name: 'Triple Bunker Redoubt' },
-  { id: 5,  x: 910,  y: 290, zoneId: 1, zone: 'Emerald Valley', name: 'Grand Citadel', milestone: 'sunburst' },
-  { id: 6,  x: 1100, y: 140, zoneId: 1, zone: 'Amber Canyon',   name: 'Canyon Gate Outpost' },
-  { id: 7,  x: 1280, y: 310, zoneId: 1, zone: 'Amber Canyon',   name: 'High Scaffold Quarry' },
-  { id: 8,  x: 1460, y: 160, zoneId: 1, zone: 'Amber Canyon',   name: 'Twin Citadels' },
-  { id: 9,  x: 1640, y: 310, zoneId: 1, zone: 'Amber Canyon',   name: 'Obsidian Arch Stronghold' },
-  { id: 10, x: 1830, y: 160, zoneId: 1, zone: 'Amber Canyon',   name: 'Colossus Gateway', milestone: 'airship' },
-
-  // Zone 2: Celestial Citadel & Crown Summit (Levels 11–20)
-  { id: 11, x: 2030, y: 300, zoneId: 2, zone: 'Celestial Twilight', name: 'Celestial Gateway' },
-  { id: 12, x: 2210, y: 150, zoneId: 2, zone: 'Celestial Twilight', name: 'Crystal Monoliths' },
-  { id: 13, x: 2390, y: 310, zoneId: 2, zone: 'Celestial Twilight', name: 'Starlight Sanctuary' },
-  { id: 14, x: 2570, y: 150, zoneId: 2, zone: 'Celestial Twilight', name: 'Aurora Spires' },
-  { id: 15, x: 2750, y: 290, zoneId: 2, zone: 'Celestial Twilight', name: 'Nebula Fortress', milestone: 'crystal' },
-  { id: 16, x: 2930, y: 150, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Bastion' },
-  { id: 17, x: 3110, y: 310, zoneId: 2, zone: 'Crown Summit',   name: 'Stormkeep Citadel' },
-  { id: 18, x: 3280, y: 160, zoneId: 2, zone: 'Crown Summit',   name: 'Dragon Spine Rampart' },
-  { id: 19, x: 3440, y: 300, zoneId: 2, zone: 'Crown Summit',   name: 'Infernal Vaults' },
-  { id: 20, x: 3580, y: 150, zoneId: 2, zone: 'Crown Summit',   name: 'Crown Summit Apex', milestone: 'crown' },
-
-  // Zone 3: Thunder Peaks & Cyber Apex (Levels 21–35)
-  { id: 21, x: 3770, y: 290, zoneId: 3, zone: 'Thunder Peaks',  name: 'Thunderfall Gate' },
-  { id: 22, x: 3950, y: 150, zoneId: 3, zone: 'Thunder Peaks',  name: 'Storm Pillar Bastion' },
-  { id: 23, x: 4130, y: 310, zoneId: 3, zone: 'Thunder Peaks',  name: 'Electric Gorge' },
-  { id: 24, x: 4310, y: 150, zoneId: 3, zone: 'Thunder Peaks',  name: 'Static Spire Outpost' },
-  { id: 25, x: 4490, y: 290, zoneId: 3, zone: 'Thunder Peaks',  name: 'Plasma Stronghold', milestone: 'sunburst' },
-  { id: 26, x: 4680, y: 140, zoneId: 3, zone: 'Storm Bastion',  name: 'Bunker of Thunder' },
-  { id: 27, x: 4860, y: 310, zoneId: 3, zone: 'Storm Bastion',  name: 'Obsidian Rampart' },
-  { id: 28, x: 5040, y: 160, zoneId: 3, zone: 'Storm Bastion',  name: 'Twin Storm Towers' },
-  { id: 29, x: 5220, y: 310, zoneId: 3, zone: 'Storm Bastion',  name: 'Titan Barricade' },
-  { id: 30, x: 5410, y: 160, zoneId: 3, zone: 'Storm Bastion',  name: 'Colossus of Sparks', milestone: 'airship' },
-  { id: 31, x: 5610, y: 300, zoneId: 3, zone: 'Cyber Apex',     name: 'Quantum Overlook' },
-  { id: 32, x: 5790, y: 150, zoneId: 3, zone: 'Cyber Apex',     name: 'Nebula Core Redoubt' },
-  { id: 33, x: 5970, y: 310, zoneId: 3, zone: 'Cyber Apex',     name: 'Astral Vault' },
-  { id: 34, x: 6150, y: 150, zoneId: 3, zone: 'Cyber Apex',     name: 'Sky Empress Bastion' },
-  { id: 35, x: 6330, y: 290, zoneId: 3, zone: 'Cyber Apex',     name: 'Supreme Grand Apex', milestone: 'crown' }
+  {
+    "id": 1,
+    "x": 180,
+    "y": 300,
+    "zoneId": 1,
+    "zone": "Emerald Valley",
+    "name": "Valley Outpost Meadow"
+  },
+  {
+    "id": 2,
+    "x": 360,
+    "y": 160,
+    "zoneId": 1,
+    "zone": "Emerald Valley",
+    "name": "Twin Crystal Spires"
+  },
+  {
+    "id": 3,
+    "x": 540,
+    "y": 310,
+    "zoneId": 1,
+    "zone": "Emerald Valley",
+    "name": "Stone Bastion Fortress"
+  },
+  {
+    "id": 4,
+    "x": 720,
+    "y": 150,
+    "zoneId": 1,
+    "zone": "Emerald Valley",
+    "name": "Triple Bunker Redoubt"
+  },
+  {
+    "id": 5,
+    "x": 910,
+    "y": 290,
+    "zoneId": 1,
+    "zone": "Emerald Valley",
+    "name": "Grand Citadel",
+    "milestone": "sunburst"
+  },
+  {
+    "id": 6,
+    "x": 1100,
+    "y": 140,
+    "zoneId": 1,
+    "zone": "Amber Canyon",
+    "name": "Canyon Gate Outpost"
+  },
+  {
+    "id": 7,
+    "x": 1280,
+    "y": 310,
+    "zoneId": 1,
+    "zone": "Amber Canyon",
+    "name": "High Scaffold Quarry"
+  },
+  {
+    "id": 8,
+    "x": 1460,
+    "y": 160,
+    "zoneId": 1,
+    "zone": "Amber Canyon",
+    "name": "Twin Citadels"
+  },
+  {
+    "id": 9,
+    "x": 1640,
+    "y": 310,
+    "zoneId": 1,
+    "zone": "Amber Canyon",
+    "name": "Obsidian Arch Stronghold"
+  },
+  {
+    "id": 10,
+    "x": 1830,
+    "y": 160,
+    "zoneId": 1,
+    "zone": "Amber Canyon",
+    "name": "Colossus Gateway",
+    "milestone": "airship"
+  },
+  {
+    "id": 11,
+    "x": 2030,
+    "y": 300,
+    "zoneId": 2,
+    "zone": "Celestial Twilight",
+    "name": "Celestial Gateway"
+  },
+  {
+    "id": 12,
+    "x": 2210,
+    "y": 150,
+    "zoneId": 2,
+    "zone": "Celestial Twilight",
+    "name": "Crystal Monoliths"
+  },
+  {
+    "id": 13,
+    "x": 2390,
+    "y": 310,
+    "zoneId": 2,
+    "zone": "Celestial Twilight",
+    "name": "Starlight Sanctuary"
+  },
+  {
+    "id": 14,
+    "x": 2570,
+    "y": 150,
+    "zoneId": 2,
+    "zone": "Celestial Twilight",
+    "name": "Aurora Spires"
+  },
+  {
+    "id": 15,
+    "x": 2750,
+    "y": 290,
+    "zoneId": 2,
+    "zone": "Celestial Twilight",
+    "name": "Nebula Fortress",
+    "milestone": "crystal"
+  },
+  {
+    "id": 16,
+    "x": 2930,
+    "y": 150,
+    "zoneId": 2,
+    "zone": "Crown Summit",
+    "name": "Crown Bastion"
+  },
+  {
+    "id": 17,
+    "x": 3110,
+    "y": 310,
+    "zoneId": 2,
+    "zone": "Crown Summit",
+    "name": "Stormkeep Citadel"
+  },
+  {
+    "id": 18,
+    "x": 3280,
+    "y": 160,
+    "zoneId": 2,
+    "zone": "Crown Summit",
+    "name": "Dragon Spine Rampart"
+  },
+  {
+    "id": 19,
+    "x": 3440,
+    "y": 300,
+    "zoneId": 2,
+    "zone": "Crown Summit",
+    "name": "Infernal Vaults"
+  },
+  {
+    "id": 20,
+    "x": 3580,
+    "y": 150,
+    "zoneId": 2,
+    "zone": "Crown Summit",
+    "name": "Crown Summit Apex",
+    "milestone": "crown"
+  },
+  {
+    "id": 21,
+    "x": 3770,
+    "y": 290,
+    "zoneId": 3,
+    "zone": "Thunder Peaks",
+    "name": "Thunderfall Gate"
+  },
+  {
+    "id": 22,
+    "x": 3950,
+    "y": 150,
+    "zoneId": 3,
+    "zone": "Thunder Peaks",
+    "name": "Storm Pillar Bastion"
+  },
+  {
+    "id": 23,
+    "x": 4130,
+    "y": 310,
+    "zoneId": 3,
+    "zone": "Thunder Peaks",
+    "name": "Electric Gorge"
+  },
+  {
+    "id": 24,
+    "x": 4310,
+    "y": 150,
+    "zoneId": 3,
+    "zone": "Thunder Peaks",
+    "name": "Static Spire Outpost"
+  },
+  {
+    "id": 25,
+    "x": 4490,
+    "y": 290,
+    "zoneId": 3,
+    "zone": "Thunder Peaks",
+    "name": "Plasma Stronghold",
+    "milestone": "sunburst"
+  },
+  {
+    "id": 26,
+    "x": 4680,
+    "y": 140,
+    "zoneId": 3,
+    "zone": "Storm Bastion",
+    "name": "Bunker of Thunder"
+  },
+  {
+    "id": 27,
+    "x": 4860,
+    "y": 310,
+    "zoneId": 3,
+    "zone": "Storm Bastion",
+    "name": "Obsidian Rampart"
+  },
+  {
+    "id": 28,
+    "x": 5040,
+    "y": 160,
+    "zoneId": 3,
+    "zone": "Storm Bastion",
+    "name": "Twin Storm Towers"
+  },
+  {
+    "id": 29,
+    "x": 5220,
+    "y": 310,
+    "zoneId": 3,
+    "zone": "Storm Bastion",
+    "name": "Titan Barricade"
+  },
+  {
+    "id": 30,
+    "x": 5410,
+    "y": 160,
+    "zoneId": 3,
+    "zone": "Storm Bastion",
+    "name": "Colossus of Sparks",
+    "milestone": "airship"
+  },
+  {
+    "id": 31,
+    "x": 5610,
+    "y": 300,
+    "zoneId": 3,
+    "zone": "Cyber Apex",
+    "name": "Quantum Overlook"
+  },
+  {
+    "id": 32,
+    "x": 5790,
+    "y": 150,
+    "zoneId": 3,
+    "zone": "Cyber Apex",
+    "name": "Nebula Core Redoubt"
+  },
+  {
+    "id": 33,
+    "x": 5970,
+    "y": 310,
+    "zoneId": 3,
+    "zone": "Cyber Apex",
+    "name": "Astral Vault"
+  },
+  {
+    "id": 34,
+    "x": 6150,
+    "y": 150,
+    "zoneId": 3,
+    "zone": "Cyber Apex",
+    "name": "Sky Empress Bastion"
+  },
+  {
+    "id": 35,
+    "x": 6330,
+    "y": 290,
+    "zoneId": 3,
+    "zone": "Cyber Apex",
+    "name": "Supreme Grand Apex",
+    "milestone": "crown"
+  },
+  {
+    "id": 36,
+    "x": 6510,
+    "y": 150,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Chrono Horizon"
+  },
+  {
+    "id": 37,
+    "x": 6690,
+    "y": 300,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Temporal Rift Keep"
+  },
+  {
+    "id": 38,
+    "x": 6870,
+    "y": 150,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Quantum Core Redoubt"
+  },
+  {
+    "id": 39,
+    "x": 7050,
+    "y": 310,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Dimensional Vault"
+  },
+  {
+    "id": 40,
+    "x": 7230,
+    "y": 160,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Void Airship Bastion",
+    "milestone": "airship"
+  },
+  {
+    "id": 41,
+    "x": 7410,
+    "y": 300,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Phase Shift Colonnade"
+  },
+  {
+    "id": 42,
+    "x": 7590,
+    "y": 150,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Event Horizon Fortress"
+  },
+  {
+    "id": 43,
+    "x": 7770,
+    "y": 310,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Warp Lattice Citadel"
+  },
+  {
+    "id": 44,
+    "x": 7950,
+    "y": 150,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Singularity Array"
+  },
+  {
+    "id": 45,
+    "x": 8130,
+    "y": 290,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Chrono Sovereign Palace",
+    "milestone": "sunburst"
+  },
+  {
+    "id": 46,
+    "x": 8310,
+    "y": 140,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Tesseract Bulwark"
+  },
+  {
+    "id": 47,
+    "x": 8490,
+    "y": 310,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Void Titan Foundry"
+  },
+  {
+    "id": 48,
+    "x": 8670,
+    "y": 160,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Hypercube Rampart"
+  },
+  {
+    "id": 49,
+    "x": 8850,
+    "y": 300,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Chrono Zenith Bastion"
+  },
+  {
+    "id": 50,
+    "x": 9030,
+    "y": 150,
+    "zoneId": 4,
+    "zone": "Chrono Void",
+    "name": "Temporal Singularity Apex",
+    "milestone": "crown"
+  },
+  {
+    "id": 51,
+    "x": 9210,
+    "y": 290,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Solar Core Genesis"
+  },
+  {
+    "id": 52,
+    "x": 9390,
+    "y": 150,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Prometheus Forge"
+  },
+  {
+    "id": 53,
+    "x": 9570,
+    "y": 310,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Helios Radiant Keep"
+  },
+  {
+    "id": 54,
+    "x": 9750,
+    "y": 150,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Supernova Rampart"
+  },
+  {
+    "id": 55,
+    "x": 9930,
+    "y": 290,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Solaris Grand Colosseum",
+    "milestone": "sunburst"
+  },
+  {
+    "id": 56,
+    "x": 10110,
+    "y": 140,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Plasma Reactor Spire"
+  },
+  {
+    "id": 57,
+    "x": 10290,
+    "y": 310,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Fusion Blast Furnace"
+  },
+  {
+    "id": 58,
+    "x": 10470,
+    "y": 160,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Starlight Bastion Matrix"
+  },
+  {
+    "id": 59,
+    "x": 10650,
+    "y": 300,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Corona Shield Citadel"
+  },
+  {
+    "id": 60,
+    "x": 10830,
+    "y": 150,
+    "zoneId": 5,
+    "zone": "Solar Foundry",
+    "name": "Solar Emperor Fortress",
+    "milestone": "airship"
+  },
+  {
+    "id": 61,
+    "x": 11010,
+    "y": 290,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Cosmic Genesis Spire"
+  },
+  {
+    "id": 62,
+    "x": 11190,
+    "y": 150,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Nebula Titan Colossus"
+  },
+  {
+    "id": 63,
+    "x": 11370,
+    "y": 310,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Dark Matter Bastion"
+  },
+  {
+    "id": 64,
+    "x": 11550,
+    "y": 150,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Astral Aegis Citadel"
+  },
+  {
+    "id": 65,
+    "x": 11730,
+    "y": 290,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Galactic Titan Pantheon",
+    "milestone": "crystal"
+  },
+  {
+    "id": 66,
+    "x": 11910,
+    "y": 140,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Infinity Core Stronghold"
+  },
+  {
+    "id": 67,
+    "x": 12090,
+    "y": 310,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Celestial Vault of Gods"
+  },
+  {
+    "id": 68,
+    "x": 12270,
+    "y": 160,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Imperial Sky Pantheon"
+  },
+  {
+    "id": 69,
+    "x": 12450,
+    "y": 300,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Singularity Apex Sanctum"
+  },
+  {
+    "id": 70,
+    "x": 12630,
+    "y": 150,
+    "zoneId": 6,
+    "zone": "Cosmic Singularity",
+    "name": "Omnipotent God Sovereign Citadel",
+    "milestone": "crown"
+  }
 ];
 
-export const MAP_TOTAL_WIDTH = 6600;
+export const MAP_TOTAL_WIDTH = 13200;
 export const MAP_TOTAL_HEIGHT = 460;
 
 /**
@@ -120,14 +654,13 @@ export class LevelSelect {
     this.viewportEl = document.getElementById('roadmap-viewport');
 
     const unlocked = this.storage.getUnlockedLevel();
-    this.activeLevelId = Math.min(35, Math.max(1, unlocked));
+    this.activeLevelId = Math.min(70, Math.max(1, unlocked));
     this.focusedLevelId = this.activeLevelId;
     this.lastPreviewedLevelId = null;
     this.currentZoneId = unlocked > 20 ? 3 : unlocked > 10 ? 2 : 1;
 
     this.isInputLocked = false;
-    this.pendingZone2Unlock = false;
-    this.pendingZone3Unlock = false;
+    this.pendingZoneUnlock = null;
     this.pendingLevelUnlock = null;
 
     // Drag / Pan interaction state
@@ -182,7 +715,7 @@ export class LevelSelect {
    */
   getMaxVisibleLevel() {
     const unlocked = this.storage ? Number(this.storage.getUnlockedLevel()) || 1 : 1;
-    return Math.min(35, Math.max(8, unlocked + 5));
+    return Math.min(70, Math.max(8, unlocked + 5));
   }
 
   /**
@@ -191,7 +724,7 @@ export class LevelSelect {
    */
   getAllowedWorldWidth() {
     const maxVisibleLevel = this.getMaxVisibleLevel();
-    if (maxVisibleLevel >= 35) {
+    if (maxVisibleLevel >= 70) {
       return MAP_TOTAL_WIDTH;
     }
     const maxNode = LEVEL_NODES.find((n) => n.id === maxVisibleLevel);
@@ -630,22 +1163,22 @@ export class LevelSelect {
         <use href="#decoBgCloud" x="5400" y="45" transform="scale(0.95)" />
         <use href="#decoBgCloud" x="6150" y="35" transform="scale(0.85)" />
 
-        <!-- 2. LAYERED MOUNTAIN RIDGES (SMOOTH ORGANIC CURVES ACROSS 6600PX) -->
+        <!-- 2. LAYERED MOUNTAIN RIDGES (SMOOTH ORGANIC CURVES ACROSS 13200PX) -->
         <!-- Layer 1: Far Mountain Silhouettes -->
         <path
-          d="M 0 240 C 250 140, 500 130, 750 230 C 1000 150, 1250 140, 1500 220 C 1750 160, 2000 150, 2250 210 C 2500 140, 2750 150, 3000 210 C 3300 140, 3550 150, 3800 230 C 4100 140, 4400 150, 4700 220 C 5000 140, 5300 150, 5600 210 C 5900 140, 6200 150, 6600 230 L 6600 460 L 0 460 Z"
+          d="M 0 240 C 250 140, 500 130, 750 230 C 1000 150, 1250 140, 1500 220 C 1750 160, 2000 150, 2250 210 C 2500 140, 2750 150, 3000 210 C 3300 140, 3550 150, 3800 230 C 4100 140, 4400 150, 4700 220 C 5000 140, 5300 150, 5600 210 C 5900 140, 6200 150, 13200 230 L 13200 460 L 0 460 Z"
           fill="url(#farMountainGrad)"
           opacity="0.38"
         />
 
         <!-- Layer 2: Mid-Distance Mountain Ridge -->
         <path
-          d="M 0 270 C 200 180, 400 170, 650 260 C 900 190, 1150 180, 1400 250 C 1650 190, 1900 190, 2150 240 C 2400 180, 2650 170, 2900 230 C 3200 170, 3500 180, 3800 250 C 4100 180, 4400 170, 4700 240 C 5000 180, 5300 170, 5600 230 C 5900 170, 6200 180, 6600 250 L 6600 460 L 0 460 Z"
+          d="M 0 270 C 200 180, 400 170, 650 260 C 900 190, 1150 180, 1400 250 C 1650 190, 1900 190, 2150 240 C 2400 180, 2650 170, 2900 230 C 3200 170, 3500 180, 3800 250 C 4100 180, 4400 170, 4700 240 C 5000 180, 5300 170, 5600 230 C 5900 170, 6200 180, 13200 250 L 13200 460 L 0 460 Z"
           fill="url(#midMountainGrad)"
           opacity="0.5"
         />
 
-        <!-- 3. CONTINUOUS ROLLING MEADOW HILLS (HARMONIOUS BIO-TRANSITION ACROSS 6600PX) -->
+        <!-- 3. CONTINUOUS ROLLING MEADOW HILLS (HARMONIOUS BIO-TRANSITION ACROSS 13200PX) -->
 
         <!-- Zone 1 Far Rolling Hills (x: 0 to 1950) -->
         <path
@@ -676,14 +1209,14 @@ export class LevelSelect {
           opacity="0.5"
         />
 
-        <!-- Zone 3 Far Thunder & Cyber Hills (x: 3750 to 6640) -->
+        <!-- Zone 3 Far Thunder & Cyber Hills (x: 3750 to 13240) -->
         <path
-          d="M 3750 310 C 3950 170, 4150 180, 4350 290 C 4550 170, 4750 180, 4950 290 C 5150 170, 5350 180, 5550 290 C 5750 170, 5950 180, 6150 290 C 6350 170, 6500 180, 6640 280 L 6640 460 L 3750 460 Z"
+          d="M 3750 310 C 3950 170, 4150 180, 4350 290 C 4550 170, 4750 180, 4950 290 C 5150 170, 5350 180, 5550 290 C 5750 170, 5950 180, 6150 290 C 6350 170, 6500 180, 13240 280 L 13240 460 L 3750 460 Z"
           fill="url(#celestialHillGradFar)"
         />
         <!-- Zone 3 Far Hill Crest Lightning Rim -->
         <path
-          d="M 3750 310 C 3950 170, 4150 180, 4350 290 C 4550 170, 4750 180, 4950 290 C 5150 170, 5350 180, 5550 290 C 5750 170, 5950 180, 6150 290 C 6350 170, 6500 180, 6640 280"
+          d="M 3750 310 C 3950 170, 4150 180, 4350 290 C 4550 170, 4750 180, 4950 290 C 5150 170, 5350 180, 5550 290 C 5750 170, 5950 180, 6150 290 C 6350 170, 6500 180, 13240 280"
           fill="none"
           stroke="#38bdf8"
           stroke-width="4"
@@ -718,13 +1251,13 @@ export class LevelSelect {
           opacity="0.6"
         />
 
-        <!-- Zone 3 Near Thunder Highlands (x: 3750 to 6640) -->
+        <!-- Zone 3 Near Thunder Highlands (x: 3750 to 13240) -->
         <path
-          d="M 3750 360 C 3940 260, 4130 270, 4320 360 C 4510 260, 4700 270, 4890 360 C 5080 260, 5270 270, 5460 360 C 5650 260, 5840 270, 6030 360 C 6220 260, 6410 270, 6640 340 L 6640 460 L 3750 460 Z"
+          d="M 3750 360 C 3940 260, 4130 270, 4320 360 C 4510 260, 4700 270, 4890 360 C 5080 260, 5270 270, 5460 360 C 5650 260, 5840 270, 6030 360 C 6220 260, 6410 270, 13240 340 L 13240 460 L 3750 460 Z"
           fill="url(#celestialHillGradNear)"
         />
         <path
-          d="M 3750 360 C 3940 260, 4130 270, 4320 360 C 4510 260, 4700 270, 4890 360 C 5080 260, 5270 270, 5460 360 C 5650 260, 5840 270, 6030 360 C 6220 260, 6410 270, 6640 340"
+          d="M 3750 360 C 3940 260, 4130 270, 4320 360 C 4510 260, 4700 270, 4890 360 C 5080 260, 5270 270, 5460 360 C 5650 260, 5840 270, 6030 360 C 6220 260, 6410 270, 13240 340"
           fill="none"
           stroke="#67e8f9"
           stroke-width="4.5"
@@ -1147,7 +1680,7 @@ export class LevelSelect {
     const avatarUrl = this.storage.getAvatarUrl();
 
     // Default activeLevelId to highest unlocked level if unset or beyond unlocked boundary
-    if (!this.activeLevelId || this.activeLevelId > Math.min(35, unlockedLevel)) {
+    if (!this.activeLevelId || this.activeLevelId > Math.min(70, unlockedLevel)) {
       this.activeLevelId = Math.min(35, Math.max(1, unlockedLevel));
     }
 
@@ -1350,8 +1883,8 @@ export class LevelSelect {
 
   async animateCloudRemoval(zoneNum = 2) {
     this.lockInput();
-    const prevLvl = zoneNum === 3 ? 20 : 10;
-    const nextLvl = zoneNum === 3 ? 21 : 11;
+    const prevLvl = zoneNum === 2 ? 10 : zoneNum === 3 ? 20 : zoneNum === 4 ? 35 : zoneNum === 5 ? 50 : 60;
+    const nextLvl = prevLvl + 1;
     this.centerOnLevel(prevLvl, true);
 
     await new Promise((r) => setTimeout(r, 400));

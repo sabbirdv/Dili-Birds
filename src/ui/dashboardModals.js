@@ -102,6 +102,47 @@ export const VOLT_STRIKER_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent
 </svg>
 `)}`;
 
+export const CHRONO_PHANTOM_AVATAR = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="chronoBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="55%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#2e1065" />
+    </radialGradient>
+    <linearGradient id="chronoSpikeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="50%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="48" fill="url(#chronoBg)" stroke="#c084fc" stroke-width="2.5" />
+  <!-- Dual Celestial Chrono Rings -->
+  <ellipse cx="50" cy="50" rx="42" ry="16" fill="none" stroke="#e9d5ff" stroke-width="2.2" stroke-dasharray="8 4" transform="rotate(-30 50 50)" opacity="0.9" />
+  <ellipse cx="50" cy="50" rx="42" ry="16" fill="none" stroke="#ec4899" stroke-width="1.8" stroke-dasharray="12 6" transform="rotate(40 50 50)" opacity="0.8" />
+  <!-- Orbiting Quantum Pips -->
+  <circle cx="16" cy="30" r="3.5" fill="#f472b6" />
+  <circle cx="84" cy="70" r="3.5" fill="#38bdf8" />
+  <!-- Top Temporal Spikes / Phase Crest -->
+  <polygon points="50,4 45,26 55,26" fill="url(#chronoSpikeGrad)" stroke="#581c87" stroke-width="1.2" />
+  <polygon points="41,12 37,28 46,28" fill="url(#chronoSpikeGrad)" stroke="#581c87" stroke-width="1.2" />
+  <polygon points="59,12 54,28 63,28" fill="url(#chronoSpikeGrad)" stroke="#581c87" stroke-width="1.2" />
+  <!-- Speech-bubble pill character body -->
+  <rect x="22" y="34" width="56" height="32" rx="16" fill="#7c3aed" stroke="#4c1d95" stroke-width="2" />
+  <polygon points="50,66 52,73 53,66" fill="#7c3aed" />
+  <!-- Chevron eyes -->
+  <g transform="translate(34, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <g transform="translate(66, 48) rotate(45)">
+    <rect x="-6" y="-6" width="12" height="12" fill="#ffffff" />
+    <rect x="-1" y="-5" width="6" height="6" fill="#090d16" />
+  </g>
+  <path d="M44 58 Q50 64 56 58" fill="none" stroke="#090d16" stroke-width="2.4" stroke-linecap="round" />
+</svg>
+`)}`;
+
 export const HEROES_DATA = [
   {
     id: 'commander_falcon',
@@ -221,6 +262,23 @@ export const HEROES_DATA = [
     pierce: 85,
     claimReward: 500,
     themeColor: '#06b6d4'
+  },
+  {
+    id: 'chrono_phantom',
+    name: 'Chrono Phantom',
+    archetype: 'Quantum Phase Disruptor',
+    type: 'chrono',
+    avatarUrl: CHRONO_PHANTOM_AVATAR,
+    milestoneLevel: 50,
+    specialPower: 'Temporal Warp Surge & Joint Disruption',
+    abilityName: 'Temporal Warp Surge',
+    abilityDesc: 'Tap mid-flight to phase forward at quantum velocity, triggering a multi-directional temporal shockwave that collapses load-bearing joints and shatters stone, metal, and glass.',
+    recommendedLevels: 'Levels 50–70',
+    speed: 96,
+    power: 98,
+    pierce: 95,
+    claimReward: 800,
+    themeColor: '#a855f7'
   }
 ];
 
@@ -352,6 +410,54 @@ export const MISSIONS_DATA = [
     target: 90,
     rewardCoins: 800,
     getProgress: (storage) => Math.min(90, storage.getTotalStars())
+  },
+  {
+    id: 'mission_chrono_unlocked',
+    title: 'Temporal Singularity',
+    desc: 'Reach Stage 50 to unlock Chrono Phantom quantum character.',
+    target: 50,
+    rewardCoins: 800,
+    getProgress: (storage) => Math.min(50, storage.getUnlockedLevel())
+  },
+  {
+    id: 'mission_stage_50',
+    title: 'Chrono Rift Sovereign',
+    desc: 'Clear Stage 50 and master the Temporal Singularity Apex.',
+    target: 50,
+    rewardCoins: 750,
+    getProgress: (storage) => (storage.getStarsForLevel(50) > 0 ? 50 : Math.min(49, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_stage_60',
+    title: 'Solar Foundry Master',
+    desc: 'Clear Stage 60 in the Solar Foundry.',
+    target: 60,
+    rewardCoins: 900,
+    getProgress: (storage) => (storage.getStarsForLevel(60) > 0 ? 60 : Math.min(59, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_ultimate_god_70',
+    title: 'Omnipotent Apex Sovereign',
+    desc: 'Clear Stage 70 and conquer all 70 realms across the galaxy.',
+    target: 70,
+    rewardCoins: 2500,
+    getProgress: (storage) => (storage.getStarsForLevel(70) > 0 ? 70 : Math.min(69, storage.getUnlockedLevel()))
+  },
+  {
+    id: 'mission_star_celestial',
+    title: 'Celestial Starlight Titan',
+    desc: 'Earn 140 or more Stars across your completed campaign stages.',
+    target: 140,
+    rewardCoins: 1200,
+    getProgress: (storage) => Math.min(140, storage.getTotalStars())
+  },
+  {
+    id: 'mission_star_absolute_god',
+    title: 'Grand Deity of Stars',
+    desc: 'Earn 210 Stars — Total 3-Star Mastery across all 70 campaign stages!',
+    target: 210,
+    rewardCoins: 3000,
+    getProgress: (storage) => Math.min(210, storage.getTotalStars())
   }
 ];
 
@@ -969,9 +1075,9 @@ export class DashboardModals {
       let nextLockedHero = HEROES_DATA.find((h) => h.milestoneLevel > unlockedLevel);
       let bannerHint = nextLockedHero
         ? `Next Unlock: <strong>${nextLockedHero.name}</strong> at <strong>Level ${nextLockedHero.milestoneLevel}</strong>!`
-        : `All 7 Legendary Birds Unlocked & Ready!`;
+        : `All 8 Legendary Birds Unlocked & Ready!`;
 
-      const maxMilestone = 21;
+      const maxMilestone = 50;
       const pct = Math.min(100, Math.max(8, Math.round(((unlockedLevel - 1) / (maxMilestone - 1)) * 100)));
 
       let nodesHtml = '';
@@ -997,7 +1103,7 @@ export class DashboardModals {
       milestoneBannerEl.innerHTML = `
         <div class="modal-milestone-info">
           <div class="milestone-banner-top">
-            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES (LEVELS 1–35)</span>
+            <span class="milestone-badge-lead">HERO PROGRESSION MILESTONES (LEVELS 1–70)</span>
             <span class="milestones-next-teaser">${bannerHint}</span>
           </div>
           <div class="milestones-track-container modal-track">

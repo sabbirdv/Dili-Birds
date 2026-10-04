@@ -568,6 +568,79 @@ function createLightningAccents(radius, scale) {
 }
 
 /**
+ * Creates sculpted celestial chrono phase crest & quantum rings for 'chrono' (Chrono Phantom).
+ */
+function createChronoAccents(radius, scale) {
+  const group = new THREE.Group();
+
+  const chronoMat = new THREE.MeshStandardMaterial({
+    color: 0x8b5cf6,
+    emissive: 0xa855f7,
+    emissiveIntensity: 0.85,
+    roughness: 0.12,
+    metalness: 0.70
+  });
+
+  const pipMat = new THREE.MeshBasicMaterial({
+    color: 0xec4899,
+    transparent: true,
+    opacity: 0.90
+  });
+
+  // Top sculpted 3D temporal phase crystal spikes (geometric triple horns)
+  const spikeGeo = new THREE.ConeGeometry(0.08 * scale, 0.42 * scale, 5);
+  spikeGeo.rotateX(Math.PI);
+
+  const centerSpike = new THREE.Mesh(spikeGeo, chronoMat);
+  centerSpike.position.set(0, radius * 0.98, 0);
+  group.add(centerSpike);
+
+  [-1, 1].forEach((dir) => {
+    const sideSpike = new THREE.Mesh(spikeGeo, chronoMat);
+    sideSpike.position.set(dir * 0.18 * scale, radius * 0.92, 0);
+    sideSpike.rotation.z = dir * -0.32;
+    sideSpike.scale.set(0.85, 0.85, 0.85);
+    group.add(sideSpike);
+  });
+
+  // Dual celestial chrono-rings orbiting at angled inclinations
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xc084fc,
+    transparent: true,
+    opacity: 0.70
+  });
+
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.94, 0.02 * scale, 8, 40),
+    ringMat
+  );
+  ring1.rotation.set(0.65, 0.45, 0.25);
+  group.add(ring1);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(radius * 0.90, 0.016 * scale, 8, 40),
+    ringMat
+  );
+  ring2.rotation.set(-0.75, 0.35, -0.55);
+  group.add(ring2);
+
+  // 4 Quantum energy pips positioned along the celestial ring
+  const pipGeo = new THREE.SphereGeometry(0.05 * scale, 8, 8);
+  for (let i = 0; i < 4; i++) {
+    const angle = (i * Math.PI) / 2;
+    const pip = new THREE.Mesh(pipGeo, pipMat);
+    pip.position.set(
+      Math.cos(angle) * radius * 0.94,
+      Math.sin(angle) * 0.25 * scale,
+      Math.sin(angle) * radius * 0.94
+    );
+    group.add(pip);
+  }
+
+  return group;
+}
+
+/**
  * Creates a full 3D Bird model accurately sculpted to match the custom character system:
  * - 'red' (Commander Falcon): Winged Blue Dili-Bird with 3D swept wings & aero stability orb
  * - 'speed' (Speedster Swift): Electric Blue 3D Glass Energy Orb with aerodynamic twin fins & sonic filaments
@@ -652,6 +725,16 @@ export function createBirdMesh(type = 'red') {
       orbEmissive: 0x00e5ff,
       orbOpacity: 0.46,
       ringColor: 0xa5f3fc
+    },
+    chrono: {
+      radius: 0.50,
+      bodyColor: 0x7c3aed,
+      metalness: 0.40,
+      roughness: 0.16,
+      orbColor: 0xa855f7,
+      orbEmissive: 0x9333ea,
+      orbOpacity: 0.48,
+      ringColor: 0xe9d5ff
     }
   };
 
@@ -732,6 +815,10 @@ export function createBirdMesh(type = 'red') {
     // Sculpted lightning bolt crest + arc fins & plasma halo
     const lightningAccents = createLightningAccents(radius, scale);
     group.add(lightningAccents);
+  } else if (type === 'chrono') {
+    // Sculpted temporal crystal phase crest & dual celestial chrono-rings
+    const chronoAccents = createChronoAccents(radius, scale);
+    group.add(chronoAccents);
   }
 
   group.userData = { radius, type };

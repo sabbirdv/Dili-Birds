@@ -926,7 +926,7 @@ export class GameScene {
       tnt: 22,
       wood: 80,
       stone: 135,
-      metal: 200
+      metal: 20
     };
 
     const mass = isStatic ? 0 : (massMap[type] || 3.6);
@@ -1018,6 +1018,8 @@ export class GameScene {
           birdMultiplier = blockObj.type === 'metal' ? 2.1 : blockObj.type === 'stone' ? 2.0 : 1.5;
         } else if (birdType === 'lightning') {
           birdMultiplier = blockObj.type === 'metal' ? 1.5 : blockObj.type === 'stone' ? 1.1 : blockObj.type === 'glass' ? 1.2 : 0.8;
+        } else if (birdType === 'chrono') {
+          birdMultiplier = blockObj.type === 'stone' ? 2.5 : blockObj.type === 'metal' ? 2.4 : blockObj.type === 'glass' ? 2.2 : 1.8;
         }
 
         // Damage derived from normal impact collision force (tuned for realistic yet beatable toughness)
@@ -1204,7 +1206,8 @@ export class GameScene {
       split: 2.4,
       fire: 2.8,
       vortex: 3.8,
-      lightning: 2.05
+      lightning: 2.05,
+      chrono: 3.6
     };
     const mass = massMap[this.activeBird.type] || 2.5;
 
@@ -1238,7 +1241,8 @@ export class GameScene {
       split: '✨ Tap or Click mid-flight for Tri-Cluster Split!',
       fire: '🔥 Tap or Click mid-flight for Inferno Burst!',
       vortex: '🌀 Tap or Click mid-flight for Vortex Shockwave!',
-      lightning: '⚡ Tap or Click mid-flight for Thunderbolt Surge!'
+      lightning: '⚡ Tap or Click mid-flight for Thunderbolt Surge!',
+      chrono: '⏳ Tap or Click mid-flight for Temporal Warp Surge!'
     };
     if (prompts[this.activeBird.type]) {
       this.onShowAbilityPrompt?.(prompts[this.activeBird.type]);
@@ -1284,6 +1288,10 @@ export class GameScene {
       this.activeBird.abilityUsed = true;
       this.onHideAbilityPrompt?.();
       this.triggerLightningSurge(pos);
+    } else if (bType === 'chrono') {
+      this.activeBird.abilityUsed = true;
+      this.onHideAbilityPrompt?.();
+      this.triggerChronoSurge(pos);
     }
   }
 
@@ -1581,6 +1589,113 @@ export class GameScene {
       });
       arcMat.dispose();
     }, 180);
+  }
+
+  triggerChronoSurge(origin) {
+    this.audio?.playExplosion?.();
+    this.audio?.playBoost?.();
+    this.spawnChronoFX(origin);
+    this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.95);
+    this.wakeAllStructures();
+
+    // High velocity quantum phase warp acceleration
+    if (this.activeBird && this.activeBird.body) {
+      this.activeBird.body.velocity.x *= 1.25;
+      this.activeBird.body.velocity.y *= 0.85;
+    }
+
+    const chronoRadius = 4.2;
+    // Shatter and dislodge destructible blocks in wide radius
+    [...this.blocks].forEach((b) => {
+      if (b.destroyed || !b.body) return;
+      const bPos = b.body.position;
+      const dist = Math.hypot(bPos.x - origin.x, bPos.y - origin.y);
+      if (dist < chronoRadius) {
+        b.body.wakeUp();
+        if (b.type === 'tnt') {
+          this.destroyBlock(b);
+        } else {
+          const falloff = 1 - dist / chronoRadius;
+          const dmg = falloff * (b.type === 'stone' ? 52 : b.type === 'metal' ? 48 : b.type === 'glass' ? 58 : 36);
+          b.hp -= dmg;
+          const impulseDir = new CANNON.Vec3(bPos.x - origin.x, bPos.y - origin.y, 0);
+          if (impulseDir.length() > 0.01) {
+            impulseDir.normalize();
+            b.body.applyImpulse(impulseDir.scale(falloff * 12.0), bPos);
+          }
+          if (b.hp <= 0) {
+            this.destroyBlock(b);
+          }
+        }
+      }
+    });
+
+    // Damage & dislodge targets
+    [...this.targets].forEach((t) => {
+      if (t.destroyed || !t.body) return;
+      const tPos = t.body.position;
+      const dist = Math.hypot(tPos.x - origin.x, tPos.y - origin.y);
+      if (dist < chronoRadius) {
+        t.body.wakeUp();
+        const falloff = 1 - dist / chronoRadius;
+        t.hp -= falloff * 30;
+        const impulseDir = new CANNON.Vec3(tPos.x - origin.x, tPos.y - origin.y, 0);
+        if (impulseDir.length() > 0.01) {
+          impulseDir.normalize();
+          t.body.applyImpulse(impulseDir.scale(falloff * 10), tPos);
+        }
+        if (t.hp <= 0) {
+          this.defeatTarget(t);
+        }
+      }
+    });
+  }
+
+  spawnChronoFX(origin) {
+    // 1. Violet & Magenta dual expanding quantum shockwaves
+    const shockwaveMat = new THREE.MeshBasicMaterial({
+      color: 0xa855f7,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false
+    });
+    const mesh = new THREE.Mesh(this.sharedShockwaveGeo, shockwaveMat);
+    mesh.position.set(origin.x, origin.y, 0.12);
+    this.scene.add(mesh);
+    this.particles.push({
+      type: 'shockwave',
+      mesh,
+      baseScale: 0.4,
+      maxExpansion: 8.4,
+      baseOpacity: 0.95,
+      life: 1.0,
+      decay: 2.2
+    });
+
+    // Secondary cyan pulse
+    const cyanMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false
+    });
+    const mesh2 = new THREE.Mesh(this.sharedShockwaveGeo, cyanMat);
+    mesh2.position.set(origin.x, origin.y, 0.14);
+    this.scene.add(mesh2);
+    this.particles.push({
+      type: 'shockwave',
+      mesh: mesh2,
+      baseScale: 0.2,
+      maxExpansion: 6.0,
+      baseOpacity: 0.85,
+      life: 0.8,
+      decay: 2.8
+    });
+
+    // 2. Quantum time-warp burst particles
+    this.spawnBurstParticles(origin, 0xa855f7, 32);
+    this.spawnBurstParticles(origin, 0xec4899, 24);
+    this.spawnBurstParticles(origin, 0x38bdf8, 16);
   }
 
   destroyBlock(blockObj) {

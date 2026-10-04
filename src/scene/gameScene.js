@@ -917,16 +917,16 @@ export class GameScene {
       wood: 3.6,
       coin: 2.6,
       tnt: 2.2,
-      stone: 6.0,
-      metal: 8.0
+      stone: 7.0,
+      metal: 9.0
     };
     const hpMap = {
       glass: 28,
       coin: 48,
       tnt: 22,
-      wood: 80,
-      stone: 135,
-      metal: 20
+      wood: 90,
+      stone: 145,
+      metal: 200,
     };
 
     const mass = isStatic ? 0 : (massMap[type] || 3.6);

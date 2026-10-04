@@ -1468,7 +1468,7 @@ export class GameScene {
     this.cameraShakeTrauma = Math.min(1.0, this.cameraShakeTrauma + 0.6);
     this.wakeStructuresNear(origin, 6.5);
 
-    const blastRadius = 4.2;
+    const blastRadius = 3.0;
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
       const bPos = b.body.position;
@@ -1588,7 +1588,7 @@ export class GameScene {
       this.activeBird.body.velocity.y *= 0.75;
     }
 
-    const lightningRadius = 3.8;
+    const lightningRadius = 3.0;
     // Zap nearby destructible blocks
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1651,7 +1651,7 @@ export class GameScene {
       type: 'shockwave',
       mesh,
       baseScale: 0.35,
-      maxExpansion: 6.8,
+      maxExpansion: 5.5,
       baseOpacity: 0.95,
       life: 1.0,
       decay: 2.5
@@ -1724,8 +1724,8 @@ export class GameScene {
       this.activeBird.body.velocity.y *= 0.85;
     }
 
-    // Shockwave radius tuned for satisfying, soft structural collapse
-    const chronoRadius = 4.0;
+    // Shockwave radius set to exactly 3.0m
+    const chronoRadius = 3.0;
     // Shatter and dislodge destructible blocks in balanced radius
     [...this.blocks].forEach((b) => {
       if (b.destroyed || !b.body) return;
@@ -1773,7 +1773,7 @@ export class GameScene {
   }
 
   spawnChronoFX(origin) {
-    // 1. Violet & Magenta dual expanding quantum shockwaves (calibrated to exact midpoint)
+    // 1. Violet & Magenta dual expanding quantum shockwaves (calibrated for 3.0m radius)
     const shockwaveMat = new THREE.MeshBasicMaterial({
       color: 0xa855f7,
       transparent: true,
@@ -1787,7 +1787,7 @@ export class GameScene {
       type: 'shockwave',
       mesh,
       baseScale: 0.35,
-      maxExpansion: 7.55,
+      maxExpansion: 5.8,
       baseOpacity: 0.95,
       life: 1.0,
       decay: 2.3
@@ -1807,7 +1807,7 @@ export class GameScene {
       type: 'shockwave',
       mesh: mesh2,
       baseScale: 0.2,
-      maxExpansion: 5.4,
+      maxExpansion: 4.0,
       baseOpacity: 0.85,
       life: 0.8,
       decay: 2.8

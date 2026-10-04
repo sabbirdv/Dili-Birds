@@ -1133,11 +1133,7 @@ export class BrandingElements {
    * ═════════════════════════════════════════════════════════════ */
 
   initPointerParallax() {
-    if (typeof window === 'undefined') return;
-    window.addEventListener('pointermove', (e) => {
-      this.targetTilt.x = ((e.clientX / window.innerWidth) - 0.5) * 2;
-      this.targetTilt.y = ((e.clientY / window.innerHeight) - 0.5) * 2;
-    }, { passive: true });
+    // Decoupled from pointer/touch to keep floating elements completely autonomous and optimize performance
   }
 
   /**
@@ -1455,11 +1451,7 @@ export class BrandingElements {
       this.rotatingLogoGroup.rotation.y += 0.85 * deltaTime;
     }
 
-    // ── Smooth Interactive Parallax Pointer Sway ──
-    this.currentTilt.x += (this.targetTilt.x - this.currentTilt.x) * 3.5 * deltaTime;
-    this.currentTilt.y += (this.targetTilt.y - this.currentTilt.y) * 3.5 * deltaTime;
-
-    // ── Animate 3D drifting game logo icons & character tokens (ONLY in dashboard mode) ──
+    // ── Animate 3D drifting game logo icons & character tokens (autonomous floating) ──
     if (this.driftingGroup && this.driftingGroup.visible) {
       this.driftingPieces.forEach((p) => {
         p.mesh.position.x += p.driftSpeed * deltaTime;
@@ -1470,8 +1462,8 @@ export class BrandingElements {
         }
 
         const floatOffset = Math.sin(elapsedTime * p.floatFreq + p.phase) * p.floatAmp;
-        p.mesh.position.y = p.baseY + floatOffset - (this.currentTilt.y * p.tiltFactor * 0.65);
-        p.mesh.position.z = p.baseZ + (this.currentTilt.x * p.tiltFactor * 0.75);
+        p.mesh.position.y = p.baseY + floatOffset;
+        p.mesh.position.z = p.baseZ;
 
         // Smooth slow 3D Y rotation showcasing front & back of character/logo badge
         p.mesh.rotation.y += p.rotSpeedY * deltaTime;

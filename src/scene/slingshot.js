@@ -32,7 +32,7 @@ export class SlingshotController {
 
     this.maxPullDistance = 4.0;
     this.minPullDistance = 0.4;
-    this.launchPowerMultiplier = 8.2;
+    this.launchPowerMultiplier = 8.5;
 
     // Physics constants matching cannon-es world in GameScene
     this.gravityY = -18.0;

@@ -736,6 +736,8 @@ html, body {
   border: 1.5px solid rgba(56, 189, 248, 0.15);
   background: rgba(56, 189, 248, 0.02);
   border-radius: 8px;
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 .sq-1 { width: 56px; height: 56px; top: 12%; left: 5%; }
@@ -1215,16 +1217,21 @@ html, body {
 
 .coin-glint-bob {
   filter: drop-shadow(0 2px 6px rgba(251, 191, 36, 0.5));
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 /* Active Road Progress */
 .roadmap-active-progress-pulse {
   opacity: 1;
+  pointer-events: none !important;
 }
 
 /* Airship above Level 10 */
 .map-floating-airship {
   transform: translate(1760px, 10px);
+  pointer-events: none !important;
+  user-select: none !important;
 }
 
 .airship-spinning-propeller {

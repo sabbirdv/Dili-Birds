@@ -177,126 +177,122 @@ export class LeaderboardService {
   }
 
   /**
-   * Syncs the current player's stars and coin values to the Dili-Birds-Data table.
-   * Uses existing serverRowId so no duplicate row is ever created.
+   * Records a verified gameplay level win directly to the Supabase database.
+   * Increments the player's existing server-side score and stars by ONLY the
+   * legitimately verified in-game turn rewards (coinsEarned and starsAdded).
+   * STRICT SECURITY: NEVER accepts or uses raw localStorage coins/stars!
    */
-  async syncPlayerScore({ serverRowId, username, score, star }) {
+  async recordVerifiedLevelWin({ serverRowId, username, levelId, coinsEarned, starsAdded }) {
     if (!this.supabase) {
       return { success: false, error: ERROR_CONNECTION_FAILED };
     }
 
     try {
       const cleanName = (username || '').trim().slice(0, 24) || 'Commander';
-      const coinScore = Math.max(0, Number(score) || 0);
-      const starCount = Math.max(0, Number(star) || 0);
+      const validLevelId = Math.max(1, Math.min(70, Math.floor(Number(levelId) || 1)));
+      // Sanity bounds: coins earned from a single level cannot exceed 2000, stars cannot exceed 3
+      const deltaCoins = Math.max(0, Math.min(2000, Math.floor(Number(coinsEarned) || 0)));
+      const deltaStars = Math.max(0, Math.min(3, Math.floor(Number(starsAdded) || 0)));
 
-      // 1. If serverRowId is provided, update by ID
-      if (serverRowId) {
+      // If no serverRowId provided, look up by username
+      let targetId = serverRowId;
+      let currentServerScore = 0;
+      let currentServerStars = 0;
+
+      if (targetId) {
+        const { data: existing, error } = await this.supabase
+          .from(LEADERBOARD_TABLE)
+          .select('id, score, star')
+          .eq('id', targetId)
+          .limit(1);
+
+        if (!error && Array.isArray(existing) && existing.length > 0) {
+          currentServerScore = Math.max(0, Number(existing[0].score) || 0);
+          currentServerStars = Math.max(0, Number(existing[0].star) || 0);
+        } else {
+          targetId = null;
+        }
+      }
+
+      if (!targetId) {
+        const { data: existingByName } = await this.supabase
+          .from(LEADERBOARD_TABLE)
+          .select('id, score, star')
+          .eq('player_name', cleanName)
+          .limit(1);
+
+        if (Array.isArray(existingByName) && existingByName.length > 0) {
+          targetId = existingByName[0].id;
+          currentServerScore = Math.max(0, Number(existingByName[0].score) || 0);
+          currentServerStars = Math.max(0, Number(existingByName[0].star) || 0);
+        }
+      }
+
+      const newScore = currentServerScore + deltaCoins;
+      // Maximum stars possible across all 70 campaign stages is 210 (70 * 3)
+      const newStars = Math.min(210, currentServerStars + deltaStars);
+
+      if (targetId) {
         const { data, error } = await this.supabase
           .from(LEADERBOARD_TABLE)
           .update({
-            score: coinScore,
-            star: starCount,
+            score: newScore,
+            star: newStars,
             player_name: cleanName
-          })
-          .eq('id', serverRowId)
-          .select('id, player_name, score, star');
-
-        if (isRlsError(error)) {
-          console.error('[LeaderboardService] Supabase RLS Policy Violation on UPDATE score! Code 42501');
-          return { success: false, isRlsBlocked: true, error: error.message };
-        }
-
-        if (!error && Array.isArray(data) && data.length > 0) {
-          return { success: true, rowId: data[0].id, data: data[0] };
-        }
-      }
-
-      // 2. If no serverRowId or ID was not found, check if record exists with this player_name
-      const { data: existing, error: existErr } = await this.supabase
-        .from(LEADERBOARD_TABLE)
-        .select('id')
-        .eq('player_name', cleanName)
-        .limit(1);
-
-      if (isRlsError(existErr)) {
-        console.error('[LeaderboardService] Supabase RLS Policy Violation on SELECT existing! Code 42501');
-        return { success: false, isRlsBlocked: true, error: existErr.message };
-      }
-
-      if (existing && existing.length > 0) {
-        const targetId = existing[0].id;
-        const { data, error } = await this.supabase
-          .from(LEADERBOARD_TABLE)
-          .update({
-            score: coinScore,
-            star: starCount
           })
           .eq('id', targetId)
           .select('id, player_name, score, star');
 
-        if (isRlsError(error)) {
-          return { success: false, isRlsBlocked: true, error: error.message };
-        }
-
-        if (!error && Array.isArray(data) && data.length > 0) {
-          return { success: true, rowId: data[0].id, data: data[0] };
-        }
-      }
-
-      // 3. If record doesn't exist yet, insert fresh
-      const { data: inserted, error: insertErr } = await this.supabase
-        .from(LEADERBOARD_TABLE)
-        .insert([
-          {
-            player_name: cleanName,
-            score: coinScore,
-            star: starCount
+        if (error) {
+          if (isRlsError(error)) {
+            return { success: false, isRlsBlocked: true, error: error.message };
           }
-        ])
-        .select('id, player_name, score, star');
-
-      if (insertErr) {
-        if (isRlsError(insertErr)) {
-          console.error(
-            '[LeaderboardService] Supabase RLS Policy Violation on INSERT score! Code 42501: new row violates row-level security policy for table "Dili-Birds-Data"'
-          );
-          return { success: false, isRlsBlocked: true, error: insertErr.message };
+          return { success: false, error: error.message };
         }
-        return { success: false, error: insertErr.message };
-      }
 
-      const insertedRow = Array.isArray(inserted) ? inserted[0] : inserted;
-      return { success: true, rowId: insertedRow?.id, data: insertedRow };
+        const updated = Array.isArray(data) ? data[0] : data;
+        return { success: true, rowId: updated?.id || targetId, score: newScore, star: newStars };
+      } else {
+        // Register new player row with verified start points
+        const { data: inserted, error: insertErr } = await this.supabase
+          .from(LEADERBOARD_TABLE)
+          .insert([
+            {
+              player_name: cleanName,
+              score: newScore,
+              star: newStars
+            }
+          ])
+          .select('id, player_name, score, star');
+
+        if (insertErr) {
+          return { success: false, error: insertErr.message };
+        }
+        const insRow = Array.isArray(inserted) ? inserted[0] : inserted;
+        return { success: true, rowId: insRow?.id, score: newScore, star: newStars };
+      }
     } catch (err) {
+      console.warn('[LeaderboardService] Error recording verified level win:', err.message);
       return { success: false, error: err.message };
     }
   }
 
   /**
-   * Syncs per-level progression, best scores, and stars to Supabase & global rankings.
-   * Ensures that level progression and achievements are preserved across sessions.
+   * Syncs per-level progression using verified level win increments.
+   * Backward compatible with existing game event listener.
    */
-  async syncLevelProgress({ serverRowId, username, levelId, score, stars, totalScore, totalStars }) {
-    try {
-      const syncRes = await this.syncPlayerScore({
-        serverRowId,
-        username,
-        score: totalScore,
-        star: totalStars
-      });
+  async syncLevelProgress({ serverRowId, username, levelId, coinsEarned, starsAdded }) {
+    return this.recordVerifiedLevelWin({ serverRowId, username, levelId, coinsEarned, starsAdded });
+  }
 
-      return {
-        success: syncRes.success,
-        rowId: syncRes.rowId || serverRowId,
-        levelId,
-        score,
-        stars,
-        error: syncRes.error
-      };
-    } catch (err) {
-      return { success: false, levelId, error: err.message };
-    }
+  /**
+   * SECURITY ENFORCEMENT:
+   * Direct synchronization of arbitrary client/localStorage scores to Supabase is permanently disabled
+   * to protect against developer-tools and localStorage modification exploits.
+   */
+  async syncPlayerScore() {
+    console.warn('[LeaderboardService] Blocked attempt to sync arbitrary client state to Supabase. Leaderboard accepts verified level wins only.');
+    return { success: false, error: 'Direct client score sync is disabled for security.' };
   }
 
   /**

@@ -1036,7 +1036,7 @@ export class GameScene {
     };
     const hpMap = {
       glass: 28,
-      coin: 35,
+      coin: 30,
       tnt: 22,
       wood: 90,
       stone: 145,

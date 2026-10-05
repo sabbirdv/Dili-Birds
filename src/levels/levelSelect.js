@@ -1586,21 +1586,6 @@ export class LevelSelect {
       const isClaimed = this.storage.hasClaimedCoins(levelId);
 
       const isChallenge = (levelId % 10 === 0) || (levelObj.difficulty && levelObj.difficulty.toLowerCase().includes('challenge'));
-      const bossName = levelId === 70
-        ? 'FINAL BOSS'
-        : levelId === 10
-        ? 'TITAN BOSS'
-        : levelId === 20
-        ? 'IMPERIAL BOSS'
-        : levelId === 30
-        ? 'COLOSSUS BOSS'
-        : levelId === 40
-        ? 'VOID BOSS'
-        : levelId === 50
-        ? 'CHRONO BOSS'
-        : levelId === 60
-        ? 'SOLAR BOSS'
-        : 'CHALLENGE BOSS';
 
       // Stars crowning completed node (arched above circular disk)
       let starsHtml = '';
@@ -1622,45 +1607,34 @@ export class LevelSelect {
         `;
       }
 
-      // Milestone / Challenge badges
+      // Milestone badges (only for non-challenge milestones if defined)
       let milestoneBadgeHtml = '';
-      if (isChallenge) {
-        milestoneBadgeHtml = `
-          <div class="challenge-boss-tag" aria-hidden="true" title="Challenge Boss Stage">
-            <div class="challenge-tag-shimmer"></div>
-            <span class="challenge-tag-icon">⚡</span>
-            <span class="challenge-tag-title">${bossName}</span>
-            <span class="challenge-tag-icon">⚡</span>
-          </div>
-        `;
-      } else if (node.milestone === 'sunburst') {
-        milestoneBadgeHtml = `<div class="milestone-sunburst-rays" aria-hidden="true"></div>`;
-      } else if (node.milestone === 'airship') {
-        milestoneBadgeHtml = `<div class="milestone-boss-beacon" aria-hidden="true"><span class="beacon-label">GATEWAY</span></div>`;
-      } else if (node.milestone === 'crystal') {
-        milestoneBadgeHtml = `<div class="milestone-crystal-aura" aria-hidden="true"></div>`;
-      } else if (node.milestone === 'crown') {
-        milestoneBadgeHtml = `<div class="milestone-crown-apex" aria-hidden="true">👑</div>`;
+      if (!isChallenge) {
+        if (node.milestone === 'sunburst') {
+          milestoneBadgeHtml = `<div class="milestone-sunburst-rays" aria-hidden="true"></div>`;
+        } else if (node.milestone === 'airship') {
+          milestoneBadgeHtml = `<div class="milestone-boss-beacon" aria-hidden="true"><span class="beacon-label">GATEWAY</span></div>`;
+        } else if (node.milestone === 'crystal') {
+          milestoneBadgeHtml = `<div class="milestone-crystal-aura" aria-hidden="true"></div>`;
+        } else if (node.milestone === 'crown') {
+          milestoneBadgeHtml = `<div class="milestone-crown-apex" aria-hidden="true">👑</div>`;
+        }
       }
 
       // Active Level Elements (Mascot Pin, Pulsing Beacon Ring, Juicy PLAY! CTA)
       let activeIndicatorHtml = '';
       if (isActive) {
-        const ctaText = isChallenge ? 'FIGHT BOSS! ⚡' : 'PLAY! ▶';
-        const ctaClass = isChallenge ? 'roadmap-juicy-play-cta challenge-play-cta' : 'roadmap-juicy-play-cta';
-        const mascotMsg = isChallenge ? `🔥 BOSS ${levelId}!` : `Stage ${levelId}${starsEarned > 0 ? ` • ${starsEarned}★` : ''}`;
-
         activeIndicatorHtml = `
           <div class="active-beacon-pulse ${isChallenge ? 'challenge-active-beacon' : ''}" aria-hidden="true"></div>
 
-          <div class="active-commander-mascot ${isChallenge ? 'challenge-mascot-pin' : ''}" id="commander-pin-${levelId}" title="Active Stage ${levelId}">
-            <div class="mascot-speech-cloud challenge-mascot-bubble">${mascotMsg}</div>
+          <div class="active-commander-mascot" id="commander-pin-${levelId}" title="Active Stage ${levelId}">
+            <div class="mascot-speech-cloud">Stage ${levelId}${starsEarned > 0 ? ` • ${starsEarned}★` : ''}</div>
             <img src="${mascotCharUrl}" alt="Dili Bird" class="mascot-bird-img" />
           </div>
 
           <button
             type="button"
-            class="${ctaClass}"
+            class="roadmap-juicy-play-cta"
             data-level-id="${levelId}"
             title="Launch Stage ${levelId}"
             aria-label="Play Level ${levelId}"
@@ -1668,7 +1642,7 @@ export class LevelSelect {
             <div class="play-cta-pointer-hand" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 8H9L12 2Z"/></svg>
             </div>
-            <span class="play-cta-text">${ctaText}</span>
+            <span class="play-cta-text">PLAY! ▶</span>
           </button>
         `;
       }

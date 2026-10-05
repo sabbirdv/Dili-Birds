@@ -1060,20 +1060,20 @@ export class GameScene {
     };
 
     const lvl = this.currentLevelId || 1;
-    // Progressive durability curve: as levels climb from 1 to 70, structures grow genuinely armored
+    // Balanced progressive durability curve: solid and challenging, yet delivers satisfying, crisp breaks
     let lvlScale = 1.0;
     if (lvl <= 20) {
-      lvlScale = 1.0 + (lvl - 1) * 0.008; // L1: 1.0 -> L20: ~1.15
+      lvlScale = 1.0 + (lvl - 1) * 0.004; // L1: 1.0 -> L20: ~1.08
     } else if (lvl <= 30) {
-      lvlScale = 1.15 + (lvl - 20) * 0.025; // L21: ~1.17 -> L30: ~1.40
+      lvlScale = 1.08 + (lvl - 20) * 0.008; // L21: ~1.09 -> L30: ~1.16
     } else {
-      // Levels 31-70 escalate solidly so late-game structures feel robust and hard
-      lvlScale = 1.40 + (lvl - 30) * 0.024; // L31: ~1.42, L40: ~1.64, L50: ~1.88, L60: ~2.12, L70: ~2.36
+      // Levels 31-70: perfectly balanced between soft and hard
+      lvlScale = 1.18 + (lvl - 30) * 0.006; // L31: ~1.19, L50: ~1.30, L70: ~1.42
     }
     const maxHp = Math.round((hpMap[type] || 60) * lvlScale);
 
-    // High levels feature heavier materials that stand firm against late-game super-birds
-    const massLevelBonus = lvl > 20 ? Math.min(0.45, (lvl - 20) * 0.009) : 0;
+    // Natural physics mass with mild reinforcement for high levels
+    const massLevelBonus = lvl > 20 ? Math.min(0.18, (lvl - 20) * 0.0035) : 0;
     const mass = isStatic ? 0 : (massMap[type] || 2.8) * (1.0 + massLevelBonus);
 
     const body = new CANNON.Body({
@@ -1081,8 +1081,8 @@ export class GameScene {
       shape: new CANNON.Box(halfExtents),
       position: new CANNON.Vec3(...alignedPos),
       material: this.defaultMaterial,
-      linearDamping: lvl > 30 ? 0.06 : 0.04,
-      angularDamping: lvl > 30 ? 0.12 : 0.08,
+      linearDamping: lvl > 30 ? 0.045 : 0.04,
+      angularDamping: lvl > 30 ? 0.09 : 0.08,
       // Constrain block physics strictly to the 2D XY plane
       linearFactor: new CANNON.Vec3(1, 1, 0),
       angularFactor: new CANNON.Vec3(0, 0, 1)
@@ -1148,29 +1148,29 @@ export class GameScene {
 
         blockObj.lastHitTime = now;
 
-        // Balanced material effectiveness matrix (tactical, crisp, prevents 1-shot fortress vaporizing)
+        // Punchy, satisfying material effectiveness matrix (balanced sweet spot)
         let birdMultiplier = 1.0;
         if (birdType === 'speed') {
-          birdMultiplier = blockObj.type === 'glass' ? 2.5 : blockObj.type === 'wood' ? 1.35 : blockObj.type === 'tnt' ? 2.0 : 0.65;
+          birdMultiplier = blockObj.type === 'glass' ? 2.9 : blockObj.type === 'wood' ? 1.5 : blockObj.type === 'tnt' ? 2.2 : 0.75;
         } else if (birdType === 'heavy') {
-          birdMultiplier = blockObj.type === 'stone' ? 2.0 : blockObj.type === 'metal' ? 1.75 : blockObj.type === 'tnt' ? 2.2 : 1.35;
+          birdMultiplier = blockObj.type === 'stone' ? 2.35 : blockObj.type === 'metal' ? 2.1 : blockObj.type === 'tnt' ? 2.6 : 1.65;
         } else if (birdType === 'red') {
-          birdMultiplier = blockObj.type === 'wood' ? 1.45 : blockObj.type === 'tnt' ? 2.0 : 0.9;
+          birdMultiplier = blockObj.type === 'wood' ? 1.65 : blockObj.type === 'tnt' ? 2.2 : 1.05;
         } else if (birdType === 'split') {
-          birdMultiplier = blockObj.type === 'glass' ? 1.85 : blockObj.type === 'wood' ? 1.25 : blockObj.type === 'tnt' ? 1.8 : 0.75;
+          birdMultiplier = blockObj.type === 'glass' ? 1.95 : blockObj.type === 'wood' ? 1.35 : blockObj.type === 'tnt' ? 2.0 : 0.85;
         } else if (birdType === 'fire') {
-          birdMultiplier = blockObj.type === 'wood' ? 2.1 : blockObj.type === 'glass' ? 1.75 : blockObj.type === 'tnt' ? 3.0 : 1.2;
+          birdMultiplier = blockObj.type === 'wood' ? 2.45 : blockObj.type === 'glass' ? 2.0 : blockObj.type === 'tnt' ? 3.5 : 1.45;
         } else if (birdType === 'vortex') {
-          birdMultiplier = blockObj.type === 'metal' ? 1.75 : blockObj.type === 'stone' ? 1.65 : blockObj.type === 'tnt' ? 2.0 : 1.25;
+          birdMultiplier = blockObj.type === 'metal' ? 2.05 : blockObj.type === 'stone' ? 1.95 : blockObj.type === 'tnt' ? 2.3 : 1.45;
         } else if (birdType === 'lightning') {
-          birdMultiplier = blockObj.type === 'metal' ? 1.55 : blockObj.type === 'stone' ? 1.35 : blockObj.type === 'glass' ? 1.25 : blockObj.type === 'tnt' ? 2.0 : 1.1;
+          birdMultiplier = blockObj.type === 'metal' ? 1.65 : blockObj.type === 'stone' ? 1.45 : blockObj.type === 'glass' ? 1.35 : blockObj.type === 'tnt' ? 2.2 : 1.2;
         } else if (birdType === 'chrono') {
-          birdMultiplier = blockObj.type === 'stone' ? 1.75 : blockObj.type === 'metal' ? 1.65 : blockObj.type === 'glass' ? 1.45 : blockObj.type === 'tnt' ? 2.0 : 1.25;
+          birdMultiplier = blockObj.type === 'stone' ? 2.05 : blockObj.type === 'metal' ? 1.95 : blockObj.type === 'glass' ? 1.75 : blockObj.type === 'tnt' ? 2.3 : 1.45;
         }
 
-        // Damage derived from normal impact collision force (tuned so reinforced structures hold together realistically)
+        // Damage derived from normal impact collision force (balanced for satisfying, crisp demolition)
         const effectiveImpact = Math.max(0, normalImpact - 0.8);
-        const dmg = effectiveImpact * 2.05 * birdMultiplier;
+        const dmg = effectiveImpact * 2.65 * birdMultiplier;
 
         if (dmg > 1.0) {
           blockObj.hp -= dmg;
@@ -1190,21 +1190,21 @@ export class GameScene {
           }
         }
       } else if (blockObj.type === 'tnt') {
-        // Requires intentional bird hit or solid structural impact (>= 2.8 m/s), preventing accidental micro-shivers
-        if (normalImpact >= 2.8) {
+        // Balanced TNT trigger: responds to intentional hits and solid impacts (>= 2.0 m/s)
+        if (normalImpact >= 2.0) {
           blockObj.lastHitTime = now;
           this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.1));
-          const tntFallDmg = (normalImpact - 1.2) * 8.0;
+          const tntFallDmg = (normalImpact - 0.8) * 10.0;
           blockObj.hp -= tntFallDmg;
-          if (blockObj.hp <= 0 || normalImpact >= 3.8) {
+          if (blockObj.hp <= 0 || normalImpact >= 2.8) {
             this.destroyBlock(blockObj);
           }
         }
-      } else if (normalImpact >= 4.2) {
-        // High-velocity falling debris or heavy roof collapse crushes blocks underneath
+      } else if (normalImpact >= 3.6) {
+        // Falling structures and tumbling debris naturally crush blocks underneath
         blockObj.lastHitTime = now;
         this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, normalImpact * 0.06));
-        const debrisDmg = (normalImpact - 3.0) * 2.0;
+        const debrisDmg = (normalImpact - 2.5) * 2.6;
         blockObj.hp -= debrisDmg;
         if (blockObj.hp <= 0) {
           this.destroyBlock(blockObj);
@@ -1248,14 +1248,14 @@ export class GameScene {
     const lvl = this.currentLevelId || 1;
     let targetLvlScale = 1.0;
     if (lvl <= 20) {
-      targetLvlScale = 1.0 + (lvl - 1) * 0.01;
+      targetLvlScale = 1.0 + (lvl - 1) * 0.005;
     } else if (lvl <= 30) {
-      targetLvlScale = 1.20 + (lvl - 20) * 0.02;
+      targetLvlScale = 1.10 + (lvl - 20) * 0.01;
     } else {
-      // Progressive escalation for late levels so targets withstand ambient debris
-      targetLvlScale = 1.40 + (lvl - 30) * 0.022; // L31: ~1.42, L50: ~1.84, L70: ~2.28
+      // Balanced: targets are sturdy against tiny debris, but collapse under solid structural falls
+      targetLvlScale = 1.20 + (lvl - 30) * 0.006; // L31: ~1.206, L50: ~1.32, L70: ~1.44
     }
-    const baseHp = isBoss ? 40 : 20;
+    const baseHp = isBoss ? 36 : 18;
     const targetHp = Math.round(baseHp * targetLvlScale);
 
     const targetObj = {
@@ -1288,17 +1288,17 @@ export class GameScene {
         }
         if (normalImpact < 1.4) return;
         targetObj.lastHitTime = now;
-        const dmg = (normalImpact - 0.9) * 3.2;
+        const dmg = (normalImpact - 0.9) * 3.4;
         if (dmg > 1.0) {
           targetObj.hp -= dmg;
           if (targetObj.hp <= 0) {
             this.defeatTarget(targetObj);
           }
         }
-      } else if (normalImpact >= 3.2) {
-        // Crushed by heavy falling structures or high drops (tuned to prevent instant micro-debris death)
+      } else if (normalImpact >= 2.6) {
+        // Crushed by falling debris, collapsing roofs, or high drops
         targetObj.lastHitTime = now;
-        const fallDmg = (normalImpact - 2.2) * 2.8;
+        const fallDmg = (normalImpact - 1.8) * 3.4;
         targetObj.hp -= fallDmg;
         if (targetObj.hp <= 0) {
           this.defeatTarget(targetObj);
@@ -2072,9 +2072,9 @@ export class GameScene {
     // Awaken nearby structures
     this.wakeStructuresNear(origin, 7.5);
 
-    // Balanced, punchy blast radius & force (destroys local room/bunker without nuking distant towers)
-    const blastRadius = 3.2;
-    const blastForce = 13.5;
+    // Balanced, punchy blast radius & force (satisfying room demolition without destroying entire distant bastions)
+    const blastRadius = 3.6;
+    const blastForce = 15.5;
 
     // Push and damage nearby blocks
     const affectedBlocks = [...this.blocks];
@@ -2104,7 +2104,7 @@ export class GameScene {
         const factor = 1 - dist / blastRadius;
         const strength = factor * blastForce;
         b.body.applyImpulse(new CANNON.Vec3(dirX * strength, (dirY + 0.3) * strength, 0));
-        b.hp -= factor * 46;
+        b.hp -= factor * 56;
 
         if (b.hp <= 0) {
           if (b.type === 'tnt') {
@@ -2154,10 +2154,10 @@ export class GameScene {
         }
 
         const factor = 1 - dist / blastRadius;
-        const targetStrength = factor * blastForce * 0.7;
+        const targetStrength = factor * blastForce * 0.75;
         t.body.applyImpulse(new CANNON.Vec3(dirX * targetStrength, (dirY + 0.3) * targetStrength, 0));
 
-        t.hp -= factor * 26;
+        t.hp -= factor * 32;
         if (t.hp <= 0) {
           this.defeatTarget(t);
         }

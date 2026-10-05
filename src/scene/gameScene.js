@@ -146,7 +146,8 @@ export class GameScene {
     this.dirLight.shadow.camera.right = d;
     this.dirLight.shadow.camera.top = d;
     this.dirLight.shadow.camera.bottom = -d;
-    this.dirLight.shadow.bias = -0.0005;
+    this.dirLight.shadow.bias = -0.0001;
+    this.dirLight.shadow.normalBias = 0.02;
     this.scene.add(this.dirLight);
 
     // Subtle front-right fill light so sculpted faces and eyes pop with 3D depth
@@ -323,8 +324,13 @@ export class GameScene {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       if (this.isBirdBody(event.body)) {
         this.audio?.stopFlightSound?.();
+        if (!event.body._hasPlayedHitSound) {
+          event.body._hasPlayedHitSound = true;
+          this.audio?.playMaterialImpact('ground', Math.min(1.0, Math.max(0.25, normalImpact * 0.05)));
+        }
+        return;
       }
-      if (normalImpact > 1.2) {
+      if (normalImpact > 2.0) {
         this.audio?.playMaterialImpact('ground', Math.min(1.0, normalImpact * 0.05));
       }
     });
@@ -925,8 +931,10 @@ export class GameScene {
       trimColor = 0x818cf8;
     }
 
-    // 1. Main rock cliff body with strata texture
-    const cliffGeo = new THREE.BoxGeometry(w, h, d);
+    // 1. Main rock cliff body with strata texture (sits strictly beneath the top deck slab to prevent z-fighting flicker)
+    const deckH = 0.22;
+    const cliffH = Math.max(0.1, h - deckH);
+    const cliffGeo = new THREE.BoxGeometry(w, cliffH, d);
     const cliffMat = new THREE.MeshStandardMaterial({
       map: this.cliffTex,
       color: cliffColor,
@@ -934,12 +942,12 @@ export class GameScene {
       metalness: 0.08
     });
     const cliffMesh = new THREE.Mesh(cliffGeo, cliffMat);
+    cliffMesh.position.set(0, -deckH / 2, 0);
     cliffMesh.castShadow = true;
     cliffMesh.receiveShadow = true;
     platformGroup.add(cliffMesh);
 
     // 2. Beveled top deck slab (where structures stand)
-    const deckH = 0.22;
     const deckGeo = new THREE.BoxGeometry(w + 0.16, deckH, d + 0.16);
     const deckMat = new THREE.MeshStandardMaterial({
       color: deckColor,
@@ -948,6 +956,7 @@ export class GameScene {
     });
     const deckMesh = new THREE.Mesh(deckGeo, deckMat);
     deckMesh.position.set(0, h / 2 - deckH / 2, 0);
+    deckMesh.castShadow = true;
     deckMesh.receiveShadow = true;
     platformGroup.add(deckMesh);
 
@@ -1001,8 +1010,13 @@ export class GameScene {
       const normalImpact = Math.abs(event.contact.getImpactVelocityAlongNormal());
       if (this.isBirdBody(event.body)) {
         this.audio?.stopFlightSound?.();
+        if (!event.body._hasPlayedHitSound) {
+          event.body._hasPlayedHitSound = true;
+          this.audio?.playMaterialImpact('stone', Math.min(1.0, Math.max(0.25, normalImpact * 0.05)));
+        }
+        return;
       }
-      if (normalImpact > 1.2) {
+      if (normalImpact > 2.0) {
         this.audio?.playMaterialImpact('stone', Math.min(1.0, normalImpact * 0.05));
       }
     });
@@ -1100,6 +1114,12 @@ export class GameScene {
         // Awaken localized structure physics around the hit point (smooth 60fps without full-world spike)
         this.wakeStructuresNear(blockObj.body.position, 6.5);
 
+        // Play sound strictly on bird's very first touch with an object
+        if (!event.body._hasPlayedHitSound) {
+          event.body._hasPlayedHitSound = true;
+          this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, Math.max(0.25, normalImpact * 0.06)));
+        }
+
         const birdType = this.getBirdTypeForBody(event.body);
 
         // Fire bird direct impact on TNT causes instant detonation
@@ -1109,9 +1129,8 @@ export class GameScene {
           return;
         }
 
-        // Light graze (< 1.2 normal impact) deals minimal bounce audio
+        // Light graze (< 1.2 normal impact)
         if (normalImpact < 1.2) {
-          this.audio?.playMaterialImpact(blockObj.type, 0.15);
           return;
         }
 
@@ -1142,7 +1161,6 @@ export class GameScene {
         const dmg = effectiveImpact * 3.2 * birdMultiplier;
 
         if (dmg > 1.0) {
-          this.audio?.playMaterialImpact(blockObj.type, Math.min(1.0, dmg * 0.06));
           blockObj.hp -= dmg;
 
           // Visual crack & stress feedback (darken slightly as it takes heavy structural damage)
@@ -1243,6 +1261,11 @@ export class GameScene {
       }
 
       if (isBirdHit) {
+        this.audio?.stopFlightSound?.();
+        if (!event.body._hasPlayedHitSound) {
+          event.body._hasPlayedHitSound = true;
+          this.audio?.playMaterialImpact('wood', Math.min(1.0, Math.max(0.25, normalImpact * 0.05)));
+        }
         if (normalImpact < 1.4) return;
         targetObj.lastHitTime = now;
         const dmg = (normalImpact - 0.9) * 3.4;
@@ -1356,6 +1379,7 @@ export class GameScene {
       angularFactor: new CANNON.Vec3(0, 0, 1)
     });
 
+    body._hasPlayedHitSound = false;
     this.world.addBody(body);
     this.activeBird.body = body;
     this.activeBird.launchTime = performance.now();
@@ -1462,6 +1486,7 @@ export class GameScene {
         linearFactor: new CANNON.Vec3(1, 1, 0),
         angularFactor: new CANNON.Vec3(0, 0, 1)
       });
+      subBody._hasPlayedHitSound = false;
       this.world.addBody(subBody);
 
       this.secondaryBirds.push({

@@ -1585,11 +1585,28 @@ export class LevelSelect {
       const isCompleted = levelId < unlockedLevel || starsEarned > 0;
       const isClaimed = this.storage.hasClaimedCoins(levelId);
 
+      const isChallenge = (levelId % 10 === 0) || (levelObj.difficulty && levelObj.difficulty.toLowerCase().includes('challenge'));
+      const bossName = levelId === 70
+        ? 'FINAL BOSS'
+        : levelId === 10
+        ? 'TITAN BOSS'
+        : levelId === 20
+        ? 'IMPERIAL BOSS'
+        : levelId === 30
+        ? 'COLOSSUS BOSS'
+        : levelId === 40
+        ? 'VOID BOSS'
+        : levelId === 50
+        ? 'CHRONO BOSS'
+        : levelId === 60
+        ? 'SOLAR BOSS'
+        : 'CHALLENGE BOSS';
+
       // Stars crowning completed node (arched above circular disk)
       let starsHtml = '';
       if (starsEarned > 0 || isCompleted) {
         starsHtml = `
-          <div class="node-stars-crown" title="${starsEarned} / 3 Stars Earned">
+          <div class="node-stars-crown ${isChallenge ? 'challenge-stars-crown' : ''}" title="${starsEarned} / 3 Stars Earned">
             <span class="crown-star ${starsEarned >= 1 ? 'earned' : ''}">★</span>
             <span class="crown-star center ${starsEarned >= 2 ? 'earned' : ''}">★</span>
             <span class="crown-star ${starsEarned >= 3 ? 'earned' : ''}">★</span>
@@ -1597,7 +1614,7 @@ export class LevelSelect {
         `;
       } else if (isUnlocked) {
         starsHtml = `
-          <div class="node-stars-crown unearned-crown" title="Unconquered Stage">
+          <div class="node-stars-crown unearned-crown ${isChallenge ? 'challenge-stars-crown' : ''}" title="Unconquered Stage">
             <span class="crown-star">★</span>
             <span class="crown-star center">★</span>
             <span class="crown-star">★</span>
@@ -1605,12 +1622,21 @@ export class LevelSelect {
         `;
       }
 
-      // Milestone badges
+      // Milestone / Challenge badges
       let milestoneBadgeHtml = '';
-      if (node.milestone === 'sunburst') {
+      if (isChallenge) {
+        milestoneBadgeHtml = `
+          <div class="challenge-boss-tag" aria-hidden="true" title="Challenge Boss Stage">
+            <div class="challenge-tag-shimmer"></div>
+            <span class="challenge-tag-icon">⚡</span>
+            <span class="challenge-tag-title">${bossName}</span>
+            <span class="challenge-tag-icon">⚡</span>
+          </div>
+        `;
+      } else if (node.milestone === 'sunburst') {
         milestoneBadgeHtml = `<div class="milestone-sunburst-rays" aria-hidden="true"></div>`;
       } else if (node.milestone === 'airship') {
-        milestoneBadgeHtml = `<div class="milestone-boss-beacon" aria-hidden="true"><span class="beacon-label">GATEWAY 10</span></div>`;
+        milestoneBadgeHtml = `<div class="milestone-boss-beacon" aria-hidden="true"><span class="beacon-label">GATEWAY</span></div>`;
       } else if (node.milestone === 'crystal') {
         milestoneBadgeHtml = `<div class="milestone-crystal-aura" aria-hidden="true"></div>`;
       } else if (node.milestone === 'crown') {
@@ -1620,17 +1646,21 @@ export class LevelSelect {
       // Active Level Elements (Mascot Pin, Pulsing Beacon Ring, Juicy PLAY! CTA)
       let activeIndicatorHtml = '';
       if (isActive) {
-        activeIndicatorHtml = `
-          <div class="active-beacon-pulse" aria-hidden="true"></div>
+        const ctaText = isChallenge ? 'FIGHT BOSS! ⚡' : 'PLAY! ▶';
+        const ctaClass = isChallenge ? 'roadmap-juicy-play-cta challenge-play-cta' : 'roadmap-juicy-play-cta';
+        const mascotMsg = isChallenge ? `🔥 BOSS ${levelId}!` : `Stage ${levelId}${starsEarned > 0 ? ` • ${starsEarned}★` : ''}`;
 
-          <div class="active-commander-mascot" id="commander-pin-${levelId}" title="Active Stage ${levelId}">
-            <div class="mascot-speech-cloud">Stage ${levelId}${starsEarned > 0 ? ` • ${starsEarned}★` : ''}</div>
+        activeIndicatorHtml = `
+          <div class="active-beacon-pulse ${isChallenge ? 'challenge-active-beacon' : ''}" aria-hidden="true"></div>
+
+          <div class="active-commander-mascot ${isChallenge ? 'challenge-mascot-pin' : ''}" id="commander-pin-${levelId}" title="Active Stage ${levelId}">
+            <div class="mascot-speech-cloud challenge-mascot-bubble">${mascotMsg}</div>
             <img src="${mascotCharUrl}" alt="Dili Bird" class="mascot-bird-img" />
           </div>
 
           <button
             type="button"
-            class="roadmap-juicy-play-cta"
+            class="${ctaClass}"
             data-level-id="${levelId}"
             title="Launch Stage ${levelId}"
             aria-label="Play Level ${levelId}"
@@ -1638,7 +1668,7 @@ export class LevelSelect {
             <div class="play-cta-pointer-hand" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15 8H9L12 2Z"/></svg>
             </div>
-            <span class="play-cta-text">PLAY! ▶</span>
+            <span class="play-cta-text">${ctaText}</span>
           </button>
         `;
       }
@@ -1653,20 +1683,65 @@ export class LevelSelect {
       } else {
         nodeClass = 'unlocked frontier';
       }
+      if (isChallenge) {
+        nodeClass += ' is-challenge-node';
+      }
 
-      html += `
-        <article
-          class="map-level-node ${nodeClass} ${node.milestone ? `milestone-${node.milestone}` : ''}"
-          id="node-level-${levelId}"
-          style="left: ${node.x}px; top: ${node.y}px;"
-          data-level-id="${levelId}"
-          role="button"
-          tabindex="${isUnlocked ? '0' : '-1'}"
-          aria-label="Level ${levelId}: ${node.name} (${isUnlocked ? (isActive ? 'Active Stage' : 'Unlocked') : 'Locked'})"
-        >
-          ${milestoneBadgeHtml}
-          ${starsHtml}
+      const circleBodyHtml = isChallenge
+        ? `
+          <!-- High-Fi Sci-Fi Challenge Boss Portal Disk -->
+          <div class="node-circle-body challenge-circle-body">
+            <!-- 1. Holographic rotating sci-fi orbit reticle -->
+            <div class="challenge-orbit-reticle" aria-hidden="true">
+              <div class="reticle-ring-outer"></div>
+              <div class="reticle-ring-inner"></div>
+              <div class="reticle-pips">
+                <span class="pip pip-n"></span>
+                <span class="pip pip-e"></span>
+                <span class="pip pip-s"></span>
+                <span class="pip pip-w"></span>
+              </div>
+            </div>
 
+            <!-- 2. Cybernetic mech claws / armor brackets framing edges -->
+            <div class="challenge-mech-brackets" aria-hidden="true">
+              <div class="bracket-claw claw-top"></div>
+              <div class="bracket-claw claw-right"></div>
+              <div class="bracket-claw claw-bottom"></div>
+              <div class="bracket-claw claw-left"></div>
+            </div>
+
+            <!-- 3. Ambient multi-layer plasma energy aura -->
+            <div class="challenge-plasma-aura" aria-hidden="true"></div>
+
+            <!-- 4. Bevel and High-Tech Reactor Core -->
+            <div class="node-circle-bevel challenge-bevel"></div>
+            <div class="challenge-reactor-core">
+              <div class="challenge-circuit-grid" aria-hidden="true"></div>
+              <div class="challenge-scanner-sweep" aria-hidden="true"></div>
+              <div class="challenge-core-shimmer" aria-hidden="true"></div>
+
+              <div class="node-circle-core challenge-core-content">
+                <span class="challenge-mini-badge">${levelId === 70 ? 'APEX' : 'BOSS'}</span>
+                <span class="node-number-text challenge-number-text">${levelId}</span>
+              </div>
+            </div>
+
+            ${
+              !isUnlocked
+                ? `<div class="node-lock-overlay challenge-lock-overlay" aria-hidden="true">
+                    <div class="challenge-lock-hazard-ring"></div>
+                    <svg class="node-lock-svg challenge-lock-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="4" y="11" width="16" height="10" rx="3" />
+                      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                    </svg>
+                    <span class="challenge-locked-text">LOCKED</span>
+                  </div>`
+                : ''
+            }
+          </div>
+        `
+        : `
           <!-- 3D Circular Disk (Enlarged to 96px for Mobile Touch) -->
           <div class="node-circle-body">
             <div class="node-circle-bevel"></div>
@@ -1685,11 +1760,28 @@ export class LevelSelect {
                 : ''
             }
           </div>
+        `;
+
+      html += `
+        <article
+          class="map-level-node ${nodeClass} ${node.milestone && !isChallenge ? `milestone-${node.milestone}` : ''}"
+          id="node-level-${levelId}"
+          style="left: ${node.x}px; top: ${node.y}px;"
+          data-level-id="${levelId}"
+          role="button"
+          tabindex="${isUnlocked ? '0' : '-1'}"
+          aria-label="${isChallenge ? 'Challenge Boss Stage' : 'Level'} ${levelId}: ${node.name} (${isUnlocked ? (isActive ? 'Active Stage' : 'Unlocked') : 'Locked'})"
+        >
+          ${milestoneBadgeHtml}
+          ${starsHtml}
+
+          ${circleBodyHtml}
 
           <!-- Bottom Coin Tag Preview -->
-          <div class="node-coin-pill ${isClaimed ? 'claimed' : ''}" title="${isClaimed ? 'Coins Claimed' : `Reward: +${levelObj.coinReward} Coins`}">
+          <div class="node-coin-pill ${isChallenge ? 'challenge-coin-pill' : ''} ${isClaimed ? 'claimed' : ''}" title="${isClaimed ? 'Coins Claimed' : `Reward: +${levelObj.coinReward} Coins`}">
             <img src="${coinLogoUrl}" class="coin-pill-img" alt="" />
             <span>${isClaimed ? '✓' : `+${levelObj.coinReward}`}</span>
+            ${isChallenge ? '<span class="challenge-coin-star">★</span>' : ''}
           </div>
 
           ${activeIndicatorHtml}
@@ -1826,10 +1918,11 @@ export class LevelSelect {
       el.classList.add('node-lock-shake');
     }
     this.audio?.playError?.();
-    this.spawnMapSpeechBubble(
-      el,
-      `🔒 Stage ${levelId} is locked! Clear Stage ${levelId - 1} first.`
-    );
+    const isChallenge = levelId % 10 === 0;
+    const msg = isChallenge
+      ? `🔒 BOSS CHALLENGE ${levelId} LOCKED!\nDefeat Stage ${levelId - 1} to unlock this epic Boss!`
+      : `🔒 Stage ${levelId} is locked! Clear Stage ${levelId - 1} first.`;
+    this.spawnMapSpeechBubble(el, msg);
   }
 
   launchLevel(levelId) {
@@ -1854,7 +1947,11 @@ export class LevelSelect {
       setTimeout(() => nodeEl.classList.remove('node-tap-pop'), 200);
     }
 
-    this.audio?.playLevelSelect?.();
+    if (num % 10 === 0 && this.audio?.playChallengeLevelSelect) {
+      this.audio.playChallengeLevelSelect();
+    } else {
+      this.audio?.playLevelSelect?.();
+    }
     this.onSelectLevel?.(levelObj);
   }
 

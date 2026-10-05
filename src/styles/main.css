@@ -1613,6 +1613,563 @@ html, body {
 }
 
 /* ═════════════════════════════════════════════════════════════
+   HIGH-FI SCI-FI CHALLENGE / BOSS LEVEL NODES (EVERY 10TH LEVEL)
+   ═════════════════════════════════════════════════════════════ */
+
+/* 1. Grand Standout Container */
+.map-level-node.is-challenge-node {
+  width: 114px;
+  height: 114px;
+  z-index: 8;
+}
+
+.map-level-node.is-challenge-node:hover.unlocked {
+  transform: translate(-50%, -55%) scale(1.12);
+  z-index: 22;
+}
+
+/* 2. Floating Challenge Boss Header Crest */
+.challenge-boss-tag {
+  position: absolute;
+  top: -38px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 3.5px 12px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.92) 100%);
+  border: 1.5px solid #38bdf8;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), 0 0 16px rgba(56, 189, 248, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #ffffff;
+  z-index: 16;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.map-level-node.completed .challenge-boss-tag {
+  border-color: #fbbf24;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), 0 0 16px rgba(251, 191, 36, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.map-level-node.locked .challenge-boss-tag {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(69, 10, 10, 0.9) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 12px rgba(239, 68, 68, 0.45);
+}
+
+.challenge-tag-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  animation: challengeTagShimmer 3s ease-in-out infinite;
+}
+
+@keyframes challengeTagShimmer {
+  0% { left: -100%; }
+  35%, 100% { left: 200%; }
+}
+
+.challenge-tag-icon {
+  font-size: 0.72rem;
+  color: #facc15;
+  filter: drop-shadow(0 0 6px #facc15);
+  animation: challengeZap 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes challengeZap {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+.challenge-tag-title {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.85);
+}
+
+.map-level-node.completed .challenge-tag-title {
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
+}
+
+.map-level-node.locked .challenge-tag-title {
+  color: #fca5a5;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+/* 3. High-Fi Disk Body */
+.node-circle-body.challenge-circle-body {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 45%, #1e1b4b 100%);
+  border: 4.5px solid #38bdf8;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.7), inset 0 2px 6px rgba(255, 255, 255, 0.7);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: visible;
+}
+
+/* Completed Golden Platinum State */
+.map-level-node.completed .node-circle-body.challenge-circle-body {
+  background: radial-gradient(circle at 35% 25%, #ffffff 0%, #fef08a 25%, #f59e0b 65%, #78350f 100%);
+  border: 4.5px solid #fbbf24;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85), 0 0 34px rgba(251, 191, 36, 0.85), inset 0 2px 6px rgba(255, 255, 255, 0.9);
+}
+
+/* Active Level State */
+.map-level-node.active .node-circle-body.challenge-circle-body {
+  width: 110px;
+  height: 110px;
+  border: 5px solid #ffffff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 36px rgba(244, 63, 94, 0.85), 0 0 50px rgba(56, 189, 248, 0.7), inset 0 3px 8px rgba(255, 255, 255, 0.95);
+}
+
+/* Locked Fortress State */
+.map-level-node.locked .node-circle-body.challenge-circle-body {
+  width: 104px;
+  height: 104px;
+  background: radial-gradient(circle at 35% 30%, #334155 0%, #1e293b 45%, #0f172a 85%, #020617 100%);
+  border: 4.5px solid #ef4444;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85), 0 0 22px rgba(239, 68, 68, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+}
+
+/* 4. Sci-Fi Rotating Holographic Orbit Reticle */
+.challenge-orbit-reticle {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.reticle-ring-outer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px dashed rgba(56, 189, 248, 0.8);
+  animation: challengeOrbitSpin 14s linear infinite;
+}
+
+.map-level-node.completed .reticle-ring-outer {
+  border-color: rgba(251, 191, 36, 0.85);
+}
+
+.map-level-node.locked .reticle-ring-outer {
+  border-color: rgba(239, 68, 68, 0.65);
+}
+
+.reticle-ring-inner {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1.5px dotted rgba(244, 63, 94, 0.7);
+  animation: challengeOrbitSpinRev 10s linear infinite;
+}
+
+.map-level-node.completed .reticle-ring-inner {
+  border-color: rgba(245, 158, 11, 0.75);
+}
+
+.map-level-node.locked .reticle-ring-inner {
+  border-color: rgba(220, 38, 38, 0.55);
+}
+
+@keyframes challengeOrbitSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes challengeOrbitSpinRev {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.reticle-pips {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: challengeOrbitSpin 14s linear infinite;
+}
+
+.reticle-pips .pip {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.map-level-node.completed .reticle-pips .pip {
+  background: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+}
+
+.map-level-node.locked .reticle-pips .pip {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.reticle-pips .pip-n { top: -3px; left: calc(50% - 3px); }
+.reticle-pips .pip-e { right: -3px; top: calc(50% - 3px); }
+.reticle-pips .pip-s { bottom: -3px; left: calc(50% - 3px); }
+.reticle-pips .pip-w { left: -3px; top: calc(50% - 3px); }
+
+/* 5. Cybernetic Mech Armor Claws / Brackets */
+.challenge-mech-brackets {
+  position: absolute;
+  inset: -7px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.bracket-claw {
+  position: absolute;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  transition: all 0.2s ease;
+}
+
+.map-level-node.completed .bracket-claw {
+  background: #fbbf24;
+  box-shadow: 0 0 10px #fbbf24;
+}
+
+.map-level-node.locked .bracket-claw {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.bracket-claw.claw-top {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 5px;
+  border-radius: 3px 3px 0 0;
+}
+
+.bracket-claw.claw-bottom {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 5px;
+  border-radius: 0 0 3px 3px;
+}
+
+.bracket-claw.claw-left {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 20px;
+  border-radius: 3px 0 0 3px;
+}
+
+.bracket-claw.claw-right {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 20px;
+  border-radius: 0 3px 3px 0;
+}
+
+.map-level-node.is-challenge-node:hover.unlocked .bracket-claw {
+  filter: brightness(1.25);
+}
+
+/* 6. Multi-layer Plasma Energy Aura */
+.challenge-plasma-aura {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.45) 0%, rgba(124, 58, 237, 0.25) 50%, transparent 72%);
+  filter: blur(5px);
+  animation: challengePlasmaPulse 2.8s ease-in-out infinite;
+}
+
+.map-level-node.completed .challenge-plasma-aura {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.5) 0%, rgba(245, 158, 11, 0.3) 50%, transparent 72%);
+}
+
+.map-level-node.locked .challenge-plasma-aura {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, rgba(185, 28, 28, 0.2) 50%, transparent 72%);
+}
+
+.map-level-node.active .challenge-plasma-aura {
+  inset: -24px;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.6) 0%, rgba(56, 189, 248, 0.4) 50%, transparent 72%);
+  filter: blur(6px);
+}
+
+@keyframes challengePlasmaPulse {
+  0%, 100% { transform: scale(0.96); opacity: 0.8; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+/* 7. Bevel & Reactor Core */
+.challenge-bevel {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.challenge-reactor-core {
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #38bdf8 0%, #1e3a8a 35%, #0f172a 75%, #020617 100%);
+  z-index: 3;
+}
+
+.map-level-node.completed .challenge-reactor-core {
+  background: radial-gradient(circle at 35% 30%, #fffbeb 0%, #fef08a 25%, #f59e0b 60%, #78350f 100%);
+}
+
+.map-level-node.locked .challenge-reactor-core {
+  background: radial-gradient(circle at 35% 30%, #475569 0%, #1e293b 45%, #0f172a 80%, #020617 100%);
+}
+
+/* Circuit grid texture */
+.challenge-circuit-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(56, 189, 248, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(56, 189, 248, 0.4) 1px, transparent 1px);
+  background-size: 8px 8px;
+}
+
+.map-level-node.locked .challenge-circuit-grid {
+  background-image: linear-gradient(rgba(239, 68, 68, 0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.35) 1px, transparent 1px);
+}
+
+/* Conic Scanner radar sweep */
+.challenge-scanner-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(56, 189, 248, 0.35) 360deg);
+  animation: challengeScanSweep 4s linear infinite;
+}
+
+.map-level-node.completed .challenge-scanner-sweep {
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(251, 191, 36, 0.4) 360deg);
+}
+
+.map-level-node.locked .challenge-scanner-sweep {
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 270deg, rgba(239, 68, 68, 0.35) 360deg);
+}
+
+@keyframes challengeScanSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.challenge-core-shimmer {
+  position: absolute;
+  top: 4px;
+  left: 12px;
+  width: 24px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  filter: blur(2px);
+  transform: rotate(-35deg);
+  pointer-events: none;
+}
+
+.challenge-core-content {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.challenge-mini-badge {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.85);
+  margin-bottom: -5px;
+  line-height: 1;
+}
+
+.map-level-node.completed .challenge-mini-badge {
+  color: #78350f;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.map-level-node.locked .challenge-mini-badge {
+  color: #ef4444;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+.node-number-text.challenge-number-text {
+  font-size: 2.65rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.95), 0 3px 0 rgba(0, 0, 0, 0.85);
+  line-height: 1;
+}
+
+.map-level-node.completed .node-number-text.challenge-number-text {
+  color: #451a03;
+  text-shadow: 0 1.5px 0 rgba(255, 255, 255, 0.85), 0 0 12px rgba(251, 191, 36, 0.8);
+}
+
+.map-level-node.active .node-number-text.challenge-number-text {
+  font-size: 2.9rem;
+  text-shadow: 0 0 18px rgba(244, 63, 94, 0.95), 0 0 28px rgba(56, 189, 248, 0.8), 0 3px 0 rgba(0, 0, 0, 0.9);
+}
+
+.map-level-node.locked .node-number-text.challenge-number-text {
+  color: #94a3b8;
+  opacity: 0.32;
+  text-shadow: none;
+}
+
+/* 8. Locked Cyber-Overlay */
+.challenge-lock-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+
+.challenge-lock-hazard-ring {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(239, 68, 68, 0.5);
+  animation: challengeOrbitSpin 20s linear infinite;
+}
+
+.challenge-lock-svg {
+  width: 36px;
+  height: 36px;
+  color: #ef4444;
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.9));
+}
+
+.challenge-locked-text {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #fca5a5;
+  margin-top: 2px;
+  text-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+}
+
+/* 9. Challenge Star Crown */
+.challenge-stars-crown {
+  top: -48px !important;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.85));
+}
+
+.challenge-stars-crown .crown-star {
+  font-size: 1.5rem;
+}
+
+.challenge-stars-crown .crown-star.center {
+  font-size: 1.85rem;
+}
+
+/* 10. Challenge Active Beacon */
+.challenge-active-beacon {
+  inset: -14px !important;
+  border: 3.5px solid rgba(56, 189, 248, 0.9) !important;
+  box-shadow: 0 0 28px rgba(56, 189, 248, 0.9), inset 0 0 18px rgba(244, 63, 94, 0.6) !important;
+  animation: challengeActiveBeaconPulse 1.6s ease-in-out infinite !important;
+}
+
+@keyframes challengeActiveBeaconPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* 11. Challenge Play CTA Button */
+.challenge-play-cta {
+  top: 96px !important;
+  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 45%, #0284c7 100%) !important;
+  border: 3px solid #fef08a !important;
+  box-shadow: 0 8px 24px rgba(244, 63, 94, 0.75), 0 0 24px rgba(56, 189, 248, 0.8), 0 3px 0 #9f1239 !important;
+  animation: challengeCtaThrob 1.2s ease-in-out infinite alternate !important;
+}
+
+@keyframes challengeCtaThrob {
+  0% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+  100% { transform: translateX(-50%) scale(1.06); filter: brightness(1.15); }
+}
+
+.challenge-play-cta:hover {
+  transform: translateX(-50%) scale(1.1) !important;
+}
+
+.challenge-mascot-bubble {
+  background: linear-gradient(135deg, #f43f5e, #e11d48) !important;
+  color: #ffffff !important;
+  border: 1.5px solid #fef08a !important;
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.6) !important;
+}
+
+/* 12. Challenge Coin Reward Pill */
+.challenge-coin-pill {
+  border: 1.5px solid #fbbf24 !important;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.92) 100%) !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.65), 0 0 12px rgba(251, 191, 36, 0.6) !important;
+  font-weight: 900 !important;
+}
+
+.challenge-coin-star {
+  color: #facc15;
+  font-size: 0.75rem;
+  margin-left: 2px;
+  filter: drop-shadow(0 0 4px #facc15);
+}
+
+/* ═════════════════════════════════════════════════════════════
    REALISTIC VOLUMETRIC CLOUD FOG OF WAR
    ═════════════════════════════════════════════════════════════ */
 .cloud-fog-of-war {

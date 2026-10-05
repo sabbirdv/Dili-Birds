@@ -2206,6 +2206,50 @@ export class AudioManager {
     osc.stop(now + 0.09);
   }
 
+  playChallengeLevelSelect() {
+    const ctx = this.ensureContext();
+    if (!ctx || this.isMuted) return;
+    const now = ctx.currentTime;
+
+    // Sub-bass impact surge
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = 'triangle';
+    subOsc.frequency.setValueAtTime(140, now);
+    subOsc.frequency.exponentialRampToValueAtTime(45, now + 0.28);
+    subGain.gain.setValueAtTime(0.45, now);
+    subGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+    subOsc.connect(subGain);
+    subGain.connect(this.sfxDuckingGain);
+    subOsc.start(now);
+    subOsc.stop(now + 0.33);
+
+    // High-tech boss fanfare chord
+    const chordNotes = [330, 440, 660, 880];
+    chordNotes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const noteTime = now + idx * 0.035;
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, noteTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.05, noteTime + 0.15);
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(1800, noteTime);
+
+      gain.gain.setValueAtTime(0.001, noteTime);
+      gain.gain.linearRampToValueAtTime(0.22, noteTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, noteTime + 0.25);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.sfxDuckingGain);
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.28);
+    });
+  }
+
   playUnlock() {
     this.playLevelUnlock();
   }

@@ -495,6 +495,225 @@ html, body {
   justify-content: center;
   gap: 20px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   DASHBOARD FLOATING CHARACTERS & LOGOS BACKGROUND LAYER
+   - Ultra-lightweight pure CSS GPU-accelerated motion
+   - Zero interaction: strictly pointer-events: none, non-draggable
+   - Smooth asynchronous out-of-phase gentle floating bob
+   - Responsive distribution across PC, tablet, and mobile screens
+   ═════════════════════════════════════════════════════════════ */
+.dash-float-layer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.dash-float-item {
+  position: absolute;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-user-drag: none !important;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  object-fit: contain;
+}
+
+/* Individual Item Coordinates & Sizing */
+.dfi-char1 {
+  top: 13%;
+  left: 5%;
+  width: 66px;
+  height: 66px;
+  opacity: 0.72;
+  filter: drop-shadow(0 8px 18px rgba(239, 68, 68, 0.45));
+  animation: dashFloatA 7.2s ease-in-out infinite alternate;
+}
+
+.dfi-char2 {
+  top: 15%;
+  right: 6%;
+  width: 58px;
+  height: 58px;
+  opacity: 0.70;
+  filter: drop-shadow(0 8px 18px rgba(56, 189, 248, 0.45));
+  animation: dashFloatB 7.8s ease-in-out infinite alternate -2.1s;
+}
+
+.dfi-char3 {
+  top: 48%;
+  right: 4%;
+  width: 56px;
+  height: 56px;
+  opacity: 0.65;
+  filter: drop-shadow(0 8px 18px rgba(236, 72, 153, 0.4));
+  animation: dashFloatC 8.4s ease-in-out infinite alternate -3.5s;
+}
+
+.dfi-sub1 {
+  top: 44%;
+  left: 4%;
+  width: 52px;
+  height: 52px;
+  opacity: 0.65;
+  filter: drop-shadow(0 8px 16px rgba(59, 130, 246, 0.4));
+  animation: dashFloatD 6.5s ease-in-out infinite alternate -1.4s;
+}
+
+.dfi-sub2 {
+  bottom: 8%;
+  left: 7%;
+  width: 54px;
+  height: 54px;
+  opacity: 0.68;
+  filter: drop-shadow(0 8px 18px rgba(244, 63, 94, 0.45));
+  animation: dashFloatB 8.0s ease-in-out infinite alternate -4.6s;
+}
+
+.dfi-sub3 {
+  bottom: 7%;
+  right: 7%;
+  width: 50px;
+  height: 50px;
+  opacity: 0.65;
+  filter: drop-shadow(0 8px 16px rgba(217, 70, 239, 0.4));
+  animation: dashFloatA 8.8s ease-in-out infinite alternate -1.8s;
+}
+
+.dfi-sub4 {
+  bottom: 15%;
+  left: 26%;
+  width: 44px;
+  height: 44px;
+  opacity: 0.55;
+  filter: drop-shadow(0 6px 14px rgba(16, 185, 129, 0.4));
+  animation: dashFloatC 7.4s ease-in-out infinite alternate -3.8s;
+}
+
+.dfi-logo1 {
+  top: 8%;
+  left: 24%;
+  width: 46px;
+  height: auto;
+  max-height: 38px;
+  opacity: 0.52;
+  filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.35));
+  animation: dashFloatD 8.2s ease-in-out infinite alternate -0.8s;
+}
+
+.dfi-logo2 {
+  top: 29%;
+  left: 13%;
+  width: 42px;
+  height: auto;
+  max-height: 36px;
+  opacity: 0.48;
+  filter: drop-shadow(0 4px 12px rgba(56, 189, 248, 0.35));
+  animation: dashFloatA 9.4s ease-in-out infinite alternate -5.4s;
+}
+
+.dfi-logo3 {
+  top: 27%;
+  right: 14%;
+  width: 42px;
+  height: auto;
+  max-height: 36px;
+  opacity: 0.45;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+  animation: dashFloatB 9.0s ease-in-out infinite alternate -3.2s;
+}
+
+.dfi-coin1 {
+  top: 9%;
+  right: 23%;
+  width: 46px;
+  height: 46px;
+  opacity: 0.65;
+  filter: drop-shadow(0 6px 16px rgba(251, 191, 36, 0.5));
+  animation: dashFloatC 6.8s ease-in-out infinite alternate -1.5s;
+}
+
+.dfi-coin2 {
+  bottom: 14%;
+  right: 24%;
+  width: 44px;
+  height: 44px;
+  opacity: 0.58;
+  filter: drop-shadow(0 6px 14px rgba(251, 191, 36, 0.45));
+  animation: dashFloatD 7.9s ease-in-out infinite alternate -4.8s;
+}
+
+/* Four Async Out-of-Phase Floating Keyframes */
+@keyframes dashFloatA {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(4px, -14px, 0) rotate(3deg); }
+  100% { transform: translate3d(-3px, -22px, 0) rotate(-2deg); }
+}
+
+@keyframes dashFloatB {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-5px, -16px, 0) rotate(-4deg); }
+  100% { transform: translate3d(4px, -24px, 0) rotate(3deg); }
+}
+
+@keyframes dashFloatC {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(6px, -12px, 0) rotate(2.5deg); }
+  100% { transform: translate3d(-4px, -18px, 0) rotate(-3deg); }
+}
+
+@keyframes dashFloatD {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-4px, -15px, 0) rotate(-2.5deg); }
+  100% { transform: translate3d(5px, -20px, 0) rotate(2deg); }
+}
+
+/* Tablet & Mobile Screens */
+@media screen and (max-width: 768px) {
+  .dash-float-item {
+    opacity: 0.50;
+  }
+  .dfi-char1 { top: 11%; left: 3%; width: 44px; height: 44px; }
+  .dfi-char2 { top: 12%; right: 3%; width: 42px; height: 42px; }
+  .dfi-char3 { top: 52%; right: 2%; width: 38px; height: 38px; }
+  .dfi-sub1 { top: 50%; left: 2%; width: 36px; height: 36px; }
+  .dfi-sub2 { bottom: 5%; left: 4%; width: 38px; height: 38px; }
+  .dfi-sub3 { bottom: 5%; right: 4%; width: 38px; height: 38px; }
+  .dfi-sub4 { display: none; }
+  .dfi-logo1 { top: 6%; left: 16%; width: 34px; }
+  .dfi-logo2 { display: none; }
+  .dfi-logo3 { display: none; }
+  .dfi-coin1 { top: 6%; right: 16%; width: 34px; height: 34px; }
+  .dfi-coin2 { display: none; }
+}
+
+@media screen and (max-height: 580px) {
+  .dash-float-item {
+    opacity: 0.50;
+  }
+  .dfi-char1 { top: 9%; left: 3%; width: 40px; height: 40px; }
+  .dfi-char2 { top: 9%; right: 3%; width: 38px; height: 38px; }
+  .dfi-char3 { top: 54%; right: 2%; width: 36px; height: 36px; }
+  .dfi-sub1 { top: 52%; left: 2%; width: 34px; height: 34px; }
+  .dfi-sub2 { bottom: 3%; left: 10%; width: 36px; height: 36px; }
+  .dfi-sub3 { bottom: 3%; right: 10%; width: 36px; height: 36px; }
+  .dfi-sub4 { display: none; }
+  .dfi-logo1 { top: 5%; left: 18%; width: 32px; }
+  .dfi-logo2 { display: none; }
+  .dfi-logo3 { display: none; }
+  .dfi-coin1 { top: 5%; right: 18%; width: 32px; height: 32px; }
+  .dfi-coin2 { display: none; }
 }
 
 /* 3 Dedicated Dashboard Hub Cards Grid */

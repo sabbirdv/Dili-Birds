@@ -2937,6 +2937,13 @@ html, body {
   transition: all 0.15s ease;
 }
 
+.dialog-close-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
 .dialog-close-btn:hover {
   background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
@@ -4787,12 +4794,15 @@ html, body {
 /* 4. Dashboard Modals (Leaderboard, Missions, Characters Codex) */
 .modal-dashboard-dialog {
   width: min(94vw, 580px);
+  max-height: min(92vh, 92dvh);
   border-radius: 24px;
   border: 1px solid rgba(56, 189, 248, 0.28);
   background: linear-gradient(155deg, rgba(11, 18, 36, 0.98), rgba(22, 33, 56, 0.97));
   color: var(--text-main);
   padding: 0;
   box-shadow: 0 25px 75px rgba(0, 0, 0, 0.75);
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
 }
 
 .modal-dashboard-dialog.modal-wide {
@@ -4800,18 +4810,21 @@ html, body {
 }
 
 .modal-dashboard-dialog.modal-wide .modal-dialog-shell {
-  max-height: 92vh;
+  max-height: min(92vh, 92dvh);
   padding: 20px 24px;
   gap: 12px;
 }
 
 .modal-dialog-shell {
   padding: 24px;
-  max-height: 88vh;
+  max-height: min(92vh, 92dvh);
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  overflow: hidden;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  box-sizing: border-box;
 }
 
 .modal-dialog-header {
@@ -4819,6 +4832,19 @@ html, body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  flex-shrink: 0;
+  touch-action: none;
+}
+
+/* Close button inside modal-dialog-header */
+.modal-dialog-header .dialog-close-btn,
+.modal-dashboard-dialog .dialog-close-btn {
+  position: relative;
+  top: auto;
+  right: auto;
+  flex-shrink: 0;
+  margin-left: auto;
+  align-self: flex-start;
 }
 
 .modal-title-wrap {
@@ -5079,10 +5105,16 @@ html, body {
 }
 
 /* Leaderboard Sub-components */
+.leaderboard-dialog {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none;
+}
+
 .leaderboard-table-wrap {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden !important;
   border-radius: 16px;
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -5101,16 +5133,21 @@ html, body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   align-items: center;
   user-select: none;
+  flex-shrink: 0;
+  touch-action: none;
 }
 
 .leaderboard-list-body {
-  max-height: 380px;
-  overflow-y: auto;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 0 !important;
+  max-height: none;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain !important;
+  touch-action: pan-y !important;
 }
 
 .leaderboard-list-body::-webkit-scrollbar {
@@ -7744,15 +7781,22 @@ html, body {
   .modal-dashboard-dialog.leaderboard-dialog,
   #leaderboard-dialog {
     width: min(96vw, 620px);
+    max-height: min(94vh, 94dvh);
     border-radius: 20px;
     margin: auto;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none;
   }
 
   .leaderboard-dialog .modal-dialog-shell,
   #leaderboard-dialog .modal-dialog-shell {
     padding: 14px 16px;
     gap: 10px;
-    max-height: 94vh;
+    max-height: min(94vh, 94dvh);
+    height: 100%;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 
   .leaderboard-dialog .modal-header-lead-row,
@@ -7787,6 +7831,12 @@ html, body {
 
   .leaderboard-dialog .dialog-close-btn,
   #leaderboard-dialog .dialog-close-btn {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    margin-left: auto;
+    align-self: flex-start;
+    flex-shrink: 0;
     width: 32px;
     height: 32px;
     padding: 4px;
@@ -7962,15 +8012,23 @@ html, body {
   /* Leaderboard Portrait Mobile (under 640px) */
   .modal-dashboard-dialog.leaderboard-dialog,
   #leaderboard-dialog {
-    width: 95vw;
+    width: min(95vw, 560px);
+    max-height: min(92vh, 92dvh);
     border-radius: 18px;
+    margin: auto;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none;
   }
 
   .leaderboard-dialog .modal-dialog-shell,
   #leaderboard-dialog .modal-dialog-shell {
     padding: 10px 12px;
     gap: 7px;
-    max-height: 93vh;
+    max-height: min(92vh, 92dvh);
+    height: 100%;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 
   .leaderboard-dialog .modal-header-lead-row,
@@ -8004,8 +8062,16 @@ html, body {
 
   .leaderboard-dialog .dialog-close-btn,
   #leaderboard-dialog .dialog-close-btn {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    margin-left: auto;
+    align-self: flex-start;
+    flex-shrink: 0;
     width: 28px;
     height: 28px;
+    border-radius: 8px;
+    padding: 2px;
   }
 
   .leaderboard-header-row,
@@ -8021,9 +8087,20 @@ html, body {
     letter-spacing: 0.05em;
   }
 
+  .leaderboard-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden !important;
+  }
+
   .leaderboard-list-body {
-    max-height: 48vh;
-    min-height: 200px;
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
   }
 
   .leaderboard-row {
@@ -8186,13 +8263,36 @@ html, body {
   .modal-dashboard-dialog.leaderboard-dialog,
   #leaderboard-dialog {
     width: 98vw;
+    max-height: min(94vh, 94dvh);
     border-radius: 14px;
+    margin: auto;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none;
   }
 
   .leaderboard-dialog .modal-dialog-shell,
   #leaderboard-dialog .modal-dialog-shell {
     padding: 8px 8px;
     gap: 5px;
+    max-height: min(94vh, 94dvh);
+    height: 100%;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+
+  .leaderboard-dialog .dialog-close-btn,
+  #leaderboard-dialog .dialog-close-btn {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    margin-left: auto;
+    align-self: flex-start;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    padding: 2px;
   }
 
   .leaderboard-header-row,
@@ -8389,15 +8489,31 @@ html, body {
   .modal-dashboard-dialog.leaderboard-dialog,
   #leaderboard-dialog {
     width: min(96vw, 680px);
+    max-height: min(95vh, 95dvh);
     border-radius: 14px;
     margin: auto;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none;
   }
 
   .leaderboard-dialog .modal-dialog-shell,
   #leaderboard-dialog .modal-dialog-shell {
-    max-height: 96vh;
+    max-height: min(95vh, 95dvh);
+    height: 100%;
     padding: 6px 10px;
     gap: 4px;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .leaderboard-dialog .modal-dialog-header {
+    flex-shrink: 0;
+    touch-action: none;
+    align-items: center;
   }
 
   .leaderboard-dialog .modal-header-lead-row,
@@ -8431,10 +8547,30 @@ html, body {
 
   .leaderboard-dialog .dialog-close-btn,
   #leaderboard-dialog .dialog-close-btn {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    margin-left: auto;
+    align-self: center;
+    flex-shrink: 0;
     width: 26px;
     height: 26px;
     padding: 2px;
     border-radius: 8px;
+  }
+
+  .leaderboard-dialog .dialog-close-btn svg,
+  #leaderboard-dialog .dialog-close-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .leaderboard-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
   }
 
   .leaderboard-header-row,
@@ -8445,13 +8581,21 @@ html, body {
   }
 
   .leaderboard-header-row {
+    flex-shrink: 0;
+    touch-action: none;
     font-size: 0.54rem;
     padding: 3px 8px;
   }
 
   .leaderboard-list-body {
-    max-height: calc(96vh - 105px);
-    min-height: 150px;
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   .leaderboard-row {

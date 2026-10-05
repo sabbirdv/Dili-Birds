@@ -610,58 +610,98 @@ function addLevels56to70_v2(levels) {
     const blocks = [];
     const targets = [];
 
-    // Left gatehouse tower (Plat 1, top = 2.8)
-    blocks.push(makeBlock(5.2, 2.8, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(8.0, 2.8, 0.8, 0.6, 'metal'));
-    blocks.push(makeCol(5.2, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(8.0, 3.4, 0.44, 2.0, 'stone'));
-    targets.push(makeTarget(6.6, 3.4, 'blue'));
-    blocks.push(makeBeam(6.6, 5.4, 3.6, 0.28, 'stone'));
-    blocks.push(makeCol(6.6, 5.68, 0.38, 1.6, 'wood'));
-    targets.push(makeTarget(6.6, 7.28, 'pink'));
-    blocks.push(makeBeam(6.6, 7.28, 2.4, 0.22, 'stone'));
+    // Left gatehouse tower (Plat 1, top = 2.8) - 3 stories
+    blocks.push(makeBlock(5.0, 2.8, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(8.2, 2.8, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(5.0, 3.4, 0.46, 2.2, 'metal'));
+    blocks.push(makeCol(8.2, 3.4, 0.46, 2.2, 'stone'));
+    blocks.push(makeTnt(6.6, 3.4, 0.65));
+    targets.push(makeTarget(6.6, 4.05, 'blue'));
+    blocks.push(makeBeam(6.6, 5.6, 3.8, 0.3, 'stone'));
+    blocks.push(makeCol(5.8, 5.9, 0.38, 1.6, 'stone'));
+    blocks.push(makeCol(7.4, 5.9, 0.38, 1.6, 'metal'));
+    targets.push(makeTarget(6.6, 5.9, 'pink'));
+    blocks.push(makeBeam(6.6, 7.5, 2.6, 0.24, 'stone'));
+    blocks.push(makeBlock(6.6, 7.74, 1.0, 0.8, 'metal'));
+    targets.push(makeTarget(6.6, 8.54, 'gold'));
 
-    // Right armory tower (Plat 3, top = 2.8)
-    blocks.push(makeBlock(17.2, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(20.0, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(17.2, 3.4, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(20.0, 3.4, 0.44, 2.0, 'metal'));
-    targets.push(makeTarget(18.6, 3.4, 'green'));
-    blocks.push(makeBeam(18.6, 5.4, 3.6, 0.28, 'stone'));
-    blocks.push(makeCol(18.6, 5.68, 0.38, 1.6, 'glass'));
-    targets.push(makeTarget(18.6, 7.28, 'gold'));
-    blocks.push(makeBeam(18.6, 7.28, 2.4, 0.22, 'stone'));
+    // Right armory tower (Plat 3, top = 2.8) - 3 stories
+    blocks.push(makeBlock(17.0, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(20.2, 2.8, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(17.0, 3.4, 0.46, 2.2, 'stone'));
+    blocks.push(makeCol(20.2, 3.4, 0.46, 2.2, 'metal'));
+    blocks.push(makeTnt(18.6, 3.4, 0.65));
+    targets.push(makeTarget(18.6, 4.05, 'green'));
+    blocks.push(makeBeam(18.6, 5.6, 3.8, 0.3, 'stone'));
+    blocks.push(makeCol(17.8, 5.9, 0.38, 1.6, 'metal'));
+    blocks.push(makeCol(19.4, 5.9, 0.38, 1.6, 'stone'));
+    targets.push(makeTarget(18.6, 5.9, 'blue'));
+    blocks.push(makeBeam(18.6, 7.5, 2.6, 0.24, 'stone'));
+    blocks.push(makeBlock(18.6, 7.74, 1.0, 0.8, 'metal'));
+    targets.push(makeTarget(18.6, 8.54, 'gold'));
 
     // Central Imperial Palace on Plat 2 (top = 4.4)
-    blocks.push(makeCol(10.2, 4.4, 0.52, 2.6, 'metal'));
-    blocks.push(makeCol(12.6, 4.4, 0.46, 2.6, 'stone'));
-    blocks.push(makeCol(15.0, 4.4, 0.52, 2.6, 'metal'));
-    blocks.push(makeTnt(11.4, 4.4, 0.6));
-    blocks.push(makeTnt(13.8, 4.4, 0.6));
-    targets.push(makeTarget(11.4, 5.0, 'gold'));
-    targets.push(makeTarget(13.8, 5.0, 'gold'));
+    // Tier 1: Armored Palace Vault (4 columns + 2 TNTs + 3 footing blocks)
+    blocks.push(makeBlock(10.0, 4.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(12.6, 4.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(15.2, 4.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(10.0, 5.0, 0.52, 2.0, 'metal'));
+    blocks.push(makeCol(11.8, 4.4, 0.46, 2.6, 'stone'));
+    blocks.push(makeCol(13.4, 4.4, 0.46, 2.6, 'stone'));
+    blocks.push(makeCol(15.2, 5.0, 0.52, 2.0, 'metal'));
+    blocks.push(makeTnt(10.9, 4.4, 0.65));
+    blocks.push(makeTnt(14.3, 4.4, 0.65));
+    targets.push(makeTarget(10.9, 5.05, 'gold'));
+    targets.push(makeTarget(14.3, 5.05, 'gold'));
     blocks.push(makeBeam(12.6, 7.0, 6.2, 0.4, 'metal'));
 
-    // Tier 2: Emperor Throne Room
-    blocks.push(makeCol(11.0, 7.4, 0.48, 2.2, 'stone'));
-    blocks.push(makeCol(14.2, 7.4, 0.48, 2.2, 'stone'));
-    blocks.push(makeBlock(12.6, 7.4, 1.4, 1.0, 'wood'));
-    // Solar Emperor Boss!
-    targets.push(makeTarget(12.6, 8.4, 'boss', true, 0.72));
+    // Connecting High Walkways from Towers to Imperial Palace
+    blocks.push(makeBeam(8.9, 5.6, 2.0, 0.24, 'metal'));
+    blocks.push(makeBeam(16.3, 5.6, 2.0, 0.24, 'metal'));
 
-    // Tier 3: Solar Crown & Spire
-    blocks.push(makeBeam(12.6, 9.6, 4.8, 0.34, 'stone'));
-    blocks.push(makeBlock(12.6, 9.94, 1.4, 1.0, 'metal'));
-    targets.push(makeTarget(12.6, 10.94, 'gold'));
+    // Tier 2: Solar Emperor Grand Throne Room
+    blocks.push(makeCol(10.6, 7.4, 0.48, 2.4, 'metal'));
+    blocks.push(makeCol(12.6, 7.4, 0.44, 2.4, 'stone'));
+    blocks.push(makeCol(14.6, 7.4, 0.48, 2.4, 'metal'));
+    blocks.push(makeBlock(11.6, 7.4, 0.8, 0.8, 'metal'));
+    blocks.push(makeBlock(13.6, 7.4, 0.8, 0.8, 'metal'));
+    targets.push(makeTarget(11.6, 8.2, 'pink'));
+    targets.push(makeTarget(13.6, 8.2, 'blue'));
+    blocks.push(makeBeam(12.6, 9.8, 5.2, 0.36, 'metal'));
+
+    // Flank Mid-Palace Battlement Pylons
+    blocks.push(makeBlock(9.2, 9.8, 0.6, 0.6, 'stone'));
+    blocks.push(makeBlock(16.0, 9.8, 0.6, 0.6, 'stone'));
+    blocks.push(makeCol(9.2, 10.4, 0.36, 1.2, 'metal'));
+    blocks.push(makeCol(16.0, 10.4, 0.36, 1.2, 'metal'));
+
+    // Tier 3: Solar Crown & Sovereign Boss Chamber
+    blocks.push(makeBlock(11.4, 10.16, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(13.8, 10.16, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(11.4, 10.76, 0.46, 1.8, 'metal'));
+    blocks.push(makeCol(13.8, 10.76, 0.46, 1.8, 'metal'));
+    blocks.push(makeBlock(12.6, 10.16, 1.4, 1.0, 'metal'));
+    // Solar Emperor Challenge Boss!
+    targets.push(makeTarget(12.6, 11.16, 'boss', true, 0.74));
+    blocks.push(makeBeam(12.6, 12.56, 4.4, 0.32, 'stone'));
+
+    // Tier 4: Corona Apex Spire
+    blocks.push(makeBlock(12.6, 12.88, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(12.6, 13.48, 0.4, 1.4, 'metal'));
+    blocks.push(makeBlock(11.6, 12.88, 0.6, 0.6, 'metal'));
+    blocks.push(makeBlock(13.6, 12.88, 0.6, 0.6, 'metal'));
+    blocks.push(makeBeam(12.6, 14.88, 2.6, 0.24, 'metal'));
+    blocks.push(makeBlock(12.6, 15.12, 1.0, 0.8, 'glass'));
+    targets.push(makeTarget(12.6, 15.92, 'gold'));
 
     levels.push({
       id: 60,
       name: "Solar Emperor Fortress",
       zone: "Solar Foundry",
-      icon: "👑",
-      difficulty: "Solar Emperor Boss",
-      description: "The grand imperial citadel of the Sun, with fortified gatehouses and the Solar Emperor presiding within the core.",
-      coinReward: 850,
+      icon: "☀️",
+      difficulty: "Solar Emperor Challenge Boss",
+      description: "CHALLENGE LEVEL 60: The imperial stronghold of the Solar Emperor featuring reinforced outer gate towers, multi-tier ballistic armor, and high-altitude throne bastions.",
+      coinReward: 900,
       birds: ["heavy", "chrono", "lightning", "vortex", "fire", "split"],
       platforms: plats,
       blocks,
@@ -1220,72 +1260,110 @@ function addLevels56to70_v2(levels) {
     const blocks = [];
     const targets = [];
 
-    // Left God Bastion (Plat 1, top = 3.0): 4 stories
-    blocks.push(makeBlock(5.4, 3.0, 0.8, 0.8, 'metal'));
-    blocks.push(makeBlock(8.2, 3.0, 0.8, 0.8, 'metal'));
-    blocks.push(makeCol(5.4, 3.8, 0.46, 2.2, 'metal'));
-    blocks.push(makeCol(8.2, 3.8, 0.46, 2.2, 'stone'));
-    targets.push(makeTarget(6.8, 3.8, 'blue'));
-    blocks.push(makeBeam(6.8, 6.0, 3.6, 0.3, 'stone'));
-    blocks.push(makeCol(6.0, 6.3, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(7.6, 6.3, 0.4, 1.8, 'wood'));
-    targets.push(makeTarget(6.8, 6.3, 'pink'));
-    blocks.push(makeBeam(6.8, 8.1, 2.8, 0.26, 'stone'));
-    blocks.push(makeBlock(6.8, 8.36, 1.2, 0.8, 'metal'));
-    targets.push(makeTarget(6.8, 9.16, 'gold'));
+    // Left God Bastion (Plat 1, top = 3.0): 4 stories fortified
+    blocks.push(makeBlock(5.0, 3.0, 0.8, 0.8, 'metal'));
+    blocks.push(makeBlock(8.6, 3.0, 0.8, 0.8, 'metal'));
+    blocks.push(makeCol(5.0, 3.8, 0.48, 2.2, 'metal'));
+    blocks.push(makeCol(8.6, 3.8, 0.48, 2.2, 'stone'));
+    blocks.push(makeTnt(6.8, 3.8, 0.65));
+    targets.push(makeTarget(6.8, 4.45, 'blue'));
+    blocks.push(makeBeam(6.8, 6.0, 4.2, 0.32, 'metal'));
 
-    // Right God Bastion (Plat 3, top = 3.0): 4 stories
-    blocks.push(makeBlock(17.4, 3.0, 0.8, 0.8, 'stone'));
-    blocks.push(makeBlock(20.2, 3.0, 0.8, 0.8, 'stone'));
-    blocks.push(makeCol(17.4, 3.8, 0.46, 2.2, 'stone'));
-    blocks.push(makeCol(20.2, 3.8, 0.46, 2.2, 'metal'));
-    targets.push(makeTarget(18.8, 3.8, 'green'));
-    blocks.push(makeBeam(18.8, 6.0, 3.6, 0.3, 'metal'));
-    blocks.push(makeTnt(18.8, 6.3, 0.6));
-    blocks.push(makeCol(17.8, 6.3, 0.4, 1.8, 'glass'));
-    blocks.push(makeCol(19.8, 6.3, 0.4, 1.8, 'glass'));
-    targets.push(makeTarget(18.8, 6.9, 'blue'));
-    blocks.push(makeBeam(18.8, 8.1, 2.8, 0.26, 'stone'));
-    blocks.push(makeBlock(18.8, 8.36, 1.2, 0.8, 'metal'));
-    targets.push(makeTarget(18.8, 9.16, 'pink'));
+    blocks.push(makeCol(5.8, 6.32, 0.4, 1.8, 'stone'));
+    blocks.push(makeCol(7.8, 6.32, 0.4, 1.8, 'metal'));
+    targets.push(makeTarget(6.8, 6.32, 'pink'));
+    blocks.push(makeBeam(6.8, 8.12, 3.2, 0.28, 'stone'));
+
+    blocks.push(makeCol(6.2, 8.4, 0.38, 1.6, 'wood'));
+    blocks.push(makeCol(7.4, 8.4, 0.38, 1.6, 'wood'));
+    targets.push(makeTarget(6.8, 8.4, 'gold'));
+    blocks.push(makeBeam(6.8, 10.0, 2.4, 0.24, 'metal'));
+    blocks.push(makeBlock(6.8, 10.24, 0.8, 0.8, 'metal'));
+    targets.push(makeTarget(6.8, 11.04, 'gold'));
+
+    // Right God Bastion (Plat 3, top = 3.0): 4 stories fortified
+    blocks.push(makeBlock(17.0, 3.0, 0.8, 0.8, 'stone'));
+    blocks.push(makeBlock(20.6, 3.0, 0.8, 0.8, 'metal'));
+    blocks.push(makeCol(17.0, 3.8, 0.48, 2.2, 'stone'));
+    blocks.push(makeCol(20.6, 3.8, 0.48, 2.2, 'metal'));
+    blocks.push(makeTnt(18.8, 3.8, 0.65));
+    targets.push(makeTarget(18.8, 4.45, 'green'));
+    blocks.push(makeBeam(18.8, 6.0, 4.2, 0.32, 'metal'));
+
+    blocks.push(makeCol(17.8, 6.32, 0.4, 1.8, 'metal'));
+    blocks.push(makeCol(19.8, 6.32, 0.4, 1.8, 'stone'));
+    targets.push(makeTarget(18.8, 6.32, 'blue'));
+    blocks.push(makeBeam(18.8, 8.12, 3.2, 0.28, 'stone'));
+
+    blocks.push(makeCol(18.2, 8.4, 0.38, 1.6, 'wood'));
+    blocks.push(makeCol(19.4, 8.4, 0.38, 1.6, 'wood'));
+    targets.push(makeTarget(18.8, 8.4, 'pink'));
+    blocks.push(makeBeam(18.8, 10.0, 2.4, 0.24, 'metal'));
+    blocks.push(makeBlock(18.8, 10.24, 0.8, 0.8, 'metal'));
+    targets.push(makeTarget(18.8, 11.04, 'gold'));
 
     // Central Sovereign Throne Keep on Plat 2 (top = 5.0)
-    // Tier 1: Armored Titan Vault
-    blocks.push(makeCol(10.4, 5.0, 0.52, 2.6, 'metal'));
-    blocks.push(makeCol(12.8, 5.0, 0.48, 2.6, 'stone'));
-    blocks.push(makeCol(15.2, 5.0, 0.52, 2.6, 'metal'));
-    blocks.push(makeTnt(11.6, 5.0, 0.6));
-    blocks.push(makeTnt(14.0, 5.0, 0.6));
-    targets.push(makeTarget(11.6, 5.6, 'gold'));
-    targets.push(makeTarget(14.0, 5.6, 'gold'));
-    blocks.push(makeBeam(12.8, 7.6, 6.0, 0.4, 'metal')); // Sovereign floor slab
+    // Connecting Heavy Skywalk Girders
+    blocks.push(makeBeam(9.3, 6.0, 2.2, 0.26, 'metal'));
+    blocks.push(makeBeam(16.3, 6.0, 2.2, 0.26, 'metal'));
+
+    // Tier 1: Armored Titan Vault (4 pillars + 2 TNTs + 4 footing blocks)
+    blocks.push(makeBlock(10.2, 5.0, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(11.9, 5.0, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(13.7, 5.0, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(15.4, 5.0, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(10.2, 5.6, 0.54, 2.0, 'metal'));
+    blocks.push(makeCol(11.9, 5.6, 0.48, 2.0, 'stone'));
+    blocks.push(makeCol(13.7, 5.6, 0.48, 2.0, 'stone'));
+    blocks.push(makeCol(15.4, 5.6, 0.54, 2.0, 'metal'));
+    blocks.push(makeTnt(11.05, 5.0, 0.65));
+    blocks.push(makeTnt(14.55, 5.0, 0.65));
+    targets.push(makeTarget(11.05, 5.65, 'gold'));
+    targets.push(makeTarget(14.55, 5.65, 'gold'));
+    blocks.push(makeBeam(12.8, 7.6, 6.4, 0.42, 'metal')); // Sovereign floor slab
 
     // Tier 2: Lightning Grid Chamber
-    blocks.push(makeCol(11.0, 8.0, 0.46, 2.2, 'metal'));
-    blocks.push(makeCol(14.6, 8.0, 0.46, 2.2, 'metal'));
-    blocks.push(makeBlock(12.8, 8.0, 1.4, 1.4, 'glass'));
-    targets.push(makeTarget(12.8, 9.4, 'pink'));
-    blocks.push(makeBeam(12.8, 10.2, 4.8, 0.34, 'stone'));
+    blocks.push(makeCol(10.8, 8.02, 0.48, 2.2, 'metal'));
+    blocks.push(makeCol(12.8, 8.02, 0.44, 2.2, 'stone'));
+    blocks.push(makeCol(14.8, 8.02, 0.48, 2.2, 'metal'));
+    blocks.push(makeBlock(11.8, 8.02, 0.8, 0.8, 'metal'));
+    blocks.push(makeBlock(13.8, 8.02, 0.8, 0.8, 'metal'));
+    targets.push(makeTarget(11.8, 8.82, 'pink'));
+    targets.push(makeTarget(13.8, 8.82, 'blue'));
+    blocks.push(makeBeam(12.8, 10.22, 5.2, 0.36, 'metal'));
+
+    // Mid-Keep Flank Defense Pods
+    blocks.push(makeBlock(9.6, 10.22, 0.6, 0.6, 'metal'));
+    blocks.push(makeBlock(16.0, 10.22, 0.6, 0.6, 'metal'));
+    blocks.push(makeCol(9.6, 10.82, 0.36, 1.4, 'metal'));
+    blocks.push(makeCol(16.0, 10.82, 0.36, 1.4, 'metal'));
 
     // Tier 3: Supreme God King Throne (Ultimate Boss Chamber)
-    blocks.push(makeCol(11.6, 10.54, 0.46, 2.2, 'metal'));
-    blocks.push(makeCol(14.0, 10.54, 0.46, 2.2, 'metal'));
+    blocks.push(makeBlock(11.4, 10.58, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(14.2, 10.58, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(11.4, 11.18, 0.48, 1.8, 'metal'));
+    blocks.push(makeCol(14.2, 11.18, 0.48, 1.8, 'metal'));
+    blocks.push(makeBlock(12.8, 10.58, 1.4, 1.0, 'metal'));
     // SUPREME GOD FINALE BOSS!
-    targets.push(makeTarget(12.8, 10.54, 'boss', true, 0.74));
+    targets.push(makeTarget(12.8, 11.58, 'boss', true, 0.76));
+    blocks.push(makeBeam(12.8, 12.98, 4.4, 0.34, 'metal'));
 
     // Tier 4: Cosmic Crown & Zenith Spire
-    blocks.push(makeBeam(12.8, 12.74, 3.8, 0.32, 'metal'));
-    blocks.push(makeBlock(12.8, 13.06, 1.2, 1.0, 'glass'));
-    targets.push(makeTarget(12.8, 14.06, 'gold'));
+    blocks.push(makeBlock(12.8, 13.32, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(12.1, 13.92, 0.4, 1.4, 'metal'));
+    blocks.push(makeCol(13.5, 13.92, 0.4, 1.4, 'metal'));
+    blocks.push(makeBeam(12.8, 15.32, 2.8, 0.28, 'stone'));
+    blocks.push(makeBlock(12.8, 15.6, 1.0, 0.8, 'metal'));
+    targets.push(makeTarget(12.8, 16.4, 'gold'));
 
     levels.push({
       id: 70,
       name: "Omnipotent God Sovereign Citadel",
       zone: "Cosmic Singularity",
       icon: "👑",
-      difficulty: "Supreme God Finale Boss",
-      description: "The ultimate cosmic deity megastructure crowned by the throne of the Omnipotent God Sovereign King.",
-      coinReward: 1500,
+      difficulty: "Supreme God Grand Finale Boss",
+      description: "CHALLENGE LEVEL 70: The ultimate cosmic deity megastructure crowned by the throne of the Omnipotent God Sovereign King, defended by triple quad-story bastions and impenetrable metal armor plating.",
+      coinReward: 2000,
       birds: ["heavy", "fire", "chrono", "lightning", "vortex", "chrono"],
       platforms: plats,
       blocks,

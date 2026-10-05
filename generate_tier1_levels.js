@@ -4,8 +4,9 @@ export function getTier1Levels() {
   const levels = [];
 
   // =========================================================================
-  // LEVEL 30: Colossus of Sparks (Grand Master Boss)
-  // Concept: Giant Mech Golem standing across dual platforms with a central pit
+  // LEVEL 30: Colossus of Sparks (Challenge Level 30)
+  // Concept: Titanic Dual-Straddling Automaton with Armored Knee Braces,
+  // Reactive Core Blast Vault, Shoulder Missile Pods, and Armored Crown Citadel.
   // =========================================================================
   {
     const plats = [
@@ -15,79 +16,88 @@ export function getTier1Levels() {
     const blocks = [];
     const targets = [];
 
-    // Left Foot & Shin (on Plat 1)
-    blocks.push(makeBlock(7.2, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(9.8, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeCol(7.2, 3.0, 0.44, 1.8, 'metal'));
-    blocks.push(makeCol(9.8, 3.0, 0.44, 1.8, 'metal'));
-    blocks.push(makeBlock(8.5, 3.0, 1.2, 0.8, 'stone'));
-    targets.push(makeTarget(8.5, 3.8, 'blue'));
-    blocks.push(makeBeam(8.5, 4.8, 3.4, 0.3, 'metal')); // knee joint
+    // Left Foot & Shin Fortress (Plat 1, top = 2.4)
+    blocks.push(makeBlock(6.8, 2.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(7.8, 2.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(9.2, 2.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(10.2, 2.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(7.2, 3.0, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(9.8, 3.0, 0.44, 2.0, 'metal'));
+    blocks.push(makeBlock(8.5, 3.0, 1.0, 0.8, 'stone'));
+    blocks.push(makeTnt(8.5, 3.8, 0.6));
+    targets.push(makeTarget(8.5, 4.4, 'blue'));
+    blocks.push(makeBeam(8.5, 5.0, 3.8, 0.32, 'metal')); // knee joint
 
-    // Right Foot & Shin (on Plat 2)
-    blocks.push(makeBlock(15.2, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(17.8, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeCol(15.2, 3.0, 0.44, 1.8, 'metal'));
-    blocks.push(makeCol(17.8, 3.0, 0.44, 1.8, 'metal'));
-    blocks.push(makeBlock(16.5, 3.0, 1.2, 0.8, 'stone'));
-    targets.push(makeTarget(16.5, 3.8, 'pink'));
-    blocks.push(makeBeam(16.5, 4.8, 3.4, 0.3, 'metal')); // knee joint
+    // Right Foot & Shin Fortress (Plat 2, top = 2.4)
+    blocks.push(makeBlock(14.8, 2.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(15.8, 2.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(17.2, 2.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(18.2, 2.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(15.2, 3.0, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(17.8, 3.0, 0.44, 2.0, 'metal'));
+    blocks.push(makeBlock(16.5, 3.0, 1.0, 0.8, 'stone'));
+    blocks.push(makeTnt(16.5, 3.8, 0.6));
+    targets.push(makeTarget(16.5, 4.4, 'pink'));
+    blocks.push(makeBeam(16.5, 5.0, 3.8, 0.32, 'metal')); // knee joint
 
-    // Upper Thighs
-    blocks.push(makeCol(8.5, 5.1, 0.5, 1.6, 'stone'));
-    blocks.push(makeBlock(7.2, 5.1, 0.6, 1.2, 'wood'));
-    blocks.push(makeCol(16.5, 5.1, 0.5, 1.6, 'stone'));
-    blocks.push(makeBlock(17.8, 5.1, 0.6, 1.2, 'wood'));
+    // Thigh Struts & Kinetic Braces
+    blocks.push(makeCol(8.5, 5.32, 0.48, 1.8, 'stone'));
+    blocks.push(makeCol(7.2, 5.32, 0.4, 1.8, 'metal'));
+    blocks.push(makeCol(16.5, 5.32, 0.48, 1.8, 'stone'));
+    blocks.push(makeCol(17.8, 5.32, 0.4, 1.8, 'metal'));
 
-    // Giant Pelvic Girder bridging across both legs over the gap!
-    const pelvicY = 6.7;
-    blocks.push(makeBeam(12.5, pelvicY, 11.4, 0.38, 'metal'));
+    // Giant Pelvic Girder bridging across both legs over the abyss
+    const pelvicY = 7.12;
+    blocks.push(makeBeam(12.5, pelvicY, 11.6, 0.4, 'metal'));
 
-    // Torso Chamber & Ribcage (between x=9.5 and x=15.5)
-    const torsoY = pelvicY + 0.38; // 7.08
-    blocks.push(makeCol(10.2, torsoY, 0.46, 2.0, 'stone'));
-    blocks.push(makeCol(14.8, torsoY, 0.46, 2.0, 'stone'));
-    blocks.push(makeCol(12.5, torsoY, 0.4, 2.0, 'metal')); // spinal strut
-    blocks.push(makeTnt(11.35, torsoY, 0.6)); // Heart reactor TNT
-    blocks.push(makeTnt(13.65, torsoY, 0.6));
-    blocks.push(makeCoin(12.5, torsoY + 0.8, 0.5));
-    targets.push(makeTarget(11.35, torsoY + 0.6, 'gold'));
-    targets.push(makeTarget(13.65, torsoY + 0.6, 'gold'));
+    // Core Reactor Torso & Ribcage Chamber
+    const torsoY = pelvicY + 0.4; // 7.52
+    blocks.push(makeCol(10.0, torsoY, 0.48, 2.2, 'metal'));
+    blocks.push(makeCol(12.5, torsoY, 0.44, 2.2, 'metal')); // central spinal strut
+    blocks.push(makeCol(15.0, torsoY, 0.48, 2.2, 'metal'));
+    blocks.push(makeTnt(11.25, torsoY, 0.65)); // Heart reactor TNT
+    blocks.push(makeTnt(13.75, torsoY, 0.65));
+    blocks.push(makeCoin(12.5, torsoY + 1.0, 0.5));
+    targets.push(makeTarget(11.25, torsoY + 0.65, 'gold'));
+    targets.push(makeTarget(13.75, torsoY + 0.65, 'gold'));
 
-    // Outer Shoulder Turrets
-    blocks.push(makeCol(7.6, torsoY, 0.4, 1.6, 'glass'));
-    blocks.push(makeCol(17.4, torsoY, 0.4, 1.6, 'glass'));
-    targets.push(makeTarget(7.6, torsoY + 1.6, 'pink'));
-    targets.push(makeTarget(17.4, torsoY + 1.6, 'blue'));
-    blocks.push(makeBeam(7.6, torsoY + 1.6, 2.0, 0.22, 'stone'));
-    blocks.push(makeBeam(17.4, torsoY + 1.6, 2.0, 0.22, 'stone'));
+    // Heavy Outer Shoulder Armor & Missile Pods
+    blocks.push(makeCol(7.4, torsoY, 0.42, 2.0, 'stone'));
+    blocks.push(makeCol(17.6, torsoY, 0.42, 2.0, 'stone'));
+    blocks.push(makeBlock(6.4, torsoY, 0.8, 1.4, 'metal'));
+    blocks.push(makeBlock(18.6, torsoY, 0.8, 1.4, 'metal'));
+    targets.push(makeTarget(7.4, torsoY + 2.0, 'pink'));
+    targets.push(makeTarget(17.6, torsoY + 2.0, 'blue'));
+    blocks.push(makeBeam(7.4, torsoY + 2.0, 2.4, 0.26, 'stone'));
+    blocks.push(makeBeam(17.6, torsoY + 2.0, 2.4, 0.26, 'stone'));
 
-    // Chest / Shoulder Deck Beam
-    const chestY = torsoY + 2.0; // 9.08
-    blocks.push(makeBeam(12.5, chestY, 5.6, 0.32, 'metal'));
+    // Chest & Shoulder Deck Girders
+    const chestY = torsoY + 2.2; // 9.72
+    blocks.push(makeBeam(12.5, chestY, 6.6, 0.36, 'metal'));
 
-    // Head / Crown Citadel (Boss Chamber)
-    const headY = chestY + 0.32; // 9.4
-    blocks.push(makeCol(11.2, headY, 0.44, 1.6, 'metal'));
-    blocks.push(makeCol(13.8, headY, 0.44, 1.6, 'metal'));
-    // Colossus Spark Boss
-    targets.push(makeTarget(12.5, headY, 'boss', true, 0.68));
+    // Armored Head & Commander Sanctuary (Boss Chamber)
+    const headY = chestY + 0.36; // 10.08
+    blocks.push(makeCol(11.0, headY, 0.46, 2.0, 'metal'));
+    blocks.push(makeCol(14.0, headY, 0.46, 2.0, 'metal'));
+    blocks.push(makeBlock(12.5, headY, 1.2, 0.8, 'metal'));
+    // Colossus Spark Grand Master Boss!
+    targets.push(makeTarget(12.5, headY + 0.8, 'boss', true, 0.7));
 
-    // Crown Spikes & Helm
-    blocks.push(makeBeam(12.5, headY + 1.6, 3.6, 0.28, 'stone'));
-    blocks.push(makeCol(12.5, headY + 1.88, 0.34, 1.0, 'metal'));
-    blocks.push(makeBlock(11.5, headY + 1.88, 0.5, 0.6, 'wood'));
-    blocks.push(makeBlock(13.5, headY + 1.88, 0.5, 0.6, 'wood'));
-    targets.push(makeTarget(12.5, headY + 2.88, 'gold'));
+    // Zenith Spire & Corona Finial
+    blocks.push(makeBeam(12.5, headY + 2.0, 4.2, 0.3, 'stone'));
+    blocks.push(makeCol(12.5, headY + 2.3, 0.36, 1.2, 'metal'));
+    blocks.push(makeBlock(11.5, headY + 2.3, 0.6, 0.6, 'wood'));
+    blocks.push(makeBlock(13.5, headY + 2.3, 0.6, 0.6, 'wood'));
+    targets.push(makeTarget(12.5, headY + 3.5, 'gold'));
 
     levels.push({
       id: 30,
       name: "Colossus of Sparks",
       zone: "Storm Bastion",
       icon: "⚡",
-      difficulty: "Grand Master Boss",
-      description: "A titanic spark-forged automaton straddling dual cliffs with an explosive heart, shoulder pods, and crowned boss helm.",
-      coinReward: 250,
+      difficulty: "Grand Master Challenge Boss",
+      description: "CHALLENGE LEVEL 30: A titanic spark-forged automaton straddling dual cliffs with dual reinforced legs, explosive core vaults, and heavy metal armor plating.",
+      coinReward: 400,
       birds: ["lightning", "vortex", "heavy", "fire", "speed", "heavy"],
       platforms: plats,
       blocks,
@@ -735,62 +745,94 @@ function addLevels36to50(levels) {
     const blocks = [];
     const targets = [];
 
-    // Mooring Pylon 1 (left)
-    blocks.push(makeBlock(7.0, 2.8, 1.0, 0.6, 'stone'));
-    blocks.push(makeCol(7.0, 3.4, 0.46, 2.0, 'metal'));
-    targets.push(makeTarget(7.0, 5.4, 'blue'));
+    // Mooring Pylon 1 (left: x=7.0, top=2.8) - 2-tier reinforced watchtower
+    blocks.push(makeBlock(5.8, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(8.2, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(5.8, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(8.2, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeBlock(7.0, 3.4, 0.8, 0.6, 'stone'));
+    targets.push(makeTarget(7.0, 4.0, 'blue'));
+    blocks.push(makeBeam(7.0, 5.4, 3.2, 0.28, 'stone'));
+    blocks.push(makeCol(7.0, 5.68, 0.38, 1.4, 'metal'));
+    targets.push(makeTarget(7.0, 7.08, 'pink'));
+    blocks.push(makeBeam(7.0, 7.08, 2.0, 0.22, 'stone'));
 
-    // Central Dock Crane (center)
-    blocks.push(makeCol(11.0, 2.0, 0.44, 3.2, 'stone'));
-    blocks.push(makeCol(14.0, 2.0, 0.44, 3.2, 'stone'));
-    blocks.push(makeTnt(12.5, 2.0, 0.6));
-    targets.push(makeTarget(12.5, 2.6, 'gold'));
+    // Central Heavy Dock Support (center: x=12.5, top=2.0)
+    blocks.push(makeBlock(10.8, 2.0, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(14.2, 2.0, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(10.8, 2.6, 0.48, 2.8, 'metal'));
+    blocks.push(makeCol(14.2, 2.6, 0.48, 2.8, 'metal'));
+    blocks.push(makeCol(12.5, 2.0, 0.44, 3.4, 'stone'));
+    blocks.push(makeTnt(11.6, 2.0, 0.65));
+    blocks.push(makeTnt(13.4, 2.0, 0.65));
+    targets.push(makeTarget(11.6, 2.65, 'gold'));
+    targets.push(makeTarget(13.4, 2.65, 'gold'));
+    blocks.push(makeBeam(12.5, 5.4, 4.4, 0.32, 'metal'));
 
-    // Mooring Pylon 3 (right)
-    blocks.push(makeBlock(18.0, 2.8, 1.0, 0.6, 'stone'));
-    blocks.push(makeCol(18.0, 3.4, 0.46, 2.0, 'metal'));
-    targets.push(makeTarget(18.0, 5.4, 'pink'));
+    // Mooring Pylon 3 (right: x=18.0, top=2.8) - 2-tier reinforced watchtower
+    blocks.push(makeBlock(16.8, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(19.2, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(16.8, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(19.2, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeBlock(18.0, 3.4, 0.8, 0.6, 'stone'));
+    targets.push(makeTarget(18.0, 4.0, 'green'));
+    blocks.push(makeBeam(18.0, 5.4, 3.2, 0.28, 'stone'));
+    blocks.push(makeCol(18.0, 5.68, 0.38, 1.4, 'metal'));
+    targets.push(makeTarget(18.0, 7.08, 'blue'));
+    blocks.push(makeBeam(18.0, 7.08, 2.0, 0.22, 'stone'));
 
-    // Airship Keel / Main Cargo Deck (spans 13.4 units from x=5.8 to x=19.2 at y=5.4!)
-    const keelY = 5.4;
-    blocks.push(makeBeam(12.5, keelY, 13.4, 0.38, 'metal'));
+    // Airship Armored Keel Girder (spans 13.6 units at y=7.3!)
+    const keelY = 7.3;
+    blocks.push(makeBeam(12.5, keelY, 13.6, 0.4, 'metal'));
 
-    // Cargo Bay / Crew Quarters (on keel)
-    blocks.push(makeBlock(6.5, keelY + 0.38, 1.2, 1.2, 'metal')); // Prow nose ram
-    blocks.push(makeCol(8.2, keelY + 0.38, 0.42, 1.8, 'wood'));
-    blocks.push(makeCol(10.6, keelY + 0.38, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(14.4, keelY + 0.38, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(16.8, keelY + 0.38, 0.42, 1.8, 'wood'));
+    // Cargo Bay, Bomb Bays & Armored Ribs (on keel)
+    blocks.push(makeBlock(6.2, keelY + 0.4, 1.2, 1.4, 'metal')); // Front Armored Ram Prow
+    blocks.push(makeBlock(18.8, keelY + 0.4, 1.2, 1.4, 'metal')); // Rear Thruster Cowling
+    blocks.push(makeCol(8.0, keelY + 0.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(10.2, keelY + 0.4, 0.44, 2.0, 'stone'));
+    blocks.push(makeCol(12.5, keelY + 0.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(14.8, keelY + 0.4, 0.44, 2.0, 'stone'));
+    blocks.push(makeCol(17.0, keelY + 0.4, 0.44, 2.0, 'metal'));
 
-    blocks.push(makeTnt(12.5, keelY + 0.38, 0.6));
-    targets.push(makeTarget(9.4, keelY + 0.38, 'blue'));
-    targets.push(makeTarget(12.5, keelY + 0.98, 'gold'));
-    targets.push(makeTarget(15.6, keelY + 0.38, 'pink'));
+    blocks.push(makeTnt(9.1, keelY + 0.4, 0.65));
+    blocks.push(makeTnt(15.9, keelY + 0.4, 0.65));
+    targets.push(makeTarget(9.1, keelY + 1.05, 'gold'));
+    targets.push(makeTarget(15.9, keelY + 1.05, 'gold'));
 
-    // Main Mid-Deck Ceiling Beam
-    const midDeckY = keelY + 0.38 + 1.8; // 7.58
-    blocks.push(makeBeam(12.5, midDeckY, 10.8, 0.34, 'wood'));
+    // Mid-Deck Ceiling Beam
+    const midDeckY = keelY + 0.4 + 2.0; // 9.7
+    blocks.push(makeBeam(12.5, midDeckY, 12.0, 0.36, 'metal'));
 
-    // Upper Bridge / Commander Tower (Boss Chamber)
-    blocks.push(makeCol(11.2, midDeckY + 0.34, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(13.8, midDeckY + 0.34, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(12.5, midDeckY + 0.34, 0.36, 2.0, 'glass'));
-    // Void Commander Boss!
-    targets.push(makeTarget(12.5, midDeckY + 2.34, 'boss', true, 0.68));
+    // Flank Mid-Deck Balconies
+    blocks.push(makeBlock(7.2, midDeckY + 0.36, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(17.8, midDeckY + 0.36, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(7.2, midDeckY + 0.96, 0.36, 1.4, 'metal'));
+    blocks.push(makeCol(17.8, midDeckY + 0.96, 0.36, 1.4, 'metal'));
 
-    // Bridge Roof & Radar Antenna
-    blocks.push(makeBeam(12.5, midDeckY + 2.34 + 0.68, 4.2, 0.28, 'metal'));
-    blocks.push(makeCol(12.5, midDeckY + 3.3, 0.34, 1.2, 'metal'));
-    targets.push(makeTarget(12.5, midDeckY + 4.5, 'gold'));
+    // Upper Bridge Citadel / Commander Sanctuary (Boss Chamber)
+    blocks.push(makeCol(10.8, midDeckY + 0.36, 0.46, 2.2, 'metal'));
+    blocks.push(makeCol(14.2, midDeckY + 0.36, 0.46, 2.2, 'metal'));
+    blocks.push(makeBlock(12.5, midDeckY + 0.36, 1.2, 0.8, 'metal'));
+    // Void Commander Grand Challenge Boss!
+    targets.push(makeTarget(12.5, midDeckY + 1.16, 'boss', true, 0.72));
+
+    // Bridge Roof Armor, Radar Arrays & Spire
+    blocks.push(makeBeam(12.5, midDeckY + 2.56, 4.8, 0.3, 'stone'));
+    blocks.push(makeCol(11.8, midDeckY + 2.86, 0.36, 1.4, 'metal'));
+    blocks.push(makeCol(13.2, midDeckY + 2.86, 0.36, 1.4, 'metal'));
+    blocks.push(makeBlock(12.5, midDeckY + 2.86, 0.8, 0.8, 'metal'));
+    blocks.push(makeBeam(12.5, midDeckY + 4.26, 2.8, 0.24, 'metal'));
+    blocks.push(makeCol(12.5, midDeckY + 4.5, 0.32, 1.0, 'metal'));
+    targets.push(makeTarget(12.5, midDeckY + 5.5, 'pink'));
 
     levels.push({
       id: 40,
       name: "Void Airship Bastion",
       zone: "Chrono Void",
       icon: "🛸",
-      difficulty: "Void Emperor Boss",
-      description: "A colossal sky dreadnought moored across three launch pylons, guarded by the Void Commander upon the bridge.",
-      coinReward: 400,
+      difficulty: "Void Emperor Challenge Boss",
+      description: "CHALLENGE LEVEL 40: A colossal armored sky dreadnought moored across three fortified watchtower pylons with multiple bomb bays, reinforced bulkhead armor, and the Void Commander bridge.",
+      coinReward: 500,
       birds: ["fire", "heavy", "vortex", "lightning", "speed", "chrono"],
       platforms: plats,
       blocks,
@@ -1364,59 +1406,97 @@ function addLevels41to50_v2(levels) {
     const blocks = [];
     const targets = [];
 
-    // Left Obelisk on Plat 1 (top = 2.8)
-    blocks.push(makeCol(5.6, 2.8, 0.44, 2.4, 'stone'));
-    blocks.push(makeCol(8.0, 2.8, 0.44, 2.4, 'stone'));
-    targets.push(makeTarget(6.8, 2.8, 'blue'));
-    blocks.push(makeBeam(6.8, 5.2, 3.2, 0.26, 'stone'));
-    blocks.push(makeBlock(6.8, 5.46, 1.2, 1.0, 'metal'));
-    targets.push(makeTarget(6.8, 6.46, 'gold'));
+    // Left Chrono Pylon on Plat 1 (x=6.8, top = 2.8): 3 stories
+    blocks.push(makeBlock(5.6, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(8.0, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(5.6, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(8.0, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeTnt(6.8, 3.4, 0.65));
+    targets.push(makeTarget(6.8, 4.05, 'blue'));
+    blocks.push(makeBeam(6.8, 5.4, 3.2, 0.28, 'stone'));
+    blocks.push(makeCol(6.0, 5.68, 0.38, 1.4, 'stone'));
+    blocks.push(makeCol(7.6, 5.68, 0.38, 1.4, 'stone'));
+    targets.push(makeTarget(6.8, 5.68, 'pink'));
+    blocks.push(makeBeam(6.8, 7.08, 2.4, 0.24, 'metal'));
+    blocks.push(makeBlock(6.8, 7.32, 1.0, 0.8, 'metal'));
+    targets.push(makeTarget(6.8, 8.12, 'gold'));
 
-    // Right Obelisk on Plat 3 (top = 2.8)
-    blocks.push(makeCol(17.3, 2.8, 0.44, 2.4, 'stone'));
-    blocks.push(makeCol(19.7, 2.8, 0.44, 2.4, 'stone'));
-    targets.push(makeTarget(18.5, 2.8, 'green'));
-    blocks.push(makeBeam(18.5, 5.2, 3.2, 0.26, 'stone'));
-    blocks.push(makeBlock(18.5, 5.46, 1.2, 1.0, 'metal'));
-    targets.push(makeTarget(18.5, 6.46, 'pink'));
+    // Right Chrono Pylon on Plat 3 (x=18.5, top = 2.8): 3 stories
+    blocks.push(makeBlock(17.3, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(19.7, 2.8, 0.8, 0.6, 'stone'));
+    blocks.push(makeCol(17.3, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeCol(19.7, 3.4, 0.44, 2.0, 'metal'));
+    blocks.push(makeTnt(18.5, 3.4, 0.65));
+    targets.push(makeTarget(18.5, 4.05, 'green'));
+    blocks.push(makeBeam(18.5, 5.4, 3.2, 0.28, 'stone'));
+    blocks.push(makeCol(17.7, 5.68, 0.38, 1.4, 'stone'));
+    blocks.push(makeCol(19.3, 5.68, 0.38, 1.4, 'stone'));
+    targets.push(makeTarget(18.5, 5.68, 'blue'));
+    blocks.push(makeBeam(18.5, 7.08, 2.4, 0.24, 'metal'));
+    blocks.push(makeBlock(18.5, 7.32, 1.0, 0.8, 'metal'));
+    targets.push(makeTarget(18.5, 8.12, 'pink'));
 
     // Central Chrono Overlord Apex Pyramid on Plat 2 (top = 4.4)
-    // Tier 1: Armored Foundation Vault
-    blocks.push(makeCol(10.4, 4.4, 0.5, 2.4, 'metal'));
-    blocks.push(makeCol(12.8, 4.4, 0.46, 2.4, 'stone'));
-    blocks.push(makeCol(15.2, 4.4, 0.5, 2.4, 'metal'));
-    blocks.push(makeTnt(11.6, 4.4, 0.6));
-    blocks.push(makeTnt(14.0, 4.4, 0.6));
-    targets.push(makeTarget(11.6, 5.0, 'gold'));
-    targets.push(makeTarget(14.0, 5.0, 'pink'));
-    blocks.push(makeBeam(12.8, 6.8, 6.0, 0.38, 'metal'));
+    // Tier 1: Armored Sub-Vault Foundation (4 columns + 2 TNTs + 4 foundation footing blocks)
+    blocks.push(makeBlock(10.2, 4.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeBlock(11.9, 4.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(13.7, 4.4, 0.8, 0.6, 'stone'));
+    blocks.push(makeBlock(15.4, 4.4, 0.8, 0.6, 'metal'));
+    blocks.push(makeCol(10.2, 5.0, 0.48, 1.8, 'metal'));
+    blocks.push(makeCol(11.9, 5.0, 0.44, 1.8, 'stone'));
+    blocks.push(makeCol(13.7, 5.0, 0.44, 1.8, 'stone'));
+    blocks.push(makeCol(15.4, 5.0, 0.48, 1.8, 'metal'));
+    blocks.push(makeTnt(11.05, 4.4, 0.65));
+    blocks.push(makeTnt(14.55, 4.4, 0.65));
+    targets.push(makeTarget(11.05, 5.05, 'gold'));
+    targets.push(makeTarget(14.55, 5.05, 'gold'));
+    blocks.push(makeBeam(12.8, 6.8, 6.2, 0.4, 'metal'));
 
-    // Tier 2: Chrono Sphere Hall
-    blocks.push(makeCol(11.0, 7.18, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(14.6, 7.18, 0.44, 2.2, 'stone'));
-    blocks.push(makeBlock(12.8, 7.18, 1.4, 1.4, 'glass'));
-    targets.push(makeTarget(12.8, 8.58, 'blue'));
-    blocks.push(makeBeam(12.8, 9.38, 4.8, 0.34, 'stone'));
+    // Connecting Energy Bridges from Side Pylons to Central Apex
+    blocks.push(makeBeam(9.1, 5.4, 2.2, 0.24, 'stone'));
+    blocks.push(makeBeam(16.2, 5.4, 2.2, 0.24, 'stone'));
 
-    // Tier 3: Supreme Overlord Throne (Boss Chamber)
-    blocks.push(makeCol(11.6, 9.72, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(14.0, 9.72, 0.44, 2.0, 'metal'));
-    // Grand Chrono Overlord Boss!
-    targets.push(makeTarget(12.8, 9.72, 'boss', true, 0.72));
+    // Tier 2: Chrono Vault Hall (4 columns + central vault + terrace battlements)
+    blocks.push(makeCol(10.8, 7.2, 0.46, 2.2, 'metal'));
+    blocks.push(makeCol(12.8, 7.2, 0.42, 2.2, 'stone'));
+    blocks.push(makeCol(14.8, 7.2, 0.46, 2.2, 'metal'));
+    blocks.push(makeBlock(11.8, 7.2, 0.8, 0.8, 'stone'));
+    blocks.push(makeBlock(13.8, 7.2, 0.8, 0.8, 'stone'));
+    targets.push(makeTarget(11.8, 8.0, 'pink'));
+    targets.push(makeTarget(13.8, 8.0, 'blue'));
+    blocks.push(makeBeam(12.8, 9.4, 5.2, 0.36, 'metal'));
 
-    // Sovereign Apex Finial
-    blocks.push(makeBeam(12.8, 11.72, 3.6, 0.3, 'metal'));
-    blocks.push(makeBlock(12.8, 12.02, 1.0, 0.8, 'glass'));
-    targets.push(makeTarget(12.8, 12.82, 'gold'));
+    // Flank Mid-Terrace Battlements
+    blocks.push(makeBlock(9.4, 9.4, 0.6, 0.6, 'metal'));
+    blocks.push(makeBlock(16.2, 9.4, 0.6, 0.6, 'metal'));
+    blocks.push(makeCol(9.4, 10.0, 0.36, 1.2, 'stone'));
+    blocks.push(makeCol(16.2, 10.0, 0.36, 1.2, 'stone'));
+    targets.push(makeTarget(9.4, 11.2, 'blue'));
+    targets.push(makeTarget(16.2, 11.2, 'pink'));
+
+    // Tier 3: Supreme Chrono Overlord Throne Keep (Boss Chamber)
+    blocks.push(makeCol(11.4, 9.76, 0.48, 2.2, 'metal'));
+    blocks.push(makeCol(14.2, 9.76, 0.48, 2.2, 'metal'));
+    blocks.push(makeBlock(12.8, 9.76, 1.4, 1.0, 'metal'));
+    // Grand Chrono Overlord Challenge Boss!
+    targets.push(makeTarget(12.8, 10.76, 'boss', true, 0.74));
+    blocks.push(makeBeam(12.8, 11.96, 4.2, 0.32, 'stone'));
+
+    // Tier 4: Crown Finial & Singularity Anchor
+    blocks.push(makeCol(12.1, 12.28, 0.38, 1.4, 'metal'));
+    blocks.push(makeCol(13.5, 12.28, 0.38, 1.4, 'metal'));
+    blocks.push(makeBeam(12.8, 13.68, 2.6, 0.26, 'metal'));
+    blocks.push(makeBlock(12.8, 13.94, 0.8, 0.8, 'glass'));
+    targets.push(makeTarget(12.8, 14.74, 'gold'));
 
     levels.push({
       id: 50,
       name: "Temporal Singularity Apex",
       zone: "Chrono Void",
       icon: "⏳",
-      difficulty: "Chrono Overlord Boss",
-      description: "The colossal singularity apex pyramid where the Chrono Overlord reigns over time and space upon his crowned throne.",
-      coinReward: 600,
+      difficulty: "Chrono Overlord Challenge Boss",
+      description: "CHALLENGE LEVEL 50: The colossal singularity apex megastructure where the Chrono Overlord reigns, shielded by dual multi-story quantum pylons, heavy kinetic girders, and armored vaults.",
+      coinReward: 700,
       birds: ["heavy", "chrono", "vortex", "lightning", "fire", "speed"],
       platforms: plats,
       blocks,

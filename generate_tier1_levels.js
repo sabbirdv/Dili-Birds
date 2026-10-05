@@ -1,1506 +1,13841 @@
 import { makePlat, makeCol, makeBeam, makeBlock, makeTnt, makeCoin, makeTarget } from './level_builder_helpers.js';
 
 export function getTier1Levels() {
-  const levels = [];
-
-  // =========================================================================
-  // LEVEL 30: Colossus of Sparks (Challenge Level 30)
-  // Concept: Titanic Dual-Straddling Automaton with Armored Knee Braces,
-  // Reactive Core Blast Vault, Shoulder Missile Pods, and Armored Crown Citadel.
-  // =========================================================================
+  return [
   {
-    const plats = [
-      makePlat(8.5, 1.2, 4.8, 2.4, 'volcanic'), // top = 2.4
-      makePlat(16.5, 1.2, 4.8, 2.4, 'volcanic') // top = 2.4
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Left Foot & Shin Fortress (Plat 1, top = 2.4)
-    blocks.push(makeBlock(6.8, 2.4, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(7.8, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(9.2, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(10.2, 2.4, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(7.2, 3.0, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(9.8, 3.0, 0.44, 2.0, 'metal'));
-    blocks.push(makeBlock(8.5, 3.0, 1.0, 0.8, 'stone'));
-    blocks.push(makeTnt(8.5, 3.8, 0.6));
-    targets.push(makeTarget(8.5, 4.4, 'blue'));
-    blocks.push(makeBeam(8.5, 5.0, 3.8, 0.32, 'metal')); // knee joint
-
-    // Right Foot & Shin Fortress (Plat 2, top = 2.4)
-    blocks.push(makeBlock(14.8, 2.4, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(15.8, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(17.2, 2.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(18.2, 2.4, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(15.2, 3.0, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(17.8, 3.0, 0.44, 2.0, 'metal'));
-    blocks.push(makeBlock(16.5, 3.0, 1.0, 0.8, 'stone'));
-    blocks.push(makeTnt(16.5, 3.8, 0.6));
-    targets.push(makeTarget(16.5, 4.4, 'pink'));
-    blocks.push(makeBeam(16.5, 5.0, 3.8, 0.32, 'metal')); // knee joint
-
-    // Thigh Struts & Kinetic Braces
-    blocks.push(makeCol(8.5, 5.32, 0.48, 1.8, 'stone'));
-    blocks.push(makeCol(7.2, 5.32, 0.4, 1.8, 'metal'));
-    blocks.push(makeCol(16.5, 5.32, 0.48, 1.8, 'stone'));
-    blocks.push(makeCol(17.8, 5.32, 0.4, 1.8, 'metal'));
-
-    // Giant Pelvic Girder bridging across both legs over the abyss
-    const pelvicY = 7.12;
-    blocks.push(makeBeam(12.5, pelvicY, 11.6, 0.4, 'metal'));
-
-    // Core Reactor Torso & Ribcage Chamber
-    const torsoY = pelvicY + 0.4; // 7.52
-    blocks.push(makeCol(10.0, torsoY, 0.48, 2.2, 'metal'));
-    blocks.push(makeCol(12.5, torsoY, 0.44, 2.2, 'metal')); // central spinal strut
-    blocks.push(makeCol(15.0, torsoY, 0.48, 2.2, 'metal'));
-    blocks.push(makeTnt(11.25, torsoY, 0.65)); // Heart reactor TNT
-    blocks.push(makeTnt(13.75, torsoY, 0.65));
-    blocks.push(makeCoin(12.5, torsoY + 1.0, 0.5));
-    targets.push(makeTarget(11.25, torsoY + 0.65, 'gold'));
-    targets.push(makeTarget(13.75, torsoY + 0.65, 'gold'));
-
-    // Heavy Outer Shoulder Armor & Missile Pods
-    blocks.push(makeCol(7.4, torsoY, 0.42, 2.0, 'stone'));
-    blocks.push(makeCol(17.6, torsoY, 0.42, 2.0, 'stone'));
-    blocks.push(makeBlock(6.4, torsoY, 0.8, 1.4, 'metal'));
-    blocks.push(makeBlock(18.6, torsoY, 0.8, 1.4, 'metal'));
-    targets.push(makeTarget(7.4, torsoY + 2.0, 'pink'));
-    targets.push(makeTarget(17.6, torsoY + 2.0, 'blue'));
-    blocks.push(makeBeam(7.4, torsoY + 2.0, 2.4, 0.26, 'stone'));
-    blocks.push(makeBeam(17.6, torsoY + 2.0, 2.4, 0.26, 'stone'));
-
-    // Chest & Shoulder Deck Girders
-    const chestY = torsoY + 2.2; // 9.72
-    blocks.push(makeBeam(12.5, chestY, 6.6, 0.36, 'metal'));
-
-    // Armored Head & Commander Sanctuary (Boss Chamber)
-    const headY = chestY + 0.36; // 10.08
-    blocks.push(makeCol(11.0, headY, 0.46, 2.0, 'metal'));
-    blocks.push(makeCol(14.0, headY, 0.46, 2.0, 'metal'));
-    blocks.push(makeBlock(12.5, headY, 1.2, 0.8, 'metal'));
-    // Colossus Spark Grand Master Boss!
-    targets.push(makeTarget(12.5, headY + 0.8, 'boss', true, 0.7));
-
-    // Zenith Spire & Corona Finial
-    blocks.push(makeBeam(12.5, headY + 2.0, 4.2, 0.3, 'stone'));
-    blocks.push(makeCol(12.5, headY + 2.3, 0.36, 1.2, 'metal'));
-    blocks.push(makeBlock(11.5, headY + 2.3, 0.6, 0.6, 'wood'));
-    blocks.push(makeBlock(13.5, headY + 2.3, 0.6, 0.6, 'wood'));
-    targets.push(makeTarget(12.5, headY + 3.5, 'gold'));
-
-    levels.push({
-      id: 30,
-      name: "Colossus of Sparks",
-      zone: "Storm Bastion",
-      icon: "⚡",
-      difficulty: "Grand Master Challenge Boss",
-      description: "CHALLENGE LEVEL 30: A titanic spark-forged automaton straddling dual cliffs with dual reinforced legs, explosive core vaults, and heavy metal armor plating.",
-      coinReward: 400,
-      birds: ["lightning", "vortex", "heavy", "fire", "speed", "heavy"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 31: Quantum Overlook
-  // Concept: Cantilevered observatory hanging over an abyss above a lower rampart
-  // =========================================================================
+    "id": 30,
+    "name": "Colossus of Sparks",
+    "zone": "Storm Bastion",
+    "icon": "⚡",
+    "difficulty": "Grand Master Challenge Boss",
+    "description": "CHALLENGE LEVEL 30: A titanic spark-forged automaton straddling dual cliffs with dual reinforced legs, explosive core vaults, and heavy metal armor plating.",
+    "coinReward": 400,
+    "birds": [
+      "lightning",
+      "vortex",
+      "heavy",
+      "fire",
+      "speed",
+      "heavy"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          1.2,
+          0
+        ],
+        "size": [
+          4.8,
+          2.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          16.5,
+          1.2,
+          0
+        ],
+        "size": [
+          4.8,
+          2.4,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.8,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.2,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.2,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.8,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          3.4,
+          0
+        ],
+        "size": [
+          1,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.5,
+          4.1,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          5.16,
+          0
+        ],
+        "size": [
+          3.8,
+          0.32,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.8,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.8,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.2,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          2.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.2,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.8,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.5,
+          3.4,
+          0
+        ],
+        "size": [
+          1,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          16.5,
+          4.1,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.5,
+          5.16,
+          0
+        ],
+        "size": [
+          3.8,
+          0.32,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          6.22,
+          0
+        ],
+        "size": [
+          0.48,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          6.22,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.5,
+          6.22,
+          0
+        ],
+        "size": [
+          0.48,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.8,
+          6.22,
+          0
+        ],
+        "size": [
+          0.4,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          7.32,
+          0
+        ],
+        "size": [
+          11.6,
+          0.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10,
+          8.62,
+          0
+        ],
+        "size": [
+          0.48,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          8.62,
+          0
+        ],
+        "size": [
+          0.44,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15,
+          8.62,
+          0
+        ],
+        "size": [
+          0.48,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          11.25,
+          7.845,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          13.75,
+          7.845,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "coin",
+        "pos": [
+          12.5,
+          8.77,
+          0
+        ],
+        "size": [
+          0.5,
+          0.5,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.4,
+          8.52,
+          0
+        ],
+        "size": [
+          0.42,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.6,
+          8.52,
+          0
+        ],
+        "size": [
+          0.42,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.4,
+          8.22,
+          0
+        ],
+        "size": [
+          0.8,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.6,
+          8.22,
+          0
+        ],
+        "size": [
+          0.8,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.4,
+          9.65,
+          0
+        ],
+        "size": [
+          2.4,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.6,
+          9.65,
+          0
+        ],
+        "size": [
+          2.4,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          9.9,
+          0
+        ],
+        "size": [
+          6.6,
+          0.36,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11,
+          11.08,
+          0
+        ],
+        "size": [
+          0.46,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14,
+          11.08,
+          0
+        ],
+        "size": [
+          0.46,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          10.48,
+          0
+        ],
+        "size": [
+          1.2,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          12.23,
+          0
+        ],
+        "size": [
+          4.2,
+          0.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          12.98,
+          0
+        ],
+        "size": [
+          0.36,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          11.5,
+          12.68,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.5,
+          12.68,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.5,
+          4.84,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.5,
+          4.84,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.25,
+          8.61,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.75,
+          8.61,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          7.4,
+          9.96,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          17.6,
+          9.96,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          12.5,
+          11.58,
+          0
+        ],
+        "radius": 0.7,
+        "isBoss": true,
+        "birdType": "boss"
+      },
+      {
+        "pos": [
+          12.5,
+          14.02,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(7.2, 1.0, 4.4, 2.0, 'celestial'), // top = 2.0
-      makePlat(14.8, 2.6, 6.8, 5.2, 'celestial') // top = 5.2
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Lower rampart (Plat 1, top = 2.0)
-    blocks.push(makeBlock(5.6, 2.0, 0.8, 1.6, 'stone'));
-    blocks.push(makeCol(6.6, 2.0, 0.4, 1.6, 'stone'));
-    blocks.push(makeCol(8.8, 2.0, 0.4, 1.6, 'stone'));
-    blocks.push(makeTnt(7.7, 2.0, 0.6));
-    targets.push(makeTarget(7.7, 2.6, 'blue'));
-    blocks.push(makeBeam(7.2, 3.6, 3.8, 0.28, 'stone'));
-    blocks.push(makeCol(6.4, 3.88, 0.36, 1.2, 'wood'));
-    blocks.push(makeCol(8.0, 3.88, 0.36, 1.2, 'wood'));
-    targets.push(makeTarget(7.2, 3.88, 'pink'));
-    blocks.push(makeBeam(7.2, 5.08, 2.6, 0.22, 'stone'));
-
-    // High Observatory Cliff (Plat 2, top = 5.2)
-    // Foundation pilings
-    blocks.push(makeBeam(14.8, 5.2, 6.6, 0.34, 'metal'));
-    blocks.push(makeCol(12.2, 5.54, 0.44, 1.8, 'metal'));
-    blocks.push(makeCol(14.8, 5.54, 0.44, 1.8, 'stone'));
-    blocks.push(makeCol(17.4, 5.54, 0.44, 1.8, 'stone'));
-    blocks.push(makeBlock(13.5, 5.54, 0.8, 0.8, 'wood'));
-    blocks.push(makeBlock(16.1, 5.54, 0.8, 0.8, 'wood'));
-    targets.push(makeTarget(13.5, 6.34, 'blue'));
-    targets.push(makeTarget(16.1, 6.34, 'gold'));
-
-    // Mid deck beam with cantilever overhang extending left to x=10.2!
-    blocks.push(makeBeam(14.2, 7.34, 7.8, 0.34, 'stone'));
-
-    // Cantilever Balcony hanging over empty air
-    blocks.push(makeCol(10.8, 7.68, 0.36, 1.6, 'glass'));
-    blocks.push(makeCol(12.4, 7.68, 0.36, 1.6, 'glass'));
-    targets.push(makeTarget(10.8, 9.28, 'pink'));
-    blocks.push(makeBeam(11.6, 9.28, 2.4, 0.22, 'wood'));
-
-    // Main Observatory Dome (x=13.5 to x=17.5)
-    blocks.push(makeCol(14.0, 7.68, 0.42, 1.8, 'stone'));
-    blocks.push(makeCol(16.8, 7.68, 0.42, 1.8, 'stone'));
-    blocks.push(makeTnt(15.4, 7.68, 0.6));
-    targets.push(makeTarget(15.4, 8.28, 'green'));
-    blocks.push(makeBeam(15.4, 9.48, 4.2, 0.3, 'metal'));
-
-    // Dome Glass Telescope Roof
-    blocks.push(makeBlock(14.6, 9.78, 1.0, 0.8, 'glass'));
-    blocks.push(makeBlock(16.2, 9.78, 1.0, 0.8, 'glass'));
-    targets.push(makeTarget(15.4, 9.78, 'blue'));
-    blocks.push(makeBeam(15.4, 10.58, 2.8, 0.24, 'stone'));
-    targets.push(makeTarget(15.4, 10.82, 'gold'));
-
-    levels.push({
-      id: 31,
-      name: "Quantum Overlook",
-      zone: "Cyber Apex",
-      icon: "🔭",
-      difficulty: "Apex Master",
-      description: "A cantilevered glass observatory suspended over an abyss with a lower bunker guard outpost.",
-      coinReward: 260,
-      birds: ["speed", "heavy", "lightning", "split", "fire", "chrono"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 32: Nebula Core Redoubt
-  // Concept: Triple stepped island pylons with central concentric redoubt
-  // =========================================================================
+    "id": 31,
+    "name": "Quantum Overlook",
+    "zone": "Cyber Apex",
+    "icon": "🔭",
+    "difficulty": "Apex Master",
+    "description": "A cantilevered glass observatory suspended over an abyss with a lower bunker guard outpost.",
+    "coinReward": 260,
+    "birds": [
+      "speed",
+      "heavy",
+      "lightning",
+      "split",
+      "fire",
+      "chrono"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.2,
+          1,
+          0
+        ],
+        "size": [
+          4.4,
+          2,
+          5
+        ],
+        "type": "celestial"
+      },
+      {
+        "pos": [
+          14.8,
+          2.6,
+          0
+        ],
+        "size": [
+          6.8,
+          5.2,
+          5
+        ],
+        "type": "celestial"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          5.639,
+          2.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.761,
+          2.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          2.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.484,
+          3.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.916,
+          3.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          3.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          4.984,
+          3.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.416,
+          3.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          4.72,
+          0
+        ],
+        "size": [
+          4.472,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.806,
+          5.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.594,
+          5.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          7.2,
+          5.69,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          6.83,
+          0
+        ],
+        "size": [
+          3.288,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          6.5,
+          7.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.9,
+          7.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          8.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.25,
+          8.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.15,
+          8.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.875,
+          5.475,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.725,
+          5.475,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.8,
+          5.475,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.72,
+          6.75,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.88,
+          6.75,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.8,
+          6.75,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.22,
+          6.65,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.38,
+          6.65,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.8,
+          7.92,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.144,
+          8.99,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.456,
+          8.99,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.8,
+          9.365,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.8,
+          10.03,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.1,
+          10.82,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          10.82,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.8,
+          11.59,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.85,
+          11.935,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.75,
+          11.935,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.271,
+          2.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          8.129,
+          2.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          7.2,
+          6.53,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          7.2,
+          7.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          13.696,
+          6.19,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.904,
+          6.19,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          14.8,
+          8.53,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          14.8,
+          10.61,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(6.8, 1.8, 2.8, 3.6, 'celestial'), // top = 3.6
-      makePlat(12.6, 1.2, 5.0, 2.4, 'celestial'), // top = 2.4
-      makePlat(18.2, 2.2, 2.8, 4.4, 'celestial')  // top = 4.4
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Left pylon (top = 3.6): sniper outpost
-    blocks.push(makeCol(6.0, 3.6, 0.38, 1.8, 'stone'));
-    blocks.push(makeCol(7.6, 3.6, 0.38, 1.8, 'stone'));
-    targets.push(makeTarget(6.8, 3.6, 'pink'));
-    blocks.push(makeBeam(6.8, 5.4, 2.4, 0.24, 'wood'));
-    blocks.push(makeCol(6.8, 5.64, 0.34, 1.4, 'glass'));
-    targets.push(makeTarget(6.8, 7.04, 'blue'));
-    blocks.push(makeBeam(6.8, 7.04, 1.6, 0.2, 'stone'));
-
-    // Right pylon (top = 4.4): high radar station
-    blocks.push(makeCol(17.4, 4.4, 0.4, 2.0, 'metal'));
-    blocks.push(makeCol(19.0, 4.4, 0.4, 2.0, 'metal'));
-    targets.push(makeTarget(18.2, 4.4, 'gold'));
-    blocks.push(makeBeam(18.2, 6.4, 2.4, 0.24, 'metal'));
-    blocks.push(makeCol(18.2, 6.64, 0.34, 1.4, 'stone'));
-    targets.push(makeTarget(18.2, 8.04, 'blue'));
-    blocks.push(makeBeam(18.2, 8.04, 1.8, 0.2, 'metal'));
-
-    // Central fortress (Plat 2, top = 2.4): 4-tier fortified keep
-    // Ground floor: heavy metal blast pillars & containment
-    blocks.push(makeCol(10.8, 2.4, 0.46, 2.2, 'metal'));
-    blocks.push(makeCol(14.4, 2.4, 0.46, 2.2, 'metal'));
-    blocks.push(makeBlock(12.6, 2.4, 1.2, 0.8, 'stone'));
-    blocks.push(makeTnt(11.7, 2.4, 0.6));
-    blocks.push(makeTnt(13.5, 2.4, 0.6));
-    targets.push(makeTarget(11.7, 3.0, 'green'));
-    targets.push(makeTarget(13.5, 3.0, 'pink'));
-    blocks.push(makeBeam(12.6, 4.6, 4.6, 0.34, 'metal')); // Tier 1 deck
-
-    // Tier 2: Glass battery cell with TNT core
-    blocks.push(makeCol(11.2, 4.94, 0.4, 1.8, 'glass'));
-    blocks.push(makeCol(14.0, 4.94, 0.4, 1.8, 'glass'));
-    blocks.push(makeBlock(12.6, 4.94, 1.0, 1.0, 'wood'));
-    targets.push(makeTarget(12.6, 5.94, 'gold'));
-    blocks.push(makeBeam(12.6, 6.74, 3.8, 0.3, 'stone')); // Tier 2 deck
-
-    // Tier 3: Stone watch-chamber
-    blocks.push(makeCol(11.8, 7.04, 0.38, 1.6, 'stone'));
-    blocks.push(makeCol(13.4, 7.04, 0.38, 1.6, 'stone'));
-    targets.push(makeTarget(12.6, 7.04, 'pink'));
-    blocks.push(makeBeam(12.6, 8.64, 2.8, 0.24, 'stone'));
-
-    // Tier 4: Apex spire
-    blocks.push(makeBlock(12.6, 8.88, 1.0, 0.8, 'metal'));
-    targets.push(makeTarget(12.6, 9.68, 'blue'));
-
-    levels.push({
-      id: 32,
-      name: "Nebula Core Redoubt",
-      zone: "Cyber Apex",
-      icon: "🌌",
-      difficulty: "Apex Master",
-      description: "Three stepped island pylons protecting a multi-tier central energy redoubt with explosive glass batteries.",
-      coinReward: 270,
-      birds: ["split", "fire", "vortex", "heavy", "speed", "chrono"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 33: Astral Vault
-  // Concept: Heavy brutalist treasury bank with 3 vault cells and rooftop towers
-  // =========================================================================
+    "id": 32,
+    "name": "Nebula Core Redoubt",
+    "zone": "Cyber Apex",
+    "icon": "🌌",
+    "difficulty": "Apex Master",
+    "description": "Three stepped island pylons protecting a multi-tier central energy redoubt with explosive glass batteries.",
+    "coinReward": 270,
+    "birds": [
+      "split",
+      "fire",
+      "vortex",
+      "heavy",
+      "speed",
+      "chrono"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          6.8,
+          1.8,
+          0
+        ],
+        "size": [
+          2.8,
+          3.6,
+          5
+        ],
+        "type": "celestial"
+      },
+      {
+        "pos": [
+          12.6,
+          1.2,
+          0
+        ],
+        "size": [
+          5,
+          2.4,
+          5
+        ],
+        "type": "celestial"
+      },
+      {
+        "pos": [
+          18.2,
+          2.2,
+          0
+        ],
+        "size": [
+          2.8,
+          4.4,
+          5
+        ],
+        "type": "celestial"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          5.943,
+          3.875,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.657,
+          3.875,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          3.875,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.788,
+          5.15,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.812,
+          5.15,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          5.15,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.288,
+          5.05,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.312,
+          5.05,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          6.32,
+          0
+        ],
+        "size": [
+          3.064,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.913,
+          7.39,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.687,
+          7.39,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          8.43,
+          0
+        ],
+        "size": [
+          2.274,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.775,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.425,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.6,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.62,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.58,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.6,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.12,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.08,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.6,
+          5.12,
+          0
+        ],
+        "size": [
+          5,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.016,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.184,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.6,
+          6.09,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.6,
+          7.23,
+          0
+        ],
+        "size": [
+          3.668,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          11.9,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.3,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.6,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.65,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.55,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.343,
+          4.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.057,
+          4.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          4.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.188,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.212,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.688,
+          5.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.712,
+          5.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          7.12,
+          0
+        ],
+        "size": [
+          3.064,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.313,
+          8.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.087,
+          8.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          9.23,
+          0
+        ],
+        "size": [
+          2.274,
+          0.28,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.209,
+          4.59,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7.391,
+          4.59,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.544,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.656,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.6,
+          6.93,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.6,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          17.609,
+          5.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18.791,
+          5.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(12.5, 1.5, 13.0, 3.0, 'stone') // top = 3.0
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Ground floor: 4 massive columns forming 3 secure vault chambers
-    blocks.push(makeCol(7.2, 3.0, 0.52, 2.4, 'metal'));
-    blocks.push(makeCol(10.7, 3.0, 0.48, 2.4, 'stone'));
-    blocks.push(makeCol(14.3, 3.0, 0.48, 2.4, 'stone'));
-    blocks.push(makeCol(17.8, 3.0, 0.52, 2.4, 'metal'));
-
-    // Vault contents & partition walls
-    blocks.push(makeBlock(8.95, 3.0, 0.8, 0.8, 'stone'));
-    targets.push(makeTarget(8.95, 3.8, 'blue'));
-    blocks.push(makeTnt(12.5, 3.0, 0.6));
-    blocks.push(makeCoin(11.6, 3.0, 0.5));
-    blocks.push(makeCoin(13.4, 3.0, 0.5));
-    targets.push(makeTarget(12.5, 3.6, 'gold'));
-    blocks.push(makeBlock(16.05, 3.0, 0.8, 0.8, 'stone'));
-    targets.push(makeTarget(16.05, 3.8, 'pink'));
-
-    // Massive continuous stone floor slab spanning all 3 vaults
-    blocks.push(makeBeam(12.5, 5.4, 11.8, 0.38, 'metal'));
-
-    // Second floor: Upper bank gallery
-    blocks.push(makeCol(8.2, 5.78, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(11.2, 5.78, 0.4, 2.0, 'glass'));
-    blocks.push(makeCol(13.8, 5.78, 0.4, 2.0, 'glass'));
-    blocks.push(makeCol(16.8, 5.78, 0.44, 2.0, 'stone'));
-    blocks.push(makeBlock(9.7, 5.78, 0.8, 0.8, 'wood'));
-    blocks.push(makeBlock(15.3, 5.78, 0.8, 0.8, 'wood'));
-
-    targets.push(makeTarget(9.7, 6.58, 'green'));
-    targets.push(makeTarget(12.5, 5.78, 'blue'));
-    targets.push(makeTarget(15.3, 6.58, 'pink'));
-
-    // Upper ceiling beam
-    blocks.push(makeBeam(12.5, 7.78, 10.0, 0.34, 'stone'));
-
-    // Third floor: Twin parapet watchtowers
-    blocks.push(makeCol(8.2, 8.12, 0.4, 1.6, 'stone'));
-    blocks.push(makeCol(10.0, 8.12, 0.4, 1.6, 'stone'));
-    targets.push(makeTarget(9.1, 8.12, 'blue'));
-    blocks.push(makeBeam(9.1, 9.72, 2.6, 0.24, 'stone'));
-
-    blocks.push(makeCol(15.0, 8.12, 0.4, 1.6, 'stone'));
-    blocks.push(makeCol(16.8, 8.12, 0.4, 1.6, 'stone'));
-    targets.push(makeTarget(15.9, 8.12, 'gold'));
-    blocks.push(makeBeam(15.9, 9.72, 2.6, 0.24, 'stone'));
-
-    levels.push({
-      id: 33,
-      name: "Astral Vault",
-      zone: "Cyber Apex",
-      icon: "💎",
-      difficulty: "Apex Master",
-      description: "A heavily fortified brutalist treasury bank with three reinforced subterranean vaults and twin battle towers.",
-      coinReward: 280,
-      birds: ["heavy", "speed", "lightning", "fire", "split", "vortex"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 34: Sky Empress Bastion
-  // Concept: 3-tiered imperial Asian pagoda palace with cantilevered curved eaves
-  // =========================================================================
+    "id": 33,
+    "name": "Astral Vault",
+    "zone": "Cyber Apex",
+    "icon": "💎",
+    "difficulty": "Apex Master",
+    "description": "A heavily fortified brutalist treasury bank with three reinforced subterranean vaults and twin battle towers.",
+    "coinReward": 280,
+    "birds": [
+      "heavy",
+      "speed",
+      "lightning",
+      "fire",
+      "split",
+      "vortex"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          12.5,
+          1.5,
+          0
+        ],
+        "size": [
+          13,
+          3,
+          5
+        ],
+        "type": "stone"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.261,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.679,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.47,
+          3.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.106,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.834,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.47,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.606,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.334,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.47,
+          5.72,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.33,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.61,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.47,
+          7.165,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.47,
+          7.83,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.77,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.17,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.47,
+          9.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.52,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.42,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.321,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.739,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.53,
+          3.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.166,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.894,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.53,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.666,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.394,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.53,
+          5.72,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.39,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.67,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.53,
+          7.165,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.53,
+          7.83,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          15.83,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          17.23,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.53,
+          9.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.58,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.48,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.35,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.65,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          4.7,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          5.17,
+          0
+        ],
+        "size": [
+          7.06,
+          0.34,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.71,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.23,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.47,
+          6.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          8.47,
+          8.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.77,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          17.29,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.53,
+          6.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.53,
+          8.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          3.44,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          5.78,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(8.2, 1.4, 5.0, 2.8, 'celestial'),  // top = 2.8
-      makePlat(15.5, 2.2, 6.2, 4.4, 'celestial')  // top = 4.4
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Gatehouse on Plat 1 (top = 2.8)
-    blocks.push(makeCol(6.4, 2.8, 0.4, 2.0, 'wood'));
-    blocks.push(makeCol(10.0, 2.8, 0.4, 2.0, 'wood'));
-    blocks.push(makeCol(8.2, 2.8, 0.36, 2.0, 'glass'));
-    blocks.push(makeBlock(7.3, 2.8, 0.6, 0.8, 'wood'));
-    blocks.push(makeBlock(9.1, 2.8, 0.6, 0.8, 'wood'));
-    targets.push(makeTarget(7.3, 3.6, 'blue'));
-    targets.push(makeTarget(9.1, 3.6, 'pink'));
-    blocks.push(makeBeam(8.2, 4.8, 4.6, 0.28, 'wood')); // Flared eave
-    blocks.push(makeBlock(8.2, 5.08, 1.6, 0.6, 'stone'));
-    targets.push(makeTarget(8.2, 5.68, 'gold'));
-
-    // High Pagoda Palace on Plat 2 (top = 4.4)
-    // Tier 1 (Base temple)
-    blocks.push(makeCol(13.0, 4.4, 0.46, 2.2, 'stone'));
-    blocks.push(makeCol(15.5, 4.4, 0.42, 2.2, 'wood'));
-    blocks.push(makeCol(18.0, 4.4, 0.46, 2.2, 'stone'));
-    blocks.push(makeTnt(14.25, 4.4, 0.6));
-    targets.push(makeTarget(14.25, 5.0, 'blue'));
-    targets.push(makeTarget(16.75, 4.4, 'green'));
-    blocks.push(makeCoin(15.5, 4.4, 0.5));
-    // Tier 1 Flared Eave Roof (wide overhang: w=6.8)
-    blocks.push(makeBeam(15.5, 6.6, 6.8, 0.32, 'wood'));
-
-    // Tier 2 (Middle gallery)
-    blocks.push(makeCol(13.8, 6.92, 0.42, 2.0, 'stone'));
-    blocks.push(makeCol(17.2, 6.92, 0.42, 2.0, 'stone'));
-    blocks.push(makeCol(15.5, 6.92, 0.36, 2.0, 'glass'));
-    targets.push(makeTarget(14.65, 6.92, 'pink'));
-    targets.push(makeTarget(16.35, 6.92, 'gold'));
-    // Tier 2 Flared Eave Roof (w=5.2)
-    blocks.push(makeBeam(15.5, 8.92, 5.2, 0.3, 'wood'));
-
-    // Tier 3 (Empress Sanctum Apex)
-    blocks.push(makeCol(14.5, 9.22, 0.38, 1.6, 'metal'));
-    blocks.push(makeCol(16.5, 9.22, 0.38, 1.6, 'metal'));
-    targets.push(makeTarget(15.5, 9.22, 'blue'));
-    blocks.push(makeBeam(15.5, 10.82, 3.2, 0.26, 'metal'));
-    blocks.push(makeBlock(15.5, 11.08, 0.8, 0.8, 'stone'));
-    targets.push(makeTarget(15.5, 11.88, 'pink'));
-
-    levels.push({
-      id: 34,
-      name: "Sky Empress Bastion",
-      zone: "Cyber Apex",
-      icon: "⛩️",
-      difficulty: "Imperial Apex",
-      description: "An elegant three-tiered imperial pagoda palace featuring cantilevered eaves, delicate paper walls, and flying buttresses.",
-      coinReward: 290,
-      birds: ["speed", "split", "vortex", "heavy", "fire", "lightning"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 35: Supreme Grand Apex (Apex Emperor Boss)
-  // Concept: Grand triple-citadel with dual suspension bridges and crowned keep
-  // =========================================================================
+    "id": 34,
+    "name": "Sky Empress Bastion",
+    "zone": "Cyber Apex",
+    "icon": "⛩️",
+    "difficulty": "Imperial Apex",
+    "description": "An elegant three-tiered imperial pagoda palace featuring cantilevered eaves, delicate paper walls, and flying buttresses.",
+    "coinReward": 290,
+    "birds": [
+      "speed",
+      "split",
+      "vortex",
+      "heavy",
+      "fire",
+      "lightning"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.2,
+          1.4,
+          0
+        ],
+        "size": [
+          5,
+          2.8,
+          5
+        ],
+        "type": "celestial"
+      },
+      {
+        "pos": [
+          15.5,
+          2.2,
+          0
+        ],
+        "size": [
+          6.2,
+          4.4,
+          5
+        ],
+        "type": "celestial"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.375,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.025,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.2,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.22,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.18,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.2,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.72,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.68,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.2,
+          5.52,
+          0
+        ],
+        "size": [
+          5,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.616,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.784,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.2,
+          6.49,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.2,
+          7.63,
+          0
+        ],
+        "size": [
+          3.668,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.5,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.9,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.2,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.25,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.15,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.575,
+          4.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.425,
+          4.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          4.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.42,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.58,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.92,
+          5.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.08,
+          5.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          7.12,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.844,
+          8.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.156,
+          8.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          8.565,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          9.23,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.8,
+          10.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.2,
+          10.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          10.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.55,
+          11.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.45,
+          11.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.144,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.256,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.2,
+          7.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          8.2,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          14.396,
+          5.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.604,
+          5.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          15.5,
+          7.73,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          15.5,
+          9.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(6.8, 1.5, 3.8, 3.0, 'volcanic'), // top = 3.0
-      makePlat(12.8, 2.4, 5.4, 4.8, 'volcanic'), // top = 4.8
-      makePlat(18.5, 1.5, 3.8, 3.0, 'volcanic')  // top = 3.0
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // West Tower on Plat 1 (top = 3.0)
-    blocks.push(makeBlock(5.6, 3.0, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(8.0, 3.0, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(5.6, 3.6, 0.42, 2.0, 'stone'));
-    blocks.push(makeCol(8.0, 3.6, 0.42, 2.0, 'stone'));
-    targets.push(makeTarget(6.8, 3.6, 'blue'));
-    blocks.push(makeBeam(6.8, 5.6, 3.4, 0.26, 'stone'));
-    blocks.push(makeCol(6.0, 5.86, 0.38, 1.6, 'wood'));
-    blocks.push(makeCol(7.6, 5.86, 0.38, 1.6, 'wood'));
-    targets.push(makeTarget(6.8, 5.86, 'pink'));
-    blocks.push(makeBeam(6.8, 7.46, 2.6, 0.22, 'stone'));
-    blocks.push(makeCol(6.8, 7.68, 0.34, 1.2, 'glass'));
-    targets.push(makeTarget(6.8, 8.88, 'gold'));
-
-    // East Tower on Plat 3 (top = 3.0)
-    blocks.push(makeBlock(17.3, 3.0, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(19.7, 3.0, 0.8, 0.6, 'metal'));
-    blocks.push(makeCol(17.3, 3.6, 0.42, 2.0, 'metal'));
-    blocks.push(makeCol(19.7, 3.6, 0.42, 2.0, 'metal'));
-    targets.push(makeTarget(18.5, 3.6, 'green'));
-    blocks.push(makeBeam(18.5, 5.6, 3.4, 0.26, 'metal'));
-    blocks.push(makeCol(17.7, 5.86, 0.38, 1.6, 'stone'));
-    blocks.push(makeCol(19.3, 5.86, 0.38, 1.6, 'stone'));
-    targets.push(makeTarget(18.5, 5.86, 'pink'));
-    blocks.push(makeBeam(18.5, 7.46, 2.6, 0.22, 'stone'));
-    blocks.push(makeCol(18.5, 7.68, 0.34, 1.2, 'glass'));
-    targets.push(makeTarget(18.5, 8.88, 'blue'));
-
-    // Central Grand Keep on Plat 2 (top = 4.8)
-    blocks.push(makeCol(10.6, 4.8, 0.48, 2.4, 'metal'));
-    blocks.push(makeCol(15.0, 4.8, 0.48, 2.4, 'metal'));
-    blocks.push(makeTnt(12.8, 4.8, 0.6));
-    blocks.push(makeCoin(11.7, 4.8, 0.5));
-    blocks.push(makeCoin(13.9, 4.8, 0.5));
-    targets.push(makeTarget(12.8, 5.4, 'gold'));
-
-    // Dual Suspension Bridges connecting Center Keep to West & East Towers!
-    blocks.push(makeBeam(9.3, 5.6, 3.6, 0.24, 'wood'));
-    blocks.push(makeBeam(16.3, 5.6, 3.6, 0.24, 'wood'));
-
-    // Center Tier 2 Deck
-    blocks.push(makeBeam(12.8, 7.2, 5.2, 0.36, 'metal'));
-
-    // Center Throne Room (Boss Chamber)
-    blocks.push(makeCol(11.0, 7.56, 0.46, 2.2, 'stone'));
-    blocks.push(makeCol(14.6, 7.56, 0.46, 2.2, 'stone'));
-    blocks.push(makeBlock(12.8, 7.56, 1.2, 1.0, 'wood'));
-    // Supreme Apex Boss!
-    targets.push(makeTarget(12.8, 8.56, 'boss', true, 0.68));
-
-    // Royal Canopy & Spire
-    blocks.push(makeBeam(12.8, 9.76, 4.4, 0.32, 'stone'));
-    blocks.push(makeBlock(12.8, 10.08, 1.2, 0.8, 'metal'));
-    targets.push(makeTarget(12.8, 10.88, 'gold'));
-
-    levels.push({
-      id: 35,
-      name: "Supreme Grand Apex",
-      zone: "Cyber Apex",
-      icon: "👑",
-      difficulty: "Apex Emperor Boss",
-      description: "The imperial citadel connecting twin defensive watchtowers across suspension bridges to the Emperor's sky throne.",
-      coinReward: 320,
-      birds: ["heavy", "fire", "lightning", "vortex", "speed", "chrono"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // Call 36-50 builder
-  addLevels36to50(levels);
-
-  return levels;
-}
-
-function addLevels36to50(levels) {
-  // =========================================================================
-  // LEVEL 36: Chrono Horizon
-  // Concept: Giant Hourglass Clocktower with narrow bottleneck waist
-  // =========================================================================
+    "id": 35,
+    "name": "Supreme Grand Apex",
+    "zone": "Cyber Apex",
+    "icon": "👑",
+    "difficulty": "Apex Emperor Boss",
+    "description": "The imperial citadel connecting twin defensive watchtowers across suspension bridges to the Emperor's sky throne.",
+    "coinReward": 320,
+    "birds": [
+      "heavy",
+      "fire",
+      "lightning",
+      "vortex",
+      "speed",
+      "chrono"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          6.8,
+          1.5,
+          0
+        ],
+        "size": [
+          3.8,
+          3,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.8,
+          2.4,
+          0
+        ],
+        "size": [
+          5.4,
+          4.8,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18.5,
+          1.5,
+          0
+        ],
+        "size": [
+          3.8,
+          3,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          5.503,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.097,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          3.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.348,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.252,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          4.848,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.752,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          5.72,
+          0
+        ],
+        "size": [
+          3.944,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.596,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.004,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          7.83,
+          0
+        ],
+        "size": [
+          2.908,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.875,
+          5.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.725,
+          5.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          5.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.72,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.88,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.22,
+          6.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.38,
+          6.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          7.52,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.144,
+          8.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.456,
+          8.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.8,
+          8.49,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          9.63,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          12.1,
+          10.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.5,
+          10.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          11.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.85,
+          11.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.75,
+          11.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.203,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.797,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.5,
+          3.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.048,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.952,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.5,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.548,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          20.452,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.5,
+          5.72,
+          0
+        ],
+        "size": [
+          3.944,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.296,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.704,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.5,
+          7.83,
+          0
+        ],
+        "size": [
+          2.908,
+          0.28,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          5.997,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7.603,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.696,
+          5.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.904,
+          5.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.8,
+          9.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.8,
+          10.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          17.697,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          19.303,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(12.5, 1.4, 11.0, 2.8, 'volcanic') // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Base buttresses
-    blocks.push(makeBlock(7.6, 2.8, 0.8, 0.8, 'stone'));
-    blocks.push(makeBlock(17.4, 2.8, 0.8, 0.8, 'stone'));
-    blocks.push(makeCol(8.8, 2.8, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(11.2, 2.8, 0.42, 2.2, 'stone'));
-    blocks.push(makeCol(13.8, 2.8, 0.42, 2.2, 'stone'));
-    blocks.push(makeCol(16.2, 2.8, 0.44, 2.2, 'stone'));
-    blocks.push(makeTnt(12.5, 2.8, 0.6));
-    targets.push(makeTarget(10.0, 2.8, 'blue'));
-    targets.push(makeTarget(12.5, 3.4, 'pink'));
-    targets.push(makeTarget(15.0, 2.8, 'green'));
-    blocks.push(makeBeam(12.5, 5.0, 9.4, 0.34, 'metal')); // Lower deck
-
-    // Inward stepped waist columns
-    blocks.push(makeCol(10.2, 5.34, 0.42, 1.8, 'wood'));
-    blocks.push(makeCol(14.8, 5.34, 0.42, 1.8, 'wood'));
-    targets.push(makeTarget(12.5, 5.34, 'gold'));
-    blocks.push(makeBeam(12.5, 7.14, 5.6, 0.3, 'stone'));
-
-    // Critical Bottleneck Waist: 2 narrow glass pillars
-    blocks.push(makeCol(11.6, 7.44, 0.38, 1.6, 'glass'));
-    blocks.push(makeCol(13.4, 7.44, 0.38, 1.6, 'glass'));
-    targets.push(makeTarget(12.5, 7.44, 'blue'));
-
-    // Waist Collar Beam
-    blocks.push(makeBeam(12.5, 9.04, 4.8, 0.3, 'metal'));
-
-    // Upper Flared Reservoir
-    blocks.push(makeCol(8.8, 9.34, 0.44, 1.8, 'stone'));
-    blocks.push(makeCol(11.0, 9.34, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(14.0, 9.34, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(16.2, 9.34, 0.44, 1.8, 'stone'));
-    blocks.push(makeBlock(12.5, 9.34, 1.4, 1.0, 'metal')); // Heavy weight!
-    targets.push(makeTarget(9.9, 9.34, 'pink'));
-    targets.push(makeTarget(15.1, 9.34, 'gold'));
-    blocks.push(makeBeam(12.5, 11.14, 8.8, 0.34, 'stone'));
-    targets.push(makeTarget(12.5, 11.48, 'blue'));
-
-    levels.push({
-      id: 36,
-      name: "Chrono Horizon",
-      zone: "Chrono Void",
-      icon: "⏳",
-      difficulty: "Singularity Master",
-      description: "An immense hourglass clocktower balanced upon a fragile glass bottleneck holding a massive stone reservoir.",
-      coinReward: 330,
-      birds: ["speed", "heavy", "vortex", "fire", "split", "lightning"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 37: Temporal Rift Keep
-  // Concept: Dual cliff fortresses connected by a long suspension bridge
-  // =========================================================================
+    "id": 36,
+    "name": "Chrono Horizon",
+    "zone": "Chrono Void",
+    "icon": "⏳",
+    "difficulty": "Singularity Master",
+    "description": "An immense hourglass clocktower balanced upon a fragile glass bottleneck holding a massive stone reservoir.",
+    "coinReward": 330,
+    "birds": [
+      "speed",
+      "heavy",
+      "vortex",
+      "fire",
+      "split",
+      "lightning"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          12.5,
+          1.4,
+          0
+        ],
+        "size": [
+          11,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.881,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.299,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.09,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.726,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.454,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.09,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.226,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.954,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.09,
+          5.52,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.95,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.23,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.09,
+          6.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.09,
+          7.63,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.39,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.79,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.09,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.14,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.04,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.701,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.119,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.91,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.546,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.274,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.91,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.046,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.774,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.91,
+          5.52,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.77,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.05,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          15.91,
+          6.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.91,
+          7.63,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          15.21,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.61,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.91,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.96,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.86,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.35,
+          3.8,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.65,
+          3.8,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          4.5,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          4.97,
+          0
+        ],
+        "size": [
+          5.82,
+          0.34,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.33,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.85,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          9.09,
+          6.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          9.09,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.15,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          16.67,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          15.91,
+          6.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          15.91,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          3.24,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          5.58,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(7.5, 2.0, 4.6, 4.0, 'cliff'),  // top = 4.0
-      makePlat(17.5, 2.0, 4.6, 4.0, 'cliff') // top = 4.0
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // West Cliff Keep (Plat 1, top = 4.0)
-    blocks.push(makeBlock(5.6, 4.0, 0.8, 0.8, 'stone'));
-    blocks.push(makeCol(6.6, 4.0, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(9.0, 4.0, 0.44, 2.2, 'stone'));
-    blocks.push(makeTnt(7.8, 4.0, 0.6));
-    targets.push(makeTarget(7.8, 4.6, 'blue'));
-    blocks.push(makeBeam(7.8, 6.2, 4.0, 0.3, 'stone'));
-    blocks.push(makeCol(6.8, 6.5, 0.38, 1.6, 'wood'));
-    blocks.push(makeCol(8.8, 6.5, 0.38, 1.6, 'wood'));
-    targets.push(makeTarget(7.8, 6.5, 'pink'));
-    blocks.push(makeBeam(7.8, 8.1, 3.0, 0.24, 'stone'));
-    targets.push(makeTarget(7.8, 8.34, 'gold'));
-
-    // East Cliff Keep (Plat 2, top = 4.0)
-    blocks.push(makeBlock(19.4, 4.0, 0.8, 0.8, 'metal'));
-    blocks.push(makeCol(16.0, 4.0, 0.44, 2.2, 'metal'));
-    blocks.push(makeCol(18.4, 4.0, 0.44, 2.2, 'metal'));
-    blocks.push(makeCoin(17.2, 4.0, 0.5));
-    targets.push(makeTarget(17.2, 4.5, 'green'));
-    blocks.push(makeBeam(17.2, 6.2, 4.0, 0.3, 'metal'));
-    blocks.push(makeCol(16.2, 6.5, 0.38, 1.6, 'stone'));
-    blocks.push(makeCol(18.2, 6.5, 0.38, 1.6, 'stone'));
-    targets.push(makeTarget(17.2, 6.5, 'blue'));
-    blocks.push(makeBeam(17.2, 8.1, 3.0, 0.24, 'stone'));
-    targets.push(makeTarget(17.2, 8.34, 'gold'));
-
-    // Suspension Bridge spanning the abyss chasm
-    blocks.push(makeBeam(12.5, 4.0, 6.6, 0.26, 'wood'));
-    targets.push(makeTarget(11.2, 4.26, 'blue'));
-    targets.push(makeTarget(13.8, 4.26, 'pink'));
-    // Suspension posts & cables
-    blocks.push(makeCol(9.8, 4.26, 0.3, 1.8, 'wood'));
-    blocks.push(makeCol(15.2, 4.26, 0.3, 1.8, 'wood'));
-    blocks.push(makeBeam(12.5, 6.06, 6.2, 0.2, 'glass'));
-
-    levels.push({
-      id: 37,
-      name: "Temporal Rift Keep",
-      zone: "Chrono Void",
-      icon: "🌉",
-      difficulty: "Singularity Master",
-      description: "Dual sheer cliff castles linked by a vulnerable wooden suspension bridge hung over a bottomless chasm.",
-      coinReward: 340,
-      birds: ["split", "fire", "lightning", "heavy", "vortex", "speed"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 38: Quantum Core Redoubt
-  // Concept: Concentric tiered bunker with alternating glass viewports & blast doors
-  // =========================================================================
+    "id": 37,
+    "name": "Temporal Rift Keep",
+    "zone": "Chrono Void",
+    "icon": "🌉",
+    "difficulty": "Singularity Master",
+    "description": "Dual sheer cliff castles linked by a vulnerable wooden suspension bridge hung over a bottomless chasm.",
+    "coinReward": 340,
+    "birds": [
+      "split",
+      "fire",
+      "lightning",
+      "heavy",
+      "vortex",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.5,
+          2,
+          0
+        ],
+        "size": [
+          4.6,
+          4,
+          5
+        ],
+        "type": "cliff"
+      },
+      {
+        "pos": [
+          17.5,
+          2,
+          0
+        ],
+        "size": [
+          4.6,
+          4,
+          5
+        ],
+        "type": "cliff"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          5.851,
+          4.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.149,
+          4.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.5,
+          4.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.696,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.304,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.5,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.196,
+          5.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.804,
+          5.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.5,
+          6.72,
+          0
+        ],
+        "size": [
+          4.648,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.043,
+          7.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.957,
+          7.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          7.5,
+          7.69,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.5,
+          8.83,
+          0
+        ],
+        "size": [
+          3.415,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          6.8,
+          9.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.2,
+          9.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.5,
+          10.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.55,
+          10.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.45,
+          10.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.851,
+          4.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.149,
+          4.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.5,
+          4.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.696,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.304,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.5,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.196,
+          5.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.804,
+          5.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.5,
+          6.72,
+          0
+        ],
+        "size": [
+          4.648,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.043,
+          7.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.957,
+          7.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          17.5,
+          8.165,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.5,
+          8.83,
+          0
+        ],
+        "size": [
+          3.415,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.8,
+          9.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          18.2,
+          9.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.5,
+          10.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.55,
+          10.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.45,
+          10.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.528,
+          4.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          8.472,
+          4.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          7.5,
+          8.53,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          7.5,
+          9.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          16.528,
+          4.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          18.472,
+          4.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          17.5,
+          7.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          17.5,
+          9.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(8.5, 1.4, 5.5, 2.8, 'volcanic'), // top = 2.8
-      makePlat(16.2, 1.4, 6.5, 2.8, 'volcanic') // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Forward outpost on Plat 1: blast buffer with TNT
-    blocks.push(makeBlock(6.5, 2.8, 0.8, 2.2, 'metal'));
-    blocks.push(makeCol(8.0, 2.8, 0.4, 2.2, 'glass'));
-    blocks.push(makeCol(10.5, 2.8, 0.44, 2.2, 'stone'));
-    blocks.push(makeTnt(9.2, 2.8, 0.6));
-    targets.push(makeTarget(9.2, 3.4, 'blue'));
-    blocks.push(makeBeam(8.5, 5.0, 5.2, 0.32, 'stone'));
-    blocks.push(makeBlock(8.5, 5.32, 1.4, 0.8, 'wood'));
-    targets.push(makeTarget(8.5, 6.12, 'pink'));
-
-    // Quantum Core Bunker on Plat 2: 3-tier reinforced citadel
-    blocks.push(makeCol(13.6, 2.8, 0.48, 2.4, 'metal'));
-    blocks.push(makeCol(16.2, 2.8, 0.44, 2.4, 'stone'));
-    blocks.push(makeCol(18.8, 2.8, 0.48, 2.4, 'metal'));
-    blocks.push(makeTnt(14.9, 2.8, 0.6));
-    targets.push(makeTarget(14.9, 3.4, 'gold'));
-    targets.push(makeTarget(17.5, 2.8, 'green'));
-    blocks.push(makeBeam(16.2, 5.2, 6.0, 0.36, 'metal'));
-
-    // Tier 2: Shielded reactor chamber
-    blocks.push(makeCol(14.4, 5.56, 0.42, 2.0, 'stone'));
-    blocks.push(makeCol(18.0, 5.56, 0.42, 2.0, 'stone'));
-    blocks.push(makeBlock(16.2, 5.56, 1.2, 1.2, 'glass'));
-    targets.push(makeTarget(16.2, 6.76, 'pink'));
-    blocks.push(makeBeam(16.2, 7.56, 4.6, 0.3, 'stone'));
-
-    // Tier 3: Sniper cupola
-    blocks.push(makeCol(15.2, 7.86, 0.38, 1.4, 'wood'));
-    blocks.push(makeCol(17.2, 7.86, 0.38, 1.4, 'wood'));
-    targets.push(makeTarget(16.2, 7.86, 'blue'));
-    blocks.push(makeBeam(16.2, 9.26, 2.8, 0.24, 'stone'));
-
-    levels.push({
-      id: 38,
-      name: "Quantum Core Redoubt",
-      zone: "Chrono Void",
-      icon: "🛡️",
-      difficulty: "Singularity Master",
-      description: "A concentric subterranean bunker complex shielded by forward blast baffles and sliding blast doors.",
-      coinReward: 350,
-      birds: ["heavy", "speed", "vortex", "fire", "lightning", "split"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 39: Dimensional Vault
-  // Concept: 5-tiered ancient stepped Ziggurat with ascending terraces
-  // =========================================================================
+    "id": 38,
+    "name": "Quantum Core Redoubt",
+    "zone": "Chrono Void",
+    "icon": "🛡️",
+    "difficulty": "Singularity Master",
+    "description": "A concentric subterranean bunker complex shielded by forward blast baffles and sliding blast doors.",
+    "coinReward": 350,
+    "birds": [
+      "heavy",
+      "speed",
+      "vortex",
+      "fire",
+      "lightning",
+      "split"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          1.4,
+          0
+        ],
+        "size": [
+          5.5,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          16.2,
+          1.4,
+          0
+        ],
+        "size": [
+          6.5,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.575,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.425,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.42,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.58,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.92,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.08,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          5.52,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.844,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.156,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.5,
+          6.49,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          7.63,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.8,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.2,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.55,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.45,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.275,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.125,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.2,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.12,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.28,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.62,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.78,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          5.52,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.544,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.856,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.2,
+          6.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.2,
+          7.63,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.9,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.25,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.15,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.396,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.604,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.5,
+          7.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          8.5,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          15.096,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          17.304,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.2,
+          6.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          16.2,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(12.5, 1.2, 12.5, 2.4, 'stone') // top = 2.4
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Tier 1 (Base, width 11.5)
-    blocks.push(makeCol(7.2, 2.4, 0.48, 2.0, 'stone'));
-    blocks.push(makeCol(9.8, 2.4, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(12.5, 2.4, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(15.2, 2.4, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(17.8, 2.4, 0.48, 2.0, 'stone'));
-    targets.push(makeTarget(8.5, 2.4, 'blue'));
-    targets.push(makeTarget(11.15, 2.4, 'pink'));
-    targets.push(makeTarget(13.85, 2.4, 'green'));
-    targets.push(makeTarget(16.5, 2.4, 'blue'));
-    blocks.push(makeBeam(12.5, 4.4, 11.6, 0.34, 'stone'));
-
-    // Tier 2 (width 9.4)
-    blocks.push(makeCol(8.4, 4.74, 0.42, 1.8, 'stone'));
-    blocks.push(makeCol(11.1, 4.74, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(13.9, 4.74, 0.4, 1.8, 'wood'));
-    blocks.push(makeCol(16.6, 4.74, 0.42, 1.8, 'stone'));
-    blocks.push(makeTnt(12.5, 4.74, 0.6));
-    targets.push(makeTarget(9.75, 4.74, 'gold'));
-    targets.push(makeTarget(15.25, 4.74, 'pink'));
-    blocks.push(makeBeam(12.5, 6.54, 9.6, 0.32, 'stone'));
-
-    // Tier 3 (width 7.2)
-    blocks.push(makeCol(9.6, 6.86, 0.4, 1.6, 'metal'));
-    blocks.push(makeCol(12.5, 6.86, 0.38, 1.6, 'glass'));
-    blocks.push(makeCol(15.4, 6.86, 0.4, 1.6, 'metal'));
-    targets.push(makeTarget(11.05, 6.86, 'blue'));
-    targets.push(makeTarget(13.95, 6.86, 'gold'));
-    blocks.push(makeBeam(12.5, 8.46, 7.2, 0.3, 'stone'));
-
-    // Tier 4 (width 4.8)
-    blocks.push(makeCol(11.0, 8.76, 0.38, 1.4, 'stone'));
-    blocks.push(makeCol(14.0, 8.76, 0.38, 1.4, 'stone'));
-    targets.push(makeTarget(12.5, 8.76, 'pink'));
-    blocks.push(makeBeam(12.5, 10.16, 4.6, 0.26, 'metal'));
-
-    // Tier 5: Summit Shrine
-    blocks.push(makeBlock(12.5, 10.42, 1.2, 0.8, 'glass'));
-    targets.push(makeTarget(12.5, 11.22, 'gold'));
-
-    levels.push({
-      id: 39,
-      name: "Dimensional Vault",
-      zone: "Chrono Void",
-      icon: "🏛️",
-      difficulty: "Singularity Master",
-      description: "A monumental five-tiered Mesopotamian Ziggurat featuring stepped ascending terraces and a summit high altar.",
-      coinReward: 360,
-      birds: ["speed", "split", "fire", "lightning", "heavy", "vortex"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 40: Void Airship Bastion (Singularity Boss)
-  // Concept: Giant war zeppelin airship docked on 3 drydock mooring pylons
-  // =========================================================================
+    "id": 39,
+    "name": "Dimensional Vault",
+    "zone": "Chrono Void",
+    "icon": "🏛️",
+    "difficulty": "Singularity Master",
+    "description": "A monumental five-tiered Mesopotamian Ziggurat featuring stepped ascending terraces and a summit high altar.",
+    "coinReward": 360,
+    "birds": [
+      "speed",
+      "split",
+      "fire",
+      "lightning",
+      "heavy",
+      "vortex"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          12.5,
+          1.2,
+          0
+        ],
+        "size": [
+          12.5,
+          2.4,
+          5
+        ],
+        "type": "stone"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.416,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.834,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.625,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.261,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.989,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.625,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.761,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.489,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.625,
+          5.12,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.485,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.765,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.625,
+          6.565,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.625,
+          7.23,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.925,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.325,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.625,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.675,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.575,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.166,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.584,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.375,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.011,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.739,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.375,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.511,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.239,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.375,
+          5.12,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.235,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.515,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.375,
+          6.565,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.375,
+          7.23,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          15.675,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          17.075,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.375,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.425,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.325,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.35,
+          3.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.65,
+          3.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          4.1,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          4.57,
+          0
+        ],
+        "size": [
+          6.75,
+          0.34,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.865,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.385,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.625,
+          5.73,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          8.625,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.615,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          17.135,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.375,
+          5.73,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.375,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          2.84,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          5.18,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(7.0, 1.4, 3.4, 2.8, 'volcanic'),  // top = 2.8
-      makePlat(12.5, 1.0, 4.2, 2.0, 'volcanic'), // top = 2.0
-      makePlat(18.0, 1.4, 3.4, 2.8, 'volcanic')  // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Mooring Pylon 1 (left: x=7.0, top=2.8) - 2-tier reinforced watchtower
-    blocks.push(makeBlock(5.8, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(8.2, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(5.8, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(8.2, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeBlock(7.0, 3.4, 0.8, 0.6, 'stone'));
-    targets.push(makeTarget(7.0, 4.0, 'blue'));
-    blocks.push(makeBeam(7.0, 5.4, 3.2, 0.28, 'stone'));
-    blocks.push(makeCol(7.0, 5.68, 0.38, 1.4, 'metal'));
-    targets.push(makeTarget(7.0, 7.08, 'pink'));
-    blocks.push(makeBeam(7.0, 7.08, 2.0, 0.22, 'stone'));
-
-    // Central Heavy Dock Support (center: x=12.5, top=2.0)
-    blocks.push(makeBlock(10.8, 2.0, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(14.2, 2.0, 0.8, 0.6, 'metal'));
-    blocks.push(makeCol(10.8, 2.6, 0.48, 2.8, 'metal'));
-    blocks.push(makeCol(14.2, 2.6, 0.48, 2.8, 'metal'));
-    blocks.push(makeCol(12.5, 2.0, 0.44, 3.4, 'stone'));
-    blocks.push(makeTnt(11.6, 2.0, 0.65));
-    blocks.push(makeTnt(13.4, 2.0, 0.65));
-    targets.push(makeTarget(11.6, 2.65, 'gold'));
-    targets.push(makeTarget(13.4, 2.65, 'gold'));
-    blocks.push(makeBeam(12.5, 5.4, 4.4, 0.32, 'metal'));
-
-    // Mooring Pylon 3 (right: x=18.0, top=2.8) - 2-tier reinforced watchtower
-    blocks.push(makeBlock(16.8, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(19.2, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(16.8, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(19.2, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeBlock(18.0, 3.4, 0.8, 0.6, 'stone'));
-    targets.push(makeTarget(18.0, 4.0, 'green'));
-    blocks.push(makeBeam(18.0, 5.4, 3.2, 0.28, 'stone'));
-    blocks.push(makeCol(18.0, 5.68, 0.38, 1.4, 'metal'));
-    targets.push(makeTarget(18.0, 7.08, 'blue'));
-    blocks.push(makeBeam(18.0, 7.08, 2.0, 0.22, 'stone'));
-
-    // Airship Armored Keel Girder (spans 13.6 units at y=7.3!)
-    const keelY = 7.3;
-    blocks.push(makeBeam(12.5, keelY, 13.6, 0.4, 'metal'));
-
-    // Cargo Bay, Bomb Bays & Armored Ribs (on keel)
-    blocks.push(makeBlock(6.2, keelY + 0.4, 1.2, 1.4, 'metal')); // Front Armored Ram Prow
-    blocks.push(makeBlock(18.8, keelY + 0.4, 1.2, 1.4, 'metal')); // Rear Thruster Cowling
-    blocks.push(makeCol(8.0, keelY + 0.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(10.2, keelY + 0.4, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(12.5, keelY + 0.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(14.8, keelY + 0.4, 0.44, 2.0, 'stone'));
-    blocks.push(makeCol(17.0, keelY + 0.4, 0.44, 2.0, 'metal'));
-
-    blocks.push(makeTnt(9.1, keelY + 0.4, 0.65));
-    blocks.push(makeTnt(15.9, keelY + 0.4, 0.65));
-    targets.push(makeTarget(9.1, keelY + 1.05, 'gold'));
-    targets.push(makeTarget(15.9, keelY + 1.05, 'gold'));
-
-    // Mid-Deck Ceiling Beam
-    const midDeckY = keelY + 0.4 + 2.0; // 9.7
-    blocks.push(makeBeam(12.5, midDeckY, 12.0, 0.36, 'metal'));
-
-    // Flank Mid-Deck Balconies
-    blocks.push(makeBlock(7.2, midDeckY + 0.36, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(17.8, midDeckY + 0.36, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(7.2, midDeckY + 0.96, 0.36, 1.4, 'metal'));
-    blocks.push(makeCol(17.8, midDeckY + 0.96, 0.36, 1.4, 'metal'));
-
-    // Upper Bridge Citadel / Commander Sanctuary (Boss Chamber)
-    blocks.push(makeCol(10.8, midDeckY + 0.36, 0.46, 2.2, 'metal'));
-    blocks.push(makeCol(14.2, midDeckY + 0.36, 0.46, 2.2, 'metal'));
-    blocks.push(makeBlock(12.5, midDeckY + 0.36, 1.2, 0.8, 'metal'));
-    // Void Commander Grand Challenge Boss!
-    targets.push(makeTarget(12.5, midDeckY + 1.16, 'boss', true, 0.72));
-
-    // Bridge Roof Armor, Radar Arrays & Spire
-    blocks.push(makeBeam(12.5, midDeckY + 2.56, 4.8, 0.3, 'stone'));
-    blocks.push(makeCol(11.8, midDeckY + 2.86, 0.36, 1.4, 'metal'));
-    blocks.push(makeCol(13.2, midDeckY + 2.86, 0.36, 1.4, 'metal'));
-    blocks.push(makeBlock(12.5, midDeckY + 2.86, 0.8, 0.8, 'metal'));
-    blocks.push(makeBeam(12.5, midDeckY + 4.26, 2.8, 0.24, 'metal'));
-    blocks.push(makeCol(12.5, midDeckY + 4.5, 0.32, 1.0, 'metal'));
-    targets.push(makeTarget(12.5, midDeckY + 5.5, 'pink'));
-
-    levels.push({
-      id: 40,
-      name: "Void Airship Bastion",
-      zone: "Chrono Void",
-      icon: "🛸",
-      difficulty: "Void Emperor Challenge Boss",
-      description: "CHALLENGE LEVEL 40: A colossal armored sky dreadnought moored across three fortified watchtower pylons with multiple bomb bays, reinforced bulkhead armor, and the Void Commander bridge.",
-      coinReward: 500,
-      birds: ["fire", "heavy", "vortex", "lightning", "speed", "chrono"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // Next batch 41-50
-  addLevels41to50_v2(levels);
-}
-
-function addLevels41to50_v2(levels) {
-  // =========================================================================
-  // LEVEL 41: Phase Shift Colonnade
-  // Concept: Classical Greek Parthenon temple with 6 columns & pediment
-  // =========================================================================
+    "id": 40,
+    "name": "Void Airship Bastion",
+    "zone": "Chrono Void",
+    "icon": "🛸",
+    "difficulty": "Void Emperor Challenge Boss",
+    "description": "CHALLENGE LEVEL 40: A colossal armored sky dreadnought moored across three fortified watchtower pylons with multiple bomb bays, reinforced bulkhead armor, and the Void Commander bridge.",
+    "coinReward": 500,
+    "birds": [
+      "fire",
+      "heavy",
+      "vortex",
+      "lightning",
+      "speed",
+      "chrono"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7,
+          1.4,
+          0
+        ],
+        "size": [
+          3.4,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.5,
+          1,
+          0
+        ],
+        "size": [
+          4.2,
+          2,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18,
+          1.4,
+          0
+        ],
+        "size": [
+          3.4,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          5.8,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.2,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.8,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.2,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7,
+          3.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7,
+          5.54,
+          0
+        ],
+        "size": [
+          3.2,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7,
+          6.38,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7,
+          7.19,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.8,
+          2.3,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.2,
+          2.3,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.8,
+          4,
+          0
+        ],
+        "size": [
+          0.48,
+          2.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.2,
+          4,
+          0
+        ],
+        "size": [
+          0.48,
+          2.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          3.7,
+          0
+        ],
+        "size": [
+          0.44,
+          3.4,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          11.6,
+          2.325,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          13.4,
+          2.325,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          5.56,
+          0
+        ],
+        "size": [
+          4.4,
+          0.32,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.8,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.2,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.8,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.2,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18,
+          3.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18,
+          5.54,
+          0
+        ],
+        "size": [
+          3.2,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18,
+          6.38,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18,
+          7.19,
+          0
+        ],
+        "size": [
+          2,
+          0.22,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          7.5,
+          0
+        ],
+        "size": [
+          13.6,
+          0.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.2,
+          8.4,
+          0
+        ],
+        "size": [
+          1.2,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.8,
+          8.4,
+          0
+        ],
+        "size": [
+          1.2,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          8.7,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.2,
+          8.7,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          8.7,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.8,
+          8.7,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17,
+          8.7,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          9.1,
+          8.025,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          15.9,
+          8.025,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          9.88,
+          0
+        ],
+        "size": [
+          12,
+          0.36,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          10.36,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.8,
+          10.36,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          11.36,
+          0
+        ],
+        "size": [
+          0.36,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.8,
+          11.36,
+          0
+        ],
+        "size": [
+          0.36,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.8,
+          11.16,
+          0
+        ],
+        "size": [
+          0.46,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.2,
+          11.16,
+          0
+        ],
+        "size": [
+          0.46,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          10.46,
+          0
+        ],
+        "size": [
+          1.2,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          12.41,
+          0
+        ],
+        "size": [
+          4.8,
+          0.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.8,
+          13.26,
+          0
+        ],
+        "size": [
+          0.36,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.2,
+          13.26,
+          0
+        ],
+        "size": [
+          0.36,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          12.96,
+          0
+        ],
+        "size": [
+          0.8,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          14.08,
+          0
+        ],
+        "size": [
+          2.8,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          14.7,
+          0
+        ],
+        "size": [
+          0.32,
+          1,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7,
+          4.44,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7,
+          7.52,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.6,
+          3.09,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.4,
+          3.09,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          18,
+          4.44,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          18,
+          7.52,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.1,
+          8.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.9,
+          8.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          12.5,
+          11.58,
+          0
+        ],
+        "radius": 0.72,
+        "isBoss": true,
+        "birdType": "boss"
+      },
+      {
+        "pos": [
+          12.5,
+          15.64,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(12.5, 1.5, 12.0, 3.0, 'celestial') // top = 3.0
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Stepped plinth base
-    blocks.push(makeBeam(12.5, 3.0, 11.6, 0.26, 'stone'));
-
-    // 6 Tall Fluted Stone Columns (spaced from x=7.5 to x=17.5)
-    const colXs = [7.5, 9.5, 11.5, 13.5, 15.5, 17.5];
-    colXs.forEach(x => {
-      blocks.push(makeCol(x, 3.26, 0.44, 2.4, 'stone'));
-    });
-
-    targets.push(makeTarget(8.5, 3.26, 'blue'));
-    targets.push(makeTarget(10.5, 3.26, 'pink'));
-    blocks.push(makeTnt(12.5, 3.26, 0.6));
-    targets.push(makeTarget(12.5, 3.86, 'gold'));
-    targets.push(makeTarget(14.5, 3.26, 'green'));
-    targets.push(makeTarget(16.5, 3.26, 'blue'));
-
-    // Continuous architrave beam (y = 5.66)
-    blocks.push(makeBeam(12.5, 5.66, 11.6, 0.36, 'stone'));
-
-    // Metope Frieze & Triglyphs (second tier)
-    blocks.push(makeCol(8.5, 6.02, 0.4, 1.6, 'stone'));
-    blocks.push(makeCol(11.0, 6.02, 0.38, 1.6, 'wood'));
-    blocks.push(makeCol(14.0, 6.02, 0.38, 1.6, 'wood'));
-    blocks.push(makeCol(16.5, 6.02, 0.4, 1.6, 'stone'));
-    targets.push(makeTarget(9.75, 6.02, 'pink'));
-    targets.push(makeTarget(15.25, 6.02, 'gold'));
-    blocks.push(makeBeam(12.5, 7.62, 9.8, 0.32, 'stone'));
-
-    // Triangular Pediment Roof
-    blocks.push(makeBlock(10.2, 7.94, 2.2, 0.8, 'stone'));
-    blocks.push(makeBlock(14.8, 7.94, 2.2, 0.8, 'stone'));
-    blocks.push(makeBlock(12.5, 7.94, 1.8, 1.4, 'glass'));
-    targets.push(makeTarget(12.5, 9.34, 'blue'));
-    blocks.push(makeBeam(12.5, 9.34, 4.6, 0.28, 'stone'));
-    targets.push(makeTarget(12.5, 9.62, 'gold'));
-
-    levels.push({
-      id: 41,
-      name: "Phase Shift Colonnade",
-      zone: "Chrono Void",
-      icon: "🏛️",
-      difficulty: "Chrono Legend",
-      description: "A monumental classical Parthenon colonnade with six load-bearing stone pillars, architrave, and pediment.",
-      coinReward: 410,
-      birds: ["speed", "heavy", "lightning", "split", "vortex", "fire"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 42: Event Horizon Fortress
-  // Concept: Asymmetrical cantilever gravity-balance fortress over a chasm
-  // =========================================================================
+    "id": 41,
+    "name": "Phase Shift Colonnade",
+    "zone": "Chrono Void",
+    "icon": "🏛️",
+    "difficulty": "Chrono Legend",
+    "description": "A monumental classical Parthenon colonnade with six load-bearing stone pillars, architrave, and pediment.",
+    "coinReward": 410,
+    "birds": [
+      "speed",
+      "heavy",
+      "lightning",
+      "split",
+      "vortex",
+      "fire"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          12.5,
+          1.5,
+          0
+        ],
+        "size": [
+          12,
+          3,
+          5
+        ],
+        "type": "celestial"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.571,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.989,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.78,
+          3.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.416,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.144,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.78,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.916,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.644,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.78,
+          5.72,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.64,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.92,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.78,
+          7.165,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.78,
+          7.83,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.08,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.48,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.78,
+          9.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.83,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.73,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.011,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.429,
+          3.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.22,
+          3.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.856,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.584,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.22,
+          4.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.356,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.084,
+          4.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.22,
+          5.72,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.08,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.36,
+          6.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.22,
+          7.165,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.22,
+          7.83,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          15.52,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.92,
+          8.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.22,
+          9.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.27,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.17,
+          9.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.35,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.65,
+          4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          4.7,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          5.17,
+          0
+        ],
+        "size": [
+          6.44,
+          0.34,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.02,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.54,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.78,
+          6.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          8.78,
+          8.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.46,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          16.98,
+          3.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.22,
+          6.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.22,
+          8.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          3.44,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          5.78,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(8.0, 1.2, 4.4, 2.4, 'volcanic'), // top = 2.4
-      makePlat(15.5, 2.4, 5.5, 4.8, 'volcanic') // top = 4.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Low bunker on Plat 1 (top = 2.4)
-    blocks.push(makeBlock(6.4, 2.4, 0.8, 1.8, 'stone'));
-    blocks.push(makeCol(7.8, 2.4, 0.42, 1.8, 'stone'));
-    blocks.push(makeCol(9.6, 2.4, 0.42, 1.8, 'stone'));
-    blocks.push(makeTnt(8.7, 2.4, 0.6));
-    targets.push(makeTarget(8.7, 3.0, 'blue'));
-    blocks.push(makeBeam(8.0, 4.2, 4.0, 0.28, 'stone'));
-    targets.push(makeTarget(8.0, 4.48, 'pink'));
-
-    // High Cantilevered Pivot Fortress on Plat 2 (top = 4.8)
-    blocks.push(makeCol(13.8, 4.8, 0.52, 2.2, 'metal'));
-    blocks.push(makeCol(17.2, 4.8, 0.52, 2.2, 'stone'));
-    blocks.push(makeBlock(15.5, 4.8, 1.2, 1.0, 'wood'));
-    targets.push(makeTarget(15.5, 5.8, 'gold'));
-
-    // Huge 8.8-unit Cantilever Balance Beam pivoting at x=13.8!
-    // Extends left to x=9.8 (hanging out into empty air over the gap!)
-    blocks.push(makeBeam(14.2, 7.0, 8.8, 0.38, 'metal'));
-
-    // Counterweight on the right (heavy metal & stone blocks)
-    blocks.push(makeBlock(17.5, 7.38, 1.8, 1.2, 'metal'));
-    blocks.push(makeBlock(17.5, 8.58, 1.6, 1.0, 'stone'));
-    targets.push(makeTarget(17.5, 9.58, 'blue'));
-
-    // Precarious perch on the overhanging left side
-    blocks.push(makeCol(10.5, 7.38, 0.38, 1.6, 'glass'));
-    blocks.push(makeCol(12.2, 7.38, 0.38, 1.6, 'glass'));
-    targets.push(makeTarget(10.5, 8.98, 'pink'));
-    blocks.push(makeBeam(11.35, 8.98, 2.6, 0.24, 'wood'));
-    targets.push(makeTarget(11.35, 9.22, 'green'));
-
-    levels.push({
-      id: 42,
-      name: "Event Horizon Fortress",
-      zone: "Chrono Void",
-      icon: "⚖️",
-      difficulty: "Chrono Legend",
-      description: "An asymmetric kinetic balance fortress extending a counterweighted cantilever beam far out over empty air.",
-      coinReward: 420,
-      birds: ["split", "fire", "heavy", "vortex", "lightning", "speed"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 43: Warp Lattice Citadel
-  // Concept: Diamond / hexagonal crisscross lattice grid fortress
-  // =========================================================================
+    "id": 42,
+    "name": "Event Horizon Fortress",
+    "zone": "Chrono Void",
+    "icon": "⚖️",
+    "difficulty": "Chrono Legend",
+    "description": "An asymmetric kinetic balance fortress extending a counterweighted cantilever beam far out over empty air.",
+    "coinReward": 420,
+    "birds": [
+      "split",
+      "fire",
+      "heavy",
+      "vortex",
+      "lightning",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8,
+          1.2,
+          0
+        ],
+        "size": [
+          4.4,
+          2.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          15.5,
+          2.4,
+          0
+        ],
+        "size": [
+          5.5,
+          4.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.439,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.561,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.284,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.716,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.784,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.216,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          5.12,
+          0
+        ],
+        "size": [
+          4.472,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.606,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.394,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8,
+          6.09,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          7.23,
+          0
+        ],
+        "size": [
+          3.288,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.3,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.7,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.05,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.95,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.575,
+          5.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.425,
+          5.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          5.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.42,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.58,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.92,
+          6.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.08,
+          6.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          7.52,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.844,
+          8.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.156,
+          8.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          8.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          9.63,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.8,
+          10.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.2,
+          10.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          11.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.55,
+          11.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.45,
+          11.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.071,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          8.929,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8,
+          6.93,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          8,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          14.396,
+          5.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.604,
+          5.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          15.5,
+          8.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          15.5,
+          10.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(8.8, 1.4, 5.2, 2.8, 'celestial'), // top = 2.8
-      makePlat(16.2, 1.4, 5.2, 2.8, 'celestial') // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Left Lattice Tower (on Plat 1)
-    blocks.push(makeCol(7.0, 2.8, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(10.6, 2.8, 0.44, 2.0, 'metal'));
-    blocks.push(makeTnt(8.8, 2.8, 0.6));
-    targets.push(makeTarget(8.8, 3.4, 'blue'));
-    blocks.push(makeBeam(8.8, 4.8, 4.4, 0.28, 'stone'));
-    // Diamond crisscross tier
-    blocks.push(makeCol(7.6, 5.08, 0.38, 1.8, 'glass'));
-    blocks.push(makeCol(10.0, 5.08, 0.38, 1.8, 'glass'));
-    targets.push(makeTarget(8.8, 5.08, 'pink'));
-    blocks.push(makeBeam(8.8, 6.88, 3.6, 0.26, 'stone'));
-    blocks.push(makeBlock(8.8, 7.14, 1.2, 0.8, 'wood'));
-    targets.push(makeTarget(8.8, 7.94, 'gold'));
-
-    // Right Lattice Tower (on Plat 2)
-    blocks.push(makeCol(14.4, 2.8, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(18.0, 2.8, 0.44, 2.0, 'metal'));
-    blocks.push(makeCoin(16.2, 2.8, 0.5));
-    targets.push(makeTarget(16.2, 3.3, 'green'));
-    blocks.push(makeBeam(16.2, 4.8, 4.4, 0.28, 'stone'));
-    // Diamond crisscross tier
-    blocks.push(makeCol(15.0, 5.08, 0.38, 1.8, 'glass'));
-    blocks.push(makeCol(17.4, 5.08, 0.38, 1.8, 'glass'));
-    targets.push(makeTarget(16.2, 5.08, 'pink'));
-    blocks.push(makeBeam(16.2, 6.88, 3.6, 0.26, 'stone'));
-    blocks.push(makeBlock(16.2, 7.14, 1.2, 0.8, 'metal'));
-    targets.push(makeTarget(16.2, 7.94, 'blue'));
-
-    // High Lattice Sky-Bridge connecting both towers (at y=6.88)
-    blocks.push(makeBeam(12.5, 6.88, 5.4, 0.28, 'wood'));
-    targets.push(makeTarget(12.5, 7.16, 'gold'));
-    blocks.push(makeBlock(12.5, 8.0, 1.0, 0.8, 'glass'));
-
-    levels.push({
-      id: 43,
-      name: "Warp Lattice Citadel",
-      zone: "Chrono Void",
-      icon: "🌐",
-      difficulty: "Chrono Legend",
-      description: "Interlocking geodesic lattice framework towers linked by a fragile skybridge over open airspace.",
-      coinReward: 430,
-      birds: ["heavy", "speed", "fire", "lightning", "split", "vortex"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 44: Singularity Array
-  // Concept: 3 parabolic deep-space radar antenna dishes on staggered pylons
-  // =========================================================================
+    "id": 43,
+    "name": "Warp Lattice Citadel",
+    "zone": "Chrono Void",
+    "icon": "🌐",
+    "difficulty": "Chrono Legend",
+    "description": "Interlocking geodesic lattice framework towers linked by a fragile skybridge over open airspace.",
+    "coinReward": 430,
+    "birds": [
+      "heavy",
+      "speed",
+      "fire",
+      "lightning",
+      "split",
+      "vortex"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.8,
+          1.4,
+          0
+        ],
+        "size": [
+          5.2,
+          2.8,
+          5
+        ],
+        "type": "celestial"
+      },
+      {
+        "pos": [
+          16.2,
+          1.4,
+          0
+        ],
+        "size": [
+          5.2,
+          2.8,
+          5
+        ],
+        "type": "celestial"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.887,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.713,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.8,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.732,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.868,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.8,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.232,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.368,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.8,
+          5.52,
+          0
+        ],
+        "size": [
+          5.176,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.153,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.447,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.8,
+          6.49,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.8,
+          7.63,
+          0
+        ],
+        "size": [
+          3.795,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.1,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.5,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.8,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.85,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.75,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.287,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.113,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.2,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.132,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.268,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.632,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.768,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          5.52,
+          0
+        ],
+        "size": [
+          5.176,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.553,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.847,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.2,
+          6.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.2,
+          7.63,
+          0
+        ],
+        "size": [
+          3.795,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.9,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.25,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.15,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.702,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.898,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.8,
+          7.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          8.8,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          15.102,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          17.298,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.2,
+          6.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          16.2,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(7.2, 1.2, 3.4, 2.4, 'volcanic'), // top = 2.4
-      makePlat(12.5, 2.2, 4.0, 4.4, 'volcanic'), // top = 4.4
-      makePlat(17.8, 1.4, 3.4, 2.8, 'volcanic')  // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Array Dish 1 (left pylon, top = 2.4)
-    blocks.push(makeBlock(7.2, 2.4, 1.0, 0.6, 'stone'));
-    blocks.push(makeCol(7.2, 3.0, 0.46, 2.0, 'metal'));
-    blocks.push(makeBeam(7.2, 5.0, 3.2, 0.26, 'metal'));
-    blocks.push(makeCol(5.8, 5.26, 0.34, 1.4, 'glass'));
-    blocks.push(makeCol(8.6, 5.26, 0.34, 1.4, 'glass'));
-    targets.push(makeTarget(7.2, 5.26, 'blue'));
-    blocks.push(makeBeam(7.2, 6.66, 3.6, 0.22, 'wood'));
-    targets.push(makeTarget(7.2, 6.88, 'pink'));
-
-    // Array Dish 2 (high center pylon, top = 4.4)
-    blocks.push(makeCol(11.0, 4.4, 0.46, 2.4, 'stone'));
-    blocks.push(makeCol(14.0, 4.4, 0.46, 2.4, 'stone'));
-    blocks.push(makeTnt(12.5, 4.4, 0.6));
-    targets.push(makeTarget(12.5, 5.0, 'gold'));
-    blocks.push(makeBeam(12.5, 6.8, 4.0, 0.3, 'metal'));
-    blocks.push(makeCol(12.5, 7.1, 0.38, 2.0, 'metal'));
-    targets.push(makeTarget(11.3, 7.1, 'pink'));
-    targets.push(makeTarget(13.7, 7.1, 'green'));
-    blocks.push(makeBeam(12.5, 9.1, 3.0, 0.24, 'stone'));
-    targets.push(makeTarget(12.5, 9.34, 'gold'));
-
-    // Array Dish 3 (right pylon, top = 2.8)
-    blocks.push(makeBlock(17.8, 2.8, 1.0, 0.6, 'stone'));
-    blocks.push(makeCol(17.8, 3.4, 0.46, 2.0, 'metal'));
-    blocks.push(makeBeam(17.8, 5.4, 3.2, 0.26, 'metal'));
-    blocks.push(makeCol(16.4, 5.66, 0.34, 1.4, 'glass'));
-    blocks.push(makeCol(19.2, 5.66, 0.34, 1.4, 'glass'));
-    targets.push(makeTarget(17.8, 5.66, 'blue'));
-    blocks.push(makeBeam(17.8, 7.06, 3.6, 0.22, 'wood'));
-    targets.push(makeTarget(17.8, 7.28, 'pink'));
-
-    levels.push({
-      id: 44,
-      name: "Singularity Array",
-      zone: "Chrono Void",
-      icon: "📡",
-      difficulty: "Chrono Legend",
-      description: "Three parabolic communications arrays mounted on staggered pylons, focusing deep energy signals.",
-      coinReward: 440,
-      birds: ["speed", "split", "vortex", "heavy", "fire", "lightning"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 45: Chrono Sovereign Palace (Chrono Emperor Boss)
-  // Concept: Gothic Royal Cathedral with twin bell towers & vaulted nave
-  // =========================================================================
+    "id": 44,
+    "name": "Singularity Array",
+    "zone": "Chrono Void",
+    "icon": "📡",
+    "difficulty": "Chrono Legend",
+    "description": "Three parabolic communications arrays mounted on staggered pylons, focusing deep energy signals.",
+    "coinReward": 440,
+    "birds": [
+      "speed",
+      "split",
+      "vortex",
+      "heavy",
+      "fire",
+      "lightning"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.2,
+          1.2,
+          0
+        ],
+        "size": [
+          3.4,
+          2.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.5,
+          2.2,
+          0
+        ],
+        "size": [
+          4,
+          4.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          17.8,
+          1.4,
+          0
+        ],
+        "size": [
+          3.4,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.079,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.321,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.924,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.476,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.424,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.976,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          5.12,
+          0
+        ],
+        "size": [
+          3.592,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.123,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.277,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          7.23,
+          0
+        ],
+        "size": [
+          2.654,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.115,
+          4.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.885,
+          4.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          4.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.96,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.04,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          5.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.46,
+          5.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.54,
+          5.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          7.12,
+          0
+        ],
+        "size": [
+          4.12,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.233,
+          8.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.767,
+          8.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          8.09,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          9.23,
+          0
+        ],
+        "size": [
+          3.034,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          11.8,
+          10.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.2,
+          10.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.5,
+          10.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.55,
+          11.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.45,
+          11.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.679,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.921,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.8,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.524,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.076,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.8,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.024,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.576,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.8,
+          5.52,
+          0
+        ],
+        "size": [
+          3.592,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.723,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.877,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.8,
+          7.63,
+          0
+        ],
+        "size": [
+          2.654,
+          0.28,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.482,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7.918,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.655,
+          5.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.345,
+          5.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.5,
+          8.93,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          9.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          17.082,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18.518,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(6.8, 1.4, 3.8, 2.8, 'volcanic'), // top = 2.8
-      makePlat(12.6, 1.8, 6.0, 3.6, 'volcanic'), // top = 3.6
-      makePlat(18.2, 1.4, 3.8, 2.8, 'volcanic')  // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // West Belltower on Plat 1 (top = 2.8): 4 stories
-    blocks.push(makeCol(5.4, 2.8, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(8.2, 2.8, 0.44, 2.2, 'stone'));
-    targets.push(makeTarget(6.8, 2.8, 'blue'));
-    blocks.push(makeBeam(6.8, 5.0, 3.4, 0.26, 'stone'));
-    blocks.push(makeTnt(6.8, 5.26, 0.6));
-    blocks.push(makeCol(5.6, 5.26, 0.38, 1.8, 'wood'));
-    blocks.push(makeCol(8.0, 5.26, 0.38, 1.8, 'wood'));
-    blocks.push(makeBeam(6.8, 7.06, 2.8, 0.24, 'stone'));
-    targets.push(makeTarget(6.8, 7.3, 'gold'));
-
-    // East Belltower on Plat 3 (top = 2.8): 4 stories
-    blocks.push(makeCol(16.8, 2.8, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(19.6, 2.8, 0.44, 2.2, 'stone'));
-    targets.push(makeTarget(18.2, 2.8, 'green'));
-    blocks.push(makeBeam(18.2, 5.0, 3.4, 0.26, 'stone'));
-    blocks.push(makeCol(17.0, 5.26, 0.38, 1.8, 'metal'));
-    blocks.push(makeCol(19.4, 5.26, 0.38, 1.8, 'metal'));
-    targets.push(makeTarget(18.2, 5.26, 'pink'));
-    blocks.push(makeBeam(18.2, 7.06, 2.8, 0.24, 'stone'));
-    targets.push(makeTarget(18.2, 7.3, 'blue'));
-
-    // Central Grand Nave on Plat 2 (top = 3.6)
-    blocks.push(makeCol(10.2, 3.6, 0.48, 2.4, 'metal'));
-    blocks.push(makeCol(15.0, 3.6, 0.48, 2.4, 'metal'));
-    blocks.push(makeCoin(11.6, 3.6, 0.5));
-    blocks.push(makeCoin(13.6, 3.6, 0.5));
-    targets.push(makeTarget(12.6, 3.6, 'gold'));
-    blocks.push(makeBeam(12.6, 6.0, 5.6, 0.36, 'metal'));
-
-    // Tier 2: Royal Throne Hall
-    blocks.push(makeCol(10.8, 6.36, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(14.4, 6.36, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(12.6, 6.36, 0.38, 2.2, 'glass')); // Rose window
-    // Chrono Emperor Boss!
-    targets.push(makeTarget(12.6, 8.56, 'boss', true, 0.68));
-
-    // Vaulted Ceiling & Royal Spire
-    blocks.push(makeBeam(12.6, 9.24, 4.6, 0.3, 'stone'));
-    blocks.push(makeBlock(12.6, 9.54, 1.4, 0.8, 'metal'));
-    targets.push(makeTarget(12.6, 10.34, 'gold'));
-
-    levels.push({
-      id: 45,
-      name: "Chrono Sovereign Palace",
-      zone: "Chrono Void",
-      icon: "🏰",
-      difficulty: "Chrono Emperor Boss",
-      description: "A grand gothic sovereign cathedral flanked by twin belltowers with the Chrono Emperor seated in the rose-window throne.",
-      coinReward: 480,
-      birds: ["heavy", "fire", "lightning", "vortex", "speed", "chrono"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 46: Tesseract Bulwark
-  // Concept: 2x2 grid 4-chamber hypercube bunker with reinforced perimeter
-  // =========================================================================
+    "id": 45,
+    "name": "Chrono Sovereign Palace",
+    "zone": "Chrono Void",
+    "icon": "🏰",
+    "difficulty": "Chrono Emperor Boss",
+    "description": "A grand gothic sovereign cathedral flanked by twin belltowers with the Chrono Emperor seated in the rose-window throne.",
+    "coinReward": 480,
+    "birds": [
+      "heavy",
+      "fire",
+      "lightning",
+      "vortex",
+      "speed",
+      "chrono"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          6.8,
+          1.4,
+          0
+        ],
+        "size": [
+          3.8,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.6,
+          1.8,
+          0
+        ],
+        "size": [
+          6,
+          3.6,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18.2,
+          1.4,
+          0
+        ],
+        "size": [
+          3.8,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          5.503,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.097,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.348,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.252,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          4.848,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.752,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          5.52,
+          0
+        ],
+        "size": [
+          3.944,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          5.596,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.004,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          7.63,
+          0
+        ],
+        "size": [
+          2.908,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.675,
+          3.875,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.525,
+          3.875,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.6,
+          3.875,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.52,
+          5.15,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.68,
+          5.15,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.6,
+          5.15,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.02,
+          5.05,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.18,
+          5.05,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.6,
+          6.32,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.944,
+          7.39,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.256,
+          7.39,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.6,
+          7.29,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.6,
+          8.43,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          11.9,
+          9.22,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.3,
+          9.22,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.6,
+          9.99,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.65,
+          10.335,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.55,
+          10.335,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.903,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.497,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.748,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.652,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.248,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          20.152,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          5.52,
+          0
+        ],
+        "size": [
+          3.944,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.996,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.404,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          7.63,
+          0
+        ],
+        "size": [
+          2.908,
+          0.28,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          5.997,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7.603,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.496,
+          4.59,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.704,
+          4.59,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.6,
+          8.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.6,
+          9.01,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          17.397,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          19.003,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(12.5, 1.4, 11.5, 2.8, 'volcanic') // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Lower Level: 2 chambers
-    blocks.push(makeCol(7.6, 2.8, 0.48, 2.4, 'metal'));
-    blocks.push(makeCol(12.5, 2.8, 0.52, 2.4, 'stone'));
-    blocks.push(makeCol(17.4, 2.8, 0.48, 2.4, 'metal'));
-
-    blocks.push(makeTnt(10.05, 2.8, 0.6));
-    targets.push(makeTarget(10.05, 3.4, 'gold'));
-    blocks.push(makeCoin(14.95, 2.8, 0.5));
-    targets.push(makeTarget(14.95, 3.3, 'blue'));
-
-    // Mid Divider Slab
-    blocks.push(makeBeam(12.5, 5.2, 10.8, 0.38, 'metal'));
-
-    // Upper Level: 2 chambers
-    blocks.push(makeCol(8.0, 5.58, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(12.5, 5.58, 0.48, 2.2, 'stone'));
-    blocks.push(makeCol(17.0, 5.58, 0.44, 2.2, 'stone'));
-
-    targets.push(makeTarget(10.25, 5.58, 'pink'));
-    targets.push(makeTarget(14.75, 5.58, 'green'));
-    blocks.push(makeBlock(14.75, 5.58, 0.8, 0.8, 'glass'));
-
-    // Upper Roof Slab
-    blocks.push(makeBeam(12.5, 7.78, 10.0, 0.34, 'stone'));
-
-    // Rooftop defense battlements
-    blocks.push(makeBlock(8.8, 8.12, 1.4, 0.8, 'stone'));
-    blocks.push(makeBlock(16.2, 8.12, 1.4, 0.8, 'stone'));
-    targets.push(makeTarget(8.8, 8.92, 'blue'));
-    targets.push(makeTarget(16.2, 8.92, 'gold'));
-    blocks.push(makeCol(12.5, 8.12, 0.36, 1.6, 'metal'));
-    targets.push(makeTarget(12.5, 9.72, 'pink'));
-
-    levels.push({
-      id: 46,
-      name: "Tesseract Bulwark",
-      zone: "Chrono Void",
-      icon: "🧊",
-      difficulty: "Tesseract Overlord",
-      description: "A four-chamber hypercube bunker matrix built with interlocking blast bulkheads and reinforced corner pillars.",
-      coinReward: 490,
-      birds: ["split", "speed", "vortex", "fire", "heavy", "lightning"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 47: Void Titan Foundry
-  // Concept: Heavy industrial smelting mill with blast furnace stack and crane
-  // =========================================================================
+    "id": 46,
+    "name": "Tesseract Bulwark",
+    "zone": "Chrono Void",
+    "icon": "🧊",
+    "difficulty": "Tesseract Overlord",
+    "description": "A four-chamber hypercube bunker matrix built with interlocking blast bulkheads and reinforced corner pillars.",
+    "coinReward": 490,
+    "birds": [
+      "split",
+      "speed",
+      "vortex",
+      "fire",
+      "heavy",
+      "lightning"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          12.5,
+          1.4,
+          0
+        ],
+        "size": [
+          11.5,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          7.726,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.144,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.935,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.571,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.299,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.935,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.071,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.799,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.935,
+          5.52,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.795,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.075,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.935,
+          6.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.935,
+          7.63,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.235,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.635,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.935,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.985,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.885,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.856,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.274,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.065,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.701,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.429,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.065,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.201,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.929,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.065,
+          5.52,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.925,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.205,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.065,
+          6.965,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.065,
+          7.63,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          15.365,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          16.765,
+          8.42,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.065,
+          9.19,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.115,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.015,
+          9.535,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.35,
+          3.8,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.65,
+          3.8,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.5,
+          4.5,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.5,
+          4.97,
+          0
+        ],
+        "size": [
+          6.13,
+          0.34,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          8.175,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.695,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.935,
+          6.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          8.935,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          15.305,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          16.825,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.065,
+          6.13,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.065,
+          8.21,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          3.24,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.5,
+          5.58,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(8.5, 1.6, 5.4, 3.2, 'volcanic'), // top = 3.2
-      makePlat(16.0, 1.2, 6.2, 2.4, 'volcanic') // top = 2.4
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Blast Furnace on Plat 1 (top = 3.2)
-    blocks.push(makeCol(6.4, 3.2, 0.48, 2.4, 'metal'));
-    blocks.push(makeCol(10.6, 3.2, 0.48, 2.4, 'metal'));
-    blocks.push(makeTnt(8.5, 3.2, 0.6));
-    targets.push(makeTarget(8.5, 3.8, 'gold'));
-    blocks.push(makeBeam(8.5, 5.6, 4.8, 0.34, 'stone'));
-
-    blocks.push(makeCol(7.2, 5.94, 0.42, 2.2, 'stone'));
-    blocks.push(makeCol(9.8, 5.94, 0.42, 2.2, 'stone'));
-    targets.push(makeTarget(8.5, 5.94, 'blue'));
-    blocks.push(makeBeam(8.5, 8.14, 3.6, 0.28, 'metal'));
-    blocks.push(makeCol(8.5, 8.42, 0.38, 1.4, 'metal'));
-    targets.push(makeTarget(8.5, 9.82, 'pink'));
-
-    // Slag Foundry & Gantry Crane on Plat 2 (top = 2.4)
-    blocks.push(makeCol(13.6, 2.4, 0.44, 2.4, 'stone'));
-    blocks.push(makeCol(18.4, 2.4, 0.44, 2.4, 'stone'));
-    blocks.push(makeTnt(16.0, 2.4, 0.6));
-    targets.push(makeTarget(14.6, 2.4, 'blue'));
-    targets.push(makeTarget(17.4, 2.4, 'green'));
-    blocks.push(makeBeam(16.0, 4.8, 5.8, 0.32, 'metal')); // Crane deck
-
-    // Suspended slag crucible cage
-    blocks.push(makeCol(14.6, 5.12, 0.38, 1.8, 'wood'));
-    blocks.push(makeCol(17.4, 5.12, 0.38, 1.8, 'wood'));
-    targets.push(makeTarget(16.0, 5.12, 'pink'));
-    blocks.push(makeBeam(16.0, 6.92, 3.6, 0.24, 'stone'));
-    targets.push(makeTarget(16.0, 7.16, 'gold'));
-
-    levels.push({
-      id: 47,
-      name: "Void Titan Foundry",
-      zone: "Chrono Void",
-      icon: "🏭",
-      difficulty: "Tesseract Overlord",
-      description: "An industrial ore-smelting complex featuring a towering blast furnace chimney and a gantry crane over molten vats.",
-      coinReward: 500,
-      birds: ["speed", "heavy", "lightning", "split", "fire", "vortex"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 48: Hypercube Rampart
-  // Concept: Medieval curtain wall with 3 crenellated bastion towers & barbican
-  // =========================================================================
+    "id": 47,
+    "name": "Void Titan Foundry",
+    "zone": "Chrono Void",
+    "icon": "🏭",
+    "difficulty": "Tesseract Overlord",
+    "description": "An industrial ore-smelting complex featuring a towering blast furnace chimney and a gantry crane over molten vats.",
+    "coinReward": 500,
+    "birds": [
+      "speed",
+      "heavy",
+      "lightning",
+      "split",
+      "fire",
+      "vortex"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8.5,
+          1.6,
+          0
+        ],
+        "size": [
+          5.4,
+          3.2,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          16,
+          1.2,
+          0
+        ],
+        "size": [
+          6.2,
+          2.4,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.575,
+          3.475,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.425,
+          3.475,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          3.475,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.42,
+          4.75,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.58,
+          4.75,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          4.75,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.92,
+          4.65,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.08,
+          4.65,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          5.92,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.844,
+          6.99,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.156,
+          6.99,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8.5,
+          6.89,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.5,
+          8.03,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.8,
+          8.82,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          9.2,
+          8.82,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.5,
+          9.59,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.55,
+          9.935,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.45,
+          9.935,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.075,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.925,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.92,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.08,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.42,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.58,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16,
+          5.12,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.344,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.656,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16,
+          6.565,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16,
+          7.23,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.3,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.7,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.05,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.95,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          7.396,
+          4.19,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.604,
+          4.19,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8.5,
+          7.73,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          8.5,
+          8.61,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          14.896,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          17.104,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16,
+          5.73,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          16,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(8.0, 1.2, 5.0, 2.4, 'stone'), // top = 2.4
-      makePlat(15.5, 2.0, 7.2, 4.0, 'stone') // top = 4.0
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Barbican Gatehouse on Plat 1 (top = 2.4)
-    blocks.push(makeBlock(6.2, 2.4, 0.8, 0.8, 'stone'));
-    blocks.push(makeCol(7.0, 2.4, 0.44, 2.2, 'stone'));
-    blocks.push(makeCol(9.8, 2.4, 0.44, 2.2, 'stone'));
-    blocks.push(makeTnt(8.4, 2.4, 0.6));
-    targets.push(makeTarget(8.4, 3.0, 'blue'));
-    blocks.push(makeBeam(8.4, 4.6, 4.2, 0.3, 'stone'));
-    blocks.push(makeCol(8.4, 4.9, 0.38, 1.4, 'wood'));
-    targets.push(makeTarget(8.4, 6.3, 'pink'));
-
-    // High Curtain Wall & Dual Bastions on Plat 2 (top = 4.0)
-    blocks.push(makeCol(12.0, 4.0, 0.46, 2.4, 'stone'));
-    blocks.push(makeCol(14.4, 4.0, 0.46, 2.4, 'stone'));
-    blocks.push(makeCol(16.6, 4.0, 0.46, 2.4, 'metal'));
-    blocks.push(makeCol(19.0, 4.0, 0.46, 2.4, 'metal'));
-
-    targets.push(makeTarget(13.2, 4.0, 'blue'));
-    targets.push(makeTarget(17.8, 4.0, 'green'));
-    blocks.push(makeCoin(15.5, 4.0, 0.5));
-
-    // Rampart Battlement Walkway
-    blocks.push(makeBeam(15.5, 6.4, 7.8, 0.36, 'stone'));
-
-    // Upper Bastion Towers
-    blocks.push(makeCol(13.2, 6.76, 0.4, 1.8, 'stone'));
-    blocks.push(makeCol(17.8, 6.76, 0.4, 1.8, 'metal'));
-    targets.push(makeTarget(13.2, 8.56, 'gold'));
-    targets.push(makeTarget(17.8, 8.56, 'pink'));
-    blocks.push(makeBlock(15.5, 6.76, 1.4, 0.8, 'wood'));
-    targets.push(makeTarget(15.5, 7.56, 'blue'));
-
-    levels.push({
-      id: 48,
-      name: "Hypercube Rampart",
-      zone: "Chrono Void",
-      icon: "🧱",
-      difficulty: "Tesseract Overlord",
-      description: "A formidable curtain-wall fortress with an outer barbican gatehouse, murder holes, and high parapet battlements.",
-      coinReward: 510,
-      birds: ["heavy", "fire", "vortex", "lightning", "speed", "split"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 49: Chrono Zenith Bastion
-  // Concept: Needle sky-citadel with alternating cantilevered decks
-  // =========================================================================
+    "id": 48,
+    "name": "Hypercube Rampart",
+    "zone": "Chrono Void",
+    "icon": "🧱",
+    "difficulty": "Tesseract Overlord",
+    "description": "A formidable curtain-wall fortress with an outer barbican gatehouse, murder holes, and high parapet battlements.",
+    "coinReward": 510,
+    "birds": [
+      "heavy",
+      "fire",
+      "vortex",
+      "lightning",
+      "speed",
+      "split"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          8,
+          1.2,
+          0
+        ],
+        "size": [
+          5,
+          2.4,
+          5
+        ],
+        "type": "stone"
+      },
+      {
+        "pos": [
+          15.5,
+          2,
+          0
+        ],
+        "size": [
+          7.2,
+          4,
+          5
+        ],
+        "type": "stone"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.175,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.825,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.02,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.98,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.52,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.48,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          5.12,
+          0
+        ],
+        "size": [
+          5,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.416,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.584,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          8,
+          6.09,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          7.23,
+          0
+        ],
+        "size": [
+          3.668,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          7.3,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          8.7,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.05,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.95,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.575,
+          4.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.425,
+          4.275,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          4.275,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.42,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.58,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          5.55,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.92,
+          5.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.08,
+          5.45,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          6.72,
+          0
+        ],
+        "size": [
+          5.2,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.844,
+          7.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.156,
+          7.79,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          15.5,
+          8.165,
+          0
+        ],
+        "size": [
+          0.75,
+          0.75,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.5,
+          8.83,
+          0
+        ],
+        "size": [
+          3.812,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          14.8,
+          9.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          16.2,
+          9.62,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.5,
+          10.39,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.55,
+          10.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.45,
+          10.735,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.944,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.056,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          8,
+          6.93,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          8,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          14.396,
+          4.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          16.604,
+          4.99,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          15.5,
+          7.33,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          15.5,
+          9.41,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(7.2, 1.4, 3.2, 2.8, 'volcanic'), // top = 2.8
-      makePlat(12.8, 1.2, 4.4, 2.4, 'volcanic'), // top = 2.4
-      makePlat(18.2, 2.4, 3.6, 4.8, 'volcanic')  // top = 4.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Left cliff outpost
-    blocks.push(makeCol(7.2, 2.8, 0.42, 2.0, 'wood'));
-    targets.push(makeTarget(7.2, 4.8, 'blue'));
-    blocks.push(makeBeam(7.2, 4.8, 2.6, 0.24, 'stone'));
-
-    // Right high cliff tower
-    blocks.push(makeCol(18.2, 4.8, 0.46, 2.2, 'metal'));
-    targets.push(makeTarget(18.2, 7.0, 'gold'));
-    blocks.push(makeBeam(18.2, 7.0, 2.8, 0.26, 'stone'));
-
-    // Central Needle Spire (on Plat 2, top = 2.4)
-    blocks.push(makeCol(11.4, 2.4, 0.46, 2.2, 'stone'));
-    blocks.push(makeCol(14.2, 2.4, 0.46, 2.2, 'stone'));
-    blocks.push(makeTnt(12.8, 2.4, 0.6));
-    targets.push(makeTarget(12.8, 3.0, 'pink'));
-    blocks.push(makeBeam(12.8, 4.6, 4.0, 0.3, 'stone'));
-
-    // Cantilever deck projecting LEFT towards Plat 1
-    blocks.push(makeBeam(10.2, 4.9, 3.6, 0.26, 'wood'));
-    targets.push(makeTarget(9.2, 5.16, 'green'));
-
-    // Spire Story 2
-    blocks.push(makeCol(12.0, 4.9, 0.42, 2.0, 'metal'));
-    blocks.push(makeCol(13.6, 4.9, 0.42, 2.0, 'metal'));
-    targets.push(makeTarget(12.8, 4.9, 'blue'));
-    blocks.push(makeBeam(12.8, 6.9, 3.6, 0.28, 'stone'));
-
-    // Cantilever deck projecting RIGHT towards Plat 3
-    blocks.push(makeBeam(15.4, 7.18, 3.6, 0.26, 'wood'));
-    targets.push(makeTarget(16.4, 7.44, 'pink'));
-
-    // Spire Story 3 (Peak)
-    blocks.push(makeCol(12.8, 7.18, 0.4, 1.8, 'glass'));
-    targets.push(makeTarget(12.8, 8.98, 'gold'));
-    blocks.push(makeBeam(12.8, 8.98, 2.4, 0.24, 'stone'));
-    targets.push(makeTarget(12.8, 9.22, 'blue'));
-
-    levels.push({
-      id: 49,
-      name: "Chrono Zenith Bastion",
-      zone: "Chrono Void",
-      icon: "⚡",
-      difficulty: "Tesseract Overlord",
-      description: "A needle sky-citadel flanked by sheer crags with alternating cantilevered decks extending out into open airspace.",
-      coinReward: 520,
-      birds: ["speed", "split", "lightning", "heavy", "fire", "vortex"],
-      platforms: plats,
-      blocks,
-      targets
-    });
-  }
-
-  // =========================================================================
-  // LEVEL 50: Temporal Singularity Apex (Chrono Overlord Boss)
-  // Concept: Colossal 4-tier stepped apex pyramid crowned with Chrono Overlord Boss
-  // =========================================================================
+    "id": 49,
+    "name": "Chrono Zenith Bastion",
+    "zone": "Chrono Void",
+    "icon": "⚡",
+    "difficulty": "Tesseract Overlord",
+    "description": "A needle sky-citadel flanked by sheer crags with alternating cantilevered decks extending out into open airspace.",
+    "coinReward": 520,
+    "birds": [
+      "speed",
+      "split",
+      "lightning",
+      "heavy",
+      "fire",
+      "vortex"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          7.2,
+          1.4,
+          0
+        ],
+        "size": [
+          3.2,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.8,
+          1.2,
+          0
+        ],
+        "size": [
+          4.4,
+          2.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18.2,
+          2.4,
+          0
+        ],
+        "size": [
+          3.6,
+          4.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "metal",
+        "pos": [
+          6.167,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.233,
+          3.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          3.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.012,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.388,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          4.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.512,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8.888,
+          4.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          7.2,
+          5.52,
+          0
+        ],
+        "size": [
+          3.416,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.186,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8.214,
+          6.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.2,
+          7.63,
+          0
+        ],
+        "size": [
+          2.528,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.239,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          14.361,
+          2.675,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          2.675,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.084,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.516,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          3.95,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          10.584,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          15.016,
+          3.85,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          5.12,
+          0
+        ],
+        "size": [
+          4.472,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.406,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.194,
+          6.19,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          12.8,
+          6.09,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          7.23,
+          0
+        ],
+        "size": [
+          3.288,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          12.1,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "wood",
+        "pos": [
+          13.5,
+          8.02,
+          0
+        ],
+        "size": [
+          0.38,
+          1.3,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          8.79,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.85,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.75,
+          9.135,
+          0
+        ],
+        "size": [
+          0.42,
+          0.45,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.991,
+          5.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.409,
+          5.075,
+          0
+        ],
+        "size": [
+          0.75,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          5.075,
+          0
+        ],
+        "size": [
+          0.8,
+          0.55,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.836,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.564,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          6.35,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.336,
+          6.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          20.064,
+          6.25,
+          0
+        ],
+        "size": [
+          0.42,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.2,
+          7.52,
+          0
+        ],
+        "size": [
+          3.768,
+          0.34,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.06,
+          8.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.34,
+          8.59,
+          0
+        ],
+        "size": [
+          0.42,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.2,
+          9.63,
+          0
+        ],
+        "size": [
+          2.781,
+          0.28,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.524,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          7.876,
+          3.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.871,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          13.729,
+          3.39,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.8,
+          6.93,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          12.8,
+          7.81,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          17.44,
+          5.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18.96,
+          5.79,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      }
+    ]
+  },
   {
-    const plats = [
-      makePlat(6.8, 1.4, 4.0, 2.8, 'volcanic'), // top = 2.8
-      makePlat(12.8, 2.2, 6.2, 4.4, 'volcanic'), // top = 4.4
-      makePlat(18.5, 1.4, 4.0, 2.8, 'volcanic')  // top = 2.8
-    ];
-    const blocks = [];
-    const targets = [];
-
-    // Left Chrono Pylon on Plat 1 (x=6.8, top = 2.8): 3 stories
-    blocks.push(makeBlock(5.6, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(8.0, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(5.6, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(8.0, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeTnt(6.8, 3.4, 0.65));
-    targets.push(makeTarget(6.8, 4.05, 'blue'));
-    blocks.push(makeBeam(6.8, 5.4, 3.2, 0.28, 'stone'));
-    blocks.push(makeCol(6.0, 5.68, 0.38, 1.4, 'stone'));
-    blocks.push(makeCol(7.6, 5.68, 0.38, 1.4, 'stone'));
-    targets.push(makeTarget(6.8, 5.68, 'pink'));
-    blocks.push(makeBeam(6.8, 7.08, 2.4, 0.24, 'metal'));
-    blocks.push(makeBlock(6.8, 7.32, 1.0, 0.8, 'metal'));
-    targets.push(makeTarget(6.8, 8.12, 'gold'));
-
-    // Right Chrono Pylon on Plat 3 (x=18.5, top = 2.8): 3 stories
-    blocks.push(makeBlock(17.3, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(19.7, 2.8, 0.8, 0.6, 'stone'));
-    blocks.push(makeCol(17.3, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeCol(19.7, 3.4, 0.44, 2.0, 'metal'));
-    blocks.push(makeTnt(18.5, 3.4, 0.65));
-    targets.push(makeTarget(18.5, 4.05, 'green'));
-    blocks.push(makeBeam(18.5, 5.4, 3.2, 0.28, 'stone'));
-    blocks.push(makeCol(17.7, 5.68, 0.38, 1.4, 'stone'));
-    blocks.push(makeCol(19.3, 5.68, 0.38, 1.4, 'stone'));
-    targets.push(makeTarget(18.5, 5.68, 'blue'));
-    blocks.push(makeBeam(18.5, 7.08, 2.4, 0.24, 'metal'));
-    blocks.push(makeBlock(18.5, 7.32, 1.0, 0.8, 'metal'));
-    targets.push(makeTarget(18.5, 8.12, 'pink'));
-
-    // Central Chrono Overlord Apex Pyramid on Plat 2 (top = 4.4)
-    // Tier 1: Armored Sub-Vault Foundation (4 columns + 2 TNTs + 4 foundation footing blocks)
-    blocks.push(makeBlock(10.2, 4.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeBlock(11.9, 4.4, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(13.7, 4.4, 0.8, 0.6, 'stone'));
-    blocks.push(makeBlock(15.4, 4.4, 0.8, 0.6, 'metal'));
-    blocks.push(makeCol(10.2, 5.0, 0.48, 1.8, 'metal'));
-    blocks.push(makeCol(11.9, 5.0, 0.44, 1.8, 'stone'));
-    blocks.push(makeCol(13.7, 5.0, 0.44, 1.8, 'stone'));
-    blocks.push(makeCol(15.4, 5.0, 0.48, 1.8, 'metal'));
-    blocks.push(makeTnt(11.05, 4.4, 0.65));
-    blocks.push(makeTnt(14.55, 4.4, 0.65));
-    targets.push(makeTarget(11.05, 5.05, 'gold'));
-    targets.push(makeTarget(14.55, 5.05, 'gold'));
-    blocks.push(makeBeam(12.8, 6.8, 6.2, 0.4, 'metal'));
-
-    // Connecting Energy Bridges from Side Pylons to Central Apex
-    blocks.push(makeBeam(9.1, 5.4, 2.2, 0.24, 'stone'));
-    blocks.push(makeBeam(16.2, 5.4, 2.2, 0.24, 'stone'));
-
-    // Tier 2: Chrono Vault Hall (4 columns + central vault + terrace battlements)
-    blocks.push(makeCol(10.8, 7.2, 0.46, 2.2, 'metal'));
-    blocks.push(makeCol(12.8, 7.2, 0.42, 2.2, 'stone'));
-    blocks.push(makeCol(14.8, 7.2, 0.46, 2.2, 'metal'));
-    blocks.push(makeBlock(11.8, 7.2, 0.8, 0.8, 'stone'));
-    blocks.push(makeBlock(13.8, 7.2, 0.8, 0.8, 'stone'));
-    targets.push(makeTarget(11.8, 8.0, 'pink'));
-    targets.push(makeTarget(13.8, 8.0, 'blue'));
-    blocks.push(makeBeam(12.8, 9.4, 5.2, 0.36, 'metal'));
-
-    // Flank Mid-Terrace Battlements
-    blocks.push(makeBlock(9.4, 9.4, 0.6, 0.6, 'metal'));
-    blocks.push(makeBlock(16.2, 9.4, 0.6, 0.6, 'metal'));
-    blocks.push(makeCol(9.4, 10.0, 0.36, 1.2, 'stone'));
-    blocks.push(makeCol(16.2, 10.0, 0.36, 1.2, 'stone'));
-    targets.push(makeTarget(9.4, 11.2, 'blue'));
-    targets.push(makeTarget(16.2, 11.2, 'pink'));
-
-    // Tier 3: Supreme Chrono Overlord Throne Keep (Boss Chamber)
-    blocks.push(makeCol(11.4, 9.76, 0.48, 2.2, 'metal'));
-    blocks.push(makeCol(14.2, 9.76, 0.48, 2.2, 'metal'));
-    blocks.push(makeBlock(12.8, 9.76, 1.4, 1.0, 'metal'));
-    // Grand Chrono Overlord Challenge Boss!
-    targets.push(makeTarget(12.8, 10.76, 'boss', true, 0.74));
-    blocks.push(makeBeam(12.8, 11.96, 4.2, 0.32, 'stone'));
-
-    // Tier 4: Crown Finial & Singularity Anchor
-    blocks.push(makeCol(12.1, 12.28, 0.38, 1.4, 'metal'));
-    blocks.push(makeCol(13.5, 12.28, 0.38, 1.4, 'metal'));
-    blocks.push(makeBeam(12.8, 13.68, 2.6, 0.26, 'metal'));
-    blocks.push(makeBlock(12.8, 13.94, 0.8, 0.8, 'glass'));
-    targets.push(makeTarget(12.8, 14.74, 'gold'));
-
-    levels.push({
-      id: 50,
-      name: "Temporal Singularity Apex",
-      zone: "Chrono Void",
-      icon: "⏳",
-      difficulty: "Chrono Overlord Challenge Boss",
-      description: "CHALLENGE LEVEL 50: The colossal singularity apex megastructure where the Chrono Overlord reigns, shielded by dual multi-story quantum pylons, heavy kinetic girders, and armored vaults.",
-      coinReward: 700,
-      birds: ["heavy", "chrono", "vortex", "lightning", "fire", "speed"],
-      platforms: plats,
-      blocks,
-      targets
-    });
+    "id": 50,
+    "name": "Temporal Singularity Apex",
+    "zone": "Chrono Void",
+    "icon": "⏳",
+    "difficulty": "Chrono Overlord Challenge Boss",
+    "description": "CHALLENGE LEVEL 50: The colossal singularity apex megastructure where the Chrono Overlord reigns, shielded by dual multi-story quantum pylons, heavy kinetic girders, and armored vaults.",
+    "coinReward": 700,
+    "birds": [
+      "heavy",
+      "chrono",
+      "vortex",
+      "lightning",
+      "fire",
+      "speed"
+    ],
+    "platforms": [
+      {
+        "pos": [
+          6.8,
+          1.4,
+          0
+        ],
+        "size": [
+          4,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          12.8,
+          2.2,
+          0
+        ],
+        "size": [
+          6.2,
+          4.4,
+          5
+        ],
+        "type": "volcanic"
+      },
+      {
+        "pos": [
+          18.5,
+          1.4,
+          0
+        ],
+        "size": [
+          4,
+          2.8,
+          5
+        ],
+        "type": "volcanic"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "stone",
+        "pos": [
+          5.6,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          8,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          5.6,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          8,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          6.8,
+          3.725,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6.8,
+          5.54,
+          0
+        ],
+        "size": [
+          3.2,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          6,
+          6.38,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          7.6,
+          6.38,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          7.2,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          6.8,
+          7.72,
+          0
+        ],
+        "size": [
+          1,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.3,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.7,
+          3.1,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          17.3,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          19.7,
+          4.4,
+          0
+        ],
+        "size": [
+          0.44,
+          2,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          18.5,
+          3.725,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          18.5,
+          5.54,
+          0
+        ],
+        "size": [
+          3.2,
+          0.28,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          17.7,
+          6.38,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          19.3,
+          6.38,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.5,
+          7.2,
+          0
+        ],
+        "size": [
+          2.4,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          18.5,
+          7.72,
+          0
+        ],
+        "size": [
+          1,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.2,
+          4.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.9,
+          4.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.7,
+          4.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.4,
+          4.7,
+          0
+        ],
+        "size": [
+          0.8,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.2,
+          5.9,
+          0
+        ],
+        "size": [
+          0.48,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.9,
+          5.9,
+          0
+        ],
+        "size": [
+          0.44,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.7,
+          5.9,
+          0
+        ],
+        "size": [
+          0.44,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          15.4,
+          5.9,
+          0
+        ],
+        "size": [
+          0.48,
+          1.8,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          11.05,
+          4.725,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "tnt",
+        "pos": [
+          14.55,
+          4.725,
+          0
+        ],
+        "size": [
+          0.65,
+          0.65,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          7,
+          0
+        ],
+        "size": [
+          6.2,
+          0.4,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.1,
+          5.52,
+          0
+        ],
+        "size": [
+          2.2,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          5.52,
+          0
+        ],
+        "size": [
+          2.2,
+          0.24,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          10.8,
+          8.3,
+          0
+        ],
+        "size": [
+          0.46,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          8.3,
+          0
+        ],
+        "size": [
+          0.42,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.8,
+          8.3,
+          0
+        ],
+        "size": [
+          0.46,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          11.8,
+          7.6,
+          0
+        ],
+        "size": [
+          0.8,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          13.8,
+          7.6,
+          0
+        ],
+        "size": [
+          0.8,
+          0.8,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          9.58,
+          0
+        ],
+        "size": [
+          5.2,
+          0.36,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          9.4,
+          9.7,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          16.2,
+          9.7,
+          0
+        ],
+        "size": [
+          0.6,
+          0.6,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          9.4,
+          10.6,
+          0
+        ],
+        "size": [
+          0.36,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          16.2,
+          10.6,
+          0
+        ],
+        "size": [
+          0.36,
+          1.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          11.4,
+          10.86,
+          0
+        ],
+        "size": [
+          0.48,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          14.2,
+          10.86,
+          0
+        ],
+        "size": [
+          0.48,
+          2.2,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          10.26,
+          0
+        ],
+        "size": [
+          1.4,
+          1,
+          0.8
+        ]
+      },
+      {
+        "type": "stone",
+        "pos": [
+          12.8,
+          12.12,
+          0
+        ],
+        "size": [
+          4.2,
+          0.32,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.1,
+          12.98,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          13.5,
+          12.98,
+          0
+        ],
+        "size": [
+          0.38,
+          1.4,
+          0.8
+        ]
+      },
+      {
+        "type": "metal",
+        "pos": [
+          12.8,
+          13.81,
+          0
+        ],
+        "size": [
+          2.6,
+          0.26,
+          0.8
+        ]
+      },
+      {
+        "type": "glass",
+        "pos": [
+          12.8,
+          14.34,
+          0
+        ],
+        "size": [
+          0.8,
+          0.8,
+          0.8
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "pos": [
+          6.8,
+          4.49,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          6.8,
+          6.12,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          6.8,
+          8.56,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          18.5,
+          4.49,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "green"
+      },
+      {
+        "pos": [
+          18.5,
+          6.12,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          18.5,
+          8.56,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          11.05,
+          5.49,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          14.55,
+          5.49,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      },
+      {
+        "pos": [
+          11.8,
+          8.44,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          13.8,
+          8.44,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          9.4,
+          11.64,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "blue"
+      },
+      {
+        "pos": [
+          16.2,
+          11.64,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "pink"
+      },
+      {
+        "pos": [
+          12.8,
+          11.5,
+          0
+        ],
+        "radius": 0.74,
+        "isBoss": true,
+        "birdType": "boss"
+      },
+      {
+        "pos": [
+          12.8,
+          15.18,
+          0
+        ],
+        "radius": 0.44,
+        "isBoss": false,
+        "birdType": "gold"
+      }
+    ]
   }
+];
 }

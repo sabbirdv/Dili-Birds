@@ -1258,6 +1258,23 @@ export class GameScene {
     const baseHp = isBoss ? 36 : 18;
     const targetHp = Math.round(baseHp * targetLvlScale);
 
+    // Determine the supporting platform/plinth for this target
+    let supportingPlatform = null;
+    let supportSurfaceY = 0;
+    if (this.platforms && this.platforms.length > 0) {
+      for (const p of this.platforms) {
+        const topY = p.pos[1] + p.size[1] / 2;
+        const minX = p.pos[0] - p.size[0] / 2;
+        const maxX = p.pos[0] + p.size[0] / 2;
+        if (pos[0] >= minX - 0.5 && pos[0] <= maxX + 0.5 && pos[1] >= topY - 0.4) {
+          if (!supportingPlatform || topY > supportSurfaceY) {
+            supportingPlatform = p;
+            supportSurfaceY = topY;
+          }
+        }
+      }
+    }
+
     const targetObj = {
       mesh,
       body,
@@ -1266,7 +1283,10 @@ export class GameScene {
       birdType,
       hp: targetHp,
       destroyed: false,
-      lastHitTime: 0
+      lastHitTime: 0,
+      initialPos: new THREE.Vector3(...alignedPos),
+      supportingPlatform,
+      supportSurfaceY
     };
 
     body.addEventListener('collide', (event) => {
@@ -2393,9 +2413,38 @@ export class GameScene {
   checkShotAndLevelState() {
     if (!this.isPlayingLevel || this.levelResolved) return;
 
-    // Eliminate any blocks or targets that fell off the stage
+    // Eliminate any blocks or targets that fell off the stage or off elevated platforms/structures
     [...this.targets].forEach((t) => {
-      if (t.body.position.y < -1.2 || Math.abs(t.body.position.x) > 30) {
+      if (t.destroyed || !t.body) return;
+
+      const currentY = t.body.position.y;
+      const currentX = t.body.position.x;
+
+      // 1. Target fell off the elevated platform / plinth (উঁচু ভিটা/স্ট্রাকচার থেকে নিচে পড়লে)
+      // Whether it touches the main ground or not, falling off the elevated plinth breaks it!
+      if (t.supportSurfaceY >= 0.8) {
+        const plat = t.supportingPlatform;
+        const minX = plat ? (plat.pos[0] - plat.size[0] / 2) : -Infinity;
+        const maxX = plat ? (plat.pos[0] + plat.size[0] / 2) : Infinity;
+        const isOffPlatHorizontally = currentX < minX - 0.25 || currentX > maxX + 0.25;
+
+        // Either dropped below the platform's top surface, or rolled off the platform edge while descending
+        if (currentY < t.supportSurfaceY - 0.35 || (isOffPlatHorizontally && currentY < t.supportSurfaceY - 0.1)) {
+          this.defeatTarget(t);
+          return;
+        }
+      }
+
+      // 2. Target fell down from a high structure perch (উঁচু স্ট্রাকচারের ওপর থেকে নিচে পড়ে যাওয়া)
+      // If perched high up in a tower and plummets significantly downwards
+      const verticalDrop = t.initialPos ? (t.initialPos.y - currentY) : 0;
+      if (t.initialPos && t.initialPos.y >= 3.0 && verticalDrop >= 2.2 && t.body.velocity.y < -0.4) {
+        this.defeatTarget(t);
+        return;
+      }
+
+      // 3. Fall into the bottom abyss / out of bounds
+      if (currentY < -1.2 || Math.abs(currentX) > 30) {
         this.defeatTarget(t);
       }
     });
